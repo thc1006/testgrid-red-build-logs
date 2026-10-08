@@ -1,0 +1,34 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-correctness",
+  "build": "2103168036499361792",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness",
+  "started": 1790269310,
+  "created": 1790269309,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-master-scale-correctness",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "kubetest.Up",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-up.sh: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790269805,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2103168036499361792",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2103168036499361792/build-log.txt",
+  "log": {
+    "bytes": 54737,
+    "md5": "8bf11aae9e0f488802c85476b556444e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 10160
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

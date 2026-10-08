@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2107766150363353088",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1791365585,
+  "created": 1791365585,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Up",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-up.sh: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791366098,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2107766150363353088",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2107766150363353088/build-log.txt",
+  "log": {
+    "bytes": 35800,
+    "md5": "0498828b47dc6eaa19210a83e5ed8401",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 7758
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

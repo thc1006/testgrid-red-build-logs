@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2105005158940282880",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1790707347,
+  "created": 1790707313,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/apiextensions-apiserver/test.integration",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestRatchetingFunctionality/Status:_CEL_transition_ru...or /healthz to be ok...\n--- FAIL: TestRatchetingFunctionality (5.96s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790709614,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2105005158940282880",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2105005158940282880/build-log.txt",
+  "log": {
+    "bytes": 155795,
+    "md5": "a9dc4ad9c24c85be2000afeb2514e237",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 12866
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

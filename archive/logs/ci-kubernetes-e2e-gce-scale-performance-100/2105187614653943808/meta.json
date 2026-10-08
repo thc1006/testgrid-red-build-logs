@@ -1,0 +1,34 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-performance-100",
+  "build": "2105187614653943808",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100",
+  "started": 1790750845,
+  "created": 1790750814,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-master-scale-performance-100",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-scale-performance-100.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790750847,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2105187614653943808",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2105187614653943808/build-log.txt",
+  "log": {
+    "bytes": 23964,
+    "md5": "e7d48a5f3a871bda65ef0896cb251c0c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 5678
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

@@ -1,0 +1,64 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2107865305916116992",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1791389233,
+  "created": 1791389225,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] Projected PodCertificate [FeatureGate:PodCertificateRequest] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should allow server and client pods to establish an mTLS connection [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 30.001s.\nclient logs did not contain expected...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] DNS should provide DNS for ExternalName services [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] context deadline exceeded\nIn [It] at: k8s.io/kubernetes/test/...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] DNS should provide DNS for services [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to read musl_tcp@_http._tcp.dns-test-service.dns-8341....detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should be able to change the type from ExternalName to ClusterIP [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] service is not reachable within 2m0s timeout on endpoint exte...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should be able to change the type from ExternalName to NodePort [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] service is not reachable within 2m0s timeout on endpoint 10.1...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should be able to create a functioning NodePort service [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] service is not reachable within 2m0s timeout on endpoint 10.1...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791395609,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2107865305916116992",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2107865305916116992/build-log.txt",
+  "log": {
+    "bytes": 2558360,
+    "md5": "ea1ec6a32e42693de33b6721d2583b3a",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 200734
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2104866746023284736",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1790674314,
+  "created": 1790674313,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Dynamic PV (filesystem volmode)] disruptive [LinuxOnly] [Provider:gce,aws,local,azure] Should test that pv written before kubelet restart is readable after restart. [Disruptive]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 60.001s.\nNode bootstrap-e2e-minion-group-sx3p...ubernetes/test/e2e/framework/node/wait.go:181 @ 09/29/26 13:27:21.528\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790689668,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2104866746023284736",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2104866746023284736/build-log.txt",
+  "log": {
+    "bytes": 115818,
+    "md5": "92c116971e20a3c2e79e884ee3a0e709",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20677
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

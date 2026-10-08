@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2105630953996029952",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1790856545,
+  "created": 1790856514,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.diffResources",
+          "status": "FAIL",
+          "message": "Error: 2 leaked resources\n+NAME                           MACHINE_TYPE...on-template  e2-standard-2               2026-10-01T05:12:24.463-07:00"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790858818,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2105630953996029952",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2105630953996029952/build-log.txt",
+  "log": {
+    "bytes": 59316,
+    "md5": "95404f2b84016413c289577d6e4ceeb7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 11660
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

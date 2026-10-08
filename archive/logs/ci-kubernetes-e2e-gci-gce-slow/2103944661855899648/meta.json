@@ -1,0 +1,109 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2103944661855899648",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1790454473,
+  "created": 1790454471,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] cpu & mem restart + resize initContainers resizing only pod-level cpu [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:40:57.038\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] cpu & mem restart + resize initContainers resizing only pod-level mem [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:53:05.704\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] cpu & mem restart resizing only pod-level cpu [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:49:41.905\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] cpu & mem restart resizing only pod-level mem [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:35:25.303\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] cpu restart resizing only pod-level cpu [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:40:36.817\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] cpu restart resizing only pod-level mem [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:54:56.316\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] mem restart resizing only pod-level cpu [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:47:01.644\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] mem restart resizing only pod-level mem [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:35:31.133\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] no restart + resize initContainers resizing only pod-level cpu [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:36:35.962\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] no restart + resize initContainers resizing only pod-level mem [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:48:20.861\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] no restart resizing only pod-level cpu [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:42:05.691\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] no restart resizing only pod-level mem [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:49:33.028\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] decrease pod-level memory limit below usage [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] failed to verify memory limit cgroup value: Told to stop tryi.../common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:42:14.94\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] should not emit ResizeCompleted event on initial creation [KubeletMinVersion:1.36] [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow] [kubelet: [>=1.36]]",
+          "status": "FAIL",
+          "message": "[FAILED] [failed to verify memory limit cgroup value: Told to stop try...common/node/pod_level_resources_resize.go:802 @ 09/26/26 20:54:06.226\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790457102,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103944661855899648",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103944661855899648/build-log.txt",
+  "log": {
+    "bytes": 1027219,
+    "md5": "dc28904caf4403c63620dd6d8ff7e2f2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 117947
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

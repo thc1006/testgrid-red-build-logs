@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2107628491947118592",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1791332793,
+  "created": 1791332764,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-cloud-provider] k8s.io/kubernetes/test/integration.cloudprovider",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   Test_RemoveExternalCloudProviderTaint\n    testserver....lready in use\n--- FAIL: Test_RemoveExternalCloudProviderTaint (1.84s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791335021,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2107628491947118592",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2107628491947118592/build-log.txt",
+  "log": {
+    "bytes": 279595,
+    "md5": "a42d3380d1328a9f81db427b7afe63fd",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 35809
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

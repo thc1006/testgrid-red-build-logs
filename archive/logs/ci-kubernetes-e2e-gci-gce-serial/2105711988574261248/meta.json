@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2105711988574261248",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1790875835,
+  "created": 1790875834,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] NFSPersistentVolumes when kubelet restarts Should test that a file written to the mount before kubelet restart is readable after restart. [Disruptive] [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 60.001s.\nNode bootstrap-e2e-minion-group-06n4...ubernetes/test/e2e/framework/node/wait.go:181 @ 10/01/26 20:32:17.365\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790891517,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2105711988574261248",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2105711988574261248/build-log.txt",
+  "log": {
+    "bytes": 112295,
+    "md5": "d52b7d5f65a5624d0b8fe86fa80c53b1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19916
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

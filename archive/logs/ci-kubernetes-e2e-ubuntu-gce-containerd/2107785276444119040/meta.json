@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2107785276444119040",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1791370145,
+  "created": 1791370145,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl Port forwarding Shutdown client connection while the remote stream is writing data to the port-forward connection port-forward should keep working after detect broken connection",
+          "status": "FAIL",
+          "message": "[FAILED] couldn't get http response from port-forward: Get \"http://127...ubernetes/test/e2e/kubectl/portforward.go:678 @ 10/07/26 11:00:04.948\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791372516,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2107785276444119040",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2107785276444119040/build-log.txt",
+  "log": {
+    "bytes": 128980,
+    "md5": "d458eac5b73d3d4eaa1e7627aabded45",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21977
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

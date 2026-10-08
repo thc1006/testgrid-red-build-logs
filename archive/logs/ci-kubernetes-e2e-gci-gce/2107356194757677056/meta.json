@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2107356194757677056",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1791267844,
+  "created": 1791267844,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Inline-volume (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.000s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 10/06/26 07:03:24.926\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791270689,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2107356194757677056",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2107356194757677056/build-log.txt",
+  "log": {
+    "bytes": 126078,
+    "md5": "a9e97a9b1a579cfa9f65753ff632ee55",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21468
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

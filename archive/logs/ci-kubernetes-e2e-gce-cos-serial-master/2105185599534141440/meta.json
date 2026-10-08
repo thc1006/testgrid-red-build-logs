@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2105185599534141440",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1790750364,
+  "created": 1790750334,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-1 [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be display pod resi...o/kubernetes/test/e2e/node/pod_resize.go:1416 @ 09/30/26 10:03:50.195\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790765109,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2105185599534141440",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2105185599534141440/build-log.txt",
+  "log": {
+    "bytes": 122638,
+    "md5": "7fdad1ac3cd233ff2f8cc5d161599e0e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21408
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

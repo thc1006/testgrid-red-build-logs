@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-ec2-conformance-latest",
+  "build": "2104295224636346368",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-ec2-conformance-latest",
+  "started": 1790538085,
+  "created": 1790538052,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "Conformance - EC2 - master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[SynchronizedBeforeSuite]",
+          "status": "FAIL",
+          "message": "[FAILED] context deadline exceeded\nIn [SynchronizedBeforeSuite] at: k8s.io/kubernetes/test/e2e/e2e.go:211 @ 09/27/26 20:33:54.533\n"
+        },
+        {
+          "test": "ci-kubernetes-ec2-conformance-latest.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790541303,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-ec2-conformance-latest/2104295224636346368",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-ec2-conformance-latest/2104295224636346368/build-log.txt",
+  "log": {
+    "bytes": 180493,
+    "md5": "31d8a4abbcdf2abae3b450f007437052",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 12926
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

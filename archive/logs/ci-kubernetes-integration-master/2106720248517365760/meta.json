@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2106720248517365760",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1791116256,
+  "created": 1791116222,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/apiextensions-apiserver/test/integration.conversion",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestWebhookConverterWithWatchCache\n    testserver.go:...ConverterWithWatchCache/unhandled-v1beta1/check-0/scale-patch (0.00s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791118473,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2106720248517365760",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2106720248517365760/build-log.txt",
+  "log": {
+    "bytes": 654576,
+    "md5": "3d95ec9241b9557d0612df0e893abd68",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 29848
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

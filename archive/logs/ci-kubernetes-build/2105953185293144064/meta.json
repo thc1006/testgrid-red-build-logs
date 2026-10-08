@@ -1,0 +1,34 @@
+{
+  "job": "ci-kubernetes-build",
+  "build": "2105953185293144064",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-build",
+  "started": 1790933371,
+  "created": 1790933340,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "build-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-build.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790933395,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-build/2105953185293144064",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-build/2105953185293144064/build-log.txt",
+  "log": {
+    "bytes": 1566,
+    "md5": "c3b922399dcab9aead788640dc4e7275",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 606
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

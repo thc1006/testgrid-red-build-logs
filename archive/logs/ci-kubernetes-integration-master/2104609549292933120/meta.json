@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2104609549292933120",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1790613024,
+  "created": 1790612992,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-apps] k8s.io/kubernetes/test/integration.job",
+          "status": "FAIL",
+          "message": "Failed\npanic: test timed out after 10m0s\n\trunning tests:\n\t\tTestJobPodR..._fail_pods,_recreate_terminating_pods,_and_verify_job_status_counters\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790615262,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2104609549292933120",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2104609549292933120/build-log.txt",
+  "log": {
+    "bytes": 2829648,
+    "md5": "30feacc071a443110175c521135cf54b",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 279553
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

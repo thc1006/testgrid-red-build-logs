@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2108146913382502400",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1791456367,
+  "created": 1791456366,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (filesystem volmode)] multiVolume should access to two volumes with the same volume mode and retain data across pod recreation on the same node [Serial] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pod-6aec6284-b253-41f0-b1ad-07daf3b7d3fc\" is not Running...est/e2e/storage/testsuites/multivolume.go:504 @ 10/08/26 12:04:28.539\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791474297,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108146913382502400",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108146913382502400/build-log.txt",
+  "log": {
+    "bytes": 198898,
+    "md5": "7a248a8f3ac6c0200a4cc3c2acae67f3",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 27532
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

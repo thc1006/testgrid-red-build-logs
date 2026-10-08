@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2103973852915699712",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1790461463,
+  "created": 1790461431,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-apps] k8s.io/kubernetes/test/integration.job",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestMutableSchedulingDirectivesForSuspendedJobsNotYet... TestMutableSchedulingDirectivesForSuspendedJobsNotYetStarted (2.05s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790463720,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2103973852915699712",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2103973852915699712/build-log.txt",
+  "log": {
+    "bytes": 204281,
+    "md5": "49f480373326551e50af84a9b08d0abe",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20622
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "time": 1789059668,
+    "job": "ci-kubernetes-e2e-gce-scale-correctness",
+    "build": "2098094429171617792",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-master-scale-correctness"
+    ],
+    "red_tests": [
+      "kubetest.Up"
+    ],
+    "files": [
+      "logs/ci-kubernetes-e2e-gce-scale-correctness/2098094429171617792/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 54734,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2098094429171617792"
+  }
+]

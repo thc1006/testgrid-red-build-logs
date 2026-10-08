@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2107457111557410816",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1791291911,
+  "created": 1791291904,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] CronJob should delete failed finished jobs with limit of one job",
+          "status": "FAIL",
+          "message": "[TIMEDOUT] A grace period timeout occurred\nIn [It] at: k8s.io/kubernet...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should serve multiport endpoints from pods [Conformance]",
+          "status": "FAIL",
+          "message": "[TIMEDOUT] A grace period timeout occurred\nIn [It] at: k8s.io/kubernet...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791297424,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2107457111557410816",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2107457111557410816/build-log.txt",
+  "log": {
+    "bytes": 400765,
+    "md5": "4907d5950e7e44a50df7e21a98cdc162",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 57190
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

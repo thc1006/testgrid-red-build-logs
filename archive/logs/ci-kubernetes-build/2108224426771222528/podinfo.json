@@ -1,0 +1,2491 @@
+{
+	"pod": {
+		"metadata": {
+			"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52",
+			"namespace": "test-pods",
+			"uid": "b15ddbfe-b73f-4a2c-be9e-0a0cc458b1aa",
+			"resourceVersion": "1791475020606495024",
+			"generation": 1,
+			"creationTimestamp": "2026-10-08T15:54:07Z",
+			"labels": {
+				"created-by-prow": "true",
+				"preset-dind-enabled": "true",
+				"prow.k8s.io/build-id": "2108224426771222528",
+				"prow.k8s.io/context": "",
+				"prow.k8s.io/id": "a91efd6b-8654-4d09-8af7-7b09b1539e52",
+				"prow.k8s.io/job": "ci-kubernetes-build",
+				"prow.k8s.io/plank-version": "v20261001-ae4792128",
+				"prow.k8s.io/refs.base_ref": "master",
+				"prow.k8s.io/refs.org": "kubernetes",
+				"prow.k8s.io/refs.repo": "kubernetes",
+				"prow.k8s.io/type": "periodic",
+				"topology.kubernetes.io/region": "us-central1",
+				"topology.kubernetes.io/zone": "us-central1-b"
+			},
+			"annotations": {
+				"fork-per-release": "true",
+				"fork-per-release-cron": "0 * * * *",
+				"kubernetes.io/limit-ranger": "LimitRanger plugin set: memory request for container sidecar; memory request for init container clonerefs; memory request for init container initupload; memory request for init container place-entrypoint",
+				"prow.k8s.io/context": "",
+				"prow.k8s.io/job": "ci-kubernetes-build",
+				"testgrid-alert-email": "release-managers+alerts@kubernetes.io, release-team@kubernetes.io",
+				"testgrid-dashboards": "sig-release-master-blocking, sig-release-releng-blocking",
+				"testgrid-tab-name": "build-master"
+			},
+			"managedFields": [
+				{
+					"manager": "prow-controller-manager",
+					"operation": "Update",
+					"apiVersion": "v1",
+					"time": "2026-10-08T15:54:07Z",
+					"fieldsType": "FieldsV1",
+					"fieldsV1": {
+						"f:metadata": {
+							"f:annotations": {
+								".": {},
+								"f:fork-per-release": {},
+								"f:fork-per-release-cron": {},
+								"f:prow.k8s.io/context": {},
+								"f:prow.k8s.io/job": {},
+								"f:testgrid-alert-email": {},
+								"f:testgrid-dashboards": {},
+								"f:testgrid-tab-name": {}
+							},
+							"f:labels": {
+								".": {},
+								"f:created-by-prow": {},
+								"f:preset-dind-enabled": {},
+								"f:prow.k8s.io/build-id": {},
+								"f:prow.k8s.io/context": {},
+								"f:prow.k8s.io/id": {},
+								"f:prow.k8s.io/job": {},
+								"f:prow.k8s.io/plank-version": {},
+								"f:prow.k8s.io/refs.base_ref": {},
+								"f:prow.k8s.io/refs.org": {},
+								"f:prow.k8s.io/refs.repo": {},
+								"f:prow.k8s.io/type": {}
+							}
+						},
+						"f:spec": {
+							"f:containers": {
+								"k:{\"name\":\"sidecar\"}": {
+									".": {},
+									"f:env": {
+										".": {},
+										"k:{\"name\":\"JOB_SPEC\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"SIDECAR_OPTIONS\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										}
+									},
+									"f:image": {},
+									"f:imagePullPolicy": {},
+									"f:name": {},
+									"f:resources": {
+										".": {},
+										"f:requests": {
+											".": {},
+											"f:cpu": {}
+										}
+									},
+									"f:terminationMessagePath": {},
+									"f:terminationMessagePolicy": {},
+									"f:volumeMounts": {
+										".": {},
+										"k:{\"mountPath\":\"/logs\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										},
+										"k:{\"mountPath\":\"/secrets/gcs\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										}
+									}
+								},
+								"k:{\"name\":\"test\"}": {
+									".": {},
+									"f:command": {},
+									"f:env": {
+										".": {},
+										"k:{\"name\":\"ARTIFACTS\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"AWS_ROLE_SESSION_NAME\"}": {
+											".": {},
+											"f:name": {},
+											"f:valueFrom": {
+												".": {},
+												"f:fieldRef": {}
+											}
+										},
+										"k:{\"name\":\"BUILD_ID\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"BUILD_NUMBER\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"CI\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"DOCKER_IN_DOCKER_ENABLED\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"ENTRYPOINT_OPTIONS\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"FASTLY_API_TOKEN\"}": {
+											".": {},
+											"f:name": {},
+											"f:valueFrom": {
+												".": {},
+												"f:secretKeyRef": {}
+											}
+										},
+										"k:{\"name\":\"FASTLY_SERVICE_NAME\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"GOPATH\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"GOPROXY\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"GOTOOLCHAIN\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"JOB_NAME\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"JOB_SPEC\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"JOB_TYPE\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"PROW_JOB_ID\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										}
+									},
+									"f:image": {},
+									"f:imagePullPolicy": {},
+									"f:name": {},
+									"f:resources": {
+										".": {},
+										"f:limits": {
+											".": {},
+											"f:cpu": {},
+											"f:memory": {}
+										},
+										"f:requests": {
+											".": {},
+											"f:cpu": {},
+											"f:memory": {}
+										}
+									},
+									"f:securityContext": {
+										".": {},
+										"f:privileged": {}
+									},
+									"f:terminationMessagePath": {},
+									"f:terminationMessagePolicy": {},
+									"f:volumeMounts": {
+										".": {},
+										"k:{\"mountPath\":\"/docker-graph\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										},
+										"k:{\"mountPath\":\"/home/prow/go\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										},
+										"k:{\"mountPath\":\"/lib/modules\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {},
+											"f:readOnly": {}
+										},
+										"k:{\"mountPath\":\"/logs\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										},
+										"k:{\"mountPath\":\"/tools\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										},
+										"k:{\"mountPath\":\"/var/lib/docker\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										}
+									},
+									"f:workingDir": {}
+								}
+							},
+							"f:dnsPolicy": {},
+							"f:enableServiceLinks": {},
+							"f:initContainers": {
+								".": {},
+								"k:{\"name\":\"clonerefs\"}": {
+									".": {},
+									"f:env": {
+										".": {},
+										"k:{\"name\":\"CLONEREFS_OPTIONS\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										}
+									},
+									"f:image": {},
+									"f:imagePullPolicy": {},
+									"f:name": {},
+									"f:resources": {
+										".": {},
+										"f:requests": {
+											".": {},
+											"f:cpu": {}
+										}
+									},
+									"f:terminationMessagePath": {},
+									"f:terminationMessagePolicy": {},
+									"f:volumeMounts": {
+										".": {},
+										"k:{\"mountPath\":\"/home/prow/go\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										},
+										"k:{\"mountPath\":\"/logs\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										},
+										"k:{\"mountPath\":\"/tmp\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										}
+									}
+								},
+								"k:{\"name\":\"initupload\"}": {
+									".": {},
+									"f:env": {
+										".": {},
+										"k:{\"name\":\"INITUPLOAD_OPTIONS\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										},
+										"k:{\"name\":\"JOB_SPEC\"}": {
+											".": {},
+											"f:name": {},
+											"f:value": {}
+										}
+									},
+									"f:image": {},
+									"f:imagePullPolicy": {},
+									"f:name": {},
+									"f:resources": {
+										".": {},
+										"f:requests": {
+											".": {},
+											"f:cpu": {}
+										}
+									},
+									"f:terminationMessagePath": {},
+									"f:terminationMessagePolicy": {},
+									"f:volumeMounts": {
+										".": {},
+										"k:{\"mountPath\":\"/logs\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										},
+										"k:{\"mountPath\":\"/secrets/gcs\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										}
+									}
+								},
+								"k:{\"name\":\"place-entrypoint\"}": {
+									".": {},
+									"f:args": {},
+									"f:image": {},
+									"f:imagePullPolicy": {},
+									"f:name": {},
+									"f:resources": {
+										".": {},
+										"f:requests": {
+											".": {},
+											"f:cpu": {}
+										}
+									},
+									"f:terminationMessagePath": {},
+									"f:terminationMessagePolicy": {},
+									"f:volumeMounts": {
+										".": {},
+										"k:{\"mountPath\":\"/tools\"}": {
+											".": {},
+											"f:mountPath": {},
+											"f:name": {}
+										}
+									}
+								}
+							},
+							"f:nodeSelector": {},
+							"f:restartPolicy": {},
+							"f:schedulerName": {},
+							"f:securityContext": {},
+							"f:serviceAccount": {},
+							"f:serviceAccountName": {},
+							"f:terminationGracePeriodSeconds": {},
+							"f:tolerations": {},
+							"f:volumes": {
+								".": {},
+								"k:{\"name\":\"clonerefs-tmp\"}": {
+									".": {},
+									"f:emptyDir": {},
+									"f:name": {}
+								},
+								"k:{\"name\":\"code\"}": {
+									".": {},
+									"f:emptyDir": {},
+									"f:name": {}
+								},
+								"k:{\"name\":\"docker-graph\"}": {
+									".": {},
+									"f:emptyDir": {},
+									"f:name": {}
+								},
+								"k:{\"name\":\"docker-root\"}": {
+									".": {},
+									"f:emptyDir": {},
+									"f:name": {}
+								},
+								"k:{\"name\":\"gcs-credentials\"}": {
+									".": {},
+									"f:name": {},
+									"f:secret": {
+										".": {},
+										"f:defaultMode": {},
+										"f:secretName": {}
+									}
+								},
+								"k:{\"name\":\"logs\"}": {
+									".": {},
+									"f:emptyDir": {},
+									"f:name": {}
+								},
+								"k:{\"name\":\"modules\"}": {
+									".": {},
+									"f:hostPath": {
+										".": {},
+										"f:path": {},
+										"f:type": {}
+									},
+									"f:name": {}
+								},
+								"k:{\"name\":\"tools\"}": {
+									".": {},
+									"f:emptyDir": {},
+									"f:name": {}
+								}
+							}
+						}
+					}
+				},
+				{
+					"manager": "kubelet",
+					"operation": "Update",
+					"apiVersion": "v1",
+					"time": "2026-10-08T15:57:00Z",
+					"fieldsType": "FieldsV1",
+					"fieldsV1": {
+						"f:status": {
+							"f:conditions": {
+								"k:{\"type\":\"ContainersReady\"}": {
+									".": {},
+									"f:lastProbeTime": {},
+									"f:lastTransitionTime": {},
+									"f:observedGeneration": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"Initialized\"}": {
+									".": {},
+									"f:lastProbeTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:observedGeneration": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"PodReadyToStartContainers\"}": {
+									".": {},
+									"f:lastProbeTime": {},
+									"f:lastTransitionTime": {},
+									"f:observedGeneration": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"PodScheduled\"}": {
+									"f:observedGeneration": {}
+								},
+								"k:{\"type\":\"Ready\"}": {
+									".": {},
+									"f:lastProbeTime": {},
+									"f:lastTransitionTime": {},
+									"f:observedGeneration": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								}
+							},
+							"f:containerStatuses": {},
+							"f:hostIP": {},
+							"f:hostIPs": {},
+							"f:initContainerStatuses": {},
+							"f:observedGeneration": {},
+							"f:phase": {},
+							"f:podIP": {},
+							"f:podIPs": {
+								".": {},
+								"k:{\"ip\":\"10.33.170.250\"}": {
+									".": {},
+									"f:ip": {}
+								}
+							},
+							"f:startTime": {}
+						}
+					},
+					"subresource": "status"
+				}
+			]
+		},
+		"spec": {
+			"volumes": [
+				{
+					"name": "docker-graph",
+					"emptyDir": {}
+				},
+				{
+					"name": "docker-root",
+					"emptyDir": {}
+				},
+				{
+					"name": "modules",
+					"hostPath": {
+						"path": "/lib/modules",
+						"type": "Directory"
+					}
+				},
+				{
+					"name": "logs",
+					"emptyDir": {}
+				},
+				{
+					"name": "tools",
+					"emptyDir": {}
+				},
+				{
+					"name": "gcs-credentials",
+					"secret": {
+						"secretName": "service-account",
+						"defaultMode": 420
+					}
+				},
+				{
+					"name": "clonerefs-tmp",
+					"emptyDir": {}
+				},
+				{
+					"name": "code",
+					"emptyDir": {}
+				},
+				{
+					"name": "kube-api-access-jcjl2",
+					"projected": {
+						"sources": [
+							{
+								"serviceAccountToken": {
+									"expirationSeconds": 3607,
+									"path": "token"
+								}
+							},
+							{
+								"configMap": {
+									"name": "kube-root-ca.crt",
+									"items": [
+										{
+											"key": "ca.crt",
+											"path": "ca.crt"
+										}
+									]
+								}
+							},
+							{
+								"downwardAPI": {
+									"items": [
+										{
+											"path": "namespace",
+											"fieldRef": {
+												"apiVersion": "v1",
+												"fieldPath": "metadata.namespace"
+											}
+										}
+									]
+								}
+							}
+						],
+						"defaultMode": 420
+					}
+				}
+			],
+			"initContainers": [
+				{
+					"name": "clonerefs",
+					"image": "us-docker.pkg.dev/k8s-infra-prow/images/clonerefs:v20261008-e012f2883",
+					"env": [
+						{
+							"name": "CLONEREFS_OPTIONS",
+							"value": "{\"src_root\":\"/home/prow/go\",\"log\":\"/logs/clone.json\",\"git_user_name\":\"ci-robot\",\"git_user_email\":\"ci-robot@k8s.io\",\"refs\":[{\"org\":\"kubernetes\",\"repo\":\"kubernetes\",\"base_ref\":\"master\",\"blobless_fetch\":true}],\"github_api_endpoints\":[\"https://api.github.com\"]}"
+						}
+					],
+					"resources": {
+						"requests": {
+							"cpu": "100m",
+							"memory": "1Gi"
+						}
+					},
+					"volumeMounts": [
+						{
+							"name": "logs",
+							"mountPath": "/logs"
+						},
+						{
+							"name": "code",
+							"mountPath": "/home/prow/go"
+						},
+						{
+							"name": "clonerefs-tmp",
+							"mountPath": "/tmp"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"readOnly": true,
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+						}
+					],
+					"terminationMessagePath": "/dev/termination-log",
+					"terminationMessagePolicy": "FallbackToLogsOnError",
+					"imagePullPolicy": "IfNotPresent"
+				},
+				{
+					"name": "initupload",
+					"image": "us-docker.pkg.dev/k8s-infra-prow/images/initupload:v20261008-e012f2883",
+					"env": [
+						{
+							"name": "INITUPLOAD_OPTIONS",
+							"value": "{\"bucket\":\"kubernetes-ci-logs\",\"path_strategy\":\"legacy\",\"default_org\":\"kubernetes\",\"default_repo\":\"kubernetes\",\"gcs_credentials_file\":\"/secrets/gcs/service-account.json\",\"dry_run\":false,\"log\":\"/logs/clone.json\"}"
+						},
+						{
+							"name": "JOB_SPEC",
+							"value": "{\"type\":\"periodic\",\"job\":\"ci-kubernetes-build\",\"buildid\":\"2108224426771222528\",\"prowjobid\":\"a91efd6b-8654-4d09-8af7-7b09b1539e52\",\"extra_refs\":[{\"org\":\"kubernetes\",\"repo\":\"kubernetes\",\"base_ref\":\"master\",\"blobless_fetch\":true}],\"decoration_config\":{\"timeout\":\"2h0m0s\",\"grace_period\":\"15m0s\",\"utility_images\":{\"clonerefs\":\"us-docker.pkg.dev/k8s-infra-prow/images/clonerefs:v20261008-e012f2883\",\"initupload\":\"us-docker.pkg.dev/k8s-infra-prow/images/initupload:v20261008-e012f2883\",\"entrypoint\":\"us-docker.pkg.dev/k8s-infra-prow/images/entrypoint:v20261008-e012f2883\",\"sidecar\":\"us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261008-e012f2883\"},\"resources\":{\"clonerefs\":{\"requests\":{\"cpu\":\"100m\"}},\"initupload\":{\"requests\":{\"cpu\":\"100m\"}},\"place_entrypoint\":{\"requests\":{\"cpu\":\"100m\"}},\"sidecar\":{\"requests\":{\"cpu\":\"100m\"}}},\"gcs_configuration\":{\"bucket\":\"kubernetes-ci-logs\",\"path_strategy\":\"legacy\",\"default_org\":\"kubernetes\",\"default_repo\":\"kubernetes\"},\"gcs_credentials_secret\":\"service-account\",\"blobless_fetch\":true}}"
+						}
+					],
+					"resources": {
+						"requests": {
+							"cpu": "100m",
+							"memory": "1Gi"
+						}
+					},
+					"volumeMounts": [
+						{
+							"name": "logs",
+							"mountPath": "/logs"
+						},
+						{
+							"name": "gcs-credentials",
+							"mountPath": "/secrets/gcs"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"readOnly": true,
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+						}
+					],
+					"terminationMessagePath": "/dev/termination-log",
+					"terminationMessagePolicy": "FallbackToLogsOnError",
+					"imagePullPolicy": "IfNotPresent"
+				},
+				{
+					"name": "place-entrypoint",
+					"image": "us-docker.pkg.dev/k8s-infra-prow/images/entrypoint:v20261008-e012f2883",
+					"args": [
+						"--copy-mode-only"
+					],
+					"resources": {
+						"requests": {
+							"cpu": "100m",
+							"memory": "1Gi"
+						}
+					},
+					"volumeMounts": [
+						{
+							"name": "tools",
+							"mountPath": "/tools"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"readOnly": true,
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+						}
+					],
+					"terminationMessagePath": "/dev/termination-log",
+					"terminationMessagePolicy": "FallbackToLogsOnError",
+					"imagePullPolicy": "IfNotPresent"
+				}
+			],
+			"containers": [
+				{
+					"name": "test",
+					"image": "gcr.io/k8s-staging-releng/k8s-ci-builder:latest-default",
+					"command": [
+						"/tools/entrypoint"
+					],
+					"workingDir": "/home/prow/go/src/github.com/kubernetes/kubernetes",
+					"env": [
+						{
+							"name": "FASTLY_SERVICE_NAME",
+							"value": "dl.k8s.io"
+						},
+						{
+							"name": "FASTLY_API_TOKEN",
+							"valueFrom": {
+								"secretKeyRef": {
+									"name": "fastly-purge-token",
+									"key": "token"
+								}
+							}
+						},
+						{
+							"name": "DOCKER_IN_DOCKER_ENABLED",
+							"value": "true"
+						},
+						{
+							"name": "GOPROXY",
+							"value": "https://proxy.golang.org"
+						},
+						{
+							"name": "GOTOOLCHAIN",
+							"value": "auto"
+						},
+						{
+							"name": "AWS_ROLE_SESSION_NAME",
+							"valueFrom": {
+								"fieldRef": {
+									"apiVersion": "v1",
+									"fieldPath": "metadata.name"
+								}
+							}
+						},
+						{
+							"name": "ARTIFACTS",
+							"value": "/logs/artifacts"
+						},
+						{
+							"name": "BUILD_ID",
+							"value": "2108224426771222528"
+						},
+						{
+							"name": "BUILD_NUMBER",
+							"value": "2108224426771222528"
+						},
+						{
+							"name": "CI",
+							"value": "true"
+						},
+						{
+							"name": "GOPATH",
+							"value": "/home/prow/go"
+						},
+						{
+							"name": "JOB_NAME",
+							"value": "ci-kubernetes-build"
+						},
+						{
+							"name": "JOB_SPEC",
+							"value": "{\"type\":\"periodic\",\"job\":\"ci-kubernetes-build\",\"buildid\":\"2108224426771222528\",\"prowjobid\":\"a91efd6b-8654-4d09-8af7-7b09b1539e52\",\"extra_refs\":[{\"org\":\"kubernetes\",\"repo\":\"kubernetes\",\"base_ref\":\"master\",\"blobless_fetch\":true}],\"decoration_config\":{\"timeout\":\"2h0m0s\",\"grace_period\":\"15m0s\",\"utility_images\":{\"clonerefs\":\"us-docker.pkg.dev/k8s-infra-prow/images/clonerefs:v20261008-e012f2883\",\"initupload\":\"us-docker.pkg.dev/k8s-infra-prow/images/initupload:v20261008-e012f2883\",\"entrypoint\":\"us-docker.pkg.dev/k8s-infra-prow/images/entrypoint:v20261008-e012f2883\",\"sidecar\":\"us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261008-e012f2883\"},\"resources\":{\"clonerefs\":{\"requests\":{\"cpu\":\"100m\"}},\"initupload\":{\"requests\":{\"cpu\":\"100m\"}},\"place_entrypoint\":{\"requests\":{\"cpu\":\"100m\"}},\"sidecar\":{\"requests\":{\"cpu\":\"100m\"}}},\"gcs_configuration\":{\"bucket\":\"kubernetes-ci-logs\",\"path_strategy\":\"legacy\",\"default_org\":\"kubernetes\",\"default_repo\":\"kubernetes\"},\"gcs_credentials_secret\":\"service-account\",\"blobless_fetch\":true}}"
+						},
+						{
+							"name": "JOB_TYPE",
+							"value": "periodic"
+						},
+						{
+							"name": "PROW_JOB_ID",
+							"value": "a91efd6b-8654-4d09-8af7-7b09b1539e52"
+						},
+						{
+							"name": "ENTRYPOINT_OPTIONS",
+							"value": "{\"timeout\":7200000000000,\"grace_period\":900000000000,\"artifact_dir\":\"/logs/artifacts\",\"args\":[\"wrapper.sh\",\"/krel\",\"ci-build\",\"--configure-docker\",\"--allow-dup=false\",\"--sign=false\",\"--bucket=k8s-release-dev\",\"--registry=gcr.io/k8s-staging-ci-images\"],\"container_name\":\"test\",\"process_log\":\"/logs/process-log.txt\",\"marker_file\":\"/logs/marker-file.txt\",\"metadata_file\":\"/logs/artifacts/metadata.json\"}"
+						}
+					],
+					"resources": {
+						"limits": {
+							"cpu": "31",
+							"memory": "100Gi"
+						},
+						"requests": {
+							"cpu": "31",
+							"memory": "100Gi"
+						}
+					},
+					"volumeMounts": [
+						{
+							"name": "docker-graph",
+							"mountPath": "/docker-graph"
+						},
+						{
+							"name": "docker-root",
+							"mountPath": "/var/lib/docker"
+						},
+						{
+							"name": "modules",
+							"readOnly": true,
+							"mountPath": "/lib/modules"
+						},
+						{
+							"name": "logs",
+							"mountPath": "/logs"
+						},
+						{
+							"name": "tools",
+							"mountPath": "/tools"
+						},
+						{
+							"name": "code",
+							"mountPath": "/home/prow/go"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"readOnly": true,
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+						}
+					],
+					"terminationMessagePath": "/dev/termination-log",
+					"terminationMessagePolicy": "FallbackToLogsOnError",
+					"imagePullPolicy": "Always",
+					"securityContext": {
+						"privileged": true
+					}
+				},
+				{
+					"name": "sidecar",
+					"image": "us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261008-e012f2883",
+					"env": [
+						{
+							"name": "JOB_SPEC",
+							"value": "{\"type\":\"periodic\",\"job\":\"ci-kubernetes-build\",\"buildid\":\"2108224426771222528\",\"prowjobid\":\"a91efd6b-8654-4d09-8af7-7b09b1539e52\",\"extra_refs\":[{\"org\":\"kubernetes\",\"repo\":\"kubernetes\",\"base_ref\":\"master\",\"blobless_fetch\":true}],\"decoration_config\":{\"timeout\":\"2h0m0s\",\"grace_period\":\"15m0s\",\"utility_images\":{\"clonerefs\":\"us-docker.pkg.dev/k8s-infra-prow/images/clonerefs:v20261008-e012f2883\",\"initupload\":\"us-docker.pkg.dev/k8s-infra-prow/images/initupload:v20261008-e012f2883\",\"entrypoint\":\"us-docker.pkg.dev/k8s-infra-prow/images/entrypoint:v20261008-e012f2883\",\"sidecar\":\"us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261008-e012f2883\"},\"resources\":{\"clonerefs\":{\"requests\":{\"cpu\":\"100m\"}},\"initupload\":{\"requests\":{\"cpu\":\"100m\"}},\"place_entrypoint\":{\"requests\":{\"cpu\":\"100m\"}},\"sidecar\":{\"requests\":{\"cpu\":\"100m\"}}},\"gcs_configuration\":{\"bucket\":\"kubernetes-ci-logs\",\"path_strategy\":\"legacy\",\"default_org\":\"kubernetes\",\"default_repo\":\"kubernetes\"},\"gcs_credentials_secret\":\"service-account\",\"blobless_fetch\":true}}"
+						},
+						{
+							"name": "SIDECAR_OPTIONS",
+							"value": "{\"gcs_options\":{\"items\":[\"/logs/artifacts\"],\"bucket\":\"kubernetes-ci-logs\",\"path_strategy\":\"legacy\",\"default_org\":\"kubernetes\",\"default_repo\":\"kubernetes\",\"gcs_credentials_file\":\"/secrets/gcs/service-account.json\",\"dry_run\":false},\"entries\":[{\"args\":[\"wrapper.sh\",\"/krel\",\"ci-build\",\"--configure-docker\",\"--allow-dup=false\",\"--sign=false\",\"--bucket=k8s-release-dev\",\"--registry=gcr.io/k8s-staging-ci-images\"],\"container_name\":\"test\",\"process_log\":\"/logs/process-log.txt\",\"marker_file\":\"/logs/marker-file.txt\",\"metadata_file\":\"/logs/artifacts/metadata.json\"}],\"censoring_options\":{}}"
+						}
+					],
+					"resources": {
+						"requests": {
+							"cpu": "100m",
+							"memory": "1Gi"
+						}
+					},
+					"volumeMounts": [
+						{
+							"name": "logs",
+							"mountPath": "/logs"
+						},
+						{
+							"name": "gcs-credentials",
+							"mountPath": "/secrets/gcs"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"readOnly": true,
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+						}
+					],
+					"terminationMessagePath": "/dev/termination-log",
+					"terminationMessagePolicy": "FallbackToLogsOnError",
+					"imagePullPolicy": "IfNotPresent"
+				}
+			],
+			"restartPolicy": "Never",
+			"terminationGracePeriodSeconds": 1125,
+			"dnsPolicy": "ClusterFirst",
+			"nodeSelector": {
+				"pool": "build"
+			},
+			"serviceAccountName": "prow-build",
+			"serviceAccount": "prow-build",
+			"nodeName": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg",
+			"securityContext": {},
+			"schedulerName": "default-scheduler",
+			"tolerations": [
+				{
+					"key": "build",
+					"operator": "Exists"
+				},
+				{
+					"key": "node.kubernetes.io/not-ready",
+					"operator": "Exists",
+					"effect": "NoExecute",
+					"tolerationSeconds": 300
+				},
+				{
+					"key": "node.kubernetes.io/unreachable",
+					"operator": "Exists",
+					"effect": "NoExecute",
+					"tolerationSeconds": 300
+				}
+			],
+			"priority": 0,
+			"enableServiceLinks": true,
+			"preemptionPolicy": "PreemptLowerPriority"
+		},
+		"status": {
+			"observedGeneration": 1,
+			"phase": "Failed",
+			"conditions": [
+				{
+					"type": "PodReadyToStartContainers",
+					"observedGeneration": 1,
+					"status": "False",
+					"lastProbeTime": null,
+					"lastTransitionTime": "2026-10-08T15:57:00Z"
+				},
+				{
+					"type": "Initialized",
+					"observedGeneration": 1,
+					"status": "False",
+					"lastProbeTime": null,
+					"lastTransitionTime": "2026-10-08T15:54:07Z",
+					"reason": "ContainersNotInitialized",
+					"message": "containers with incomplete status: [initupload place-entrypoint]"
+				},
+				{
+					"type": "Ready",
+					"observedGeneration": 1,
+					"status": "False",
+					"lastProbeTime": null,
+					"lastTransitionTime": "2026-10-08T15:54:07Z",
+					"reason": "PodFailed"
+				},
+				{
+					"type": "ContainersReady",
+					"observedGeneration": 1,
+					"status": "False",
+					"lastProbeTime": null,
+					"lastTransitionTime": "2026-10-08T15:54:07Z",
+					"reason": "PodFailed"
+				},
+				{
+					"type": "PodScheduled",
+					"observedGeneration": 1,
+					"status": "True",
+					"lastProbeTime": null,
+					"lastTransitionTime": "2026-10-08T15:54:07Z"
+				}
+			],
+			"hostIP": "10.128.0.109",
+			"hostIPs": [
+				{
+					"ip": "10.128.0.109"
+				}
+			],
+			"podIP": "10.33.170.250",
+			"podIPs": [
+				{
+					"ip": "10.33.170.250"
+				}
+			],
+			"startTime": "2026-10-08T15:54:07Z",
+			"initContainerStatuses": [
+				{
+					"name": "clonerefs",
+					"state": {
+						"terminated": {
+							"exitCode": 0,
+							"reason": "Completed",
+							"startedAt": "2026-10-08T15:54:07Z",
+							"finishedAt": "2026-10-08T15:54:38Z",
+							"containerID": "containerd://c538a04d105f30fdd29dfda5866c9b348cb4d174f9de950831f747d56284058e"
+						}
+					},
+					"lastState": {},
+					"ready": true,
+					"restartCount": 0,
+					"image": "us-docker.pkg.dev/k8s-infra-prow/images/clonerefs:v20261008-e012f2883",
+					"imageID": "us-docker.pkg.dev/k8s-infra-prow/images/clonerefs@sha256:7492b3ad8f0f3c4e29821d46fca10fd8c61bd369cbc1f5a850d13dfb479e3de3",
+					"containerID": "containerd://c538a04d105f30fdd29dfda5866c9b348cb4d174f9de950831f747d56284058e",
+					"started": false,
+					"allocatedResources": {
+						"cpu": "100m",
+						"memory": "1Gi"
+					},
+					"resources": {
+						"requests": {
+							"cpu": "100m",
+							"memory": "1Gi"
+						}
+					},
+					"volumeMounts": [
+						{
+							"name": "logs",
+							"mountPath": "/logs"
+						},
+						{
+							"name": "code",
+							"mountPath": "/home/prow/go"
+						},
+						{
+							"name": "clonerefs-tmp",
+							"mountPath": "/tmp"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+							"readOnly": true,
+							"recursiveReadOnly": "Disabled"
+						}
+					],
+					"user": {
+						"linux": {
+							"uid": 0,
+							"gid": 0,
+							"supplementalGroups": [
+								0,
+								1,
+								2,
+								3,
+								4,
+								6,
+								10,
+								11,
+								20,
+								26,
+								27
+							]
+						}
+					}
+				},
+				{
+					"name": "initupload",
+					"state": {
+						"terminated": {
+							"exitCode": 1,
+							"reason": "Error",
+							"message": "gs.k8s.io/prow/pkg/pod-utils/gcs.upload\",\"level\":\"info\",\"msg\":\"Queued for upload\",\"severity\":\"info\",\"time\":\"2026-10-08T15:56:54Z\"}\n{\"component\":\"initupload\",\"dest\":\"gs://kubernetes-ci-logs/logs/ci-kubernetes-build/2108224426771222528/started.json\",\"file\":\"sigs.k8s.io/prow/pkg/pod-utils/gcs/upload.go:104\",\"func\":\"sigs.k8s.io/prow/pkg/pod-utils/gcs.upload\",\"level\":\"info\",\"msg\":\"Queued for upload\",\"severity\":\"info\",\"time\":\"2026-10-08T15:56:54Z\"}\n{\"component\":\"initupload\",\"dest\":\"gs://kubernetes-ci-logs/logs/ci-kubernetes-build/2108224426771222528/clone-log.txt\",\"file\":\"sigs.k8s.io/prow/pkg/pod-utils/gcs/upload.go:132\",\"func\":\"sigs.k8s.io/prow/pkg/pod-utils/gcs.upload.func1\",\"level\":\"info\",\"msg\":\"Finished upload\",\"severity\":\"info\",\"time\":\"2026-10-08T15:56:54Z\"}\n{\"component\":\"initupload\",\"dest\":\"gs://kubernetes-ci-logs/logs/ci-kubernetes-build/2108224426771222528/started.json\",\"file\":\"sigs.k8s.io/prow/pkg/pod-utils/gcs/upload.go:132\",\"func\":\"sigs.k8s.io/prow/pkg/pod-utils/gcs.upload.func1\",\"level\":\"info\",\"msg\":\"Finished upload\",\"severity\":\"info\",\"time\":\"2026-10-08T15:56:54Z\"}\n{\"component\":\"initupload\",\"dest\":\"gs://kubernetes-ci-logs/logs/ci-kubernetes-build/2108224426771222528/clone-records.json\",\"file\":\"sigs.k8s.io/prow/pkg/pod-utils/gcs/upload.go:132\",\"func\":\"sigs.k8s.io/prow/pkg/pod-utils/gcs.upload.func1\",\"level\":\"info\",\"msg\":\"Finished upload\",\"severity\":\"info\",\"time\":\"2026-10-08T15:56:59Z\"}\n{\"component\":\"initupload\",\"file\":\"sigs.k8s.io/prow/pkg/gcsupload/run.go:79\",\"func\":\"sigs.k8s.io/prow/pkg/gcsupload.completeUpload\",\"level\":\"info\",\"msg\":\"Finished upload to blob storage\",\"severity\":\"info\",\"time\":\"2026-10-08T15:56:59Z\"}\n{\"component\":\"initupload\",\"error\":\"failed to upload to blob storage: failed to upload to blob storage: encountered errors during upload: [writer close error: googleapi: got HTTP response code 503 with body: Service Unavailable]\",\"file\":\"sigs.k8s.io/prow/cmd/initupload/main.go:45\",\"func\":\"main.main\",\"level\":\"fatal\",\"msg\":\"Failed to initialize job\",\"severity\":\"fatal\",\"time\":\"2026-10-08T15:56:59Z\"}\n",
+							"startedAt": "2026-10-08T15:54:40Z",
+							"finishedAt": "2026-10-08T15:56:59Z",
+							"containerID": "containerd://2352edc0b76333cebc4b7203b1383a11be6370d89764f7f7c7bfa87cf1a8f009"
+						}
+					},
+					"lastState": {},
+					"ready": false,
+					"restartCount": 0,
+					"image": "us-docker.pkg.dev/k8s-infra-prow/images/initupload:v20261008-e012f2883",
+					"imageID": "us-docker.pkg.dev/k8s-infra-prow/images/initupload@sha256:0849bfd09ab1a35b5c188de52328b11992f79d6444cf3e7996c97f1ae241e180",
+					"containerID": "containerd://2352edc0b76333cebc4b7203b1383a11be6370d89764f7f7c7bfa87cf1a8f009",
+					"started": false,
+					"allocatedResources": {
+						"cpu": "100m",
+						"memory": "1Gi"
+					},
+					"resources": {
+						"requests": {
+							"cpu": "100m",
+							"memory": "1Gi"
+						}
+					},
+					"volumeMounts": [
+						{
+							"name": "logs",
+							"mountPath": "/logs"
+						},
+						{
+							"name": "gcs-credentials",
+							"mountPath": "/secrets/gcs"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+							"readOnly": true,
+							"recursiveReadOnly": "Disabled"
+						}
+					],
+					"user": {
+						"linux": {
+							"uid": 0,
+							"gid": 0,
+							"supplementalGroups": [
+								0,
+								1,
+								2,
+								3,
+								4,
+								6,
+								10,
+								11,
+								20,
+								26,
+								27
+							]
+						}
+					}
+				},
+				{
+					"name": "place-entrypoint",
+					"state": {
+						"waiting": {
+							"reason": "PodInitializing"
+						}
+					},
+					"lastState": {},
+					"ready": false,
+					"restartCount": 0,
+					"image": "us-docker.pkg.dev/k8s-infra-prow/images/entrypoint:v20261008-e012f2883",
+					"imageID": "",
+					"started": false,
+					"volumeMounts": [
+						{
+							"name": "tools",
+							"mountPath": "/tools"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+							"readOnly": true,
+							"recursiveReadOnly": "Disabled"
+						}
+					]
+				}
+			],
+			"containerStatuses": [
+				{
+					"name": "sidecar",
+					"state": {
+						"waiting": {
+							"reason": "PodInitializing"
+						}
+					},
+					"lastState": {},
+					"ready": false,
+					"restartCount": 0,
+					"image": "us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261008-e012f2883",
+					"imageID": "",
+					"started": false,
+					"volumeMounts": [
+						{
+							"name": "logs",
+							"mountPath": "/logs"
+						},
+						{
+							"name": "gcs-credentials",
+							"mountPath": "/secrets/gcs"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+							"readOnly": true,
+							"recursiveReadOnly": "Disabled"
+						}
+					]
+				},
+				{
+					"name": "test",
+					"state": {
+						"waiting": {
+							"reason": "PodInitializing"
+						}
+					},
+					"lastState": {},
+					"ready": false,
+					"restartCount": 0,
+					"image": "gcr.io/k8s-staging-releng/k8s-ci-builder:latest-default",
+					"imageID": "",
+					"started": false,
+					"volumeMounts": [
+						{
+							"name": "docker-graph",
+							"mountPath": "/docker-graph"
+						},
+						{
+							"name": "docker-root",
+							"mountPath": "/var/lib/docker"
+						},
+						{
+							"name": "modules",
+							"mountPath": "/lib/modules",
+							"readOnly": true,
+							"recursiveReadOnly": "Disabled"
+						},
+						{
+							"name": "logs",
+							"mountPath": "/logs"
+						},
+						{
+							"name": "tools",
+							"mountPath": "/tools"
+						},
+						{
+							"name": "code",
+							"mountPath": "/home/prow/go"
+						},
+						{
+							"name": "kube-api-access-jcjl2",
+							"mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+							"readOnly": true,
+							"recursiveReadOnly": "Disabled"
+						}
+					]
+				}
+			],
+			"qosClass": "Burstable"
+		}
+	},
+	"events": [
+		{
+			"metadata": {
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52.18dc98e1bd0c8a30",
+				"namespace": "test-pods",
+				"uid": "3b318ff1-2495-4df4-aedd-4d23f68b7926",
+				"resourceVersion": "1791474847107375010",
+				"creationTimestamp": "2026-10-08T15:54:07Z",
+				"managedFields": [
+					{
+						"manager": "kube-scheduler",
+						"operation": "Update",
+						"apiVersion": "events.k8s.io/v1",
+						"time": "2026-10-08T15:54:07Z",
+						"fieldsType": "FieldsV1",
+						"fieldsV1": {
+							"f:action": {},
+							"f:eventTime": {},
+							"f:note": {},
+							"f:reason": {},
+							"f:regarding": {},
+							"f:reportingController": {},
+							"f:reportingInstance": {},
+							"f:type": {}
+						}
+					}
+				]
+			},
+			"involvedObject": {
+				"kind": "Pod",
+				"namespace": "test-pods",
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52",
+				"uid": "b15ddbfe-b73f-4a2c-be9e-0a0cc458b1aa",
+				"apiVersion": "v1",
+				"resourceVersion": "1791474847051167024"
+			},
+			"reason": "Scheduled",
+			"message": "Successfully assigned test-pods/a91efd6b-8654-4d09-8af7-7b09b1539e52 to gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg",
+			"source": {},
+			"firstTimestamp": null,
+			"lastTimestamp": null,
+			"type": "Normal",
+			"eventTime": "2026-10-08T15:54:07.093380Z",
+			"action": "Binding",
+			"reportingComponent": "default-scheduler",
+			"reportingInstance": "default-scheduler-gke-8d7225b757872b0f06a6-6f5f-cab4-vm"
+		},
+		{
+			"metadata": {
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52.18dc98e1e48fd70f",
+				"namespace": "test-pods",
+				"uid": "85f9b7dd-eb7e-4a4d-b61f-ea615428d782",
+				"resourceVersion": "1791474847768655004",
+				"creationTimestamp": "2026-10-08T15:54:07Z",
+				"managedFields": [
+					{
+						"manager": "kubelet",
+						"operation": "Update",
+						"apiVersion": "v1",
+						"time": "2026-10-08T15:54:07Z",
+						"fieldsType": "FieldsV1",
+						"fieldsV1": {
+							"f:count": {},
+							"f:firstTimestamp": {},
+							"f:involvedObject": {},
+							"f:lastTimestamp": {},
+							"f:message": {},
+							"f:reason": {},
+							"f:reportingComponent": {},
+							"f:reportingInstance": {},
+							"f:source": {
+								"f:component": {},
+								"f:host": {}
+							},
+							"f:type": {}
+						}
+					}
+				]
+			},
+			"involvedObject": {
+				"kind": "Pod",
+				"namespace": "test-pods",
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52",
+				"uid": "b15ddbfe-b73f-4a2c-be9e-0a0cc458b1aa",
+				"apiVersion": "v1",
+				"resourceVersion": "1791474847085407024",
+				"fieldPath": "spec.initContainers{clonerefs}"
+			},
+			"reason": "Pulled",
+			"message": "Container image \"us-docker.pkg.dev/k8s-infra-prow/images/clonerefs:v20261008-e012f2883\" already present on machine and can be accessed by the pod",
+			"source": {
+				"component": "kubelet",
+				"host": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+			},
+			"firstTimestamp": "2026-10-08T15:54:07Z",
+			"lastTimestamp": "2026-10-08T15:54:07Z",
+			"count": 1,
+			"type": "Normal",
+			"eventTime": null,
+			"reportingComponent": "kubelet",
+			"reportingInstance": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+		},
+		{
+			"metadata": {
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52.18dc98e1e4e8f87d",
+				"namespace": "test-pods",
+				"uid": "ced57650-f2f5-4c39-824b-18fda2a65c55",
+				"resourceVersion": "1791474847786751006",
+				"creationTimestamp": "2026-10-08T15:54:07Z",
+				"managedFields": [
+					{
+						"manager": "kubelet",
+						"operation": "Update",
+						"apiVersion": "v1",
+						"time": "2026-10-08T15:54:07Z",
+						"fieldsType": "FieldsV1",
+						"fieldsV1": {
+							"f:count": {},
+							"f:firstTimestamp": {},
+							"f:involvedObject": {},
+							"f:lastTimestamp": {},
+							"f:message": {},
+							"f:reason": {},
+							"f:reportingComponent": {},
+							"f:reportingInstance": {},
+							"f:source": {
+								"f:component": {},
+								"f:host": {}
+							},
+							"f:type": {}
+						}
+					}
+				]
+			},
+			"involvedObject": {
+				"kind": "Pod",
+				"namespace": "test-pods",
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52",
+				"uid": "b15ddbfe-b73f-4a2c-be9e-0a0cc458b1aa",
+				"apiVersion": "v1",
+				"resourceVersion": "1791474847085407024",
+				"fieldPath": "spec.initContainers{clonerefs}"
+			},
+			"reason": "Created",
+			"message": "Container created",
+			"source": {
+				"component": "kubelet",
+				"host": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+			},
+			"firstTimestamp": "2026-10-08T15:54:07Z",
+			"lastTimestamp": "2026-10-08T15:54:07Z",
+			"count": 1,
+			"type": "Normal",
+			"eventTime": null,
+			"reportingComponent": "kubelet",
+			"reportingInstance": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+		},
+		{
+			"metadata": {
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52.18dc98e1e6990dc1",
+				"namespace": "test-pods",
+				"uid": "abecfd9b-52af-499a-8afa-ab427e6f4067",
+				"resourceVersion": "1791474847803103008",
+				"creationTimestamp": "2026-10-08T15:54:07Z",
+				"managedFields": [
+					{
+						"manager": "kubelet",
+						"operation": "Update",
+						"apiVersion": "v1",
+						"time": "2026-10-08T15:54:07Z",
+						"fieldsType": "FieldsV1",
+						"fieldsV1": {
+							"f:count": {},
+							"f:firstTimestamp": {},
+							"f:involvedObject": {},
+							"f:lastTimestamp": {},
+							"f:message": {},
+							"f:reason": {},
+							"f:reportingComponent": {},
+							"f:reportingInstance": {},
+							"f:source": {
+								"f:component": {},
+								"f:host": {}
+							},
+							"f:type": {}
+						}
+					}
+				]
+			},
+			"involvedObject": {
+				"kind": "Pod",
+				"namespace": "test-pods",
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52",
+				"uid": "b15ddbfe-b73f-4a2c-be9e-0a0cc458b1aa",
+				"apiVersion": "v1",
+				"resourceVersion": "1791474847085407024",
+				"fieldPath": "spec.initContainers{clonerefs}"
+			},
+			"reason": "Started",
+			"message": "Container started",
+			"source": {
+				"component": "kubelet",
+				"host": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+			},
+			"firstTimestamp": "2026-10-08T15:54:07Z",
+			"lastTimestamp": "2026-10-08T15:54:07Z",
+			"count": 1,
+			"type": "Normal",
+			"eventTime": null,
+			"reportingComponent": "kubelet",
+			"reportingInstance": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+		},
+		{
+			"metadata": {
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52.18dc98e979c2f995",
+				"namespace": "test-pods",
+				"uid": "1d82cfb8-22bd-472a-83e0-548265df6d64",
+				"resourceVersion": "1791474880333439017",
+				"creationTimestamp": "2026-10-08T15:54:40Z",
+				"managedFields": [
+					{
+						"manager": "kubelet",
+						"operation": "Update",
+						"apiVersion": "v1",
+						"time": "2026-10-08T15:54:40Z",
+						"fieldsType": "FieldsV1",
+						"fieldsV1": {
+							"f:count": {},
+							"f:firstTimestamp": {},
+							"f:involvedObject": {},
+							"f:lastTimestamp": {},
+							"f:message": {},
+							"f:reason": {},
+							"f:reportingComponent": {},
+							"f:reportingInstance": {},
+							"f:source": {
+								"f:component": {},
+								"f:host": {}
+							},
+							"f:type": {}
+						}
+					}
+				]
+			},
+			"involvedObject": {
+				"kind": "Pod",
+				"namespace": "test-pods",
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52",
+				"uid": "b15ddbfe-b73f-4a2c-be9e-0a0cc458b1aa",
+				"apiVersion": "v1",
+				"resourceVersion": "1791474847085407024",
+				"fieldPath": "spec.initContainers{initupload}"
+			},
+			"reason": "Pulled",
+			"message": "Container image \"us-docker.pkg.dev/k8s-infra-prow/images/initupload:v20261008-e012f2883\" already present on machine and can be accessed by the pod",
+			"source": {
+				"component": "kubelet",
+				"host": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+			},
+			"firstTimestamp": "2026-10-08T15:54:40Z",
+			"lastTimestamp": "2026-10-08T15:54:40Z",
+			"count": 1,
+			"type": "Normal",
+			"eventTime": null,
+			"reportingComponent": "kubelet",
+			"reportingInstance": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+		},
+		{
+			"metadata": {
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52.18dc98e97a0a6361",
+				"namespace": "test-pods",
+				"uid": "7a3d677c-0149-4b8c-bfea-854fc6d1d284",
+				"resourceVersion": "1791474880347855022",
+				"creationTimestamp": "2026-10-08T15:54:40Z",
+				"managedFields": [
+					{
+						"manager": "kubelet",
+						"operation": "Update",
+						"apiVersion": "v1",
+						"time": "2026-10-08T15:54:40Z",
+						"fieldsType": "FieldsV1",
+						"fieldsV1": {
+							"f:count": {},
+							"f:firstTimestamp": {},
+							"f:involvedObject": {},
+							"f:lastTimestamp": {},
+							"f:message": {},
+							"f:reason": {},
+							"f:reportingComponent": {},
+							"f:reportingInstance": {},
+							"f:source": {
+								"f:component": {},
+								"f:host": {}
+							},
+							"f:type": {}
+						}
+					}
+				]
+			},
+			"involvedObject": {
+				"kind": "Pod",
+				"namespace": "test-pods",
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52",
+				"uid": "b15ddbfe-b73f-4a2c-be9e-0a0cc458b1aa",
+				"apiVersion": "v1",
+				"resourceVersion": "1791474847085407024",
+				"fieldPath": "spec.initContainers{initupload}"
+			},
+			"reason": "Created",
+			"message": "Container created",
+			"source": {
+				"component": "kubelet",
+				"host": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+			},
+			"firstTimestamp": "2026-10-08T15:54:40Z",
+			"lastTimestamp": "2026-10-08T15:54:40Z",
+			"count": 1,
+			"type": "Normal",
+			"eventTime": null,
+			"reportingComponent": "kubelet",
+			"reportingInstance": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+		},
+		{
+			"metadata": {
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52.18dc98e97c1c4a26",
+				"namespace": "test-pods",
+				"uid": "12ab28ee-5717-4244-adaf-6a4ae600a705",
+				"resourceVersion": "1791474880373535016",
+				"creationTimestamp": "2026-10-08T15:54:40Z",
+				"managedFields": [
+					{
+						"manager": "kubelet",
+						"operation": "Update",
+						"apiVersion": "v1",
+						"time": "2026-10-08T15:54:40Z",
+						"fieldsType": "FieldsV1",
+						"fieldsV1": {
+							"f:count": {},
+							"f:firstTimestamp": {},
+							"f:involvedObject": {},
+							"f:lastTimestamp": {},
+							"f:message": {},
+							"f:reason": {},
+							"f:reportingComponent": {},
+							"f:reportingInstance": {},
+							"f:source": {
+								"f:component": {},
+								"f:host": {}
+							},
+							"f:type": {}
+						}
+					}
+				]
+			},
+			"involvedObject": {
+				"kind": "Pod",
+				"namespace": "test-pods",
+				"name": "a91efd6b-8654-4d09-8af7-7b09b1539e52",
+				"uid": "b15ddbfe-b73f-4a2c-be9e-0a0cc458b1aa",
+				"apiVersion": "v1",
+				"resourceVersion": "1791474847085407024",
+				"fieldPath": "spec.initContainers{initupload}"
+			},
+			"reason": "Started",
+			"message": "Container started",
+			"source": {
+				"component": "kubelet",
+				"host": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+			},
+			"firstTimestamp": "2026-10-08T15:54:40Z",
+			"lastTimestamp": "2026-10-08T15:54:40Z",
+			"count": 1,
+			"type": "Normal",
+			"eventTime": null,
+			"reportingComponent": "kubelet",
+			"reportingInstance": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+		}
+	],
+	"node": {
+		"metadata": {
+			"name": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg",
+			"uid": "57b8b211-fbcf-4534-9274-358ca818138d",
+			"resourceVersion": "1791475031206527024",
+			"creationTimestamp": "2026-09-21T12:06:31Z",
+			"labels": {
+				"addon.gke.io/node-local-dns-ds-ready": "true",
+				"beta.kubernetes.io/arch": "amd64",
+				"beta.kubernetes.io/instance-type": "c4d-standard-32-lssd",
+				"beta.kubernetes.io/os": "linux",
+				"cloud.google.com/gke-boot-disk": "hyperdisk-balanced",
+				"cloud.google.com/gke-container-runtime": "containerd",
+				"cloud.google.com/gke-cpu-scaling-level": "32",
+				"cloud.google.com/gke-ephemeral-storage-local-ssd": "true",
+				"cloud.google.com/gke-logging-variant": "DEFAULT",
+				"cloud.google.com/gke-max-pods-per-node": "110",
+				"cloud.google.com/gke-memory-gb-scaling-level": "126",
+				"cloud.google.com/gke-netd-ready": "true",
+				"cloud.google.com/gke-nodepool": "pool8-build-20260921120442962500000001",
+				"cloud.google.com/gke-os-distribution": "cos",
+				"cloud.google.com/gke-provisioning": "standard",
+				"cloud.google.com/machine-family": "c4d",
+				"cloud.google.com/private-node": "false",
+				"disk-type.gke.io/hyperdisk-balanced": "true",
+				"disk-type.gke.io/hyperdisk-balanced-high-availability": "true",
+				"disk-type.gke.io/hyperdisk-ml": "true",
+				"disk-type.gke.io/hyperdisk-throughput": "true",
+				"failure-domain.beta.kubernetes.io/region": "us-central1",
+				"failure-domain.beta.kubernetes.io/zone": "us-central1-b",
+				"iam.gke.io/gke-metadata-server-enabled": "true",
+				"kubernetes.io/arch": "amd64",
+				"kubernetes.io/hostname": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg",
+				"kubernetes.io/os": "linux",
+				"node.kubernetes.io/instance-type": "c4d-standard-32-lssd",
+				"pool": "build",
+				"topology.gke.io/zone": "us-central1-b",
+				"topology.kubernetes.io/region": "us-central1",
+				"topology.kubernetes.io/zone": "us-central1-b"
+			},
+			"annotations": {
+				"container.googleapis.com/instance_id": "8188495782959948674",
+				"csi.volume.kubernetes.io/nodeid": "{\"pd.csi.storage.gke.io\":\"projects/k8s-infra-prow-build/zones/us-central1-b/instances/gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg\",\"podcertificate.gke.io\":\"gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg\"}",
+				"node.alpha.kubernetes.io/ttl": "15",
+				"node.gke.io/last-applied-node-labels": "addon.gke.io/node-local-dns-ds-ready=true,cloud.google.com/gke-boot-disk=hyperdisk-balanced,cloud.google.com/gke-container-runtime=containerd,cloud.google.com/gke-cpu-scaling-level=32,cloud.google.com/gke-ephemeral-storage-local-ssd=true,cloud.google.com/gke-logging-variant=DEFAULT,cloud.google.com/gke-max-pods-per-node=110,cloud.google.com/gke-memory-gb-scaling-level=126,cloud.google.com/gke-netd-ready=true,cloud.google.com/gke-nodepool=pool8-build-20260921120442962500000001,cloud.google.com/gke-os-distribution=cos,cloud.google.com/gke-provisioning=standard,cloud.google.com/machine-family=c4d,cloud.google.com/private-node=false,disk-type.gke.io/hyperdisk-balanced-high-availability=true,disk-type.gke.io/hyperdisk-balanced=true,disk-type.gke.io/hyperdisk-ml=true,disk-type.gke.io/hyperdisk-throughput=true,iam.gke.io/gke-metadata-server-enabled=true,pool=build",
+				"node.gke.io/last-applied-node-taints": "build=true:NoSchedule",
+				"volumes.kubernetes.io/controller-managed-attach-detach": "true"
+			},
+			"managedFields": [
+				{
+					"manager": "cloud-controller-manager",
+					"operation": "Update",
+					"apiVersion": "v1",
+					"time": "2026-09-21T12:06:31Z",
+					"fieldsType": "FieldsV1",
+					"fieldsV1": {
+						"f:metadata": {
+							"f:labels": {
+								"f:beta.kubernetes.io/instance-type": {},
+								"f:failure-domain.beta.kubernetes.io/region": {},
+								"f:failure-domain.beta.kubernetes.io/zone": {},
+								"f:node.kubernetes.io/instance-type": {},
+								"f:topology.kubernetes.io/region": {},
+								"f:topology.kubernetes.io/zone": {}
+							}
+						},
+						"f:spec": {
+							"f:podCIDR": {},
+							"f:podCIDRs": {
+								".": {},
+								"v:\"10.33.170.0/24\"": {}
+							},
+							"f:providerID": {}
+						}
+					}
+				},
+				{
+					"manager": "kubelet",
+					"operation": "Update",
+					"apiVersion": "v1",
+					"time": "2026-09-21T12:06:31Z",
+					"fieldsType": "FieldsV1",
+					"fieldsV1": {
+						"f:metadata": {
+							"f:annotations": {
+								".": {},
+								"f:volumes.kubernetes.io/controller-managed-attach-detach": {}
+							},
+							"f:labels": {
+								".": {},
+								"f:addon.gke.io/node-local-dns-ds-ready": {},
+								"f:beta.kubernetes.io/arch": {},
+								"f:beta.kubernetes.io/os": {},
+								"f:cloud.google.com/gke-boot-disk": {},
+								"f:cloud.google.com/gke-container-runtime": {},
+								"f:cloud.google.com/gke-cpu-scaling-level": {},
+								"f:cloud.google.com/gke-ephemeral-storage-local-ssd": {},
+								"f:cloud.google.com/gke-logging-variant": {},
+								"f:cloud.google.com/gke-max-pods-per-node": {},
+								"f:cloud.google.com/gke-memory-gb-scaling-level": {},
+								"f:cloud.google.com/gke-netd-ready": {},
+								"f:cloud.google.com/gke-nodepool": {},
+								"f:cloud.google.com/gke-os-distribution": {},
+								"f:cloud.google.com/gke-provisioning": {},
+								"f:cloud.google.com/machine-family": {},
+								"f:cloud.google.com/private-node": {},
+								"f:iam.gke.io/gke-metadata-server-enabled": {},
+								"f:kubernetes.io/arch": {},
+								"f:kubernetes.io/hostname": {},
+								"f:kubernetes.io/os": {}
+							}
+						}
+					}
+				},
+				{
+					"manager": "gcp-controller-manager",
+					"operation": "Update",
+					"apiVersion": "v1",
+					"time": "2026-09-21T12:06:32Z",
+					"fieldsType": "FieldsV1",
+					"fieldsV1": {
+						"f:metadata": {
+							"f:annotations": {
+								"f:container.googleapis.com/instance_id": {},
+								"f:node.gke.io/last-applied-node-labels": {},
+								"f:node.gke.io/last-applied-node-taints": {}
+							},
+							"f:labels": {
+								"f:disk-type.gke.io/hyperdisk-balanced": {},
+								"f:disk-type.gke.io/hyperdisk-balanced-high-availability": {},
+								"f:disk-type.gke.io/hyperdisk-ml": {},
+								"f:disk-type.gke.io/hyperdisk-throughput": {},
+								"f:pool": {}
+							}
+						}
+					}
+				},
+				{
+					"manager": "cloud-controller-manager",
+					"operation": "Update",
+					"apiVersion": "v1",
+					"time": "2026-09-21T12:06:55Z",
+					"fieldsType": "FieldsV1",
+					"fieldsV1": {
+						"f:status": {
+							"f:addresses": {
+								"k:{\"type\":\"ExternalIP\"}": {
+									".": {},
+									"f:address": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"InternalIP\"}": {
+									".": {},
+									"f:address": {},
+									"f:type": {}
+								}
+							},
+							"f:conditions": {
+								"k:{\"type\":\"NetworkUnavailable\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								}
+							}
+						}
+					},
+					"subresource": "status"
+				},
+				{
+					"manager": "kube-controller-manager",
+					"operation": "Update",
+					"apiVersion": "v1",
+					"time": "2026-10-08T12:00:47Z",
+					"fieldsType": "FieldsV1",
+					"fieldsV1": {
+						"f:metadata": {
+							"f:annotations": {
+								"f:node.alpha.kubernetes.io/ttl": {}
+							}
+						},
+						"f:spec": {
+							"f:taints": {}
+						}
+					}
+				},
+				{
+					"manager": "node-problem-detector",
+					"operation": "Update",
+					"apiVersion": "v1",
+					"time": "2026-10-08T15:56:31Z",
+					"fieldsType": "FieldsV1",
+					"fieldsV1": {
+						"f:status": {
+							"f:conditions": {
+								"k:{\"type\":\"CorruptDockerOverlay2\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"CperHardwareErrorFatal\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"DPv2MigrationUnsupportedCNI\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"DeprecatedAuthsFieldInContainerdConfiguration\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"DeprecatedConfigsFieldInContainerdConfiguration\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"DeprecatedMirrorsFieldInContainerdConfiguration\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"DeprecatedOtherContainerdFeatures\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"DeprecatedPullingSchemaV1Image\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"DeprecatedUsingV1Alpha2Cri\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"FrequentContainerdRestart\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"FrequentDockerRestart\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"FrequentKubeletRestart\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"FrequentUnregisterNetDevice\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"KernelDeadlock\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"KubeletConfigChanged\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"ReadOnlyRootFileSystem\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"ResourceExhausted\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"StoragePressureRootFileSystem\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"Swap\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"SysctlChanged\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"UnsupportedEBPFPrograms\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								},
+								"k:{\"type\":\"XfsShutdown\"}": {
+									".": {},
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {},
+									"f:type": {}
+								}
+							}
+						}
+					},
+					"subresource": "status"
+				},
+				{
+					"manager": "kubelet",
+					"operation": "Update",
+					"apiVersion": "v1",
+					"time": "2026-10-08T15:57:11Z",
+					"fieldsType": "FieldsV1",
+					"fieldsV1": {
+						"f:metadata": {
+							"f:annotations": {
+								"f:csi.volume.kubernetes.io/nodeid": {}
+							},
+							"f:labels": {
+								"f:topology.gke.io/zone": {}
+							}
+						},
+						"f:status": {
+							"f:conditions": {
+								"k:{\"type\":\"DiskPressure\"}": {
+									"f:lastHeartbeatTime": {}
+								},
+								"k:{\"type\":\"MemoryPressure\"}": {
+									"f:lastHeartbeatTime": {}
+								},
+								"k:{\"type\":\"PIDPressure\"}": {
+									"f:lastHeartbeatTime": {}
+								},
+								"k:{\"type\":\"Ready\"}": {
+									"f:lastHeartbeatTime": {},
+									"f:lastTransitionTime": {},
+									"f:message": {},
+									"f:reason": {},
+									"f:status": {}
+								}
+							},
+							"f:images": {}
+						}
+					},
+					"subresource": "status"
+				}
+			]
+		},
+		"spec": {
+			"podCIDR": "10.33.170.0/24",
+			"podCIDRs": [
+				"10.33.170.0/24"
+			],
+			"providerID": "gce://k8s-infra-prow-build/us-central1-b/gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg",
+			"taints": [
+				{
+					"key": "build",
+					"value": "true",
+					"effect": "NoSchedule"
+				}
+			]
+		},
+		"status": {
+			"capacity": {
+				"cpu": "32",
+				"ephemeral-storage": "772706776Ki",
+				"hugepages-1Gi": "0",
+				"hugepages-2Mi": "0",
+				"memory": "127775480Ki",
+				"pods": "110"
+			},
+			"allocatable": {
+				"cpu": "31850m",
+				"ephemeral-storage": "631595926783",
+				"hugepages-1Gi": "0",
+				"hugepages-2Mi": "0",
+				"memory": "118192888Ki",
+				"pods": "110"
+			},
+			"conditions": [
+				{
+					"type": "NetworkUnavailable",
+					"status": "False",
+					"lastHeartbeatTime": "2026-09-21T12:06:55Z",
+					"lastTransitionTime": "2026-09-21T12:06:55Z",
+					"reason": "RouteCreated",
+					"message": "RouteController created a route"
+				},
+				{
+					"type": "DeprecatedConfigsFieldInContainerdConfiguration",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "DeprecatedConfigsFieldInContainerdConfigurationNotDetected",
+					"message": "No deprecation risk: did not find any deprecated 'configs' field in containerd's config"
+				},
+				{
+					"type": "DeprecatedMirrorsFieldInContainerdConfiguration",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "DeprecatedMirrorsFieldInContainerdConfigurationNotDetected",
+					"message": "No deprecation risk: did not find any deprecated 'mirrors' field in containerd's config"
+				},
+				{
+					"type": "FrequentContainerdRestart",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "NoFrequentContainerdRestart",
+					"message": "containerd is functioning properly"
+				},
+				{
+					"type": "KernelDeadlock",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "KernelHasNoDeadlock",
+					"message": "kernel has no deadlock"
+				},
+				{
+					"type": "DeprecatedAuthsFieldInContainerdConfiguration",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "DeprecatedAuthsFieldInContainerdConfigurationNotDetected",
+					"message": "No deprecation risk: did not find any deprecated 'auths' field in containerd's config"
+				},
+				{
+					"type": "KubeletConfigChanged",
+					"status": "True",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "KubeletConfigChangeDetected",
+					"message": "{\"managed\": {\"cpuCFSQuota\": true, \"singleProcessOOMKill\": true}}"
+				},
+				{
+					"type": "CorruptDockerOverlay2",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "NoCorruptDockerOverlay2",
+					"message": "docker overlay2 is functioning properly"
+				},
+				{
+					"type": "DPv2MigrationUnsupportedCNI",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "DPv2MigrationUnsupportedCNINotDetected",
+					"message": "No unsupported CNI detected for DPv2 migration"
+				},
+				{
+					"type": "DeprecatedOtherContainerdFeatures",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "DeprecatedOtherContainerdFeaturesNotDetected",
+					"message": "No deprecation risk: did not find any deprecations other than 3 configs fields (auths/configs/mirrors), pulling schema v1 images and using v1alpha2 CRI."
+				},
+				{
+					"type": "UnsupportedEBPFPrograms",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "UnsupportedEBPFProgramsNotDetected",
+					"message": "No unsupported EBPF programs detected"
+				},
+				{
+					"type": "StoragePressureRootFileSystem",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "StoragePressureRootFileSystemNotDetected",
+					"message": "Root filesystem has no storage pressure"
+				},
+				{
+					"type": "ResourceExhausted",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "ResourcesOK",
+					"message": "System resources are within normal range."
+				},
+				{
+					"type": "XfsShutdown",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "XfsHasNotShutDown",
+					"message": "XFS has not shutdown"
+				},
+				{
+					"type": "DeprecatedUsingV1Alpha2Cri",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "DeprecatedUsingV1Alpha2CriNotDetected",
+					"message": "No deprecation risk: did not use v1alpha2 CRI"
+				},
+				{
+					"type": "Swap",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "SwapNotDetected",
+					"message": "Swap is not active"
+				},
+				{
+					"type": "CperHardwareErrorFatal",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "CperHardwareHasNoFatalError",
+					"message": "UEFI CPER has no fatal error"
+				},
+				{
+					"type": "FrequentUnregisterNetDevice",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "NoFrequentUnregisterNetDevice",
+					"message": "node is functioning properly"
+				},
+				{
+					"type": "ReadOnlyRootFileSystem",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "ReadOnlyRootFileSystemNotDetected",
+					"message": "Root filesystem is not read only"
+				},
+				{
+					"type": "FrequentKubeletRestart",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "NoFrequentKubeletRestart",
+					"message": "kubelet is functioning properly"
+				},
+				{
+					"type": "DeprecatedPullingSchemaV1Image",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "DeprecatedPullingSchemaV1ImageDetected",
+					"message": "No deprecation risk: did not pull any schema v1 images"
+				},
+				{
+					"type": "SysctlChanged",
+					"status": "True",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "NodeSysctlChange",
+					"message": "{\"unmanaged\": {\"kernel.cad_pid\": \"1\"}}"
+				},
+				{
+					"type": "FrequentDockerRestart",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:56:31Z",
+					"lastTransitionTime": "2026-09-21T12:06:27Z",
+					"reason": "NoFrequentDockerRestart",
+					"message": "docker is functioning properly"
+				},
+				{
+					"type": "MemoryPressure",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:57:11Z",
+					"lastTransitionTime": "2026-09-21T12:06:31Z",
+					"reason": "KubeletHasSufficientMemory",
+					"message": "kubelet has sufficient memory available"
+				},
+				{
+					"type": "DiskPressure",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:57:11Z",
+					"lastTransitionTime": "2026-09-21T12:06:31Z",
+					"reason": "KubeletHasNoDiskPressure",
+					"message": "kubelet has no disk pressure"
+				},
+				{
+					"type": "PIDPressure",
+					"status": "False",
+					"lastHeartbeatTime": "2026-10-08T15:57:11Z",
+					"lastTransitionTime": "2026-09-21T12:06:31Z",
+					"reason": "KubeletHasSufficientPID",
+					"message": "kubelet has sufficient PID available"
+				},
+				{
+					"type": "Ready",
+					"status": "True",
+					"lastHeartbeatTime": "2026-10-08T15:57:11Z",
+					"lastTransitionTime": "2026-09-21T12:08:43Z",
+					"reason": "KubeletReady",
+					"message": "kubelet is posting ready status"
+				}
+			],
+			"addresses": [
+				{
+					"type": "InternalIP",
+					"address": "10.128.0.109"
+				},
+				{
+					"type": "ExternalIP",
+					"address": "34.68.218.199"
+				},
+				{
+					"type": "Hostname",
+					"address": "gke-prow-build-pool8-build-2026092112-55a7d4bb-hblg"
+				}
+			],
+			"daemonEndpoints": {
+				"kubeletEndpoint": {
+					"Port": 10250
+				}
+			},
+			"nodeInfo": {
+				"machineID": "cf52e3d642656e73f47014cfdc6d2fc2",
+				"systemUUID": "cf52e3d6-4265-6e73-f470-14cfdc6d2fc2",
+				"bootID": "4feabebb-ac62-4554-b822-a72d58868a64",
+				"kernelVersion": "6.12.94+",
+				"osImage": "Container-Optimized OS from Google",
+				"containerRuntimeVersion": "containerd://2.1.9",
+				"kubeletVersion": "v1.35.7-gke.1150000",
+				"kubeProxyVersion": "",
+				"operatingSystem": "linux",
+				"architecture": "amd64"
+			},
+			"images": [
+				{
+					"names": [
+						"gcr.io/k8s-staging-releng/k8s-ci-builder@sha256:b36c192cf00d82cf367d2f89276712bf60f5b9c6714df138aacdb40118ec5af6"
+					],
+					"sizeBytes": 971003833
+				},
+				{
+					"names": [
+						"gcr.io/k8s-staging-releng/k8s-ci-builder@sha256:f63f3b77790298f8b41d1e0620f054f23530f14a6d2c7bd90c4cc8578e8cd869",
+						"gcr.io/k8s-staging-releng/k8s-ci-builder:latest-default"
+					],
+					"sizeBytes": 970963827
+				},
+				{
+					"names": [
+						"gcr.io/k8s-staging-releng/k8s-ci-builder@sha256:31483043a600527ae327b2132db0879f3e89e1b640adc7656dd6f0365bf534a6"
+					],
+					"sizeBytes": 970091509
+				},
+				{
+					"names": [
+						"gcr.io/k8s-staging-releng/k8s-ci-builder@sha256:4fa2833ada4d83ba77351312f89d8880d79be7082742b404cde961c7750a2d72"
+					],
+					"sizeBytes": 967694205
+				},
+				{
+					"names": [
+						"gcr.io/k8s-staging-releng/k8s-ci-builder@sha256:541080d755144d2bc44bf524ab0f1b35022a88f2969cf8becab958198d35d9db"
+					],
+					"sizeBytes": 967668069
+				},
+				{
+					"names": [
+						"gcr.io/k8s-staging-releng/k8s-ci-builder@sha256:46c3a561d849f21ff4b1b3923588e5e33850024c8221ffda9996d294c2437571"
+					],
+					"sizeBytes": 967633341
+				},
+				{
+					"names": [
+						"gcr.io/k8s-staging-releng/k8s-ci-builder@sha256:ad13a356988b55349a6f1428c3cc48c3f12a79014c2caabdefed0fb1b38f2de0"
+					],
+					"sizeBytes": 961729650
+				},
+				{
+					"names": [
+						"gke.gcr.io-artifactregistry.gcr.io/gke-release-staging/gke-release-staging/cilium/cilium@sha256:9b241a7d955544e680f66da3772739a29bdb18f6eef11c3a84763063c48bfeeb",
+						"gke.gcr.io-artifactregistry.gcr.io/gke-release/gke-release/cilium/cilium@sha256:9b241a7d955544e680f66da3772739a29bdb18f6eef11c3a84763063c48bfeeb",
+						"us-central1-artifactregistry.gcr.io/gke-release-staging/gke-release-staging/cilium/cilium@sha256:9b241a7d955544e680f66da3772739a29bdb18f6eef11c3a84763063c48bfeeb",
+						"us-central1-artifactregistry.gcr.io/gke-release/gke-release/cilium/cilium@sha256:9b241a7d955544e680f66da3772739a29bdb18f6eef11c3a84763063c48bfeeb"
+					],
+					"sizeBytes": 210915499
+				},
+				{
+					"names": [
+						"gke.gcr.io/prometheus-engine/prometheus@sha256:68038912eddca33347de1e85ffae8b785832303875957bd58d579a52ce8b6f93"
+					],
+					"sizeBytes": 146494435
+				},
+				{
+					"names": [
+						"gke.gcr.io/gcp-compute-persistent-disk-csi-driver@sha256:fc65b739e47e804ec6c93f4a2a8d8a2dbcaa2c1dd91f082fdb0c4266856d12ce"
+					],
+					"sizeBytes": 124338789
+				},
+				{
+					"names": [
+						"gcr.io/gke-on-prem-staging/kube-proxy-amd64:v1.35.7-gke.200",
+						"gcr.io/gke-on-prem-staging/kube-proxy:v1.35.7-gke.200",
+						"gcr.io/gke-release-staging/kube-proxy-amd64:v1.35.7-gke.200",
+						"gcr.io/gke-release-staging/kube-proxy:v1.35.7-gke.200",
+						"gke.gcr.io/kube-proxy-amd64:v1.35.7-gke.1150000"
+					],
+					"sizeBytes": 122518906
+				},
+				{
+					"names": [
+						"gke.gcr.io/fluent-bit@sha256:cf47db3b70ee9b962711663a2081ddbd790cfcc1eed67c3e75f40231e3a2bf36"
+					],
+					"sizeBytes": 67992058
+				},
+				{
+					"names": [
+						"gke.gcr.io/network-metering-agent@sha256:20c021f3162fc5b84cb5faaf3aaf4556c2674f58bab1433c77c9b75b881cb8ba"
+					],
+					"sizeBytes": 54385328
+				},
+				{
+					"names": [
+						"gke.gcr.io/k8s-dns-node-cache@sha256:2b87a215897f0184d14c04dc7a9e7baebb1cd83b426de469fedee99a7c8b11c0"
+					],
+					"sizeBytes": 52917341
+				},
+				{
+					"names": [
+						"gke.gcr.io/gke-metadata-server@sha256:2fd008f6a58022a2880e918c0f484e9f2680d55ef42176d43a3ba89efaa155ef"
+					],
+					"sizeBytes": 46402277
+				},
+				{
+					"names": [
+						"gke.gcr.io-artifactregistry.gcr.io/gke-release-staging/gke-release-staging/cilium/certgen@sha256:53d518f28456c9563f153b6cf4fd9b43835286dff3b2c37d32f0038f9f22b482",
+						"gke.gcr.io-artifactregistry.gcr.io/gke-release/gke-release/cilium/certgen@sha256:53d518f28456c9563f153b6cf4fd9b43835286dff3b2c37d32f0038f9f22b482",
+						"us-central1-artifactregistry.gcr.io/gke-release-staging/gke-release-staging/cilium/certgen@sha256:53d518f28456c9563f153b6cf4fd9b43835286dff3b2c37d32f0038f9f22b482",
+						"us-central1-artifactregistry.gcr.io/gke-release/gke-release/cilium/certgen@sha256:53d518f28456c9563f153b6cf4fd9b43835286dff3b2c37d32f0038f9f22b482"
+					],
+					"sizeBytes": 44153383
+				},
+				{
+					"names": [
+						"gke.gcr.io-artifactregistry.gcr.io/gke-release-staging/gke-release-staging/cilium/slim-daemon/anet-agent@sha256:ba0a6da47429812a57ed35390f9666f9cdbbd0ca2ae7994443af53459dd986ee",
+						"gke.gcr.io-artifactregistry.gcr.io/gke-release/gke-release/cilium/slim-daemon/anet-agent@sha256:ba0a6da47429812a57ed35390f9666f9cdbbd0ca2ae7994443af53459dd986ee",
+						"us-central1-artifactregistry.gcr.io/gke-release-staging/gke-release-staging/cilium/slim-daemon/anet-agent@sha256:ba0a6da47429812a57ed35390f9666f9cdbbd0ca2ae7994443af53459dd986ee",
+						"us-central1-artifactregistry.gcr.io/gke-release/gke-release/cilium/slim-daemon/anet-agent@sha256:ba0a6da47429812a57ed35390f9666f9cdbbd0ca2ae7994443af53459dd986ee"
+					],
+					"sizeBytes": 40933322
+				},
+				{
+					"names": [
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar@sha256:e90a981b692a934832669b1f006fbbaf84bf56bd288ecdb5e5aa2f9fbdda3a10",
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261007-6ed406f29"
+					],
+					"sizeBytes": 40366240
+				},
+				{
+					"names": [
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar@sha256:f81b0c379f681d6f003815dd90769093e38bba9bcbfca6d4212c1be510c76a5c",
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261008-e012f2883"
+					],
+					"sizeBytes": 40366230
+				},
+				{
+					"names": [
+						"us-docker.pkg.dev/k8s-infra-prow/images/initupload@sha256:0849bfd09ab1a35b5c188de52328b11992f79d6444cf3e7996c97f1ae241e180",
+						"us-docker.pkg.dev/k8s-infra-prow/images/initupload:v20261008-e012f2883"
+					],
+					"sizeBytes": 40219753
+				},
+				{
+					"names": [
+						"us-docker.pkg.dev/k8s-infra-prow/images/initupload@sha256:ee2425c51be7efb9ce6c95f79966bbfaace93e8d35d70f27a5d89e5e9c9f5669",
+						"us-docker.pkg.dev/k8s-infra-prow/images/initupload:v20261007-6ed406f29"
+					],
+					"sizeBytes": 40219750
+				},
+				{
+					"names": [
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar@sha256:8bb38d6d26b83c974554ff8f17d3f9348b2b685b773758a7e22a31d21e1014ef",
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261001-1bf709c1c"
+					],
+					"sizeBytes": 40162898
+				},
+				{
+					"names": [
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar@sha256:3c03bb9d298f9aa6077c90096f2720f2f4a9b2519cac27fdc63eae99d6a8bb84",
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261005-27fe62bda"
+					],
+					"sizeBytes": 40162863
+				},
+				{
+					"names": [
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar@sha256:cd0ad4b53a20fa3380fe2fea88db1ad30a9345eb7527e4b2b68d6c8f0b190052",
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261001-6844e439e"
+					],
+					"sizeBytes": 40162838
+				},
+				{
+					"names": [
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar@sha256:32bb79c1c1f4307c905442dc57ac0db560a3e450068afe6d9f9d0710ba6cb2e4",
+						"us-docker.pkg.dev/k8s-infra-prow/images/sidecar:v20261001-ae4792128"
+					],
+					"sizeBytes": 40162828
+				}
+			],
+			"runtimeHandlers": [
+				{
+					"name": "",
+					"features": {
+						"recursiveReadOnlyMounts": true,
+						"userNamespaces": true
+					}
+				},
+				{
+					"name": "runc",
+					"features": {
+						"recursiveReadOnlyMounts": true,
+						"userNamespaces": true
+					}
+				}
+			],
+			"features": {
+				"supplementalGroupsPolicy": true
+			}
+		}
+	}
+}

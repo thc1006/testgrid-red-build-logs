@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2105566278767874048",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1790841138,
+  "created": 1790841095,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler/preemption.podgroup",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestPodGroupPreemption/Binding_first_before_preemptio...N   TestPodGroupPreemption\n--- FAIL: TestPodGroupPreemption (254.38s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790843337,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2105566278767874048",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2105566278767874048/build-log.txt",
+  "log": {
+    "bytes": 203266,
+    "md5": "6512e0b0b057b2fc0b60ae5063dc30b4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 18898
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

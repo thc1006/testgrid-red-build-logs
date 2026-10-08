@@ -1,0 +1,34 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-correctness",
+  "build": "2106066936642146304",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness",
+  "started": 1790960462,
+  "created": 1790960461,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-master-scale-correctness",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] kubelet host cleanup with volume mounts [HostCleanup] Host cleanup after disrupting NFS volume [NFS] [Provider:gce,aws,local,azure] after stopping the nfs-server and deleting the (active) client pod, the NFS mount and the pod's UID directory should be removed. [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Expected an error to have occurred.  Got:\n    <nil>: nil\nIn [...8s.io/kubernetes/test/e2e/node/kubelet.go:424 @ 10/02/26 17:37:24.381\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790965085,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2106066936642146304",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2106066936642146304/build-log.txt",
+  "log": {
+    "bytes": 1428059,
+    "md5": "0c7ff0f500282de36f2bcd28dbd4bff8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 122449
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

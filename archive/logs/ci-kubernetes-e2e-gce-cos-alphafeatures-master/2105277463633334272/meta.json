@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2105277463633334272",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1790772264,
+  "created": 1790772236,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Feature:(AdmissionW...r=/logs/artifacts --disable-log-dump=true (interrupted): exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container burstable pods - 1 container with all requests & limits set and resize policy [Feature:InPlacePodVerticalScaling] mem restart resizing mem requests",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...netes/test/e2e/common/node/pod_resize.go:1209 @ 09/30/26 14:44:29.021\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790779950,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2105277463633334272",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2105277463633334272/build-log.txt",
+  "log": {
+    "bytes": 156045,
+    "md5": "e8e4c6515e06ec83997e00f86cbafb8d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25313
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

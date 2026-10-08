@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2107987361420808192",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1791418326,
+  "created": 1791418326,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (block volmode)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to wait for pod-4 [&Pod{ObjectMeta:{pod-3884b26b-7cfa-...t/e2e/storage/testsuites/volume_stress.go:221 @ 10/08/26 01:54:58.549\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791436989,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2107987361420808192",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2107987361420808192/build-log.txt",
+  "log": {
+    "bytes": 447532,
+    "md5": "76393e911bd00fd6266d421544ac4cac",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 47019
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

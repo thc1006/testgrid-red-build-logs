@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2105233925742792704",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1790761890,
+  "created": 1790761855,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-instrumentation] k8s.io/kubernetes/test/integration.events",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestEventSeries\n    testserver.go:691: Resolved tests...imed out waiting for the condition\n--- FAIL: TestEventSeries (21.98s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790764162,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2105233925742792704",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2105233925742792704/build-log.txt",
+  "log": {
+    "bytes": 200599,
+    "md5": "76ad6886d042930b128c02c508255c27",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19984
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

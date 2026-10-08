@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2107432699080740864",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1791286084,
+  "created": 1791286084,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Deployment should not disrupt a cloud load-balancer's connectivity during rollout [Provider:aws,azure,gce]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 34.10.6.253:80 after 2m0...bernetes/test/e2e/framework/service/util.go:49 @ 10/06/26 11:46:07.32\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791288669,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2107432699080740864",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2107432699080740864/build-log.txt",
+  "log": {
+    "bytes": 321990,
+    "md5": "c4d937e807afcf0a0d2a0d6c4824ad40",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 46848
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

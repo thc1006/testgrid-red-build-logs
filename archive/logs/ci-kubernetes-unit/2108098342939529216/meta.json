@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2108098342939529216",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1791444940,
+  "created": 1791444786,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/client-go/tools.remotecommand",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestWebSocketClient_DifferentBufferSizes\n    websocke...ming ready\n--- FAIL: TestWebSocketClient_DifferentBufferSizes (0.24s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791446279,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108098342939529216",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108098342939529216/build-log.txt",
+  "log": {
+    "bytes": 255399,
+    "md5": "0a2b6b6dabc4d6f6a304873bc8c74653",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 33018
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

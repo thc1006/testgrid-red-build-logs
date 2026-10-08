@@ -1,0 +1,39 @@
+{
+  "job": "ci-kubernetes-build-fast",
+  "build": "2108221405156872192",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-build-fast",
+  "started": 1791474250,
+  "created": 1791474126,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "build-master-fast",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-build-fast.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        },
+        {
+          "test": "ci-kubernetes-build-fast.Pod",
+          "status": "FAIL",
+          "message": "pod could not initialize: containers with incomplete status: [initupload place-entrypoint]"
+        }
+      ]
+    }
+  ],
+  "result": "failure",
+  "finished": 1791474509,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-build-fast/2108221405156872192",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-build-fast/2108221405156872192/build-log.txt",
+  "log": null,
+  "podinfo": {
+    "bytes": 97107,
+    "md5": "c11b88315fda2f56478b4524611740b2",
+    "verified": true,
+    "file": "podinfo.json",
+    "file_bytes": 97107
+  },
+  "archived_by_run": "20261008T192522.317018Z"
+}

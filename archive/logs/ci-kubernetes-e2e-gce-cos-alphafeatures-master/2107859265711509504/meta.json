@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2107859265711509504",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1791387814,
+  "created": 1791387785,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update nodePort: udp [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failure validating that node port service STOPPED removed pro...kubernetes/test/e2e/network/networking.go:408 @ 10/07/26 15:52:31.911\n"
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Feature:(AdmissionW...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791394682,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2107859265711509504",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2107859265711509504/build-log.txt",
+  "log": {
+    "bytes": 143694,
+    "md5": "10522b4ad34e2e66e144bbd6d3a98d17",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21806
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}

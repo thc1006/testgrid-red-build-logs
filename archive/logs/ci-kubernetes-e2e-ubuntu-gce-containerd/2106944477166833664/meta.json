@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2106944477166833664",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1791169683,
+  "created": 1791169683,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota [FeatureGate:VolumeAttributesClass] should verify ResourceQuota's volume attributes class scope (quota set to pvc count: 1) against a pvc with different volume attributes class.",
+          "status": "FAIL",
+          "message": "[FAILED] persistentvolumeclaims \"test-claim\" is forbidden: exceeded qu.../test/e2e/apimachinery/resource_quota.go:1387 @ 10/05/26 03:30:44.082\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791171869,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2106944477166833664",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2106944477166833664/build-log.txt",
+  "log": {
+    "bytes": 139724,
+    "md5": "e01c790bec43ec57e9cf3fc3895d1cd5",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22809
+  },
+  "podinfo": null,
+  "archived_by_run": "20261008T192522.317018Z"
+}
