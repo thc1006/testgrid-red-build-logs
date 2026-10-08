@@ -37,6 +37,7 @@ import json
 import math
 import os
 import re
+import signal
 import sys
 import tempfile
 import threading
@@ -957,18 +958,26 @@ def main(argv=None):
     bind_context(ctx)
     pool = cf.ThreadPoolExecutor(ctx.limit.ceiling, initializer=bind_context, initargs=(ctx,))
     deadline = time.monotonic() + args.run_timeout_minutes * 60
+    # The GitHub runner ends a timed-out or cancelled step with SIGINT, then SIGTERM;
+    # handle both the same way.
+    previous_term = signal.signal(signal.SIGTERM, interrupt)
     try:
         return run(args, root, run_start, run_id, pool, deadline)
-    except KeyboardInterrupt:  # SIGINT, e.g. a GitHub step timeout or cancel
+    except KeyboardInterrupt:  # outside the download wait (see run()): nothing to record yet
         ctx.abandoned.set()  # workers stop at their next read and cannot write
         print("ERROR interrupted; unfinished builds are picked up by the next run", file=sys.stderr)
         return 130
     finally:
+        signal.signal(signal.SIGTERM, previous_term)
         # Workers still blocked past the deadline are abandoned: they cannot write
         # any more (see replace()), and the process exit does not wait for them.
         pool.shutdown(wait=not ctx.abandoned.is_set(), cancel_futures=True)
         if lock:
             lock.close()
+
+
+def interrupt(signum, frame):
+    raise KeyboardInterrupt
 
 
 def run(args, root, run_start, run_id, pool, deadline):
@@ -1041,7 +1050,14 @@ def run(args, root, run_start, run_id, pool, deadline):
     max_bytes = int(args.max_file_mb * (1 << 20))
     futures = {pool.submit(archive, b, root, args.gcs, run_id, run_start, args.max_job_hours, args.gzip, max_bytes): b
                for b in selected + retry}
-    done, not_done = cf.wait(futures, timeout=max(0, deadline - time.monotonic()))
+    interrupted = False
+    try:
+        _, not_done = cf.wait(futures, timeout=max(0, deadline - time.monotonic()))
+    except KeyboardInterrupt:
+        # Interrupted while downloading: stop the workers, but still record what
+        # was archived and remember the rest for the next run.
+        interrupted = True
+        not_done = {f for f in futures if not f.done()}
     if not_done:
         ctx.abandoned.set()
     for fut in futures:
@@ -1055,7 +1071,8 @@ def run(args, root, run_start, run_id, pool, deadline):
                     if key in state["no_log"]:
                         no_log[key] = state["no_log"][key]  # keep re-checking it for a late log
                     continue  # finished just as the run gave up, or was already on disk
-                raise TimeoutError("run timeout reached before this build finished; retrying next run")
+                cause = "interrupted" if interrupted else "run timeout reached"
+                raise TimeoutError(f"{cause} before this build finished; retrying next run")
             outcome, meta = fut.result()
             outcomes.setdefault(outcome, []).append(key)
             if outcome in ("archived", "archived-without-log", "repaired", "log-recovered"):
@@ -1099,6 +1116,7 @@ def run(args, root, run_start, run_id, pool, deadline):
         warnings=warnings,
         bytes_downloaded=downloaded,
         concurrency=concurrency,
+        interrupted=interrupted,
     ))
     write_json(os.path.join(root, "state.json"),
                {"tabs": tab_scans, "unresolved": unresolved, "given_up": given_up, "no_log": no_log})
@@ -1118,6 +1136,9 @@ def run(args, root, run_start, run_id, pool, deadline):
     # A possible gap in TestGrid history or a lost retry list means builds may be
     # missing without an error naming them, so it fails the run too.
     serious = [w for w in warnings if "may be missing" in w or "state.json" in w]
+    if interrupted:
+        print("ERROR interrupted; unfinished builds are retried by the next run", file=sys.stderr)
+        return 130
     return 1 if tab_errors or errors or serious else 0
 
 

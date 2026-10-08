@@ -866,30 +866,45 @@ class EndToEndTest(unittest.TestCase):
         frl.sweep_parts(self.root)
         self.assertTrue(os.path.exists(keep))
 
-    def test_sigint_stops_the_run_at_once_without_writing(self):
+    def interrupt_mid_download(self, sig):
         def trickle(h):
             h.send_response(200)
             h.send_header("Content-Length", "1000000")
             h.end_headers()
-            for _ in range(200):
-                h.wfile.write(b"x")
-                h.wfile.flush()
-                time.sleep(0.05)
+            with contextlib.suppress(BrokenPipeError, ConnectionResetError):  # the client was killed
+                for _ in range(200):
+                    h.wfile.write(b"x")
+                    h.wfile.flush()
+                    time.sleep(0.05)
 
         self.srv.route("/bucket/logs/job-a/1004/build-log.txt", trickle)
+        # The subprocess keeps the real retry backoff, so make the scan fast and clean.
+        self.srv.table("dash", "broken", table("bucket/logs/job-d", ["4000"], {"o": ([1], [""])}))
         script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fetch_red_logs.py")
         p = subprocess.Popen([sys.executable, script, "--archive", self.root, "--dashboard", "dash",
                               "--testgrid", self.srv.url, "--gcs", self.srv.url],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        time.sleep(3)  # it is now stuck in the slow download
+        time.sleep(3)  # the scan is done and it is stuck in the slow download
         t0 = time.monotonic()
-        p.send_signal(signal.SIGINT)
-        out, err = p.communicate(timeout=10)
+        p.send_signal(sig)
+        _, err = p.communicate(timeout=10)
         self.assertLess(time.monotonic() - t0, 3)
         self.assertEqual(p.returncode, 130)
         self.assertIn("interrupted", err)
+        # What finished is recorded; the cut-off build is not on disk but queued for the next run.
         self.assertFalse(os.path.exists(self.path("logs/job-a/1004/meta.json")))
+        run = self.last_run()
+        self.assertTrue(run["interrupted"])
+        self.assertIn("job-a/1002", run["outcomes"]["archived"])
+        self.assertIn("interrupted", self.state()["unresolved"]["job-a/1004"]["last_error"])
+        self.assertTrue(os.path.exists(self.path("INDEX.md")))
         time.sleep(10)  # let the server finish the abandoned response
+
+    def test_sigint_mid_download_records_the_run_and_stops_at_once(self):
+        self.interrupt_mid_download(signal.SIGINT)
+
+    def test_sigterm_is_handled_like_sigint(self):
+        self.interrupt_mid_download(signal.SIGTERM)
 
     def test_second_concurrent_run_is_refused(self):
         held = frl.lock_archive(self.root)

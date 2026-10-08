@@ -22,9 +22,9 @@ jobs:
     # The commit step pushes back to the branch the run was started on.
     if: github.ref_type == 'branch'
     runs-on: ubuntu-24.04
-    # More than the step timeouts below (50 + 20 + 10) plus setup, so the
-    # commit step always gets to run.
-    timeout-minutes: 90
+    # More than the step timeouts below (5 + 50 + 20 + 10) plus checkout and
+    # setup-uv, so the commit step always gets to run.
+    timeout-minutes: 95
     permissions:
       contents: write # push the archive back to the branch
     steps:
@@ -44,24 +44,31 @@ jobs:
           enable-cache: true
           cache-dependency-glob: tool/uv.lock
 
-      # exec: on a timeout or cancel the runner signals only the step's own
-      # process, so it must be uv (which passes signals on to Python), not a bash
-      # that would exit and leave the tool writing to archive/.
+      # uv builds the environment from uv.lock (and fails if the lock is stale).
+      - name: Set up the Python environment
+        timeout-minutes: 5
+        run: uv sync --no-dev --locked --project tool
+
+      # On a timeout or cancel the runner signals only the step's own process:
+      # SIGINT, then SIGTERM, then SIGKILL. exec makes that process Python itself,
+      # so the tool stops cleanly; a bash or a uv in between would die first and
+      # leave the tool still writing to archive/.
       - name: Fetch the build logs behind red TestGrid cells
         id: fetch
         continue-on-error: true
         timeout-minutes: 50
-        run: exec uv run --no-dev --project tool tool/fetch_red_logs.py --archive archive --gzip
+        run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --gzip
 
       - name: Verify the archive against TestGrid and GCS
         id: verify
         continue-on-error: true
         timeout-minutes: 20
-        run: exec uv run --no-dev --project tool tool/cross_check.py --archive archive --hours 48
+        run: exec tool/.venv/bin/python tool/cross_check.py --archive archive --hours 48
 
       # Commit whatever was archived even when a step failed or timed out (a step
-      # timeout is a failure, not a cancellation); the run report in archive/runs/
-      # says what went wrong. A run cancelled by hand pushes nothing.
+      # timeout is a failure, not a cancellation). The run report in archive/runs/
+      # says what went wrong; an interrupted fetch writes one too, unless it was
+      # killed outright. A run cancelled before this step pushes nothing.
       - name: Commit the archive
         if: ${{ !cancelled() }}
         timeout-minutes: 10
@@ -72,6 +79,12 @@ jobs:
             echo "No archive/ to commit."
             exit 0
           fi
+          # A build directory without meta.json is a download that was cut off: leave
+          # it out; the build is retried by a later run.
+          shopt -s nullglob
+          for d in archive/logs/*/*/; do
+            [ -e "${d}meta.json" ] || rm -rf -- "$d"
+          done
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add archive
