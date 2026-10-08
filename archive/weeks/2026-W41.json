@@ -1,5 +1,44 @@
 [
   {
+    "time": 1791488470,
+    "job": "ci-kubernetes-e2e-kind-beta-features",
+    "build": "2108281300413583360",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with multiple PVs and PVCs all in same ns should create 2 PVs and 4 PVCs: test write access",
+      "ci-kubernetes-e2e-kind-beta-features.Overall"
+    ],
+    "files": [
+      "logs/ci-kubernetes-e2e-kind-beta-features/2108281300413583360/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 136030,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108281300413583360"
+  },
+  {
+    "time": 1791486787,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2108274507192995840",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should only target nodes with endpoints [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "files": [
+      "logs/ci-kubernetes-e2e-gci-gce-slow/2108274507192995840/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 139453,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108274507192995840"
+  },
+  {
     "time": 1791483128,
     "job": "ci-kubernetes-e2e-gci-gce-slow",
     "build": "2108259154840784896",
