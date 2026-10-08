@@ -959,6 +959,10 @@ def main(argv=None):
     deadline = time.monotonic() + args.run_timeout_minutes * 60
     try:
         return run(args, root, run_start, run_id, pool, deadline)
+    except KeyboardInterrupt:  # SIGINT, e.g. a GitHub step timeout or cancel
+        ctx.abandoned.set()  # workers stop at their next read and cannot write
+        print("ERROR interrupted; unfinished builds are picked up by the next run", file=sys.stderr)
+        return 130
     finally:
         # Workers still blocked past the deadline are abandoned: they cannot write
         # any more (see replace()), and the process exit does not wait for them.

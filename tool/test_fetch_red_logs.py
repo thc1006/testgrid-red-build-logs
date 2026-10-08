@@ -8,6 +8,7 @@ import http.server
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -864,6 +865,31 @@ class EndToEndTest(unittest.TestCase):
         open(keep, "w").close()
         frl.sweep_parts(self.root)
         self.assertTrue(os.path.exists(keep))
+
+    def test_sigint_stops_the_run_at_once_without_writing(self):
+        def trickle(h):
+            h.send_response(200)
+            h.send_header("Content-Length", "1000000")
+            h.end_headers()
+            for _ in range(200):
+                h.wfile.write(b"x")
+                h.wfile.flush()
+                time.sleep(0.05)
+
+        self.srv.route("/bucket/logs/job-a/1004/build-log.txt", trickle)
+        script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fetch_red_logs.py")
+        p = subprocess.Popen([sys.executable, script, "--archive", self.root, "--dashboard", "dash",
+                              "--testgrid", self.srv.url, "--gcs", self.srv.url],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        time.sleep(3)  # it is now stuck in the slow download
+        t0 = time.monotonic()
+        p.send_signal(signal.SIGINT)
+        out, err = p.communicate(timeout=10)
+        self.assertLess(time.monotonic() - t0, 3)
+        self.assertEqual(p.returncode, 130)
+        self.assertIn("interrupted", err)
+        self.assertFalse(os.path.exists(self.path("logs/job-a/1004/meta.json")))
+        time.sleep(10)  # let the server finish the abandoned response
 
     def test_second_concurrent_run_is_refused(self):
         held = frl.lock_archive(self.root)

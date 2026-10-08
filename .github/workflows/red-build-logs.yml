@@ -9,10 +9,11 @@ on:
 
 permissions: {}
 
-# One run at a time. A run still waiting when a newer one arrives is replaced
-# by it, which loses nothing: every run rescans everything that is still red.
+# One run at a time per branch. A run still waiting when a newer one for the same
+# branch arrives is replaced by it, which loses nothing: every run rescans
+# everything that is still red.
 concurrency:
-  group: red-build-logs
+  group: red-build-logs-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -43,22 +44,26 @@ jobs:
           enable-cache: true
           cache-dependency-glob: tool/uv.lock
 
+      # exec: on a timeout or cancel the runner signals only the step's own
+      # process, so it must be uv (which passes signals on to Python), not a bash
+      # that would exit and leave the tool writing to archive/.
       - name: Fetch the build logs behind red TestGrid cells
         id: fetch
         continue-on-error: true
         timeout-minutes: 50
-        run: uv run --no-dev --project tool tool/fetch_red_logs.py --archive archive --gzip
+        run: exec uv run --no-dev --project tool tool/fetch_red_logs.py --archive archive --gzip
 
       - name: Verify the archive against TestGrid and GCS
         id: verify
         continue-on-error: true
         timeout-minutes: 20
-        run: uv run --no-dev --project tool tool/cross_check.py --archive archive --hours 48
+        run: exec uv run --no-dev --project tool tool/cross_check.py --archive archive --hours 48
 
-      # Commit whatever was archived even when a step failed; the run report
-      # in archive/runs/ says what went wrong.
+      # Commit whatever was archived even when a step failed or timed out (a step
+      # timeout is a failure, not a cancellation); the run report in archive/runs/
+      # says what went wrong. A run cancelled by hand pushes nothing.
       - name: Commit the archive
-        if: always()
+        if: ${{ !cancelled() }}
         timeout-minutes: 10
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -80,7 +85,7 @@ jobs:
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $auth"
           for _ in 1 2 3; do
             git push && exit 0
-            if ! git pull --rebase -q; then
+            if ! git pull --rebase -q origin "$GITHUB_REF_NAME"; then
               git rebase --abort || true
               echo "::error::Someone else changed the branch meanwhile; this run's results were not pushed."
               exit 1

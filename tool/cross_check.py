@@ -96,6 +96,9 @@ def main(argv=None):
     watchdog.start()
     try:
         return verify(args)
+    except KeyboardInterrupt:
+        print("  PROBLEM: interrupted", flush=True)
+        os._exit(130)  # read-only, so stop now instead of waiting for worker threads
     finally:
         watchdog.cancel()
 
