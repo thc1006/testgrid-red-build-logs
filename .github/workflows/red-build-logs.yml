@@ -1,0 +1,76 @@
+name: Archive red TestGrid build logs
+
+on:
+  schedule:
+    # 00:17 and 12:17 UTC (08:17 and 20:17 in Taiwan). Off the hour because
+    # GitHub delays or drops scheduled runs at busy times such as :00.
+    - cron: "17 0,12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: red-build-logs
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      # Check out the branch tip, not the commit that triggered the run: a re-run
+      # or a run queued behind another must build on what the last run pushed.
+      # github.ref_name is the default branch for scheduled runs (their event
+      # payload has no repository field) and the chosen branch for manual ones.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: tool/uv.lock
+
+      # Step timeouts stay below the job timeout so the commit step always runs.
+      - name: Fetch the build logs behind red TestGrid cells
+        id: fetch
+        continue-on-error: true
+        timeout-minutes: 50
+        run: uv run --no-dev --project tool tool/fetch_red_logs.py --archive archive --gzip
+
+      - name: Verify the archive against TestGrid and GCS
+        id: verify
+        continue-on-error: true
+        timeout-minutes: 20
+        run: uv run --no-dev --project tool tool/cross_check.py --archive archive --hours 48
+
+      # Commit whatever was archived even when a step failed; the run report
+      # in archive/runs/ says what went wrong.
+      - name: Commit the archive
+        if: always()
+        timeout-minutes: 5
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add archive
+          if git diff --cached --quiet; then
+            echo "Nothing new to commit."
+            exit 0
+          fi
+          git commit -q -m "archive: red builds as of $(date -u +%Y-%m-%dT%H:%MZ)"
+          for _ in 1 2 3; do
+            git push && exit 0
+            if ! git pull --rebase -q; then
+              git rebase --abort || true
+              echo "::error::Someone else changed archive/ meanwhile; this run's results were not pushed."
+              exit 1
+            fi
+          done
+          exit 1
+
+      - name: Fail the run if fetching or verifying failed
+        if: steps.fetch.outcome == 'failure' || steps.verify.outcome == 'failure'
+        run: |
+          echo "fetch: ${{ steps.fetch.outcome }}, verify: ${{ steps.verify.outcome }}"
+          exit 1

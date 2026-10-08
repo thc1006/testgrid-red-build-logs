@@ -1,0 +1,19 @@
+[project]
+name = "red-build-logs"
+version = "0.1.0"
+description = "Archive the Prow build-log.txt behind every red cell on the sig-release TestGrid dashboards"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = ["ruff"]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP"]
