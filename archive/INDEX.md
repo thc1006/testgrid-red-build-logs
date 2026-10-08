@@ -1,6 +1,6 @@
 # Red TestGrid builds
 
-Updated 2026-10-08T19:25:59Z. Every build with a red cell on sig-release-master-blocking and sig-release-master-informing; times are UTC.
+Updated 2026-10-08T19:44:46Z. Every build with a red cell on sig-release-master-blocking and sig-release-master-informing; times are UTC.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/trend-dark.svg">
