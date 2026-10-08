@@ -7,19 +7,28 @@ on:
     paths: ["tool/**", ".github/workflows/**"]
 
 permissions:
-  contents: read
+  contents: read # check out the code, nothing else
+
+# A newer push or PR update supersedes a test run still in progress.
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    name: Lint and unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: tool
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: "0.11.16"
           enable-cache: true
           cache-dependency-glob: tool/uv.lock
       - run: uv run ruff check .

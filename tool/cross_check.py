@@ -107,7 +107,11 @@ def timed_out(minutes):
 
 def verify(args):
 
-    run_path = args.run or sorted(glob.glob(os.path.join(args.archive, "runs", "*.json")))[-1]
+    runs = sorted(glob.glob(os.path.join(args.archive, "runs", "*.json")))
+    run_path = args.run or (runs[-1] if runs else None)
+    if run_path is None:
+        print(f"  PROBLEM: no run report in {os.path.join(args.archive, 'runs')}; the fetch never finished a run")
+        return 1
     with open(run_path) as f:
         run = json.load(f)
     t0 = run["started"]

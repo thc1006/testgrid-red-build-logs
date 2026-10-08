@@ -69,3 +69,9 @@ uv run cross_check.py --archive ../archive
 uv run python -m unittest
 uv run ruff check .
 ```
+
+## License
+
+[Apache License 2.0](LICENSE), the same license as Kubernetes. The archived
+logs are copies of Kubernetes CI output that is already public in the
+`kubernetes-ci-logs` bucket.

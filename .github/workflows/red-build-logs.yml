@@ -7,32 +7,42 @@ on:
     - cron: "17 0,12 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
+permissions: {}
 
+# One run at a time. A run still waiting when a newer one arrives is replaced
+# by it, which loses nothing: every run rescans everything that is still red.
 concurrency:
   group: red-build-logs
   cancel-in-progress: false
 
 jobs:
   archive:
-    runs-on: ubuntu-latest
-    timeout-minutes: 80
+    name: Archive and verify
+    # The commit step pushes back to the branch the run was started on.
+    if: github.ref_type == 'branch'
+    runs-on: ubuntu-24.04
+    # More than the step timeouts below (50 + 20 + 10) plus setup, so the
+    # commit step always gets to run.
+    timeout-minutes: 90
+    permissions:
+      contents: write # push the archive back to the branch
     steps:
       # Check out the branch tip, not the commit that triggered the run: a re-run
       # or a run queued behind another must build on what the last run pushed.
       # github.ref_name is the default branch for scheduled runs (their event
       # payload has no repository field) and the chosen branch for manual ones.
+      # No credentials are kept in .git/config; only the commit step gets the token.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref_name }}
+          persist-credentials: false
 
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: "0.11.16"
           enable-cache: true
           cache-dependency-glob: tool/uv.lock
 
-      # Step timeouts stay below the job timeout so the commit step always runs.
       - name: Fetch the build logs behind red TestGrid cells
         id: fetch
         continue-on-error: true
@@ -49,8 +59,14 @@ jobs:
       # in archive/runs/ says what went wrong.
       - name: Commit the archive
         if: always()
-        timeout-minutes: 5
+        timeout-minutes: 10
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
+          if [ ! -d archive ]; then
+            echo "No archive/ to commit."
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add archive
@@ -59,11 +75,14 @@ jobs:
             exit 0
           fi
           git commit -q -m "archive: red builds as of $(date -u +%Y-%m-%dT%H:%MZ)"
+          auth=$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)
+          echo "::add-mask::$auth"
+          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $auth"
           for _ in 1 2 3; do
             git push && exit 0
             if ! git pull --rebase -q; then
               git rebase --abort || true
-              echo "::error::Someone else changed archive/ meanwhile; this run's results were not pushed."
+              echo "::error::Someone else changed the branch meanwhile; this run's results were not pushed."
               exit 1
             fi
           done
@@ -71,6 +90,9 @@ jobs:
 
       - name: Fail the run if fetching or verifying failed
         if: steps.fetch.outcome == 'failure' || steps.verify.outcome == 'failure'
+        env:
+          FETCH: ${{ steps.fetch.outcome }}
+          VERIFY: ${{ steps.verify.outcome }}
         run: |
-          echo "fetch: ${{ steps.fetch.outcome }}, verify: ${{ steps.verify.outcome }}"
+          echo "fetch: $FETCH, verify: $VERIFY"
           exit 1

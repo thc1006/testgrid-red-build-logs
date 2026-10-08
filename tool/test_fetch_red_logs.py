@@ -1147,6 +1147,11 @@ class CrossCheckTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("the last fetch did not finish", out)
 
+    def test_no_run_report_is_a_problem_not_a_crash(self):
+        code, out = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("no run report", out)
+
     def test_missing_local_log_is_a_problem_not_a_crash(self):
         start = NOW_MS - 20 * 3600 * 1000
         build = str((int(start) - frl.PROW_EPOCH_MS) << 22)
