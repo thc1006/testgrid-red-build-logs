@@ -1,5 +1,78 @@
 [
   {
+    "time": 1791521767,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2108421223502319616",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourceDefinition resources [Privileged:ClusterAdmin] Simple CustomResourceDefinition listing custom resource definition objects works [Conformance]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-09T060609Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2108421223502319616",
+    "run": "2026-10-09T060609Z",
+    "files": [
+      "runs/2026-10/2026-10-09T060609Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2108421223502319616/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 128222,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108421223502319616"
+  },
+  {
+    "time": 1791519134,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2108410152204898304",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-09T060609Z/ci-kubernetes-e2e-capz-master-windows/2108410152204898304",
+    "run": "2026-10-09T060609Z",
+    "files": [
+      "runs/2026-10/2026-10-09T060609Z/ci-kubernetes-e2e-capz-master-windows/2108410152204898304/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 8552,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2108410152204898304"
+  },
+  {
+    "time": 1791511539,
+    "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+    "build": "2108378189913919488",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-alphafeatures-master"
+    ],
+    "red_tests": [
+      "kubetest.TearDown",
+      "kubetest.Timeout",
+      "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-09T060609Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108378189913919488",
+    "run": "2026-10-09T060609Z",
+    "files": [
+      "runs/2026-10/2026-10-09T060609Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108378189913919488/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 56939,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108378189913919488"
+  },
+  {
     "time": 1791508835,
     "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
     "build": "2108366866593353728",
@@ -17,7 +90,7 @@
     ],
     "remote": [],
     "bytes": 8296,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2108366866593353728"
@@ -41,7 +114,7 @@
     ],
     "remote": [],
     "bytes": 256853,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2108364602046681088"
@@ -114,7 +187,7 @@
     ],
     "remote": [],
     "bytes": 479189,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108305461039075328"
@@ -1447,7 +1520,7 @@
     "remote": [],
     "bytes": 2891690,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2107691157248020480"
   },

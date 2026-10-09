@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2108378189913919488",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1791511539,
+  "created": 1791511506,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.TearDown",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-down.sh (interrupted): signal: interrupt"
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791518836,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108378189913919488",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108378189913919488/build-log.txt",
+  "log": {
+    "bytes": 56939,
+    "md5": "a401e4ead1880aba512d1fac4225b21a",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 11156,
+    "gcs": {
+      "generation": "1791518838671092",
+      "md5": "a401e4ead1880aba512d1fac4225b21a",
+      "crc32c": "7e24a9f3",
+      "bytes": 56939,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T060609Z",
+  "archived_at": 1791525969.0,
+  "settled": false,
+  "final": false
+}

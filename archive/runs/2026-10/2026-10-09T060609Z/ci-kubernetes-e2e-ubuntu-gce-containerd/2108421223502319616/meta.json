@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2108421223502319616",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1791521767,
+  "created": 1791521766,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourceDefinition resources [Privileged:ClusterAdmin] Simple CustomResourceDefinition listing custom resource definition objects works [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] deleting CustomResourceDefinition: context deadline exceeded\n...pimachinery/custom_resource_definition.go:114 @ 10/09/26 05:16:38.283\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791524149,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108421223502319616",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108421223502319616/build-log.txt",
+  "log": {
+    "bytes": 128222,
+    "md5": "96c25abb1e75fd22b9fddfe75aaca36c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21242,
+    "gcs": {
+      "generation": "1791524165064915",
+      "md5": "96c25abb1e75fd22b9fddfe75aaca36c",
+      "crc32c": "8e069417",
+      "bytes": 128222,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T060609Z",
+  "archived_at": 1791525969.0,
+  "settled": false,
+  "final": false
+}
