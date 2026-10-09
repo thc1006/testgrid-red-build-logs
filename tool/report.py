@@ -21,6 +21,7 @@ import glob
 import json
 import math
 import os
+import re
 import tempfile
 from xml.sax.saxutils import escape
 
@@ -51,6 +52,19 @@ BINS = [(1, 1, "1"), (2, 2, "2"), (3, 4, "3–4"), (5, 8, "5–8"), (9, None, "9
 LABELS = {"sig-release-master-blocking": "Blocking", "sig-release-master-informing": "Informing"}
 
 
+# What can start markup inside a table cell or list item: emphasis, code, links and
+# images, raw HTML, a table pipe, strikethrough. Block markers only matter at the start.
+MD_INLINE = re.compile(r"([\\`*_\[\]<>|!~])")
+
+
+def md_cell(s):
+    """Text safe inside a Markdown table cell or list item: one line, no markup, links, images or HTML."""
+    s = MD_INLINE.sub(r"\\\1", re.sub(r"[\x00-\x1f\x7f-\x9f\u2028\u2029]+", " ", str(s)).strip())
+    if s and s[0] in "#+-=":
+        return "\\" + s
+    return re.sub(r"^(\d+)([.)])", r"\1\\\2", s)
+
+
 def day_of(ts):
     return dt.datetime.fromtimestamp(ts, dt.UTC).date()
 
@@ -60,13 +74,14 @@ def day_start(d):
 
 
 def load_runs(root, current_run=None):
+    """Every readable run report (runs/<YYYY-MM>/<run>/run.json), plus the current run's."""
     runs = {}
-    for path in glob.glob(os.path.join(root, "runs", "*.json")):
+    for path in glob.glob(os.path.join(glob.escape(root), "runs", "*", "*", "run.json")):
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 run = json.load(f)
             runs[run["run"]] = run
-        except (OSError, ValueError, KeyError, TypeError):
+        except (OSError, ValueError, KeyError, TypeError, RecursionError):
             continue
     if current_run:
         runs[current_run["run"]] = current_run
@@ -118,7 +133,6 @@ def coverage(runs):
     """
     spans, listed = {}, {}
     for run in sorted(runs, key=lambda r: r["started"]):
-        settle = run.get("max_job_hours", 6) * 3600
         floor = run["started"] - run["since_hours"] * 3600 if run.get("since_hours") is not None else -math.inf
         seen = {}
         for t in run["tabs"]:
@@ -127,17 +141,51 @@ def coverage(runs):
             seen.setdefault(t["dashboard"], set()).add(t["tab"])
             if t.get("error") or not number(t.get("oldest")):
                 continue
-            lo, hi = max(t["oldest"], floor), run["started"] - settle
+            # a tab whose job can run longer than the run-wide default says so itself
+            own = t.get("max_job_hours")
+            hours = own if number(own) and own > 0 else run.get("max_job_hours", 6)
+            lo, hi = max(t["oldest"], floor), run["started"] - hours * 3600
             if hi > lo:
                 spans.setdefault((t["dashboard"], t["tab"]), []).append((lo, hi))
         listed.update(seen)
     return {k: merge(v) for k, v in spans.items()}, listed
 
 
+def membership(runs):
+    """Per dashboard, the tab lists its summary had over time: [(from, tabs), ...].
+
+    A day is only complete if every tab listed during it covered it, so a tab
+    that never loaded keeps its days partial even after it leaves the
+    dashboard. Before the first run, the first list is assumed.
+    """
+    history = {}
+    for run in sorted(runs, key=lambda r: r["started"]):
+        seen = {}
+        for t in run["tabs"]:
+            if isinstance(t, dict) and isinstance(t.get("dashboard"), str) and isinstance(t.get("tab"), str):
+                seen.setdefault(t["dashboard"], set()).add(t["tab"])
+        for dash, tabs in seen.items():
+            epochs = history.setdefault(dash, [])
+            if not epochs or epochs[-1][1] != tabs:
+                epochs.append((run["started"], tabs))
+    return history
+
+
+def tabs_during(epochs, lo, hi):
+    """Every tab listed at some point in [lo, hi)."""
+    out = set()
+    for i, (since, tabs) in enumerate(epochs):
+        until = epochs[i + 1][0] if i + 1 < len(epochs) else math.inf
+        if (since if i else -math.inf) < hi and until > lo:
+            out |= tabs
+    return out
+
+
 def summarize(entries, runs, now):
     today = day_of(now)
     days = [today - dt.timedelta(days=i) for i in range(TREND_DAYS - 1, -1, -1)]
     spans, listed = coverage(runs)
+    history = membership(runs)
     dashboards = sorted(set(listed) | {t.split("#", 1)[0] for e in entries for t in e["tabs"]},
                         key=lambda d: (d not in LABELS, list(LABELS).index(d) if d in LABELS else 0, d))
     per_day = {d: {day: 0 for day in days} for d in dashboards}
@@ -154,22 +202,31 @@ def summarize(entries, runs, now):
 
     panels = []
     for dash in dashboards:
-        tabs = listed.get(dash, set())
-        complete = {day for day in days
-                    if day < today and tabs
-                    and all(covers(spans.get((dash, t), []), day_start(day), day_start(day) + 86400) for t in tabs)}
+        complete = set()
+        for day in days:
+            lo, hi = day_start(day), day_start(day) + 86400
+            tabs = tabs_during(history.get(dash, []), lo, hi)
+            if day < today and tabs and all(covers(spans.get((dash, t), []), lo, hi) for t in tabs):
+                complete.add(day)
         counts = per_day[dash]
         avg = {}
         for i, day in enumerate(days):
             window = days[max(0, i - 6):i + 1]
             if len(window) == 7 and all(w in complete for w in window):
                 avg[day] = sum(counts[w] for w in window) / 7
-        last7 = [today - dt.timedelta(days=i) for i in range(1, 8)]
-        prev7 = [today - dt.timedelta(days=i) for i in range(8, 15)]
-        week = None
-        if all(d in complete for d in last7 + prev7):
-            week = (sum(counts[d] for d in last7), sum(counts[d] for d in prev7))
-        panels.append({"dashboard": dash, "counts": counts, "complete": complete, "avg": avg, "week": week})
+        # Compare the last 7 complete days with the 7 before. Yesterday is complete
+        # only once a run has scanned long enough after midnight, so the window may
+        # end the day before; it never jumps between two answers within a day.
+        week = week_end = None
+        for back in (1, 2):
+            end = today - dt.timedelta(days=back)
+            last7 = [end - dt.timedelta(days=i) for i in range(7)]
+            prev7 = [end - dt.timedelta(days=i) for i in range(7, 14)]
+            if all(d in complete for d in last7 + prev7) and all(d in counts for d in last7 + prev7):
+                week, week_end = (sum(counts[d] for d in last7), sum(counts[d] for d in prev7)), end
+                break
+        panels.append({"dashboard": dash, "counts": counts, "complete": complete, "avg": avg, "week": week,
+                       "week_end": week_end})
 
     heat_days = days[-HEAT_DAYS:]
     rows = []
@@ -193,9 +250,15 @@ def nice_scale(peak):
     return top, [0, top // 2, top]
 
 
+def xml_text(s):
+    """Escaped text without the characters XML 1.0 forbids, even escaped (control
+    characters, and lone surrogates from a JSON escape)."""
+    return escape(re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]", " ", str(s)))
+
+
 def text(x, y, s, size=12, fill="#000", weight=400, anchor="start", extra=""):
     return (f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" font-weight="{weight}" fill="{fill}" '
-            f'text-anchor="{anchor}" {extra}>{escape(s)}</text>')
+            f'text-anchor="{anchor}" {extra}>{xml_text(s)}</text>')
 
 
 def column(x, y, w, h, r, fill, opacity=1.0):
@@ -209,7 +272,7 @@ def column(x, y, w, h, r, fill, opacity=1.0):
 def svg(width, height, body, c, title):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
             f'viewBox="0 0 {width} {height}" font-family="{FONT}" role="img">'
-            f'<title>{escape(title)}</title>'
+            f'<title>{xml_text(title)}</title>'
             f'<rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" rx="8" fill="{c["surface"]}" '
             f'stroke="{c["border"]}"/>' + "".join(body) + "</svg>\n")
 
@@ -231,7 +294,7 @@ def week_text(week):
         else:
             change = f"{round(pct):+d}%"
     arrow = "up" if now > before else "down" if now < before else None
-    return arrow, f"last 7 days {now} · {change} vs previous 7 ({before})"
+    return arrow, f"last 7 full days {now} · {change} vs previous 7 ({before})"
 
 
 def render_trend(s, mode):
@@ -305,15 +368,28 @@ def render_trend(s, mode):
             b.append(column(x, base - h, bw, h, 4, c["bar"], 0.5 if d == s["today"] else 1.0))
             if i == top_i:
                 b.append(text(x + bw / 2, base - h - 6, str(v), 11, c["ink2"], 600, "middle"))
-        pts = [(left + i * slot + slot / 2, base - plot_h * p["avg"][d] / ymax)
-               for i, d in enumerate(s["days"]) if d in p["avg"]]
-        if pts:
-            path = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
-            b.append(f'<polyline points="{path}" fill="none" stroke="{c["surface"]}" stroke-width="5" '
-                     'stroke-linejoin="round" stroke-linecap="round"/>')
-            b.append(f'<polyline points="{path}" fill="none" stroke="{c["line"]}" stroke-width="2" '
-                     'stroke-linejoin="round" stroke-linecap="round"/>')
-            ex, ey = pts[-1]
+        # one line per stretch of days with an average: never bridge days without one
+        segments = []
+        for i, d in enumerate(s["days"]):
+            if d not in p["avg"]:
+                continue
+            point = (left + i * slot + slot / 2, base - plot_h * p["avg"][d] / ymax)
+            if segments and segments[-1][-1][0] == i - 1:
+                segments[-1].append((i, point))
+            else:
+                segments.append([(i, point)])
+        if segments:
+            for seg in segments:
+                if len(seg) == 1:  # a lone day: a dot, since a one-point line draws nothing
+                    x, y = seg[0][1]
+                    b.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2.5" fill="{c["line"]}"/>')
+                    continue
+                path = " ".join(f"{x:.1f},{y:.1f}" for _, (x, y) in seg)
+                b.append(f'<polyline points="{path}" fill="none" stroke="{c["surface"]}" stroke-width="5" '
+                         'stroke-linejoin="round" stroke-linecap="round"/>')
+                b.append(f'<polyline points="{path}" fill="none" stroke="{c["line"]}" stroke-width="2" '
+                         'stroke-linejoin="round" stroke-linecap="round"/>')
+            ex, ey = segments[-1][-1][1]
             b.append(f'<circle cx="{ex:.1f}" cy="{ey:.1f}" r="4" fill="{c["line"]}" stroke="{c["surface"]}" stroke-width="2"/>')
             last_avg = p["avg"][max(p["avg"])]
             b.append(text(left + pw + 10, ey + 4, f"avg {last_avg:.1f}/day", 12, c["ink"], 600))
@@ -421,7 +497,7 @@ def render_heatmap(s, mode):
 
 def picture(name, alt):
     return (f'<picture>\n  <source media="(prefers-color-scheme: dark)" srcset="charts/{name}-dark.svg">\n'
-            f'  <img alt="{escape(alt, {chr(34): "&quot;"})}" src="charts/{name}-light.svg">\n</picture>')
+            f'  <img alt="{escape(" ".join(alt.split()), {chr(34): "&quot;"})}" src="charts/{name}-light.svg">\n</picture>')
 
 
 def write_charts(root, entries, now, current_run=None):
@@ -433,7 +509,7 @@ def write_charts(root, entries, now, current_run=None):
             path = os.path.join(root, "charts", f"{name}-{mode}.svg")
             fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), prefix=f".{name}-{mode}.svg.", suffix=".part")
             try:
-                with os.fdopen(fd, "w") as f:
+                with os.fdopen(fd, "w", encoding="utf-8", errors="backslashreplace") as f:
                     os.fchmod(f.fileno(), 0o644)
                     f.write(render(s, mode))
                 os.replace(tmp, path)
@@ -452,7 +528,7 @@ def write_charts(root, entries, now, current_run=None):
              "<details><summary>Red builds per tab (table)</summary>", "",
              "| Dashboard | Tab | 7 days incl. today | " + f"{HEAT_DAYS} days |", "|---|---|---:|---:|"]
     for r in s["rows"]:
-        lines.append(f"| {LABELS.get(r['dashboard'], r['dashboard'])} | {r['tab'].replace('|', chr(92) + '|')} | "
+        lines.append(f"| {md_cell(LABELS.get(r['dashboard'], r['dashboard']))} | {md_cell(r['tab'])} | "
                      f"{r['last7']} | {sum(r['counts'].values())} |")
     lines += ["", "</details>", "",
               "<details><summary>Daily counts (table)</summary>", "",

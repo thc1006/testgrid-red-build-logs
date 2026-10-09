@@ -1,12 +1,14 @@
 """Tests for fetch_red_logs.py against a local fake TestGrid + GCS server."""
 import base64
 import contextlib
+import glob
 import io
 import gzip
 import hashlib
 import http.server
 import json
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -140,7 +142,8 @@ class FakeServer:
         self.route(f"/{dashboard}/summary", (200, {}, {t: ({"overall_status": s} if s else None) for t, s in tabs.items()}))
 
     def table(self, dashboard, tab, value):
-        self.route(frl.table_url("", dashboard, tab), value if isinstance(value, tuple) else (200, {}, value))
+        self.route(frl.table_url("", dashboard, tab),
+                   value if isinstance(value, tuple) or callable(value) else (200, {}, value))
 
     def close(self):
         self.httpd.shutdown()
@@ -157,7 +160,7 @@ PURPLE = table("bucket/logs/job-a",
 GREEN = table("bucket/logs/job-b", ["2002", "2001", "2000"], {"job-b.Overall": ([1, 12, 1], ["", "", ""])},
               start=NOW_MS)  # 2001 started an hour ago and has uploaded nothing yet
 BAD = table("bucket/logs/job-c", ["3001", "3000"], {"job-c.Overall": ([12, 12], ["", ""])})
-FIN = (200, {}, {"result": "FAILURE", "timestamp": 1})
+FIN = (200, {}, {"result": "FAILURE", "timestamp": OLD // 1000 + 600})  # finished a month ago
 
 
 class RedColumnsTest(unittest.TestCase):
@@ -186,18 +189,17 @@ class RedColumnsTest(unittest.TestCase):
 
 class GunzipTest(unittest.TestCase):
     def test_multi_member(self):
-        g = frl.Gunzip()
         data = gzip.compress(b"first half\n") + gzip.compress(b"SECOND HALF\n")
-        out = b"".join(g.feed(data[i:i + 7]) for i in range(0, len(data), 7)) + g.finish()
+        out = b"".join(frl.gunzipped(data[i:i + 7] for i in range(0, len(data), 7)))
         self.assertEqual(out, b"first half\nSECOND HALF\n")
 
     def test_truncated_and_garbage(self):
         g = frl.Gunzip()
-        g.feed(gzip.compress(b"x" * 1000)[:-6])
+        list(g.feed(gzip.compress(b"x" * 1000)[:-6]))
         with self.assertRaises(frl.IntegrityError):
             g.finish()
         with self.assertRaises(frl.IntegrityError):
-            frl.Gunzip().feed(b"not gzip at all")
+            list(frl.Gunzip().feed(b"not gzip at all"))
 
 
 class EndToEndTest(unittest.TestCase):
@@ -240,8 +242,26 @@ class EndToEndTest(unittest.TestCase):
     def path(self, *parts):
         return os.path.join(self.root, *parts)
 
+    def bdir(self, job, build):
+        """The folder holding a build (in the run that archived it), or None."""
+        found = sorted(glob.glob(os.path.join(glob.escape(self.root), "runs", "*", "*", job, build)))
+        return found[0] if found else None
+
+    def bpath(self, job, build, name):
+        d = self.bdir(job, build)
+        self.assertIsNotNone(d, f"{job}/{build} is not in the archive")
+        return os.path.join(d, name)
+
+    def assertNotArchived(self, job, build):
+        d = self.bdir(job, build)
+        self.assertFalse(d and os.path.exists(os.path.join(d, "meta.json")), f"{job}/{build} has a meta.json")
+
+    def rel(self, job, build, name):
+        return os.path.relpath(self.bpath(job, build, name), self.root)
+
     def runs(self):
-        return [frl.read_json(self.path("runs", n)) for n in sorted(os.listdir(self.path("runs")))]
+        return [frl.read_json(self.path(rel, "run.json")) for rel in frl.run_dirs(self.root)
+                if os.path.exists(self.path(rel, "run.json"))]
 
     def last_run(self):
         return self.runs()[-1]
@@ -271,24 +291,24 @@ class EndToEndTest(unittest.TestCase):
         self.assertEqual(sorted(e["build"] for e in run["errors"]), ["job-c/3000", "job-c/3001"])
         self.assertEqual([t["tab"] for t in run["tabs"] if t.get("error")], ["broken"])
 
-        with open(self.path("logs/job-a/1004/build-log.txt"), "rb") as f:
+        with open(self.bpath("job-a", "1004", "build-log.txt"), "rb") as f:
             self.assertEqual(f.read(), b"log 1004\n")
-        with open(self.path("logs/job-a/1002/build-log.txt"), "rb") as f:
+        with open(self.bpath("job-a", "1002", "build-log.txt"), "rb") as f:
             self.assertEqual(f.read(), b"log 1002\n" * 1000)  # gzip-stored object saved as raw text
-        meta = frl.read_json(self.path("logs/job-a/1004/meta.json"))
+        meta = frl.read_json(self.bpath("job-a", "1004", "meta.json"))
         self.assertTrue(meta["log"]["verified"])
         self.assertEqual(meta["log"]["md5"], hashlib.md5(b"log 1004\n").hexdigest())
         self.assertEqual(meta["tabs"][0]["tab_status"], "FLAKY")
-        no_log = frl.read_json(self.path("logs/job-a/1001/meta.json"))
+        no_log = frl.read_json(self.bpath("job-a", "1001", "meta.json"))
         self.assertIsNone(no_log["log"])
         self.assertTrue(no_log["podinfo"]["verified"])
 
         # Not red: running, passing, flaky (purple), build fail (black), unknown (grey).
         for b in ("1006", "1005", "1003", "1000", "999"):
-            self.assertFalse(os.path.exists(self.path("logs/job-a", b)), b)
+            self.assertIsNone(self.bdir("job-a", b), b)
         # Failed downloads leave nothing behind and were retried.
         for b in ("job-c/3001", "job-c/3000", "job-b/2001"):
-            self.assertFalse(os.path.exists(self.path("logs", b)), b)
+            self.assertIsNone(self.bdir(*b.split("/")), b)
         self.assertEqual(self.srv.hits("/bucket/logs/job-c/3001/build-log.txt"), frl.RETRIES)
         self.assertEqual(self.srv.hits("/bucket/logs/job-c/3000/build-log.txt"), frl.RETRIES)
         # Per-tab state: the failed tab is not marked scanned; unfinished builds are remembered.
@@ -300,10 +320,19 @@ class EndToEndTest(unittest.TestCase):
             md = f.read()
         self.assertIn("charts/trend-light.svg", md)
         self.assertIn("## Not archived yet", md)  # job-b/2001 is pending
-        self.assertIn("[build-log.txt](../logs/job-a/1004/build-log.txt)", self.week_pages())
+        self.assertIn(f"[build-log.txt](../{self.rel('job-a', '1004', 'build-log.txt')})", self.week_pages())
         week = frl.week_of(OLD // 1000)
         self.assertIn(f"- [{week}](weeks/{week}.md)", md)
-        for name in ("INDEX.md", "index.json", f"weeks/{week}.md", "logs/job-a/1004/build-log.txt"):
+        # The run has its own folder: its report, a README, and the builds it archived.
+        (folder,) = frl.run_dirs(self.root)
+        self.assertEqual(run["dir"], folder)
+        self.assertEqual(os.path.dirname(os.path.dirname(self.bdir("job-a", "1004"))), self.path(folder))
+        with open(self.path(folder, "README.md")) as f:
+            readme = f.read()
+        self.assertIn("This run archived 3 new builds", readme)
+        self.assertIn("[build-log.txt](../../../" + self.rel("job-a", "1004", "build-log.txt") + ")", readme)
+        self.assertIn(f"[{frl.run_title(run['run'])}]({folder}/)", md)
+        for name in ("INDEX.md", "index.json", f"weeks/{week}.md", self.rel("job-a", "1004", "build-log.txt")):
             self.assertEqual(os.stat(self.path(name)).st_mode & 0o777, 0o666 & ~frl.UMASK, name)
         for name in ("trend-light", "trend-dark", "tabs-light", "tabs-dark"):
             self.assertTrue(os.path.getsize(self.path("charts", f"{name}.svg")) > 500, name)
@@ -344,36 +373,42 @@ class EndToEndTest(unittest.TestCase):
         self.run_tool("--since-hours", "12")
         self.assertIn("job-e/5001", self.last_run()["outcomes"]["archived"])
 
-    def test_pending_too_long_becomes_an_error(self):
+    def test_a_red_build_gcs_never_got_is_kept_without_a_log(self):
+        # e.g. TestGrid's "Build did not complete within 24 hours": red, but nothing in GCS
         self.srv.table("dash", "green", table("bucket/logs/job-b", ["2001"], {"o": ([12], [""])}))
         self.run_tool()
-        errors = {e["build"]: e["error"] for e in self.last_run()["errors"]}
-        self.assertIn("nothing in GCS", errors["job-b/2001"])
+        self.assertIn("job-b/2001", self.last_run()["outcomes"]["archived-without-log"])
+        meta = frl.read_json(self.bpath("job-b", "2001", "meta.json"))
+        self.assertIn("neither finished.json nor build-log.txt", meta["note"])
+        self.assertFalse(meta["final"])  # later runs look for a late log
 
     def test_log_that_appears_later_is_recovered(self):
         self.run_tool()
         self.srv.route("/bucket/logs/job-a/1001/build-log.txt", gcs_object(b"late log\n"))
         self.run_tool()
         self.assertEqual(self.last_run()["outcomes"]["log-recovered"], ["job-a/1001"])
-        with open(self.path("logs/job-a/1001/build-log.txt"), "rb") as f:
+        with open(self.bpath("job-a", "1001", "build-log.txt"), "rb") as f:
             self.assertEqual(f.read(), b"late log\n")
 
     def test_missing_or_damaged_files_are_repaired(self):
         self.run_tool()
-        os.remove(self.path("logs/job-a/1004/build-log.txt"))
-        with open(self.path("logs/job-a/1002/build-log.txt"), "w") as f:
+        os.remove(self.bpath("job-a", "1004", "build-log.txt"))
+        with open(self.bpath("job-a", "1002", "build-log.txt"), "w") as f:
             f.write("garbage")
         self.run_tool()
         self.assertEqual(self.last_run()["outcomes"]["repaired"], ["job-a/1002", "job-a/1004"])
-        with open(self.path("logs/job-a/1004/build-log.txt"), "rb") as f:
+        with open(self.bpath("job-a", "1004", "build-log.txt"), "rb") as f:
             self.assertEqual(f.read(), b"log 1004\n")
 
     def test_stray_files_and_corrupt_meta_do_not_break_runs(self):
         self.heal()
-        os.makedirs(self.path("logs/job-z/1"))
-        for p in ("logs/.gitkeep", "logs/job-a.gitkeep", "logs/job-z/.gitkeep"):
+        self.srv.gcs_listing("bucket", [])  # with state.json lost, every tab is searched for a gap
+        old = "runs/2020-01/2020-01-01T000000Z"
+        os.makedirs(self.path(old, "job-z/1"))
+        for p in ("runs/.gitkeep", "runs/2020-01/.gitkeep", f"{old}/.gitkeep", f"{old}/job-a.gitkeep",
+                  f"{old}/job-z/.gitkeep", "runs/notes", "runs/2020-01/notes"):
             open(self.path(p), "w").close()
-        with open(self.path("logs/job-z/1/meta.json"), "w") as f:
+        with open(self.path(old, "job-z/1/meta.json"), "w") as f:
             f.write("{not json")
         with open(self.path("state.json"), "w") as f:
             f.write("{corrupt")
@@ -381,7 +416,8 @@ class EndToEndTest(unittest.TestCase):
         run = self.last_run()
         self.assertEqual(len(run["outcomes"]["archived"]), 5)
         self.assertEqual(run["outcomes"]["archived-without-log"], ["job-a/1001"])
-        self.assertEqual([e["error"][:28] for e in run["errors"]], ["unreadable logs/job-z/1/meta"])
+        self.assertEqual([e["error"][:60] for e in run["errors"]],
+                         ["unreadable runs/2020-01/2020-01-01T000000Z/job-z/1/meta.json"])
         self.assertIn("state.json is corrupt", run["warnings"][0])
 
     def test_odd_summary_entries_do_not_stop_the_run(self):
@@ -417,10 +453,11 @@ class EndToEndTest(unittest.TestCase):
             h.send_response(200)
             h.send_header("Content-Length", "50")
             h.end_headers()
-            for _ in range(50):
-                h.wfile.write(b"x")
-                h.wfile.flush()
-                time.sleep(0.05)
+            with contextlib.suppress(BrokenPipeError, ConnectionResetError):  # the client gave up
+                for _ in range(50):
+                    h.wfile.write(b"x")
+                    h.wfile.flush()
+                    time.sleep(0.05)
 
         self.srv.route("/bucket/logs/job-a/1004/build-log.txt", trickle)
         old = frl.BASE_DEADLINE, frl.RETRIES
@@ -455,7 +492,7 @@ class EndToEndTest(unittest.TestCase):
         stored = gzip.compress(b"first half\n" * 100) + gzip.compress(b"SECOND HALF\n" * 300)
         self.srv.route("/bucket/logs/job-a/1004/build-log.txt", gzip_stored(content, stored))
         self.run_tool()
-        with open(self.path("logs/job-a/1004/build-log.txt"), "rb") as f:
+        with open(self.bpath("job-a", "1004", "build-log.txt"), "rb") as f:
             self.assertEqual(f.read(), content)
 
     def test_unsupported_encoding_is_rejected(self):
@@ -473,33 +510,33 @@ class EndToEndTest(unittest.TestCase):
 
     def test_gzip_storage_keeps_the_raw_log_verifiable(self):
         self.run_tool("--gzip")
-        meta = frl.read_json(self.path("logs/job-a/1002/meta.json"))
+        meta = frl.read_json(self.bpath("job-a", "1002", "meta.json"))
         self.assertEqual(meta["log"]["file"], "build-log.txt.gz")
-        with gzip.open(self.path("logs/job-a/1002/build-log.txt.gz"), "rb") as f:
+        with gzip.open(self.bpath("job-a", "1002", "build-log.txt.gz"), "rb") as f:
             raw = f.read()
         self.assertEqual(raw, b"log 1002\n" * 1000)
         self.assertEqual(hashlib.md5(raw).hexdigest(), meta["log"]["md5"])
-        self.assertEqual(os.path.getsize(self.path("logs/job-a/1002/build-log.txt.gz")), meta["log"]["file_bytes"])
-        self.assertFalse(os.path.exists(self.path("logs/job-a/1002/build-log.txt")))
-        self.assertIn("logs/job-a/1002/build-log.txt.gz", [f for e in self.indexed() for f in e["files"]])
+        self.assertEqual(os.path.getsize(self.bpath("job-a", "1002", "build-log.txt.gz")), meta["log"]["file_bytes"])
+        self.assertFalse(os.path.exists(os.path.join(self.bdir("job-a", "1002"), "build-log.txt")))
+        self.assertIn(self.rel("job-a", "1002", "build-log.txt.gz"), [f for e in self.indexed() for f in e["files"]])
         # a second run sees it intact; deleting it gets it repaired, still gzipped
         self.run_tool("--gzip")
         self.assertIn("job-a/1002", self.last_run()["outcomes"]["already-archived"])
-        os.remove(self.path("logs/job-a/1002/build-log.txt.gz"))
+        os.remove(self.bpath("job-a", "1002", "build-log.txt.gz"))
         self.run_tool("--gzip")
         self.assertEqual(self.last_run()["outcomes"]["repaired"], ["job-a/1002"])
         # switching an archive from raw to --gzip replaces the raw copy when it is re-downloaded
-        os.remove(self.path("logs/job-a/1002/build-log.txt.gz"))
+        os.remove(self.bpath("job-a", "1002", "build-log.txt.gz"))
         self.run_tool()
-        self.assertTrue(os.path.exists(self.path("logs/job-a/1002/build-log.txt")))
-        os.remove(self.path("logs/job-a/1002/build-log.txt"))
+        self.assertTrue(os.path.exists(self.bpath("job-a", "1002", "build-log.txt")))
+        os.remove(self.bpath("job-a", "1002", "build-log.txt"))
         self.run_tool("--gzip")
-        self.assertFalse(os.path.exists(self.path("logs/job-a/1002/build-log.txt")))
+        self.assertFalse(os.path.exists(os.path.join(self.bdir("job-a", "1002"), "build-log.txt")))
 
     def test_implausible_timestamps_fail_only_their_tab(self):
-        huge = table("bucket/logs/job-f", ["6001"], {"o": ([12], [""])})
-        huge["timestamps"] = [10 ** 20]
-        self.srv.table("dash", "broken", huge)
+        broken = table("bucket/logs/job-f", ["6001"], {"o": ([12], [""])})
+        broken["timestamps"] = ["1e20"]  # not a number (a bogus number only makes the column undated)
+        self.srv.table("dash", "broken", broken)
         odd = table("bucket/logs/job-b", ["2002", "2001", "2000"], {"o": ([1, 12, 1], ["", "", ""])}, start=NOW_MS)
         odd["timestamps"][2] = None  # a non-red column
         self.srv.table("dash", "green", odd)
@@ -511,8 +548,8 @@ class EndToEndTest(unittest.TestCase):
         self.assertIn("job-a/1004", run["outcomes"]["archived"])
 
     def test_poisoned_meta_does_not_crash_later_runs(self):
-        os.makedirs(self.path("logs/job-z/9"))
-        frl.write_json(self.path("logs/job-z/9/meta.json"),
+        os.makedirs(self.path("runs/2020-01/2020-01-01T000000Z/job-z/9"))
+        frl.write_json(self.path("runs/2020-01/2020-01-01T000000Z/job-z/9/meta.json"),
                        {"job": "job-z", "build": "9", "query": "b/logs/job-z", "started": 1e17, "created": 1,
                         "tabs": [], "log": None, "podinfo": None, "prow_url": "x", "result": None})
         self.assertEqual(self.run_tool(), 1)
@@ -524,25 +561,27 @@ class EndToEndTest(unittest.TestCase):
         self.srv.summary("dash", {"purple": "FLAKY", "other": "FLAKY"})
         self.srv.table("dash", "other", (503, {}, b""))
         self.run_tool()
-        self.assertEqual([t["tab"] for t in frl.read_json(self.path("logs/job-a/1004/meta.json"))["tabs"]], ["purple"])
+        self.assertEqual([t["tab"] for t in frl.read_json(self.bpath("job-a", "1004", "meta.json"))["tabs"]], ["purple"])
         self.srv.table("dash", "other", both)
         self.run_tool()
-        meta = frl.read_json(self.path("logs/job-a/1004/meta.json"))
+        meta = frl.read_json(self.bpath("job-a", "1004", "meta.json"))
         self.assertEqual([t["tab"] for t in meta["tabs"]], ["purple", "other"])
         self.assertIn("job-a/1004", self.last_run()["outcomes"]["already-archived"])
 
     def test_repair_keeps_the_record_when_gcs_lost_the_log(self):
         self.run_tool()
-        before = frl.read_json(self.path("logs/job-a/1004/meta.json"))
-        os.remove(self.path("logs/job-a/1004/build-log.txt"))
+        before = frl.read_json(self.bpath("job-a", "1004", "meta.json"))
+        os.remove(self.bpath("job-a", "1004", "build-log.txt"))
         del self.srv.httpd.routes["/bucket/logs/job-a/1004/build-log.txt"]
         self.run_tool()
         errors = {e["build"]: e["error"] for e in self.last_run()["errors"]}
         self.assertIn("GCS no longer has it", errors["job-a/1004"])
-        self.assertEqual(frl.read_json(self.path("logs/job-a/1004/meta.json")), before)
+        self.assertEqual(frl.read_json(self.bpath("job-a", "1004", "meta.json")), before)
 
     def test_given_up_builds_stay_given_up_and_stay_visible(self):
         self.srv.table("dash", "green", table("bucket/logs/job-b", ["2001"], {"o": ([12], [""])}))
+        self.srv.route("/bucket/logs/job-b/2001/finished.json", FIN)
+        self.srv.route("/bucket/logs/job-b/2001/build-log.txt", (503, {}, b""))
         rec = {"job": "job-b", "build": "2001", "query": "bucket/logs/job-b", "started": OLD // 1000,
                "created": frl.created("2001"), "tabs": [{"dashboard": "dash", "tab": "green", "tab_status": "PASSING",
                                                          "red_cells": [{"test": "o", "status": "FAIL", "message": ""}]}]}
@@ -569,8 +608,7 @@ class EndToEndTest(unittest.TestCase):
         self.assertIn("job-a/1004", self.state()["unresolved"])
         self.assertIn("job-a/1002", run["outcomes"]["archived"])
         time.sleep(2.5)  # let the abandoned worker finish: it must not write
-        self.assertFalse(os.path.exists(self.path("logs/job-a/1004/meta.json")))
-        self.assertFalse(os.path.exists(self.path("logs/job-a/1004/build-log.txt")))
+        self.assertNotArchived("job-a", "1004")
 
     def test_truncated_json_is_retried(self):
         calls = []
@@ -599,7 +637,7 @@ class EndToEndTest(unittest.TestCase):
     def test_a_failed_repair_is_listed_as_waiting_but_counted_once(self):
         self.heal()
         self.run_tool()  # job-b/2001 (started an hour ago) is archived
-        with open(self.path("logs/job-b/2001/build-log.txt"), "w") as f:
+        with open(self.bpath("job-b", "2001", "build-log.txt"), "w") as f:
             f.write("x")  # damaged
         self.srv.route("/bucket/logs/job-b/2001/build-log.txt", (503, {}, b""))
         self.run_tool()
@@ -608,9 +646,10 @@ class EndToEndTest(unittest.TestCase):
             md = f.read()
         waiting = md.split("## Not archived yet")[1].split("\n## ")[0]
         self.assertIn("job-b 2001", waiting)
-        today = frl.iso(time.time())[:10]
-        row = next(line for line in md.splitlines() if line.startswith(f"| {today} |"))
-        self.assertEqual(row, f"| {today} | 1 (today so far) |")
+        day = frl.iso(NOW_MS // 1000 - 3600)[:10]  # 2001's start: yesterday in the first hour of a UTC day
+        row = next(line for line in md.splitlines() if line.startswith(f"| {day} |"))
+        label = re.escape(" (today so far)") if day == frl.iso(time.time())[:10] else r"( \(partial\))?"
+        self.assertRegex(row, rf"^\| {day} \| 1{label} \|$")
 
     def report_rows(self):
         entries, _ = frl.load_index(self.root, time.time())
@@ -624,7 +663,7 @@ class EndToEndTest(unittest.TestCase):
             send(h, *gcs_object(b"x"))
 
         self.srv.route("/bucket/logs/job-a/1004/finished.json", slow)
-        os.remove(self.path("logs/job-a/1004/meta.json"))  # forces 1004 to be fetched again, slowly
+        os.remove(self.bpath("job-a", "1004", "meta.json"))  # forces 1004 to be fetched again, slowly
         self.run_tool("--run-timeout-minutes", "0.01", "--max-concurrency", "1", "--start-concurrency", "1")
         run = self.last_run()
         self.assertEqual([e["build"] for e in run["errors"] if "run timeout" in e["error"]], ["job-a/1004"])
@@ -664,18 +703,21 @@ class EndToEndTest(unittest.TestCase):
         self.run_tool("--run-timeout-minutes", "0.01")
         self.run_tool("--list-only")  # a second main() in the same process
         time.sleep(2.5)
-        self.assertFalse(os.path.exists(self.path("logs/job-a/1004/meta.json")))
+        self.assertNotArchived("job-a", "1004")
 
     def test_stale_part_files_are_swept(self):
-        os.makedirs(self.path("logs/job-a/1004"))
-        stale = self.path("logs/job-a/1004/.build-log.txt.abc.part")
+        os.makedirs(self.path("runs/2020-01/2020-01-01T000000Z/job-a/1004"))
+        stale = self.path("runs/2020-01/2020-01-01T000000Z/job-a/1004/.build-log.txt.abc.part")
         open(stale, "w").close()
         self.run_tool()
         self.assertFalse(os.path.exists(stale))
+        # the cut-off download's folder went with it; the build was archived by this run instead
+        self.assertFalse(os.path.exists(self.path("runs/2020-01/2020-01-01T000000Z/job-a/1004")))
+        self.assertIn("job-a/1004", self.last_run()["outcomes"]["archived"])
 
     def test_same_size_damage_is_repaired(self):
         self.run_tool()
-        path = self.path("logs/job-a/1004/build-log.txt")
+        path = self.bpath("job-a", "1004", "build-log.txt")
         with open(path, "wb") as f:
             f.write(b"\0" * len(b"log 1004\n"))
         self.run_tool()
@@ -749,7 +791,7 @@ class EndToEndTest(unittest.TestCase):
 
     def test_timeout_during_a_repair_is_not_reported_as_intact(self):
         self.run_tool()
-        path = self.path("logs/job-a/1004/build-log.txt")
+        path = self.bpath("job-a", "1004", "build-log.txt")
         with open(path, "wb") as f:
             f.write(b"\0" * len(b"log 1004\n"))  # same size, wrong content
 
@@ -765,7 +807,7 @@ class EndToEndTest(unittest.TestCase):
 
     def test_gzip_bytes_are_stable(self):
         self.run_tool("--gzip")
-        path = self.path("logs/job-a/1002/build-log.txt.gz")
+        path = self.bpath("job-a", "1002", "build-log.txt.gz")
         with open(path, "rb") as f:
             first = f.read()
         os.remove(path)
@@ -776,11 +818,11 @@ class EndToEndTest(unittest.TestCase):
 
     def test_oversized_files_are_verified_but_not_stored(self):
         self.run_tool("--max-file-mb", "0.000001")
-        meta = frl.read_json(self.path("logs/job-a/1004/meta.json"))
+        meta = frl.read_json(self.bpath("job-a", "1004", "meta.json"))
         self.assertTrue(meta["log"]["verified"])
         self.assertIsNone(meta["log"]["file"])
         self.assertIn("over the", meta["log"]["omitted"])
-        self.assertFalse(os.path.exists(self.path("logs/job-a/1004/build-log.txt")))
+        self.assertFalse(os.path.exists(os.path.join(self.bdir("job-a", "1004"), "build-log.txt")))
         self.assertIn("[build-log.txt in GCS (too large to store)](", self.week_pages())
         self.run_tool("--max-file-mb", "0.000001")
         self.assertIn("job-a/1004", self.last_run()["outcomes"]["already-archived"])
@@ -807,18 +849,18 @@ class EndToEndTest(unittest.TestCase):
 
     def test_huge_numbers_in_state_and_run_reports_do_not_crash(self):
         frl.write_json(self.path("state.json"), {"tabs": {"dash#purple": 10 ** 400}})
-        os.makedirs(self.path("runs"))
+        os.makedirs(self.path("runs/2020-01/2020-01-01T000000Z"))
         bad_tabs = [{"tab": "t"}, {"dashboard": ["x"], "tab": "t"}, {"dashboard": "d", "tab": "t", "oldest": 10 ** 400}]
-        frl.write_json(self.path("runs", "0.json"), run_record(time.time(), bad_tabs))
+        frl.write_json(self.path("runs/2020-01/2020-01-01T000000Z/run.json"), run_record(time.time(), bad_tabs))
         self.run_tool()
         self.assertTrue(os.path.exists(self.path("INDEX.md")))
 
     def test_a_damaged_given_up_build_stays_given_up(self):
         self.run_tool()
-        path = self.path("logs/job-a/1004/build-log.txt")
+        path = self.bpath("job-a", "1004", "build-log.txt")
         with open(path, "wb") as f:
             f.write(b"\0" * len(b"log 1004\n"))
-        rec = frl.read_json(self.path("logs/job-a/1004/meta.json"))
+        rec = frl.read_json(self.bpath("job-a", "1004", "meta.json"))
         rec = {k: rec[k] for k in ("job", "build", "query", "started", "created", "tabs")}
         frl.write_json(self.path("state.json"), {"tabs": {}, "given_up": {
             "job-a/1004": {"rec": rec, "first_seen": time.time() - 20 * DAY, "last_error": "x"}}})
@@ -831,16 +873,16 @@ class EndToEndTest(unittest.TestCase):
 
     def test_a_log_that_appears_after_testgrid_drops_the_build_is_recovered(self):
         self.run_tool()
-        self.assertIn("job-a/1001", self.state()["no_log"])
+        self.assertFalse(frl.read_json(self.path(self.bdir("job-a", "1001"), "meta.json"))["final"])
         self.srv.table("dash", "purple", table("bucket/logs/job-a", ["1006"], {"o": ([1], [""])}))
         self.srv.route("/bucket/logs/job-a/1001/build-log.txt", gcs_object(b"late log\n"))
         self.run_tool()
         self.assertEqual(self.last_run()["outcomes"]["log-recovered"], ["job-a/1001"])
-        self.assertNotIn("job-a/1001", self.state()["no_log"])
+        self.assertTrue(frl.read_json(self.path(self.bdir("job-a", "1001"), "meta.json"))["log"]["verified"])
 
     def test_a_timeout_keeps_tracking_a_logless_build(self):
         self.run_tool()
-        self.assertIn("job-a/1001", self.state()["no_log"])
+        self.srv.table("dash", "purple", table("bucket/logs/job-a", ["1006"], {"o": ([1], [""])}))
 
         def slow(h):
             time.sleep(2)
@@ -848,8 +890,12 @@ class EndToEndTest(unittest.TestCase):
 
         self.srv.route("/bucket/logs/job-a/1001/build-log.txt", slow)
         self.run_tool("--run-timeout-minutes", "0.01")
-        self.assertIn("job-a/1001", self.state()["no_log"])
+        self.assertFalse(frl.read_json(self.path(self.bdir("job-a", "1001"), "meta.json"))["final"])
         time.sleep(2.5)
+        del self.srv.httpd.routes["/bucket/logs/job-a/1001/build-log.txt"]
+        hits = self.srv.hits("/bucket/logs/job-a/1001/build-log.txt")
+        self.run_tool()  # off TestGrid, but still checked for a late log
+        self.assertEqual(self.srv.hits("/bucket/logs/job-a/1001/build-log.txt"), hits + 1)
 
     def test_omitted_podinfo_links_its_own_gcs_copy(self):
         meta = {"started": OLD // 1000, "created": 1, "tabs": [], "query": "b/logs/j",
@@ -892,7 +938,7 @@ class EndToEndTest(unittest.TestCase):
         self.assertEqual(p.returncode, 130)
         self.assertIn("interrupted", err)
         # What finished is recorded; the cut-off build is not on disk but queued for the next run.
-        self.assertFalse(os.path.exists(self.path("logs/job-a/1004/meta.json")))
+        self.assertNotArchived("job-a", "1004")
         run = self.last_run()
         self.assertTrue(run["interrupted"])
         self.assertIn("job-a/1002", run["outcomes"]["archived"])
@@ -973,11 +1019,10 @@ class AdaptiveLimitTest(unittest.TestCase):
 
 class GunzipPaddingTest(unittest.TestCase):
     def test_zero_padding_after_last_member(self):
-        g = frl.Gunzip()
-        out = g.feed(gzip.compress(b"abc") + b"\0" * 16) + g.feed(b"\0" * 4) + g.finish()
+        out = b"".join(frl.gunzipped([gzip.compress(b"abc") + b"\0" * 16, b"\0" * 4]))
         self.assertEqual(out, b"abc")
         with self.assertRaises(frl.IntegrityError):
-            frl.Gunzip().feed(gzip.compress(b"abc") + b"\0\0" + gzip.compress(b"def"))
+            list(frl.Gunzip().feed(gzip.compress(b"abc") + b"\0\0" + gzip.compress(b"def")))
 
 
 class AdaptiveLimitBurstTest(unittest.TestCase):
@@ -1027,13 +1072,13 @@ class ReportTest(unittest.TestCase):
         self.assertIsNone(p["week"])
 
     def test_week_text_never_says_no_change_for_a_change(self):
-        self.assertEqual(self.report.week_text((201, 200))[1], "last 7 days 201 · +<1% vs previous 7 (200)")
-        self.assertEqual(self.report.week_text((199, 200))[1], "last 7 days 199 · -<1% vs previous 7 (200)")
-        self.assertEqual(self.report.week_text((200, 200)), (None, "last 7 days 200 · no change vs previous 7 (200)"))
-        self.assertEqual(self.report.week_text((3, 0))[1], "last 7 days 3 · new vs previous 7 (0)")
-        self.assertEqual(self.report.week_text((10, 20))[1], "last 7 days 10 · -50% vs previous 7 (20)")
-        self.assertEqual(self.report.week_text((1, 200))[1], "last 7 days 1 · -99.5% vs previous 7 (200)")
-        self.assertEqual(self.report.week_text((0, 200))[1], "last 7 days 0 · -100% vs previous 7 (200)")
+        self.assertEqual(self.report.week_text((201, 200))[1], "last 7 full days 201 · +<1% vs previous 7 (200)")
+        self.assertEqual(self.report.week_text((199, 200))[1], "last 7 full days 199 · -<1% vs previous 7 (200)")
+        self.assertEqual(self.report.week_text((200, 200)), (None, "last 7 full days 200 · no change vs previous 7 (200)"))
+        self.assertEqual(self.report.week_text((3, 0))[1], "last 7 full days 3 · new vs previous 7 (0)")
+        self.assertEqual(self.report.week_text((10, 20))[1], "last 7 full days 10 · -50% vs previous 7 (20)")
+        self.assertEqual(self.report.week_text((1, 200))[1], "last 7 full days 1 · -99.5% vs previous 7 (200)")
+        self.assertEqual(self.report.week_text((0, 200))[1], "last 7 full days 0 · -100% vs previous 7 (200)")
 
     def test_one_band_per_stretch_of_partial_days(self):
         now = time.time()
@@ -1048,10 +1093,10 @@ class ReportTest(unittest.TestCase):
     def test_malformed_run_reports_are_ignored(self):
         root = tempfile.mkdtemp()
         try:
-            os.makedirs(os.path.join(root, "runs"))
             for i, bad in enumerate([{"since_hours": "12"}, {"max_job_hours": float("nan")}, {"started": None}]):
-                frl.write_json(os.path.join(root, "runs", f"{i}.json"),
-                               dict(run_record(time.time(), [{"dashboard": "d", "tab": "t", "oldest": 1}]), run=str(i), **bad))
+                os.makedirs(os.path.join(root, "runs", "2020-01", f"2020-01-0{i + 1}T000000Z"))
+                with open(os.path.join(root, "runs", "2020-01", f"2020-01-0{i + 1}T000000Z", "run.json"), "w") as f:
+                    json.dump(dict(run_record(time.time(), [{"dashboard": "d", "tab": "t", "oldest": 1}]), run=str(i), **bad), f)
             self.assertEqual(self.report.load_runs(root), [])
         finally:
             shutil.rmtree(root)
@@ -1091,27 +1136,54 @@ class CrossCheckTest(unittest.TestCase):
         return frl.main(["--archive", self.root, "--dashboard", "dash", "--testgrid", self.srv.url,
                          "--gcs", self.srv.url, *extra])
 
-    def test_reports_a_red_build_with_nothing_in_gcs(self):
+    def bdir(self, job, build):
+        found = glob.glob(os.path.join(glob.escape(self.root), "runs", "*", "*", job, build))
+        return found[0] if found else None
+
+    def test_a_red_build_with_nothing_in_gcs_is_recorded(self):
         start = NOW_MS - 20 * 3600 * 1000
+        build = str((int(start) - frl.PROW_EPOCH_MS) << 22)
         self.srv.summary("dash", {"t": "FLAKY"})
-        self.srv.table("dash", "t", table("bucket/logs/job", [str((int(start) - frl.PROW_EPOCH_MS) << 22)],
-                                          {"o": ([12], [""])}, start=start))
+        self.srv.table("dash", "t", table("bucket/logs/job", [build], {"o": ([12], [""])}, start=start))
         self.srv.gcs_listing("bucket", [])
+        self.assertEqual(self.fetch(), 0)
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertIn("neither finished.json", frl.read_json(os.path.join(self.bdir("job", build), "meta.json"))["note"])
+
+    def test_a_red_build_lost_while_the_fetch_failed_is_reported(self):
+        start = NOW_MS - 20 * 3600 * 1000
+        build = str((int(start) - frl.PROW_EPOCH_MS) << 22)
+        self.srv.summary("dash", {"t": "FLAKY"})
+        self.srv.table("dash", "t", table("bucket/logs/job", [build], {"o": ([12], [""])}, start=start))
+        self.srv.route(f"/bucket/logs/job/{build}/finished.json",
+                       (200, {}, {"result": "FAILURE", "passed": False, "timestamp": start // 1000 + 600}))
+        self.srv.route(f"/bucket/logs/job/{build}/build-log.txt", (500, {}, b""))
+        self.srv.gcs_listing("bucket", [f"logs/job/{build}/finished.json"])
         self.assertEqual(self.fetch(), 1)
         code, out = self.check()
         self.assertEqual(code, 1, out)
         self.assertIn("MISSED red build", out)
         self.assertIn("the run reported an error", out)
 
-    def test_a_gap_warning_fails_the_check(self):
+    def test_a_gap_gcs_could_not_cover_fails_the_check(self):
+        self.srv.summary("dash", {"t": "FLAKY"})
+        self.srv.table("dash", "t", table("bucket/logs/job", ["1"], {"o": ([1], [""])}, start=NOW_MS))
+        frl.write_json(os.path.join(self.root, "state.json"), {"tabs": {"dash#t": time.time() - 5 * DAY}})
+        self.assertEqual(self.fetch(), 1)  # no GCS listing to search the gap with
+        code, out = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("the run warned", out)
+
+    def test_a_gap_gcs_covered_passes(self):
         self.srv.summary("dash", {"t": "FLAKY"})
         self.srv.table("dash", "t", table("bucket/logs/job", ["1"], {"o": ([1], [""])}, start=NOW_MS))
         self.srv.gcs_listing("bucket", [])
         frl.write_json(os.path.join(self.root, "state.json"), {"tabs": {"dash#t": time.time() - 5 * DAY}})
-        self.assertEqual(self.fetch(), 1)
-        code, out = self.check()
-        self.assertEqual(code, 1)
-        self.assertIn("the run warned", out)
+        self.assertEqual(self.fetch(), 0)
+        self.assertTrue(any("GCS was searched instead" in w for w in frl.read_json(
+            os.path.join(self.root, frl.run_dirs(self.root)[-1], "run.json"))["warnings"]))
+        self.assertEqual(self.check()[0], 0)
 
     def test_red_build_without_a_start_time_is_still_checked(self):
         build = str((NOW_MS - 20 * 3600 * 1000 - frl.PROW_EPOCH_MS) << 22)
@@ -1119,11 +1191,12 @@ class CrossCheckTest(unittest.TestCase):
         t["timestamps"] = [0]
         self.srv.summary("dash", {"t": "FLAKY"})
         self.srv.table("dash", "t", t)
-        self.srv.route(f"/bucket/logs/job/{build}/finished.json", FIN)
+        self.srv.route(f"/bucket/logs/job/{build}/finished.json", (200, {}, {"result": "FAILURE",
+                                                                            "timestamp": frl.created(build) + 600}))
         self.srv.route(f"/bucket/logs/job/{build}/build-log.txt", gcs_object(b"log\n"))
         self.srv.gcs_listing("bucket", [f"logs/job/{build}/finished.json"])
         self.assertEqual(self.fetch(), 0)
-        shutil.rmtree(os.path.join(self.root, "logs", "job", build))
+        shutil.rmtree(self.bdir("job", build))
         code, out = self.check()
         self.assertEqual(code, 1)
         self.assertIn("MISSED red build", out)
@@ -1136,7 +1209,8 @@ class CrossCheckTest(unittest.TestCase):
 
         def hang(h):
             time.sleep(5)
-            send(h, 200, {}, b"{}")
+            with contextlib.suppress(BrokenPipeError, ConnectionResetError):  # cross_check gave up long ago
+                send(h, 200, {}, b"{}")
 
         self.srv.table("dash", "t", hang)
         script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cross_check.py")
@@ -1153,7 +1227,8 @@ class CrossCheckTest(unittest.TestCase):
         build = str((int(start) - frl.PROW_EPOCH_MS) << 22)
         self.srv.summary("dash", {"t": "FLAKY"})
         self.srv.table("dash", "t", table("bucket/logs/job", [build], {"o": ([12], [""])}, start=start))
-        self.srv.route(f"/bucket/logs/job/{build}/finished.json", FIN)
+        self.srv.route(f"/bucket/logs/job/{build}/finished.json",
+                       (200, {}, {"result": "FAILURE", "timestamp": start // 1000 + 600}))
         self.srv.gcs_listing("bucket", [f"logs/job/{build}/finished.json"])
         return build
 
@@ -1179,8 +1254,7 @@ class CrossCheckTest(unittest.TestCase):
     def test_a_stale_run_report_fails_the_check(self):
         self.archived_build()
         self.assertEqual(self.fetch(), 0)
-        runs = sorted(os.listdir(os.path.join(self.root, "runs")))
-        path = os.path.join(self.root, "runs", runs[-1])
+        path = os.path.join(self.root, frl.run_dirs(self.root)[-1], "run.json")
         report_ = frl.read_json(path)
         report_["finished"] -= 3 * 3600
         frl.write_json(path, report_)
@@ -1198,12 +1272,13 @@ class CrossCheckTest(unittest.TestCase):
         build = str((int(start) - frl.PROW_EPOCH_MS) << 22)
         self.srv.summary("dash", {"t": "FLAKY"})
         self.srv.table("dash", "t", table("bucket/logs/job", [build], {"o": ([12], [""])}, start=start))
-        self.srv.route(f"/bucket/logs/job/{build}/finished.json", FIN)
+        self.srv.route(f"/bucket/logs/job/{build}/finished.json",
+                       (200, {}, {"result": "FAILURE", "timestamp": start // 1000 + 600}))
         self.srv.route(f"/bucket/logs/job/{build}/build-log.txt", gcs_object(b"log\n"))
         self.srv.gcs_listing("bucket", [f"logs/job/{build}/finished.json"])
         self.assertEqual(self.fetch(), 0)
         self.assertEqual(self.check()[0], 0)
-        os.remove(os.path.join(self.root, "logs", "job", build, "build-log.txt"))
+        os.remove(os.path.join(self.bdir("job", build), "build-log.txt"))
         code, out = self.check()
         self.assertEqual(code, 1)
         self.assertIn("cannot verify", out)

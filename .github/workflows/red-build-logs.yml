@@ -66,10 +66,12 @@ jobs:
         run: exec tool/.venv/bin/python tool/cross_check.py --archive archive --hours 48
 
       # Commit whatever was archived even when a step failed or timed out (a step
-      # timeout is a failure, not a cancellation). The run report in archive/runs/
-      # says what went wrong; an interrupted fetch writes one too, unless it was
-      # killed outright. A run cancelled before this step pushes nothing.
+      # timeout is a failure, not a cancellation). The run's report in its folder
+      # under archive/runs/ says what went wrong; an interrupted fetch writes one
+      # too, unless it was killed outright. A run cancelled before this step
+      # pushes nothing.
       - name: Commit the archive
+        id: commit
         if: ${{ !cancelled() }}
         timeout-minutes: 10
         env:
@@ -79,10 +81,10 @@ jobs:
             echo "No archive/ to commit."
             exit 0
           fi
-          # A build directory without meta.json is a download that was cut off: leave
+          # A build folder without meta.json is a download that was cut off: leave
           # it out; the build is retried by a later run.
           shopt -s nullglob
-          for d in archive/logs/*/*/; do
+          for d in archive/runs/*/*/*/*/; do
             [ -e "${d}meta.json" ] || rm -rf -- "$d"
           done
           git config user.name "github-actions[bot]"
@@ -97,14 +99,30 @@ jobs:
           echo "::add-mask::$auth"
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $auth"
           for _ in 1 2 3; do
-            git push && exit 0
+            # Without pack.useSparse=false, git sends again every file a commit only
+            # moved (the one-time move to per-run folders: about 50 MB, not 0.5 MB).
+            git -c pack.useSparse=false push && exit 0
             if ! git pull --rebase -q origin "$GITHUB_REF_NAME"; then
-              git rebase --abort || true
-              echo "::error::Someone else changed the branch meanwhile; this run's results were not pushed."
-              exit 1
+              git rebase --abort 2>/dev/null || true
+              break
             fi
           done
+          # Not pushed: keep this run's commit so it is not lost with the runner (see the next step).
+          if git bundle create "$RUNNER_TEMP/unpushed-archive.bundle" "origin/$GITHUB_REF_NAME..HEAD"; then
+            echo "bundle=$RUNNER_TEMP/unpushed-archive.bundle" >> "$GITHUB_OUTPUT"
+          fi
+          echo "::error::This run's results could not be pushed (the branch changed in a conflicting way, or pushing kept failing). Its commit is attached to this run as the unpushed-archive artifact, a zipped git bundle."
           exit 1
+
+      # A git bundle of the commit that could not be pushed: unzip the artifact,
+      # then `git fetch unpushed-archive.bundle HEAD` brings it back for a merge.
+      - name: Keep the unpushed commit
+        if: ${{ failure() && steps.commit.outputs.bundle != '' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: unpushed-archive
+          path: ${{ steps.commit.outputs.bundle }}
+          retention-days: 14
 
       - name: Fail the run if fetching or verifying failed
         if: steps.fetch.outcome == 'failure' || steps.verify.outcome == 'failure'
