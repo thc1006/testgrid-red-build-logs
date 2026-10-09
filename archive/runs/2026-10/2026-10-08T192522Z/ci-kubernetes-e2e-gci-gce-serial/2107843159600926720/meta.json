@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2107843159600926720",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1791383946,
+  "created": 1791383945,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] [Provider:gce] [LinuxOnly] NonGracefulNodeShutdown [NonGracefulNodeShutdown] pod that uses a persistent volume via gce pd driver should get immediately rescheduled to a different node after non graceful node shutdown [Disruptive]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected all pods to be running and...e2e/storage/non_graceful_node_shutdown.go:156 @ 10/07/26 16:50:43.217\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791401430,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2107843159600926720",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2107843159600926720/build-log.txt",
+  "log": {
+    "bytes": 194969,
+    "md5": "20b954f197bdbbce05bdcd4f07dca908",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 27236,
+    "gcs": {
+      "generation": "1791401465356448",
+      "md5": "20b954f197bdbbce05bdcd4f07dca908",
+      "crc32c": "2c5bf3b6",
+      "bytes": 194969,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": false
+}

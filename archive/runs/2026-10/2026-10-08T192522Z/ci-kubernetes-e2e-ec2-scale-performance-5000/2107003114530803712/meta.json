@@ -1,0 +1,44 @@
+{
+  "job": "ci-kubernetes-e2e-ec2-scale-performance-5000",
+  "build": "2107003114530803712",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000",
+  "started": 1791183700,
+  "created": 1791183663,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ec2-master-scale-performance-5000",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ec2-scale-performance-5000.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791183702,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2107003114530803712",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2107003114530803712/build-log.txt",
+  "log": {
+    "bytes": 12779,
+    "md5": "4a5fbb0daf89790f3bea04af584209e6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 2970,
+    "gcs": {
+      "generation": "1791183703412990",
+      "md5": "4a5fbb0daf89790f3bea04af584209e6",
+      "crc32c": "2b89d164",
+      "bytes": 12779,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

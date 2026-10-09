@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2106211893038288896",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1790995052,
+  "created": 1790995021,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.001s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 10/03/26 03:00:58.554\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790996672,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2106211893038288896",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2106211893038288896/build-log.txt",
+  "log": {
+    "bytes": 119547,
+    "md5": "5d51e4c6a7a66d590ed1653d1f9518bd",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19773,
+    "gcs": {
+      "generation": "1790996690222756",
+      "md5": "5d51e4c6a7a66d590ed1653d1f9518bd",
+      "crc32c": "3680a2b7",
+      "bytes": 119547,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

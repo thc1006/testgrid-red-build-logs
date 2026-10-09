@@ -1,0 +1,74 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-performance-5000",
+  "build": "2100631134294511616",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-5000",
+  "started": 1789664498,
+  "created": 1789664464,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-master-scale-performance-5000",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-scale-performance-5000.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "ClusterLoaderV2.load overall (/home/prow/go/src/k8s.io/perf-tests/clusterloader2/testing/load/config.yaml)",
+          "status": "FAIL",
+          "message": ":0\n[measurement call WaitForControlledPodsRunning - WaitForRunningDaem...bt90v-23/medium-deployment-15, test-3bt90v-26/medium-deployment-14]\n:0"
+        },
+        {
+          "test": "ClusterLoaderV2.load: [step: 07] Waiting for 'create objects' to be completed [00] - ",
+          "status": "FAIL",
+          "message": ":0\n[measurement call WaitForControlledPodsRunning - WaitForRunningDaem...st-3bt90v-39/big-deployment-0, test-3bt90v-23/medium-deployment-15]\n:0"
+        },
+        {
+          "test": "ClusterLoaderV2.load: [step: 10] Waiting for scheduler throughput pods to be created [00] - WaitForSchedulerThroughputDeployments",
+          "status": "FAIL",
+          "message": ":0\n[measurement call WaitForControlledPodsRunning - WaitForSchedulerTh...out: Deployments: test-3bt90v-51/scheduler-throughput-deployment-0]\n:0"
+        },
+        {
+          "test": "ClusterLoaderV2.load: [step: 16] Waiting for latency pods to be running [00] - WaitForRunningLatencyDeployments",
+          "status": "FAIL",
+          "message": ":0\n[measurement call WaitForControlledPodsRunning - WaitForRunningLate...objects timed out: Deployments: test-3bt90v-1/latency-deployment-2]\n:0"
+        },
+        {
+          "test": "ClusterLoaderV2.load: [step: 22] Waiting for 'scale and update objects' to be completed [00] - ",
+          "status": "FAIL",
+          "message": ":0\n[measurement call WaitForControlledPodsRunning - WaitForRunningDaem...bt90v-23/medium-deployment-15, test-3bt90v-26/medium-deployment-14]\n:0"
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1789682323,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-5000/2100631134294511616",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-5000/2100631134294511616/build-log.txt",
+  "log": {
+    "bytes": 84532120,
+    "md5": "b32d3decf15b0e9bbe9cb7596c144094",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 3952422,
+    "gcs": {
+      "generation": "1789682796524868",
+      "md5": "b32d3decf15b0e9bbe9cb7596c144094",
+      "crc32c": "00da6421",
+      "bytes": 84532120,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

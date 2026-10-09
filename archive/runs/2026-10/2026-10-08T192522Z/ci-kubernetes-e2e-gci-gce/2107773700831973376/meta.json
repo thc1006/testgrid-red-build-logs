@@ -1,0 +1,59 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2107773700831973376",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1791367386,
+  "created": 1791367385,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Inline-volume (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.000s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 10/07/26 10:32:30.114\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and non-pre-bound PV: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-f9kx6\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 10/07/26 10:32:48.571\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791369652,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2107773700831973376",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2107773700831973376/build-log.txt",
+  "log": {
+    "bytes": 198865,
+    "md5": "993333feb37eea02a6b34f2e621a4175",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 31506,
+    "gcs": {
+      "generation": "1791369668709444",
+      "md5": "993333feb37eea02a6b34f2e621a4175",
+      "crc32c": "04ab740c",
+      "bytes": 198865,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2103390000002371584",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1790322257,
+  "created": 1790322229,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should have session affinity timeout work for NodePort service [LinuxOnly]",
+          "status": "FAIL",
+          "message": "[FAILED] Session is still sticky after reaching the 15s timeout\nIn [It...o/kubernetes/test/e2e/network/service.go:4264 @ 09/25/26 08:02:31.645\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790324782,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2103390000002371584",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2103390000002371584/build-log.txt",
+  "log": {
+    "bytes": 154626,
+    "md5": "e805768c243b6c21df123ee294ad1775",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24142,
+    "gcs": {
+      "generation": "1790324799241504",
+      "md5": "e805768c243b6c21df123ee294ad1775",
+      "crc32c": "9803e92c",
+      "bytes": 154626,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

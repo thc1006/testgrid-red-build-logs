@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2108305461039075328",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1791494167,
+  "created": 1791494166,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (block volmode)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to wait for pod-3 [&Pod{ObjectMeta:{pod-b177ad9e-2ac1-...t/e2e/storage/testsuites/volume_stress.go:221 @ 10/08/26 23:08:21.227\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791511772,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108305461039075328",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108305461039075328/build-log.txt",
+  "log": {
+    "bytes": 479189,
+    "md5": "8a8fb2c7f9da7160379ef86a7c02d9b9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 50235,
+    "gcs": {
+      "generation": "1791511804833605",
+      "md5": "8a8fb2c7f9da7160379ef86a7c02d9b9",
+      "crc32c": "dced539b",
+      "bytes": 479189,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T031554Z",
+  "archived_at": 1791515754.0,
+  "settled": false,
+  "final": false
+}

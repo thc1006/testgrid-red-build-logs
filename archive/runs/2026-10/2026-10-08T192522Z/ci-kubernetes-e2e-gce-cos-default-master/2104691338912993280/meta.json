@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2104691338912993280",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1790632523,
+  "created": 1790632493,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Deployment should not disrupt a cloud load-balancer's connectivity during rollout [Provider:aws,azure,gce]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 34.10.227.75:80 after 2m...ernetes/test/e2e/framework/service/util.go:49 @ 09/28/26 22:28:07.771\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790635039,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2104691338912993280",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2104691338912993280/build-log.txt",
+  "log": {
+    "bytes": 299009,
+    "md5": "88d5fa2ba670e793798a74e091529a53",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 43982,
+    "gcs": {
+      "generation": "1790635056321860",
+      "md5": "88d5fa2ba670e793798a74e091529a53",
+      "crc32c": "cb889309",
+      "bytes": 299009,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

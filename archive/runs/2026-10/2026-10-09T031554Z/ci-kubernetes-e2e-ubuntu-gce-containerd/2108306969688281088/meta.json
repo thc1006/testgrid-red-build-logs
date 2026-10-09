@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2108306969688281088",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1791494527,
+  "created": 1791494526,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.diffResources",
+          "status": "FAIL",
+          "message": "Error: 2 leaked resources\n+NAME                           MACHINE_TYPE...on-template  e2-standard-2               2026-10-08T14:25:06.438-07:00"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791496720,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108306969688281088",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108306969688281088/build-log.txt",
+  "log": {
+    "bytes": 63614,
+    "md5": "1b0b46c076ac07e8bef040eabdc38019",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 12136,
+    "gcs": {
+      "generation": "1791496736291266",
+      "md5": "1b0b46c076ac07e8bef040eabdc38019",
+      "crc32c": "82067027",
+      "bytes": 63614,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T031554Z",
+  "archived_at": 1791515754.0,
+  "settled": true,
+  "final": false
+}

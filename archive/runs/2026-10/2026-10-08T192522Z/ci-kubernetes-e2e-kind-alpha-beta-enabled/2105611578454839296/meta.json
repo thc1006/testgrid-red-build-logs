@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "build": "2105611578454839296",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "started": 1790851927,
+  "created": 1790851895,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with multiple PVs and PVCs all in same ns should create 3 PVs and 3 PVCs: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-lt5qt\" did not exit with Success: pod \"pvc-te...es/test/e2e/storage/persistent_volumes.go:350 @ 10/01/26 11:03:36.451\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790853508,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2105611578454839296",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2105611578454839296/build-log.txt",
+  "log": {
+    "bytes": 144548,
+    "md5": "1554817afb44bc5a3450399cad154990",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22384,
+    "gcs": {
+      "generation": "1790853527462933",
+      "md5": "1554817afb44bc5a3450399cad154990",
+      "crc32c": "3154a2b7",
+      "bytes": 144548,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

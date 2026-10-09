@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2104210665487994880",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1790517920,
+  "created": 1790517891,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Daemon set should surge pods onto nodes when spec was updated and update strategy is RollingUpdate [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] invariants were violated during daemonset update:\nAn old pod ...io/kubernetes/test/e2e/apps/daemon_set.go:833 @ 09/27/26 16:15:55.231\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790532415,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2104210665487994880",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2104210665487994880/build-log.txt",
+  "log": {
+    "bytes": 196791,
+    "md5": "c181514917466da43cd5d6ac2cb9fd58",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23930,
+    "gcs": {
+      "generation": "1790532441323332",
+      "md5": "c181514917466da43cd5d6ac2cb9fd58",
+      "crc32c": "44ece335",
+      "bytes": 196791,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

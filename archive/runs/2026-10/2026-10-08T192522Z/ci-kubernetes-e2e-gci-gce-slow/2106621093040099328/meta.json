@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2106621093040099328",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1791092582,
+  "created": 1791092582,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] kubelet host cleanup with volume mounts [HostCleanup] Host cleanup after disrupting NFS volume [NFS] [Provider:gce,aws,local,azure] after stopping the nfs-server and deleting the (sleeping) client pod, the NFS mount and the pod's UID directory should be removed. [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] command terminated with exit code 1\nIn [It] at: k8s.io/kubern...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791095807,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2106621093040099328",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2106621093040099328/build-log.txt",
+  "log": {
+    "bytes": 127237,
+    "md5": "a971b04f309ade07534d8730a65a5907",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22263,
+    "gcs": {
+      "generation": "1791095812891914",
+      "md5": "a971b04f309ade07534d8730a65a5907",
+      "crc32c": "1e21ff55",
+      "bytes": 127237,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

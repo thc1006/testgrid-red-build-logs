@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2104943753818017792",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1790692716,
+  "created": 1790692673,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration.apiserver",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   Test4xxStatusCodeInvalidPatch\n{\"level\":\"warn\",\"ts\":\"2...port 42185...\n    testserver.go:498: Waiting for /healthz to be ok...\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790694974,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2104943753818017792",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2104943753818017792/build-log.txt",
+  "log": {
+    "bytes": 227623,
+    "md5": "f4ebdd108ee0e97687c02a882a7f95b3",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21906,
+    "gcs": {
+      "generation": "1790694978561923",
+      "md5": "f4ebdd108ee0e97687c02a882a7f95b3",
+      "crc32c": "c056d11c",
+      "bytes": 227623,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

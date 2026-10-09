@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2106726540405379072",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1791117752,
+  "created": 1791117722,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourceDefinition resources [Privileged:ClusterAdmin] Simple CustomResourceDefinition creating/deleting custom resource definition objects works [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] deleting CustomResourceDefinition: context deadline exceeded\n...apimachinery/custom_resource_definition.go:76 @ 10/04/26 12:48:58.684\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791119231,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2106726540405379072",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2106726540405379072/build-log.txt",
+  "log": {
+    "bytes": 113375,
+    "md5": "79d2595f8ed868411e6430daf7803424",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 18122,
+    "gcs": {
+      "generation": "1791119249381721",
+      "md5": "79d2595f8ed868411e6430daf7803424",
+      "crc32c": "59c3cec1",
+      "bytes": 113375,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

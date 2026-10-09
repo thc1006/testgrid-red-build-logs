@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2107094466945880064",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1791205450,
+  "created": 1791205443,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PreStop should call prestop when killing a pod [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] validating pre-stop.: timed out waiting for the condition\nIn ...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791210336,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2107094466945880064",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2107094466945880064/build-log.txt",
+  "log": {
+    "bytes": 282622,
+    "md5": "2036e422c36a124efa043eff9b394eca",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 40960,
+    "gcs": {
+      "generation": "1791210342460268",
+      "md5": "2036e422c36a124efa043eff9b394eca",
+      "crc32c": "ed8e5a7f",
+      "bytes": 282622,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

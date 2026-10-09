@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2105858309545267200",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1790910750,
+  "created": 1790910720,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        },
+        {
+          "test": "kubetest.DumpClusterLogs",
+          "status": "FAIL",
+          "message": "error during ./cluster/log-dump/log-dump.sh /logs/artifacts (interrupted): signal: interrupt"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790918326,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2105858309545267200",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2105858309545267200/build-log.txt",
+  "log": {
+    "bytes": 53173,
+    "md5": "ba8c7575cf9f7f9878560552e0b004a6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 10717,
+    "gcs": {
+      "generation": "1790918327342337",
+      "md5": "ba8c7575cf9f7f9878560552e0b004a6",
+      "crc32c": "75bbb40a",
+      "bytes": 53173,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

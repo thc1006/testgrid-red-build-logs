@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2106141679940538368",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1790978288,
+  "created": 1790978281,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Update Demo should scale a replication controller [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300 seconds waiting for name=update-demo pods...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Container Lifecycle Hook when create a pod with lifecycle hook should execute poststart exec hook properly [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.000s.\nexpected pod to be running and read...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790984169,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2106141679940538368",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2106141679940538368/build-log.txt",
+  "log": {
+    "bytes": 563793,
+    "md5": "6164be5147f0977cbaaf597d3cc46366",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 72680,
+    "gcs": {
+      "generation": "1790984175167475",
+      "md5": "6164be5147f0977cbaaf597d3cc46366",
+      "crc32c": "96fa94ee",
+      "bytes": 563793,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

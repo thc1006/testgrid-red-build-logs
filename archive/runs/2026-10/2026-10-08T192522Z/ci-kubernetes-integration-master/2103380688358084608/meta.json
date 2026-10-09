@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2103380688358084608",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1790320039,
+  "created": 1790320009,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-instrumentation] k8s.io/kubernetes/test/integration.events",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestEventSeries\n    testserver.go:691: Resolved tests...imed out waiting for the condition\n--- FAIL: TestEventSeries (21.60s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790322284,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2103380688358084608",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2103380688358084608/build-log.txt",
+  "log": {
+    "bytes": 201804,
+    "md5": "816ee8cff4e0e2a16cb279fbc0f42746",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20184,
+    "gcs": {
+      "generation": "1790322288606470",
+      "md5": "816ee8cff4e0e2a16cb279fbc0f42746",
+      "crc32c": "f20a2f76",
+      "bytes": 201804,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

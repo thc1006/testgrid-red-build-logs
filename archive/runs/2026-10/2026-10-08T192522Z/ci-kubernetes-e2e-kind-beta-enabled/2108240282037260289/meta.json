@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2108240282037260289",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1791478658,
+  "created": 1791478627,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Pod",
+          "status": "FAIL",
+          "message": "pod could not initialize: containers with incomplete status: [initupload place-entrypoint]"
+        }
+      ]
+    }
+  ],
+  "result": "failure",
+  "finished": 1791478930,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2108240282037260289",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2108240282037260289/build-log.txt",
+  "log": null,
+  "podinfo": {
+    "bytes": 79246,
+    "md5": "322e16a08465ece6ab8e3c8411bcbcd4",
+    "verified": true,
+    "file": "podinfo.json",
+    "file_bytes": 79246,
+    "gcs": {
+      "generation": "1791478962569900",
+      "md5": "322e16a08465ece6ab8e3c8411bcbcd4",
+      "crc32c": "fd6ca759",
+      "bytes": 79246,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2108311249702883328",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1791495579,
+  "created": 1791495547,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-auth] k8s.io/kubernetes/test/integration.auth",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestResourceClaimGranularStatusAuthorization/succeeds...ation\n--- FAIL: TestResourceClaimGranularStatusAuthorization (12.74s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791497927,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2108311249702883328",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2108311249702883328/build-log.txt",
+  "log": {
+    "bytes": 208662,
+    "md5": "84f110d3eec9cc6e370a0f5564298347",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20943,
+    "gcs": {
+      "generation": "1791497931535822",
+      "md5": "84f110d3eec9cc6e370a0f5564298347",
+      "crc32c": "affd7a85",
+      "bytes": 208662,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T031554Z",
+  "archived_at": 1791515754.0,
+  "settled": true,
+  "final": false
+}

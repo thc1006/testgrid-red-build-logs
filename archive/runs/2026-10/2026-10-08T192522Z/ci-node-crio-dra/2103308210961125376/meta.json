@@ -1,0 +1,54 @@
+{
+  "job": "ci-node-crio-dra",
+  "build": "2103308210961125376",
+  "query": "kubernetes-ci-logs/logs/ci-node-crio-dra",
+  "started": 1790302736,
+  "created": 1790302729,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ci-node-crio-dra",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must call NodeUnprepareResources again if it's in progress for one plugin when Kubelet restarts [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 120.000s.\nExpected:\n    <[]app.GRPCCall | len...s.io/kubernetes/test/e2e_node/dra_test.go:747 @ 09/25/26 02:28:24.407\n"
+        },
+        {
+          "test": "ci-node-crio-dra.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1790304908,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-dra/2103308210961125376",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-crio-dra/2103308210961125376/build-log.txt",
+  "log": {
+    "bytes": 858954,
+    "md5": "7d68ae701d8e0f5a9a6c66e208609200",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 81846,
+    "gcs": {
+      "generation": "1790304909329040",
+      "md5": "7d68ae701d8e0f5a9a6c66e208609200",
+      "crc32c": "22d80498",
+      "bytes": 858954,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-08T192522Z",
+  "archived_at": 1791487522.3170176,
+  "settled": true,
+  "final": true
+}

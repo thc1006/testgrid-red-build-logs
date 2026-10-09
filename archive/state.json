@@ -1,337 +1,375 @@
 {
   "tabs": {
     "sig-release-master-blocking#Conformance - GCE - master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790200217
+      "scan": 1791515754.4446766,
+      "oldest": 1790221817,
+      "current_job_hours": 3.0,
+      "job_hours": {
+        "3": 1791526554.4446766
+      }
     },
     "sig-release-master-blocking#build-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790198060
+      "scan": 1791515754.4446766,
+      "oldest": 1790219718,
+      "current_job_hours": 2.5,
+      "job_hours": {
+        "2.5": 1791524754.4446766
+      }
     },
     "sig-release-master-blocking#build-master-fast": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790196078
+      "scan": 1791515754.4446766,
+      "oldest": 1790219896,
+      "current_job_hours": 2.5,
+      "job_hours": {
+        "2.5": 1791524754.4446766
+      }
     },
     "sig-release-master-blocking#ci-kubernetes-unit": {
-      "scan": 1791491998.6135333,
-      "oldest": 1791408335
+      "scan": 1791515754.4446766,
+      "oldest": 1791430175,
+      "current_job_hours": 2.5,
+      "job_hours": {
+        "2.5": 1791524754.4446766
+      }
     },
     "sig-release-master-blocking#ci-node-crio-conformance": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790196452
+      "scan": 1791515754.4446766,
+      "oldest": 1790221636,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-blocking#ci-node-e2e": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790199320
+      "scan": 1791515754.4446766,
+      "oldest": 1790220917,
+      "current_job_hours": 2.0,
+      "job_hours": {
+        "2": 1791522954.4446766
+      }
     },
     "sig-release-master-blocking#cmd-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790195004
+      "scan": 1791515754.4446766,
+      "oldest": 1790220260,
+      "current_job_hours": 2.5,
+      "job_hours": {
+        "2.5": 1791524754.4446766
+      }
     },
     "sig-release-master-blocking#conformance-ga-only": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790198000
+      "scan": 1791515754.4446766,
+      "oldest": 1790219596,
+      "current_job_hours": 3.0,
+      "job_hours": {
+        "3": 1791526554.4446766
+      }
     },
     "sig-release-master-blocking#gce-cos-alphafeatures-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790197397
+      "scan": 1791515754.4446766,
+      "oldest": 1790219296,
+      "current_job_hours": 2.83,
+      "job_hours": {
+        "2.83": 1791525942.4446766
+      }
     },
     "sig-release-master-blocking#gce-cos-default-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790286259
+      "scan": 1791515754.4446766,
+      "oldest": 1791224315,
+      "current_job_hours": 2.83,
+      "job_hours": {
+        "2.83": 1791525942.4446766
+      }
     },
     "sig-release-master-blocking#gce-cos-master-default": {
-      "scan": 1791491998.6135333,
-      "oldest": 1791220924
+      "scan": 1791515754.4446766,
+      "oldest": 1791223324,
+      "current_job_hours": 2.83,
+      "job_hours": {
+        "2.83": 1791525942.4446766
+      }
     },
     "sig-release-master-blocking#gce-device-plugin-gpu-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790199077
+      "scan": 1791515754.4446766,
+      "oldest": 1790220678,
+      "current_job_hours": 1.83,
+      "job_hours": {
+        "1.83": 1791522342.4446766
+      }
     },
     "sig-release-master-blocking#gce-master-scale-performance-100": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790195790
+      "scan": 1791515754.4446766,
+      "oldest": 1790221639,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-blocking#gce-ubuntu-master-containerd": {
-      "scan": 1791491998.6135333,
-      "oldest": 1791142083
+      "scan": 1791515754.4446766,
+      "oldest": 1791144423,
+      "current_job_hours": 2.25,
+      "job_hours": {
+        "2.25": 1791523854.4446766
+      }
     },
     "sig-release-master-blocking#integration-arm64-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790197103
+      "scan": 1791515754.4446766,
+      "oldest": 1790218699,
+      "current_job_hours": 2.5,
+      "job_hours": {
+        "2.5": 1791524754.4446766
+      }
     },
     "sig-release-master-blocking#integration-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790196859
+      "scan": 1791515754.4446766,
+      "oldest": 1790218455,
+      "current_job_hours": 2.5,
+      "job_hours": {
+        "2.5": 1791524754.4446766
+      }
     },
     "sig-release-master-blocking#kind-ipv6-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1791228094
+      "scan": 1791515754.4446766,
+      "oldest": 1791231693,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-blocking#kind-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1791157412
+      "scan": 1791515754.4446766,
+      "oldest": 1791161072,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-blocking#kind-master-beta-features": {
-      "scan": 1791491998.6135333,
-      "oldest": 1791202221
+      "scan": 1791515754.4446766,
+      "oldest": 1791205805,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-blocking#sig-network-kind, loadbalancer": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790196561
+      "scan": 1791515754.4446766,
+      "oldest": 1790218263,
+      "current_job_hours": 1.0,
+      "job_hours": {
+        "1": 1791519354.4446766
+      }
     },
     "sig-release-master-blocking#skew-cluster-latest-kubectl-stable2-gce": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790221789
+      "scan": 1791515754.4446766,
+      "oldest": 1790221789,
+      "current_job_hours": 2.83,
+      "job_hours": {
+        "2.83": 1791525942.4446766
+      }
     },
     "sig-release-master-blocking#verify-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790195297
+      "scan": 1791515754.4446766,
+      "oldest": 1790220557,
+      "current_job_hours": 2.5,
+      "job_hours": {
+        "2.5": 1791524754.4446766
+      }
     },
     "sig-release-master-informing#Conformance - EC2 - arm64 - master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790201722
+      "scan": 1791515754.4446766,
+      "oldest": 1790223321,
+      "current_job_hours": 4.5,
+      "job_hours": {
+        "4.5": 1791531954.4446766
+      }
     },
     "sig-release-master-informing#Conformance - EC2 - master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790213960
+      "scan": 1791515754.4446766,
+      "oldest": 1790235561,
+      "current_job_hours": 4.5,
+      "job_hours": {
+        "4.5": 1791531954.4446766
+      }
     },
     "sig-release-master-informing#capz-windows-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790199361
+      "scan": 1791515754.4446766,
+      "oldest": 1790220956,
+      "current_job_hours": 4.5,
+      "job_hours": {
+        "4.5": 1791531954.4446766
+      }
     },
     "sig-release-master-informing#ci-kind-dra": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790196889
+      "scan": 1791515754.4446766,
+      "oldest": 1790240149,
+      "current_job_hours": 2.0,
+      "job_hours": {
+        "2": 1791522954.4446766
+      }
     },
     "sig-release-master-informing#ci-node-crio-dra": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790216157
+      "scan": 1791515754.4446766,
+      "oldest": 1790237817,
+      "current_job_hours": 2.0,
+      "job_hours": {
+        "2": 1791522954.4446766
+      }
     },
     "sig-release-master-informing#ci-node-e2e-containerd-2-1-cos-dra": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790208236
+      "scan": 1791515754.4446766,
+      "oldest": 1790229838,
+      "current_job_hours": 2.0,
+      "job_hours": {
+        "2": 1791522954.4446766
+      }
     },
     "sig-release-master-informing#ci-node-e2e-containerd-2-1-ubuntu-dra": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790208237
+      "scan": 1791515754.4446766,
+      "oldest": 1790229838,
+      "current_job_hours": 2.0,
+      "job_hours": {
+        "2": 1791522954.4446766
+      }
     },
     "sig-release-master-informing#ec2-master-scale-performance-5000": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790146943
+      "scan": 1791515754.4446766,
+      "oldest": 1790146943,
+      "current_job_hours": 8.5,
+      "job_hours": {
+        "8.5": 1791546354.4446766
+      }
     },
     "sig-release-master-informing#gce-cos-master-alpha-features": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790196709
+      "scan": 1791515754.4446766,
+      "oldest": 1790224609,
+      "current_job_hours": 3.83,
+      "job_hours": {
+        "3.83": 1791529542.4446766
+      }
     },
     "sig-release-master-informing#gce-cos-master-serial": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790200311
+      "scan": 1791515754.4446766,
+      "oldest": 1790230729,
+      "current_job_hours": 9.17,
+      "job_hours": {
+        "9.17": 1791548766.4446766
+      }
     },
     "sig-release-master-informing#gce-cos-master-slow": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790195389
+      "scan": 1791515754.4446766,
+      "oldest": 1790216989,
+      "current_job_hours": 3.33,
+      "job_hours": {
+        "3.33": 1791527742.4446766
+      }
     },
     "sig-release-master-informing#gce-cos-serial-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790197822
+      "scan": 1791515754.4446766,
+      "oldest": 1790226619,
+      "current_job_hours": 11.83,
+      "job_hours": {
+        "11.83": 1791558342.4446766
+      }
     },
     "sig-release-master-informing#gce-cos-slow-master": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790197522
+      "scan": 1791515754.4446766,
+      "oldest": 1790219118,
+      "current_job_hours": 3.33,
+      "job_hours": {
+        "3.33": 1791527742.4446766
+      }
     },
     "sig-release-master-informing#gce-master-scale-correctness": {
-      "scan": 1791491998.6135333,
-      "oldest": 1789059668
+      "scan": 1791515754.4446766,
+      "oldest": 1789059668,
+      "current_job_hours": 5.0,
+      "job_hours": {
+        "5": 1791533754.4446766
+      }
     },
     "sig-release-master-informing#gce-master-scale-performance-5000": {
-      "scan": 1791491998.6135333,
-      "oldest": 1786640516
+      "scan": 1791515754.4446766,
+      "oldest": 1786640516,
+      "current_job_hours": 8.0,
+      "job_hours": {
+        "8": 1791544554.4446766
+      }
     },
     "sig-release-master-informing#kind-master-alpha-beta-enabled": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790808603
+      "scan": 1791515754.4446766,
+      "oldest": 1790815805,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-informing#kind-master-alpha-beta-enabled-conformance": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790196318
+      "scan": 1791515754.4446766,
+      "oldest": 1790218082,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-informing#kind-master-alpha-beta-features": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790615252
+      "scan": 1791515754.4446766,
+      "oldest": 1790622511,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-informing#kind-master-beta-enabled": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790966131
+      "scan": 1791515754.4446766,
+      "oldest": 1790973390,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-informing#kind-master-beta-enabled-conformance": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790200553
+      "scan": 1791515754.4446766,
+      "oldest": 1790222144,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-informing#kubeadm-kinder-latest": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790193981
+      "scan": 1791515754.4446766,
+      "oldest": 1790222844,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-informing#kubeadm-kinder-latest-on-1-37": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790198360
+      "scan": 1791515754.4446766,
+      "oldest": 1790219961,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-informing#kubeadm-kinder-upgrade-1-37-latest": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790197943
+      "scan": 1791515754.4446766,
+      "oldest": 1790219540,
+      "current_job_hours": 1.5,
+      "job_hours": {
+        "1.5": 1791521154.4446766
+      }
     },
     "sig-release-master-informing#periodic-kubernetes-e2e-kind-kms": {
-      "scan": 1791491998.6135333,
-      "oldest": 1790203816
+      "scan": 1791515754.4446766,
+      "oldest": 1790225417,
+      "current_job_hours": 3.0,
+      "job_hours": {
+        "3": 1791526554.4446766
+      }
     }
   },
   "unresolved": {},
   "given_up": {},
-  "no_log": {
-    "ci-kubernetes-build/2108224426771222528": {
-      "rec": {
-        "job": "ci-kubernetes-build",
-        "build": "2108224426771222528",
-        "query": "kubernetes-ci-logs/logs/ci-kubernetes-build",
-        "started": 1791474880,
-        "created": 1791474846,
-        "tabs": [
-          {
-            "dashboard": "sig-release-master-blocking",
-            "tab": "build-master",
-            "tab_status": "PASSING",
-            "red_cells": [
-              {
-                "test": "ci-kubernetes-build.Overall",
-                "status": "FAIL",
-                "message": "Build failed outside of test results"
-              },
-              {
-                "test": "ci-kubernetes-build.Pod",
-                "status": "FAIL",
-                "message": "pod could not initialize: containers with incomplete status: [initupload place-entrypoint]"
-              }
-            ]
-          }
-        ]
-      },
-      "first_seen": 1791487522.3170176
-    },
-    "ci-kubernetes-build-fast/2108221405156872192": {
-      "rec": {
-        "job": "ci-kubernetes-build-fast",
-        "build": "2108221405156872192",
-        "query": "kubernetes-ci-logs/logs/ci-kubernetes-build-fast",
-        "started": 1791474250,
-        "created": 1791474126,
-        "tabs": [
-          {
-            "dashboard": "sig-release-master-blocking",
-            "tab": "build-master-fast",
-            "tab_status": "PASSING",
-            "red_cells": [
-              {
-                "test": "ci-kubernetes-build-fast.Overall",
-                "status": "FAIL",
-                "message": "Build failed outside of test results"
-              },
-              {
-                "test": "ci-kubernetes-build-fast.Pod",
-                "status": "FAIL",
-                "message": "pod could not initialize: containers with incomplete status: [initupload place-entrypoint]"
-              }
-            ]
-          }
-        ]
-      },
-      "first_seen": 1791487522.3170176
-    },
-    "ci-kubernetes-integration-arm64-master/2108237764653748224": {
-      "rec": {
-        "job": "ci-kubernetes-integration-arm64-master",
-        "build": "2108237764653748224",
-        "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
-        "started": 1791478061,
-        "created": 1791478026,
-        "tabs": [
-          {
-            "dashboard": "sig-release-master-blocking",
-            "tab": "integration-arm64-master",
-            "tab_status": "FLAKY",
-            "red_cells": [
-              {
-                "test": "ci-kubernetes-integration-arm64-master.Overall",
-                "status": "FAIL",
-                "message": "Build failed outside of test results"
-              },
-              {
-                "test": "ci-kubernetes-integration-arm64-master.Pod",
-                "status": "FAIL",
-                "message": "pod could not initialize: containers with incomplete status: [initupload place-entrypoint]"
-              }
-            ]
-          }
-        ]
-      },
-      "first_seen": 1791487522.3170176
-    },
-    "ci-kubernetes-e2e-kind-beta-features/2108220901790060544": {
-      "rec": {
-        "job": "ci-kubernetes-e2e-kind-beta-features",
-        "build": "2108220901790060544",
-        "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
-        "started": 1791474080,
-        "created": 1791474006,
-        "tabs": [
-          {
-            "dashboard": "sig-release-master-blocking",
-            "tab": "kind-master-beta-features",
-            "tab_status": "FLAKY",
-            "red_cells": [
-              {
-                "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
-                "status": "FAIL",
-                "message": "Build failed outside of test results"
-              },
-              {
-                "test": "ci-kubernetes-e2e-kind-beta-features.Pod",
-                "status": "FAIL",
-                "message": "pod could not initialize: containers with incomplete status: [initupload place-entrypoint]"
-              }
-            ]
-          }
-        ]
-      },
-      "first_seen": 1791487522.3170176
-    },
-    "ci-kubernetes-e2e-kind-beta-enabled/2108240282037260289": {
-      "rec": {
-        "job": "ci-kubernetes-e2e-kind-beta-enabled",
-        "build": "2108240282037260289",
-        "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
-        "started": 1791478658,
-        "created": 1791478627,
-        "tabs": [
-          {
-            "dashboard": "sig-release-master-informing",
-            "tab": "kind-master-beta-enabled",
-            "tab_status": "FLAKY",
-            "red_cells": [
-              {
-                "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
-                "status": "FAIL",
-                "message": "Build failed outside of test results"
-              },
-              {
-                "test": "ci-kubernetes-e2e-kind-beta-enabled.Pod",
-                "status": "FAIL",
-                "message": "pod could not initialize: containers with incomplete status: [initupload place-entrypoint]"
-              }
-            ]
-          }
-        ]
-      },
-      "first_seen": 1791487522.3170176
-    }
-  }
+  "watch": {}
 }

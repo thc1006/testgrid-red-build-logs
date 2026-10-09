@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2108243802819923968",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1791479496,
+  "created": 1791479466,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Daemon set should surge pods onto nodes when spec was updated and update strategy is RollingUpdate [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] invariants were violated during daemonset update:\nAn old pod ....io/kubernetes/test/e2e/apps/daemon_set.go:833 @ 10/08/26 19:50:31.98\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791495587,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108243802819923968",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108243802819923968/build-log.txt",
+  "log": {
+    "bytes": 184779,
+    "md5": "b04efcccea3057ec8e1827c1fa25758d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23204,
+    "gcs": {
+      "generation": "1791495619583658",
+      "md5": "b04efcccea3057ec8e1827c1fa25758d",
+      "crc32c": "844f008a",
+      "bytes": 184779,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T031554Z",
+  "archived_at": 1791515754.0,
+  "settled": true,
+  "final": false
+}
