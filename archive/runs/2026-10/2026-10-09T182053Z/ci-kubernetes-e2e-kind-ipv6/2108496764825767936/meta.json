@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2108496764825767936",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1791539806,
+  "created": 1791539777,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Pre-provisioned PV (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-preprovisionedpv-gcxm\" success...s/test/e2e/framework/pod/output/output.go:263 @ 10/09/26 10:09:18.191\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791541423,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2108496764825767936",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2108496764825767936/build-log.txt",
+  "log": {
+    "bytes": 156977,
+    "md5": "95ffe11729702bda20c080b59e805f5a",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25139,
+    "gcs": {
+      "generation": "1791541444343738",
+      "md5": "95ffe11729702bda20c080b59e805f5a",
+      "crc32c": "38799d75",
+      "bytes": 156977,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T182053Z",
+  "archived_at": 1791570053.0,
+  "settled": true,
+  "final": false
+}

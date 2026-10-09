@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2108509808276541440",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1791542887,
+  "created": 1791542887,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] ReplicaSet should surface a failure condition on a common issue like exceeded quota",
+          "status": "FAIL",
+          "message": "[FAILED] rs controller never added the failure condition for replica s...o/kubernetes/test/e2e/apps/replica_set.go:286 @ 10/09/26 11:14:10.834\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791545389,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108509808276541440",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108509808276541440/build-log.txt",
+  "log": {
+    "bytes": 140103,
+    "md5": "20c26edc2e20f067ae6c7bac2b5384bc",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22688,
+    "gcs": {
+      "generation": "1791545403820133",
+      "md5": "20c26edc2e20f067ae6c7bac2b5384bc",
+      "crc32c": "5d6d1351",
+      "bytes": 140103,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T182053Z",
+  "archived_at": 1791570053.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,59 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2108508549771431936",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1791542615,
+  "created": 1791542587,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (default fs)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to wait for pod-3 [&Pod{ObjectMeta:{pod-642dd39e-6f1b-...t/e2e/storage/testsuites/volume_stress.go:221 @ 10/09/26 11:28:22.203\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] [Provider:gce] [LinuxOnly] NonGracefulNodeShutdown [NonGracefulNodeShutdown] pod that uses a persistent volume via gce pd driver should get immediately rescheduled to a different node after non graceful node shutdown [Disruptive]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected at least 1 pods to be runn...e2e/storage/non_graceful_node_shutdown.go:120 @ 10/09/26 14:00:59.038\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791558963,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108508549771431936",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108508549771431936/build-log.txt",
+  "log": {
+    "bytes": 536646,
+    "md5": "b1d416229bac027515a365cc844529c2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 60389,
+    "gcs": {
+      "generation": "1791559008174169",
+      "md5": "b1d416229bac027515a365cc844529c2",
+      "crc32c": "07aec438",
+      "bytes": 536646,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T182053Z",
+  "archived_at": 1791570053.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2108505781732118528",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1791541962,
+  "created": 1791541927,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] Garbage collector should support orphan deletion of custom resources",
+          "status": "FAIL",
+          "message": "[FAILED] Told to stop trying after 0.067s.\nUnexpected final error whil...st/e2e/apimachinery/garbage_collector.go:1116 @ 10/09/26 11:05:39.638\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791544703,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2108505781732118528",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2108505781732118528/build-log.txt",
+  "log": {
+    "bytes": 131632,
+    "md5": "dd950123a0640f84a77fc5787a27cf31",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21833,
+    "gcs": {
+      "generation": "1791544719568157",
+      "md5": "dd950123a0640f84a77fc5787a27cf31",
+      "crc32c": "375d8c05",
+      "bytes": 131632,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T182053Z",
+  "archived_at": 1791570053.0,
+  "settled": true,
+  "final": false
+}

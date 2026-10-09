@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2108449914181652480",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1791528607,
+  "created": 1791528607,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (default fs)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to wait for pod-1 [&Pod{ObjectMeta:{pod-9cd250c9-c50d-...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791546132,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108449914181652480",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108449914181652480/build-log.txt",
+  "log": {
+    "bytes": 438456,
+    "md5": "a6ea33259124e6da4e1ad1f9f10a0618",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 50091,
+    "gcs": {
+      "generation": "1791546160265955",
+      "md5": "a6ea33259124e6da4e1ad1f9f10a0618",
+      "crc32c": "1fd591fd",
+      "bytes": 438456,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T182053Z",
+  "archived_at": 1791570053.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2108592235074293760",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1791562546,
+  "created": 1791562539,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should be capable to mount multiple trust bundles by signer+labels can combine all signer CTBs with an empty label selector [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected \"(mode of file \\\"/var/run/ctbtest/trust-bundle.crt\\\"...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791568284,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2108592235074293760",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2108592235074293760/build-log.txt",
+  "log": {
+    "bytes": 285667,
+    "md5": "6e8df9a3df65c13026f9fe351404e730",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 44529,
+    "gcs": {
+      "generation": "1791568294185866",
+      "md5": "6e8df9a3df65c13026f9fe351404e730",
+      "crc32c": "b4e07d38",
+      "bytes": 285667,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T182053Z",
+  "archived_at": 1791570053.0,
+  "settled": false,
+  "final": false
+}

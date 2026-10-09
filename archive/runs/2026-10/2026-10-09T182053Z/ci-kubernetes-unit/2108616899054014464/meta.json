@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2108616899054014464",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1791568509,
+  "created": 1791568419,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-network] k8s.io/kubernetes/pkg/controller/nodeipam/ipam.sync",
+          "status": "FAIL",
+          "message": "Failed\npanic: test timed out after 3m0s\n\trunning tests:\n\t\tTestNodeSync...SyncUpdate\n=== PAUSE TestNodeSyncUpdate\n\n=== RUN   TestNodeSyncResync\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791569877,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108616899054014464",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108616899054014464/build-log.txt",
+  "log": {
+    "bytes": 259061,
+    "md5": "dafae3f9626dd499a99a0abba717bfe1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 33652,
+    "gcs": {
+      "generation": "1791569877742104",
+      "md5": "dafae3f9626dd499a99a0abba717bfe1",
+      "crc32c": "08c3dc22",
+      "bytes": 259061,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T182053Z",
+  "archived_at": 1791570053.0,
+  "settled": false,
+  "final": false
+}

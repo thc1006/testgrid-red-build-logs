@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2108441609812054016",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1791526655,
+  "created": 1791526627,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (block volmode)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to wait for pod-6 [&Pod{ObjectMeta:{pod-98123be6-4639-...t/e2e/storage/testsuites/volume_stress.go:221 @ 10/09/26 07:29:23.636\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791542513,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108441609812054016",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108441609812054016/build-log.txt",
+  "log": {
+    "bytes": 443096,
+    "md5": "f30b77bd3eec3b677e2c437ec6b16c0c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 46769,
+    "gcs": {
+      "generation": "1791542544601919",
+      "md5": "f30b77bd3eec3b677e2c437ec6b16c0c",
+      "crc32c": "a36552e7",
+      "bytes": 443096,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-09T182053Z",
+  "archived_at": 1791570053.0,
+  "settled": true,
+  "final": false
+}
