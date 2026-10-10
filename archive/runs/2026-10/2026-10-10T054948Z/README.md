@@ -1,0 +1,31 @@
+# Run 2026-10-10 05:49:48 UTC
+
+46 tabs read (0 failed), 573 red builds on TestGrid. This run archived 14 new builds.
+
+[run.json](run.json) has the details; [INDEX.md](../../../INDEX.md) lists every build. A file marked provisional was taken before Prow finished uploading and is re-checked against GCS on every run until it settles.
+
+## Builds archived by this run (14)
+
+### 2026-10-10
+
+| Time | Tab | Build | Red tests | Files |
+|---|---|---|---|---|
+| 03:53 | blocking#integration-master | [ci-kubernetes-integration-master 2108767642398494720](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2108767642398494720) | \[sig-scheduling\] k8s.io/kubernetes/test/integration/scheduler.podgroup (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-integration-master/2108767642398494720/build-log.txt.gz) (provisional) |
+| 02:35 | blocking#gce-cos-default-master | [ci-kubernetes-e2e-gce-cos-default-master 2108748012787339264](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2108748012787339264) | Kubernetes e2e suite.\[It\] \[sig-node\] Pods Extended (pod generation) Pod Generation pod gen (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-e2e-gce-cos-default-master/2108748012787339264/build-log.txt.gz) |
+| 01:48 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2108736436428607488](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108736436428607488) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2108736436428607488/build-log.txt.gz) |
+| 00:55 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2108723099858898944](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108723099858898944) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-e2e-gci-gce-slow/2108723099858898944/build-log.txt.gz) |
+| 00:54 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2108722596936683520](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108722596936683520) | \[sig-storage\] k8s.io/kubernetes/pkg/controller/volume/attachdetach.reconciler (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-unit/2108722596936683520/build-log.txt.gz) |
+
+### 2026-10-09
+
+| Time | Tab | Build | Red tests | Files |
+|---|---|---|---|---|
+| 20:59 | blocking#integration-arm64-master | [ci-kubernetes-integration-arm64-master 2108663455950049280](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2108663455950049280) | \[sig-scheduling\] k8s.io/kubernetes/test/integration/scheduler.preemption (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-integration-arm64-master/2108663455950049280/build-log.txt.gz) |
+| 20:49 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2108661191277547520](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2108661191277547520) | Kubernetes e2e suite.\[It\] \[sig-storage\] Volume metrics Ephemeral should create prometheus (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-e2e-gci-gce/2108661191277547520/build-log.txt.gz) |
+| 20:36 | blocking#build-master | [ci-kubernetes-build 2108657668250931200](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-build/2108657668250931200) | ci-kubernetes-build.Overall | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-build/2108657668250931200/build-log.txt.gz) |
+| 19:54 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2108647097220730880](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108647097220730880) | \[sig-network\] k8s.io/kubernetes/pkg/proxy.localnodeportproxy (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-unit/2108647097220730880/build-log.txt.gz) |
+| 18:52 | blocking#ci-node-e2e | [ci-kubernetes-node-e2e-containerd 2108631495462621184](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2108631495462621184) | kubetest.Node Tests (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-node-e2e-containerd/2108631495462621184/build-log.txt.gz) |
+| 18:14 | blocking#gce-cos-alphafeatures-master | [ci-kubernetes-e2e-gce-cos-alphafeatures-master 2108621931174432768](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108621931174432768) | kubetest.Timeout (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108621931174432768/build-log.txt.gz) |
+| 18:04 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2108619423593009152](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2108619423593009152) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers ExternalTrafficPolicy: Local \[Featur (+3) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-e2e-gce-cos-slow-master/2108619423593009152/build-log.txt.gz) |
+| 16:20 | informing#gce-cos-master-serial | [ci-kubernetes-e2e-gci-gce-serial 2108593492866371584](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108593492866371584) | Kubernetes e2e suite.\[It\] \[sig-storage\] CSI Volumes \[Driver: pd.csi.storage.gke.io\] \[Provi (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-e2e-gci-gce-serial/2108593492866371584/build-log.txt.gz) |
+| 15:18 | informing#gce-cos-serial-master | [ci-kubernetes-e2e-gce-cos-serial-master 2108577638569218048](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108577638569218048) | Kubernetes e2e suite.\[It\] \[sig-storage\] CSI Volumes \[Driver: pd.csi.storage.gke.io\] \[Provi (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-10T054948Z/ci-kubernetes-e2e-gce-cos-serial-master/2108577638569218048/build-log.txt.gz) |

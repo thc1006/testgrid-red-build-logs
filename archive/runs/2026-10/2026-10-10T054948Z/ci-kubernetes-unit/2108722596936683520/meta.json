@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2108722596936683520",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1791593666,
+  "created": 1791593619,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-storage] k8s.io/kubernetes/pkg/controller/volume/attachdetach.reconciler",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   Test_Run_OneVolumeDetachOnOutOfServiceTaintedNode\n   ...0\n--- FAIL: Test_Run_OneVolumeDetachOnOutOfServiceTaintedNode (0.01s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791595026,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108722596936683520",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108722596936683520/build-log.txt",
+  "log": {
+    "bytes": 259070,
+    "md5": "ad1f70ab12a4c4646aab2430f5c7167d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 34347,
+    "gcs": {
+      "generation": "1791595026714622",
+      "md5": "ad1f70ab12a4c4646aab2430f5c7167d",
+      "crc32c": "1b73d1ef",
+      "bytes": 259070,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T054948Z",
+  "archived_at": 1791611388.0,
+  "settled": true,
+  "final": false
+}

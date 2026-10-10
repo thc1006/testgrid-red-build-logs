@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2108621931174432768",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1791569650,
+  "created": 1791569619,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        },
+        {
+          "test": "kubetest.listResources After",
+          "status": "FAIL",
+          "message": "Failed to list resources (error during ./cluster/gce/list-resources.sh (interrupted): signal: interrupt):\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791576873,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108621931174432768",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108621931174432768/build-log.txt",
+  "log": {
+    "bytes": 54262,
+    "md5": "6992906b23185082a0993206a7febc5c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 10988,
+    "gcs": {
+      "generation": "1791576875800184",
+      "md5": "6992906b23185082a0993206a7febc5c",
+      "crc32c": "294b2f0a",
+      "bytes": 54262,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T054948Z",
+  "archived_at": 1791611388.0,
+  "settled": true,
+  "final": false
+}

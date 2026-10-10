@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2108748012787339264",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1791599707,
+  "created": 1791599679,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pods Extended (pod generation) Pod Generation pod generation should start at 1 and increment per update [MinimumKubeletVersion:1.34] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 20.000s.\nexpected pod generation to be 5, got...: k8s.io/kubernetes/test/e2e/node/pods.go:531 @ 10/10/26 02:43:59.108\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791602228,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2108748012787339264",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2108748012787339264/build-log.txt",
+  "log": {
+    "bytes": 126860,
+    "md5": "ae2fc79ec8bbb546cd85245bf845cbdf",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21531,
+    "gcs": {
+      "generation": "1791602246796384",
+      "md5": "ae2fc79ec8bbb546cd85245bf845cbdf",
+      "crc32c": "0c50625a",
+      "bytes": 126860,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T054948Z",
+  "archived_at": 1791611388.0,
+  "settled": true,
+  "final": false
+}

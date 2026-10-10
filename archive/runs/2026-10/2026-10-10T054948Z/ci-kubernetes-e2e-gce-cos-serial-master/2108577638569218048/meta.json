@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2108577638569218048",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1791559092,
+  "created": 1791559059,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (block volmode)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to wait for pod-8 [&Pod{ObjectMeta:{pod-befeeba9-7cae-...t/e2e/storage/testsuites/volume_stress.go:221 @ 10/09/26 15:45:13.325\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791575622,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108577638569218048",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108577638569218048/build-log.txt",
+  "log": {
+    "bytes": 439795,
+    "md5": "1222c8f30eef2cebcc4f5f60fc84a517",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 46092,
+    "gcs": {
+      "generation": "1791575652159318",
+      "md5": "1222c8f30eef2cebcc4f5f60fc84a517",
+      "crc32c": "2b14ae63",
+      "bytes": 439795,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T054948Z",
+  "archived_at": 1791611388.0,
+  "settled": true,
+  "final": false
+}

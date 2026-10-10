@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2108663455950049280",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1791579552,
+  "created": 1791579519,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestPreemptionRespectsBindingPod\n    preemption_test....im pod was deleted\n--- FAIL: TestPreemptionRespectsBindingPod (2.49s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791581812,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2108663455950049280",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2108663455950049280/build-log.txt",
+  "log": {
+    "bytes": 197130,
+    "md5": "79f22cf0d892c5b6ae8c6f2c27eba085",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 17967,
+    "gcs": {
+      "generation": "1791581816228077",
+      "md5": "79f22cf0d892c5b6ae8c6f2c27eba085",
+      "crc32c": "95ba1a2f",
+      "bytes": 197130,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T054948Z",
+  "archived_at": 1791611388.0,
+  "settled": true,
+  "final": false
+}

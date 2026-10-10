@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2108647097220730880",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1791575649,
+  "created": 1791575619,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-network] k8s.io/kubernetes/pkg/proxy.localnodeportproxy",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestSyncNodePorts_ListenersGaugeReflectsActiveCount\n ...--- FAIL: TestSyncNodePorts_ListenersGaugeReflectsActiveCount (0.04s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791576995,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108647097220730880",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108647097220730880/build-log.txt",
+  "log": {
+    "bytes": 256047,
+    "md5": "97c7ed4c1fccd15508e5b0e68e7ca73d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 33329,
+    "gcs": {
+      "generation": "1791576995459783",
+      "md5": "97c7ed4c1fccd15508e5b0e68e7ca73d",
+      "crc32c": "7b8ab69b",
+      "bytes": 256047,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T054948Z",
+  "archived_at": 1791611388.0,
+  "settled": true,
+  "final": false
+}
