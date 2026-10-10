@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2108812941791858688",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1791615187,
+  "created": 1791615159,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler/podgroup.topology_aware_scheduling",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCPGTopologyAwareSchedulingWorkloadAwarePreemption... FAIL: TestCPGTopologyAwareSchedulingWorkloadAwarePreemption (76.64s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791617339,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2108812941791858688",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2108812941791858688/build-log.txt",
+  "log": {
+    "bytes": 210921,
+    "md5": "269b0e7cbe0c1b1fdcd90a6fc8db3424",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19845,
+    "gcs": {
+      "generation": "1791617343031620",
+      "md5": "269b0e7cbe0c1b1fdcd90a6fc8db3424",
+      "crc32c": "4f606ae2",
+      "bytes": 210921,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T172002Z",
+  "archived_at": 1791652802.0,
+  "settled": true,
+  "final": false
+}

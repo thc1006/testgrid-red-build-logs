@@ -1,5 +1,275 @@
 [
   {
+    "time": 1791647890,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+    "build": "2108950098028269568",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Pod Allocated Endpoint [FeatureGate:KubeletAllocatedPodsEndpoint] should return all allocated pods with status cleared when listing [Alpha] [Feature:OffByDefault] [FeatureGate:InPlacePodVerticalScaling]",
+      "ci-kubernetes-e2e-kind-alpha-beta-features.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-alpha-beta-features/2108950098028269568",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-alpha-beta-features/2108950098028269568/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 134864,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2108950098028269568"
+  },
+  {
+    "time": 1791642587,
+    "job": "ci-node-crio-dra",
+    "build": "2108927951822131200",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#ci-node-crio-dra"
+    ],
+    "red_tests": [
+      "kubetest2.Test",
+      "ci-node-crio-dra.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-node-crio-dra/2108927951822131200",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-node-crio-dra/2108927951822131200/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 24931,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-dra/2108927951822131200"
+  },
+  {
+    "time": 1791634147,
+    "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+    "build": "2108892466282237952",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-serial-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-1 [Serial]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-serial-master.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gce-cos-serial-master/2108892466282237952",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gce-cos-serial-master/2108892466282237952/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 122621,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108892466282237952"
+  },
+  {
+    "time": 1791633738,
+    "job": "ci-kubernetes-e2e-kind-beta-features",
+    "build": "2108889699211808768",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should support inline execution and attach",
+      "ci-kubernetes-e2e-kind-beta-features.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-beta-features/2108889699211808768",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-beta-features/2108889699211808768/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 140034,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108889699211808768"
+  },
+  {
+    "time": 1791629830,
+    "job": "ci-kubernetes-e2e-kind-beta-features",
+    "build": "2108874347878813696",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should store data",
+      "ci-kubernetes-e2e-kind-beta-features.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-beta-features/2108874347878813696",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-beta-features/2108874347878813696/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 133655,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108874347878813696"
+  },
+  {
+    "time": 1791629560,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2108873341405237248",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gci-gce-slow/2108873341405237248",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gci-gce-slow/2108873341405237248/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 141885,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108873341405237248"
+  },
+  {
+    "time": 1791622628,
+    "job": "ci-kubernetes-e2e-kind-beta-features",
+    "build": "2108844147531059200",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should allow exec of files on the volume",
+      "ci-kubernetes-e2e-kind-beta-features.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-beta-features/2108844147531059200",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-beta-features/2108844147531059200/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 143643,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108844147531059200"
+  },
+  {
+    "time": 1791621310,
+    "job": "ci-kubernetes-e2e-gce-cos-default-master",
+    "build": "2108838610739400704",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-default-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourceDefinition resources [Privileged:ClusterAdmin] Simple CustomResourceDefinition creating/deleting custom resource definition objects works [Conformance]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-default-master.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gce-cos-default-master/2108838610739400704",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gce-cos-default-master/2108838610739400704/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 125362,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2108838610739400704"
+  },
+  {
+    "time": 1791617467,
+    "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+    "build": "2108822504901447680",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-device-plugin-gpu-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] [Feature:GPUDevicePlugin] Test using a Job [Provider:aws,gce] should run gpu based jobs [Serial]",
+      "kubetest2.Test",
+      "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2108822504901447680",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2108822504901447680/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 159749,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2108822504901447680"
+  },
+  {
+    "time": 1791615187,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2108812941791858688",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler/podgroup.topology_aware_scheduling",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-integration-master/2108812941791858688",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-integration-master/2108812941791858688/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 210921,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2108812941791858688"
+  },
+  {
+    "time": 1791612580,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2108802119870976000",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] CSI Mock volume node stage CSI NodeStage error cases should call NodeUnstage after NodeStage success [Slow]",
+      "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: csi-hostpath] [Testpattern: Dynamic PV (filesystem volmode)] multiVolume should concurrently access the single read-only volume from pods on the same node [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "dir": "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gci-gce-slow/2108802119870976000",
+    "run": "2026-10-10T172002Z",
+    "files": [
+      "runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gci-gce-slow/2108802119870976000/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 345875,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108802119870976000"
+  },
+  {
     "time": 1791604388,
     "job": "ci-kubernetes-integration-master",
     "build": "2108767642398494720",
@@ -18,7 +288,7 @@
     ],
     "remote": [],
     "bytes": 286111,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2108767642398494720"
@@ -1211,7 +1481,7 @@
     "remote": [],
     "bytes": 36353,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-alpha-features/2108227697611116544"
   },
@@ -1357,7 +1627,7 @@
     "remote": [],
     "bytes": 57733,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2108202783202086912"
   },
@@ -1382,7 +1652,7 @@
     "remote": [],
     "bytes": 142139,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108201272271179776"
   },
@@ -1406,7 +1676,7 @@
     "remote": [],
     "bytes": 35781,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108193724059095040"
   },
@@ -1430,7 +1700,7 @@
     "remote": [],
     "bytes": 36690,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108193219895365632"
   },
@@ -1454,7 +1724,7 @@
     "remote": [],
     "bytes": 132705,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2108184663477456896"
   },
@@ -1478,7 +1748,7 @@
     "remote": [],
     "bytes": 41319,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2108180654662356992"
   },
@@ -1505,7 +1775,7 @@
     "remote": [],
     "bytes": 908854,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108172083153342464"
   },
@@ -1530,7 +1800,7 @@
     "remote": [],
     "bytes": 179606,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2108154464115363840"
   },
@@ -1555,7 +1825,7 @@
     "remote": [],
     "bytes": 198898,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108146913382502400"
   },
@@ -1579,7 +1849,7 @@
     "remote": [],
     "bytes": 2897022,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2108146159338917888"
   },
@@ -1604,7 +1874,7 @@
     "remote": [],
     "bytes": 136611,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2108103376502788096"
   },
@@ -1628,7 +1898,7 @@
     "remote": [],
     "bytes": 255399,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108098342939529216"
   },
@@ -1652,7 +1922,7 @@
     "remote": [],
     "bytes": 135358,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2108088780979179520"
   },
@@ -1676,7 +1946,7 @@
     "remote": [],
     "bytes": 255398,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2108082993485582336"
   },
@@ -1701,7 +1971,7 @@
     "remote": [],
     "bytes": 310930,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108073680289402880"
   },
@@ -1726,7 +1996,7 @@
     "remote": [],
     "bytes": 54775,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2108071920288141312"
   },
@@ -1751,7 +2021,7 @@
     "remote": [],
     "bytes": 142306,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108068900443787264"
   },
@@ -1776,7 +2046,7 @@
     "remote": [],
     "bytes": 212743,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2108065878695219200"
   },
@@ -1801,7 +2071,7 @@
     "remote": [],
     "bytes": 323221,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2108063362054098944"
   },
@@ -1826,7 +2096,7 @@
     "remote": [],
     "bytes": 469172,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108021599901847552"
   },

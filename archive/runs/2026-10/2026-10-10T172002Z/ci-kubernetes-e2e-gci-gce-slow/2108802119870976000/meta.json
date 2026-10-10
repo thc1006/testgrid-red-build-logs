@@ -1,0 +1,59 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2108802119870976000",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1791612580,
+  "created": 1791612579,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Mock volume node stage CSI NodeStage error cases should call NodeUnstage after NodeStage success [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to register CSIDriver csi-mock-csi-mock-volumes-node-s...bernetes/test/e2e/storage/csimock/base.go:230 @ 10/10/26 06:31:11.717\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: csi-hostpath] [Testpattern: Dynamic PV (filesystem volmode)] multiVolume should concurrently access the single read-only volume from pods on the same node [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] PersistentVolumeClaims [csi-hostpathsscqb] not all in phase B.../e2e/storage/framework/volume_resource.go:321 @ 10/10/26 06:34:52.378\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791615585,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108802119870976000",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108802119870976000/build-log.txt",
+  "log": {
+    "bytes": 345875,
+    "md5": "22086d24118ca4a2dcfeb5b4ef37131c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 44170,
+    "gcs": {
+      "generation": "1791615591854270",
+      "md5": "22086d24118ca4a2dcfeb5b4ef37131c",
+      "crc32c": "6a7d4f42",
+      "bytes": 345875,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T172002Z",
+  "archived_at": 1791652802.0,
+  "settled": true,
+  "final": false
+}

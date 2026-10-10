@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2108822504901447680",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1791617467,
+  "created": 1791617439,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] [Feature:GPUDevicePlugin] Test using a Job [Provider:aws,gce] should run gpu based jobs [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 1800.001s.\njob \"nvidia-gpu2-9055/cuda-add\" ex...t: k8s.io/kubernetes/test/e2e/node/gpu.go:128 @ 10/10/26 08:17:04.173\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791620769,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2108822504901447680",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2108822504901447680/build-log.txt",
+  "log": {
+    "bytes": 159749,
+    "md5": "79c770f2ac1aad87c6325408ac96bd28",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21502,
+    "gcs": {
+      "generation": "1791620771418204",
+      "md5": "79c770f2ac1aad87c6325408ac96bd28",
+      "crc32c": "71f179f7",
+      "bytes": 159749,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T172002Z",
+  "archived_at": 1791652802.0,
+  "settled": true,
+  "final": false
+}

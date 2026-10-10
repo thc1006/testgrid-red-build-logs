@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2108889699211808768",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1791633738,
+  "created": 1791633460,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should support inline execution and attach",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...etes/test/e2e/framework/kubectl/builder.go:97 @ 10/10/26 13:02:34.872\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791637418,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108889699211808768",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108889699211808768/build-log.txt",
+  "log": {
+    "bytes": 140034,
+    "md5": "0ecda0bf8bbc9da1474d2f6a21564f4f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23278,
+    "gcs": {
+      "generation": "1791637434266383",
+      "md5": "0ecda0bf8bbc9da1474d2f6a21564f4f",
+      "crc32c": "72d3d2c7",
+      "bytes": 140034,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T172002Z",
+  "archived_at": 1791652802.0,
+  "settled": true,
+  "final": false
+}

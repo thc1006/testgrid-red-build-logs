@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2108844147531059200",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1791622628,
+  "created": 1791622599,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-preprovisionedpv-sw5w\" success...es/test/e2e/framework/pod/output/output.go:263 @ 10/10/26 09:19:14.79\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791624243,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108844147531059200",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108844147531059200/build-log.txt",
+  "log": {
+    "bytes": 143643,
+    "md5": "5beb8e82855570f24c5e968711776356",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23417,
+    "gcs": {
+      "generation": "1791624261391537",
+      "md5": "5beb8e82855570f24c5e968711776356",
+      "crc32c": "9b78c4cc",
+      "bytes": 143643,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-10T172002Z",
+  "archived_at": 1791652802.0,
+  "settled": true,
+  "final": false
+}
