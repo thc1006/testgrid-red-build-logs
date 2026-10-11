@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 """Independently verify an archive written by fetch_red_logs.py.
 
-For one run (default: the latest), within --hours before it started:
-  integrity  every archived file (build-log.txt or podinfo.json) still has the
-             md5 and length in its meta.json, and GCS still holds the content it
-             was taken from; a build archived without a log still has none in GCS
+For one run (default: the latest):
+  integrity  every archived file (build-log.txt or podinfo.json, or its parts)
+             still has the md5 and length in its meta.json, however old, and
+             no other stored file sits next to it; and GCS still holds the
+             content it was taken from, checked for the builds of the last
+             --hours and a seventh of the older ones for each day since the
+             run before (so each at least once a week); a build archived
+             without a log still has none in GCS. Then what the archive
+             holds, by kind.
   testgrid   every column TestGrid paints red now, whose build finished well
              before the run, is archived (red cells recomputed here)
-  gcs        every build of the dashboards' jobs that failed is archived, or
-             the reason it is not is shown (TestGrid does not paint it red,
-             or does not list it)
+  gcs        every build of the dashboards' jobs from the last --hours that
+             TestGrid no longer shows, but painted red by its own rule (read
+             from GCS as its updater reads it: testgrid_rule), is archived; and
+             every failed one is archived, or the reason it is not is shown
 A difference in GCS for a build whose copy is not settled yet (taken before
 Prow finished uploading) is only noted: the next fetch compares it again.
 Exits 1 when a check finds a problem.
@@ -18,11 +24,13 @@ import argparse
 import concurrent.futures as cf
 import hashlib
 import math
+import operator
 import os
 import sys
 import threading
 import time
 import urllib.parse
+import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_red_logs as frl  # noqa: E402
@@ -31,9 +39,32 @@ from fetch_red_logs import GCS, PROW_EPOCH_MS, TESTGRID, NotFound, get_json, iso
 # Recomputed here on purpose: TestGrid's UI maps these statuses to its red
 # classes (fail, timeout, categorized-fail, tool), all #a00.
 PAINTED_RED = {9, 10, 12, 14}
+GITHUB_MAX_BYTES = 100 << 20  # GitHub rejects a push holding a larger file
 NAMES = {0: "NO_RESULT", 1: "PASS", 2: "PASS_WITH_ERRORS", 3: "PASS_WITH_SKIPS", 4: "RUNNING",
          5: "ABORTED", 6: "UNKNOWN", 7: "CANCEL", 8: "BLOCKED", 9: "TIMED_OUT", 10: "CATEGORIZED_FAIL",
          11: "BUILD_FAIL", 12: "FAIL", 13: "FLAKY", 14: "TOOL_FAIL", 15: "BUILD_PASSED"}
+
+
+_VALUE, _COUNT = operator.itemgetter("value"), operator.itemgetter("count")
+_BYTE = [bytes((v,)) for v in range(16)]
+_LOW_BITS = bytes(1 << v if v < 8 else 0 for v in range(256))  # a status byte to its bit, statuses 0-7 ...
+_HIGH_BITS = bytes(1 << (v - 8) if 8 <= v < 16 else 0 for v in range(256))  # ... and 8-15
+
+
+def row_error(row, width):
+    """Raise ValueError for what is wrong with a row, checked run by run."""
+    col = 0
+    for run in row["statuses"]:
+        value, count = run["value"], run["count"]
+        if type(count) is not int or count <= 0:
+            raise ValueError(f"row {str(row.get('name'))[:80]!r}: bad run length {count!r}")
+        if type(value) is not int or value not in NAMES:
+            raise ValueError(f"row {str(row.get('name'))[:80]!r}: bad status {value!r}")
+        if col + count > width:
+            raise ValueError(f"row {str(row.get('name'))[:80]!r} is wider than the table")
+        col += count
+    if col != width:
+        raise ValueError(f"row {str(row.get('name'))[:80]!r} spans {col} of {width} columns")
 
 
 def columns(table):
@@ -43,41 +74,53 @@ def columns(table):
     before its build was made (TestGrid dates a column it could not read by an
     earlier one) or in the future, is dated by its build ID.
     Decoded here independently of the fetcher, and as strictly: a malformed
-    row raises ValueError. Each status gets a difference array over the
-    columns, so the work grows with the number of runs, not rows x columns.
+    row raises ValueError. Each row is checked in bulk, then either expanded
+    in bulk into a bit per status per column (a row with many runs: work per
+    column, in C) or added to a difference array per status (a row with few
+    runs: work per run).
     """
     builds, stamps = table["changelists"], table["timestamps"]
     width = len(builds)
     if not isinstance(builds, list) or not isinstance(stamps, list) or len(stamps) != width:
         raise ValueError("changelists and timestamps must be lists of the same length")
+    if width > frl.MAX_COLUMNS:
+        raise ValueError(f"{width} columns, more than the {frl.MAX_COLUMNS} accepted")
+    low = high = 0
     edges = {}
     for row in table.get("tests", []):
-        col = 0
-        for run in row["statuses"]:
-            value, count = run["value"], run["count"]
-            if type(count) is not int or count <= 0:
-                raise ValueError(f"row {str(row.get('name'))[:80]!r}: bad run length {count!r}")
-            if type(value) is not int or value not in NAMES:
-                raise ValueError(f"row {str(row.get('name'))[:80]!r}: bad status {value!r}")
-            if col + count > width:
-                raise ValueError(f"row {str(row.get('name'))[:80]!r} is wider than the table")
-            diff = edges.setdefault(value, [0] * (width + 1))
-            diff[col] += 1
-            diff[col + count] -= 1
-            col += count
-        if col != width:
-            raise ValueError(f"row {str(row.get('name'))[:80]!r} spans {col} of {width} columns")
-    cells = [set() for _ in range(width)]
+        runs = row["statuses"]
+        values, counts = list(map(_VALUE, runs)), list(map(_COUNT, runs))
+        if not (set(map(type, values)) <= {int} and set(map(type, counts)) <= {int} and set(values) <= NAMES.keys()
+                and (not counts or min(counts) > 0) and sum(counts) == width):
+            row_error(row, width)
+        if len(values) < 4 + width // 100:  # (measured: below this, run by run is cheaper)
+            col = 0
+            for value, count in zip(values, counts, strict=True):
+                diff = edges.get(value)
+                if diff is None:
+                    diff = edges[value] = [0] * (width + 1)
+                diff[col] += 1
+                col += count
+                diff[col] -= 1
+        else:
+            expanded = b"".join(map(operator.mul, map(_BYTE.__getitem__, values), counts))
+            low |= int.from_bytes(expanded.translate(_LOW_BITS), "little")
+            high |= int.from_bytes(expanded.translate(_HIGH_BITS), "little")
+    masks = [lo | hi << 8 for lo, hi in zip(low.to_bytes(width, "little"), high.to_bytes(width, "little"), strict=True)]
     for value, diff in edges.items():
-        open_runs = 0
+        bit, depth = 1 << value, 0
         for i in range(width):
-            open_runs += diff[i]
-            if open_runs:
-                cells[i].add(value)
+            depth += diff[i]
+            if depth:
+                masks[i] |= bit
+    sets = {}
     latest = time.time() + 86400
     for i, build in enumerate(builds):
+        cells = sets.get(masks[i])
+        if cells is None:
+            cells = sets[masks[i]] = frozenset(v for v in range(16) if masks[i] >> v & 1)
         start = stamps[i] // 1000 if stamps[i] > 0 else 0
-        yield build, (start if created(build) - 86400 <= start <= latest else created(build)), cells[i]
+        yield build, (start if created(build) - 86400 <= start <= latest else created(build)), cells
 
 
 class Unreachable:
@@ -106,49 +149,6 @@ MALFORMED = {"malformed": True}
 
 def number(v):
     return isinstance(v, (int, float)) and not isinstance(v, bool)
-
-
-INT64 = range(-(1 << 63), 1 << 63)
-FINISHED_TYPES = {"timestamp": int, "passed": bool, "result": str}
-
-
-def passed(finished):
-    """Whether finished.json alone says TestGrid shows the build as passed: a finish
-    time, and passed (no `passed`: SUCCESS). Like the fetch, this check then reads no
-    other file, though TestGrid would paint it red for a malformed one."""
-    if not finished or finished.get("malformed") is True or not decodable(finished, FINISHED_TYPES):
-        return False
-    stamp, ok = finished.get("timestamp"), finished.get("passed")
-    return stamp is not None and stamp > 0 and (ok if isinstance(ok, bool) else finished.get("result") == "SUCCESS")
-
-
-def decodable(doc, types):
-    """Whether Go's JSON decoder, which TestGrid reads these files with, accepts the
-    fields TestGrid uses: each absent, null, or of its Go type (an int fits int64)."""
-    return all(doc.get(k) is None or (type(doc[k]) is t and (t is not int or doc[k] in INT64))
-               for k, t in types.items())
-
-
-def testgrid_red(finished, started, now):
-    """TestGrid's own rule for the Overall cell (readResult in its
-    pkg/updater/read.go; overallCell and deadline in pkg/updater/gcs.go), written
-    here independently of the fetcher: a build with started.json is red when
-    started.json or finished.json is malformed or has a field TestGrid cannot
-    decode, when it finished without passing (no `passed`: its result is not
-    SUCCESS), or when it has gone 24 hours without finishing."""
-    if started is None:
-        return False
-    if started.get("malformed") is True or (finished or {}).get("malformed") is True:
-        return True
-    if not decodable(started, {"timestamp": int}) or (finished and not decodable(finished, FINISHED_TYPES)):
-        return True
-    stamp = (finished or {}).get("timestamp")
-    if stamp is None:  # running, or finished without saying when: red once 24 hours have passed
-        start = started.get("timestamp")  # (a start time it cannot date counts as none)
-        return number(start) and 0 < start <= now + 86400 and now - start > 24 * 3600
-    if stamp <= 0:
-        return True  # TestGrid's deadline, an hour after this "finish", is long past
-    return not passed(finished)
 
 
 def list_builds(gcs, query, since):
@@ -239,10 +239,16 @@ def latest_run(root):
     return None
 
 
-def local_digest(path):
-    """(md5, length, size on disk) of an archived file; a .gz is gunzipped strictly."""
-    md5, size = frl.file_digest(path)
-    return md5, size, os.path.getsize(path)
+def local_digest(root, rel, name, info):
+    """(md5, length, size on disk) of an archived file, read from its parts when it has
+    them (a .gz is gunzipped strictly)."""
+    path = os.path.join(root, rel, name)
+    parts = frl.part_paths(os.path.join(root, rel), name, info["parts"]) if "parts" in info else None
+    sizes = [os.path.getsize(p) for p in parts] if parts else [os.path.getsize(path)]
+    if parts and sizes != [p["bytes"] for p in info["parts"]]:
+        raise ValueError(f"a part of {name} is not the size meta.json records")
+    md5, size = frl.file_digest(path, parts)
+    return md5, size, sum(sizes)
 
 
 class LocalDamage(str):
@@ -264,20 +270,26 @@ def remote_raw_md5(url):
     return request(url, consume=consume, headers={"Accept-Encoding": "gzip"})
 
 
-def check_file(root, rel, m, key, default):
+def check_file(root, rel, m, key, default, remote=True):
     """What is wrong with one archived file (build-log.txt or podinfo.json): a
-    LocalDamage or a "GCS changed" message, or None."""
+    LocalDamage or a "GCS changed" message, or None. Without `remote`, only the
+    copy on disk is checked."""
     info = m[key]
     name = default if info.get("omitted") else info.get("file", default)
     label = f"{m['job']}/{m['build']} {name}"
     if not info.get("omitted"):  # a file too large to store is only compared with GCS
         if name not in frl.LOG_FILES:
             return LocalDamage(f"{label}: unexpected file name in meta.json")
-        md5, size, on_disk = local_digest(os.path.join(root, rel, name))
+        try:
+            md5, size, on_disk = local_digest(root, rel, name, info)
+        except (OSError, ValueError, frl.IntegrityError) as e:
+            return LocalDamage(f"{label}: cannot verify: {type(e).__name__}: {e}")
         if (md5, size) != (info["md5"], info["bytes"]):
             return LocalDamage(f"{label}: local md5 {md5} ({size} bytes) != meta {info['md5']} ({info['bytes']} bytes)")
         if on_disk != info.get("file_bytes", info["bytes"]):
             return LocalDamage(f"{label}: {on_disk} bytes on disk, meta says {info.get('file_bytes')}")
+    if not remote:
+        return None
     url = m["log_url"].rsplit("/", 1)[0] + "/" + default
     try:
         headers = request(url, consume=lambda r: r.headers, method="HEAD", headers={"Accept-Encoding": "gzip"})
@@ -293,6 +305,38 @@ def check_file(root, rel, m, key, default):
         # an old record of a gzip-stored object: compare the gunzipped content
         return f"{label}: GCS content changed since it was archived (gunzipped md5 differs)"
     return None
+
+
+def inventory(archived, root):
+    """What the archive holds, by kind of record (and what state.json still tracks)."""
+    counts = {}
+
+    def count(what):
+        counts[what] = counts.get(what, 0) + 1
+    for _, m in archived.values():
+        log, pod = (m.get(k) if isinstance(m.get(k), dict) else None for k in ("log", "podinfo"))
+        count("with a log" if log else "with only podinfo.json" if pod else "without files")
+        if any(i and i.get("parts") for i in (log, pod)):
+            count("with a file stored in parts")
+        if any(i and i.get("omitted") for i in (log, pod)):
+            count("with a file not stored (an older record: too large)")
+        if log and m.get("finished") is None:
+            count("log without a finish time")
+        if m.get("settled") is False:
+            count("provisional" if m.get("final") is not True else "never settled")
+        if m.get("final") is not True:
+            count("still compared with GCS by the fetch")
+        if m.get("backfilled"):
+            count("taken from GCS, judged by TestGrid's rule")
+    try:
+        state = frl.read_json(os.path.join(root, "state.json"))
+    except (OSError, ValueError):
+        state = {}
+    for key, what in (("unresolved", "waiting to be archived"), ("given_up", "given up on"), ("watch", "watched")):
+        n = len(state.get(key) or {}) if isinstance(state, dict) else 0
+        if n:
+            counts[what] = n
+    return f"{len(archived)} builds: " + ", ".join(f"{n} {what}" for what, n in counts.items())
 
 
 def verify(args):
@@ -368,18 +412,39 @@ def check(args, problems, notes):
     frl.bind_context(ctx)
     pool = cf.ThreadPoolExecutor(ctx.limit.ceiling, initializer=frl.bind_context, initargs=(ctx,))
 
-    # 1. integrity of every archived file, and what GCS holds now
+    # 1. integrity: every archived file on disk, whatever its age; and what GCS holds
+    # now for the builds of the window, and for a seventh of the older ones per day
+    # since the run before this one (a different seventh each day, so each is
+    # compared again at least once a week, even when a day has no run)
+    day = int(t0 // 86400)
+    previous = next((s for s in (run_start(os.path.join(root, rel, "run.json")) for rel in reversed(frl.run_dirs(root)))
+                     if s is not None and s < t0), None)
+    first = max(min(int(previous // 86400) + 1, day), day - 6) if previous is not None else day
+    sevenths = {d % 7 for d in range(first, day + 1)}
+
+    def compare_with_gcs(m):
+        return (m["started"] or m["created"]) >= since or zlib.crc32(f"{m['job']}/{m['build']}".encode()) % 7 in sevenths
+
     def integrity(item):
         rel, m = item
         try:
-            return check_build(rel, m)
+            return check_build(rel, m, compare_with_gcs(m))
         except Exception as e:
             return [LocalDamage(f"{m.get('job')}/{m.get('build')}: cannot verify: {type(e).__name__}: {e}")]
 
-    def check_build(rel, m):
-        found = [check_file(root, rel, m, key, default)
+    def check_build(rel, m, remote):
+        found = [check_file(root, rel, m, key, default, remote)
                  for key, default in (("log", "build-log.txt"), ("podinfo", "podinfo.json")) if m.get(key)]
-        if not m.get("log"):
+        # a stored file its meta.json does not list (`cat <file>.*` would take a stray part in),
+        # or one GitHub would refuse
+        folder = os.path.join(root, rel)
+        found += [LocalDamage(f"{m['job']}/{m['build']} {n}: not listed in its meta.json")
+                  for n in frl.stray_files(folder, m)]
+        found += [LocalDamage(f"{m['job']}/{m['build']} {n}: {os.path.getsize(os.path.join(folder, n))} bytes, "
+                              "more than GitHub accepts in one file")
+                  for n in frl.listdir(folder) if not n.startswith(".")  # (not a temp file git ignores)
+                  and os.path.getsize(os.path.join(folder, n)) > GITHUB_MAX_BYTES]
+        if remote and not m.get("log"):
             try:  # archived without a log: has one appeared in GCS since?
                 request(m["log_url"], consume=lambda r: r.headers, method="HEAD")
                 found.append(f"{m['job']}/{m['build']}: GCS now has a build-log.txt that is not archived")
@@ -387,10 +452,10 @@ def check(args, problems, notes):
                 pass
         return [p for p in found if p]
 
-    recent = [(rel, m) for rel, m in archived.values() if (m["started"] or m["created"]) >= since]
-    unsettled = [m for _, m in recent if m.get("settled") is False]
+    items = sorted(archived.values(), key=lambda item: item[0])
+    unsettled = [m for _, m in items if m.get("settled") is False]
     bad = 0
-    for (_, m), found in zip(recent, pool.map(integrity, recent), strict=True):
+    for (_, m), found in zip(items, pool.map(integrity, items), strict=True):
         bad += bool(found)
         for p in found:
             # GCS may still change a copy that is not settled, and the next fetch compares it again
@@ -398,9 +463,11 @@ def check(args, problems, notes):
                 notes.append(f"{p} (not settled yet: the next fetch compares it again)")
             else:
                 problems.append(p)
-    print(f"  integrity: {len(recent)} builds checked ({sum(1 for _, m in recent if m.get('log'))} with a log, "
-          f"{sum(1 for _, m in recent if not m.get('log') and m.get('podinfo'))} with only podinfo.json), "
-          f"{bad} differ, {len(unsettled)} not settled yet")
+    compared = sum(1 for _, m in items if compare_with_gcs(m))
+    print(f"  integrity: {len(items)} builds' files checked on disk, {compared} of them compared with GCS (those "
+          f"from the window, and {len(sevenths)}/7 of the rest, one seventh per day since the run before): {bad} differ, "
+          f"{len(unsettled)} not settled yet")
+    print("  inventory: " + inventory(archived, root))
 
     # 2. every column TestGrid paints red now
     def load(t):
@@ -416,13 +483,14 @@ def check(args, problems, notes):
         h = t.get("max_job_hours")
         margin = h * 3600 if number(h) and h > 0 else default_settle
         settle_of[t["query"]] = max(settle_of.get(t["query"], 0), margin)
-    red_now, statuses, oldest_shown, undecoded, shown = {}, {}, {}, set(), set()
+    red_now, statuses, oldest_shown, undecoded, shown, rows_of = {}, {}, {}, set(), set(), {}
     for (dashboard, tab), table in tables.items():
         if table is None:
             continue
         try:
             job = table["query"].rsplit("/", 1)[-1]
             cols = list(columns(table))
+            rows_of[(dashboard, tab)] = frl.tab_rows(table, job, results=any(cells - {0, 6} for _, _, cells in cols))
         except (KeyError, TypeError, AttributeError, ValueError) as e:
             problems.append(f"cannot decode {dashboard}#{tab}: {type(e).__name__}: {e}")
             undecoded.add(table.get("query") if isinstance(table, dict) else None)
@@ -476,23 +544,49 @@ def check(args, problems, notes):
     results = dict(zip(candidates, pool.map(lambda qb: try_json(f"{args.gcs}/{qb[0]}/{qb[1]}/finished.json"), candidates),
                        strict=True))
     # A build TestGrid no longer shows (it scrolled off: it is older than the
-    # oldest column with results) but painted red by its own rule should have
-    # been archived, or taken from GCS for a history gap, if the archive ran then.
+    # oldest column with results) whose column TestGrid painted red on one of its
+    # job's tabs (TestGrid's own rule, read from GCS as its updater reads it; see
+    # testgrid_rule) should have been archived, or taken from GCS for a history
+    # gap, if the archive ran then. A build that passed can be red too (a failing
+    # test, a failed pod, a malformed artifact), so every one is judged.
     unread = {t["query"] for t in tabs if tables.get((t["dashboard"], t["tab"])) is None} | undecoded
     unlisted = [(q, b) for (q, b), fin in results.items()
-                if not isinstance(fin, Unreachable) and not passed(fin)
-                and not (fin and number(fin.get("timestamp")) and fin["timestamp"] > settled)
+                if not (isinstance(fin, dict) and number(fin.get("timestamp")) and fin["timestamp"] > settled)
                 and (job_of[q], b) not in archived and (job_of[q], b) not in shown
                 and created(b) >= archive_start and q not in unread and q in oldest_shown and created(b) < oldest_shown[q]]
-    started = dict(zip(unlisted, pool.map(lambda qb: try_json(f"{args.gcs}/{qb[0]}/{qb[1]}/started.json"), unlisted),
-                       strict=True))
-    for (q, b) in unlisted:
-        st = started[(q, b)]
-        if isinstance(st, Unreachable):
-            problems.append(f"cannot check {job_of[q]}/{b}: started.json: {st.error}")
-        elif testgrid_red(results[(q, b)], st, t0):
-            problems.append(f"MISSED red build {job_of[q]}/{b}: TestGrid no longer lists it, but by TestGrid's rule "
-                            f"it was red, and it is not archived")
+
+    def judge(qb):
+        try:
+            col = frl.gcs_column(args.gcs, qb[0], qb[1], frl.tab_days(oldest_shown[qb[0]], t0), now=t0)
+        except Exception as e:
+            return Unreachable(e)
+        # a finished column not red without its junit files, which cannot be read now, cannot be checked
+        if frl.unreadable_junit(col) and not any(
+                frl.verdict(col, job_of[qb[0]], rows_of.get((t["dashboard"], t["tab"])))[0] == "red"
+                for t in tabs if t["query"] == qb[0]):
+            return Unreachable(ValueError(col.partial))
+        return col
+    judged = dict(zip(unlisted, pool.map(judge, unlisted), strict=True))
+    judged_as = {}
+    for (q, b), col in judged.items():
+        if isinstance(col, Unreachable):
+            problems.append(f"cannot check {job_of[q]}/{b} by TestGrid's rule: {col.error}")
+            judged_as["unreadable"] = judged_as.get("unreadable", 0) + 1
+            continue
+        verdicts = {f"{t['dashboard']}#{t['tab']}": frl.verdict(col, job_of[q], rows_of.get((t["dashboard"], t["tab"])))
+                    for t in tabs if t["query"] == q}
+        red_in = sorted(k for k, (state, _) in verdicts.items() if state == "red")
+        if red_in:
+            problems.append(f"MISSED red build {job_of[q]}/{b} ({', '.join(red_in)}): TestGrid no longer lists it, "
+                            f"but by TestGrid's rule it was red, and it is not archived")
+            state = "red"
+        elif any(state == "undecided" for state, _ in verdicts.values()):
+            notes.append(f"{job_of[q]}/{b}: TestGrid no longer lists it and it is not decided yet (still running, "
+                         f"or not started); the fetch watches such builds")
+            state = "undecided"
+        else:
+            state = "not red"
+        judged_as[state] = judged_as.get(state, 0) + 1
     counts = {}
     for (q, b), fin in results.items():
         key = (job_of[q], b)
@@ -519,7 +613,7 @@ def check(args, problems, notes):
         if key in archived:
             continue
         cells = statuses.get(key)
-        if (q, b) in started:
+        if (q, b) in judged:
             continue  # no longer shown (at most in a placeholder column): judged above
         if cells is None:
             notes.append(f"{key[0]}/{b}: {result}, not listed on TestGrid (not archived)")
@@ -530,6 +624,8 @@ def check(args, problems, notes):
                          f"(not red, not archived)")
     pool.shutdown()
     print(f"  gcs: {len(candidates)} builds created in window: " + ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
+    print(f"  gcs: {len(judged)} of them no longer shown by TestGrid and not archived, judged by its rule"
+          + (": " + ", ".join(f"{k}={v}" for k, v in sorted(judged_as.items())) if judged_as else ""))
 
     for n in notes:
         print("  note:", n)

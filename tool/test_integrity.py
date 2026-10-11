@@ -100,7 +100,6 @@ class StrictTableTest(unittest.TestCase):
             "statuses not a list": self.variant(runs={"value": 1, "count": 3}),
             "row not an object": self.variant(row=["t"]),
             "name not a string": self.variant(name=["x"]),
-            "name with a lone surrogate": self.variant(name="bad\ud800"),
             "messages a string": self.variant(messages="xyz"),
             "a message not a string": self.variant(messages=["", 5, ""]),
             "tests not a list": self.variant(tests={"t": 1}),
@@ -124,7 +123,7 @@ class StrictTableTest(unittest.TestCase):
         now = time.time()
         for query in ("bucket/logs/job#/x", "bucket/../other/job", "bucket/logs/./job", "bucket/logs/job?x=1",
                       "Bucket/logs/job", "bucket", "bucket/logs/job/", "bucket/logs/jo b", "bucket/logs/job,x"):
-            t = dict(table(query.rsplit("/", 1)[0] + "/job", ["1"], {"o": ([12], [""])}), query=query)
+            t = dict(table(query.rsplit("/", 1)[0] + "/job", ["1"], {"job.Overall": ([12], [""])}), query=query)
             with self.subTest(query), self.assertRaises(ValueError):
                 frl.read_tab(t, now)
 
@@ -132,13 +131,13 @@ class StrictTableTest(unittest.TestCase):
         # TestGrid dates a column it could not read by an earlier one; such a start is not the build's
         now = time.time()
         build = snowflake(now - HOUR)
-        t = table("bucket/logs/job", [build], {"o": ([12], [""])}, start=1000)
+        t = table("bucket/logs/job", [build], {"job.Overall": ([12], [""])}, start=1000)
         _, _, oldest, found, _ = frl.read_tab(t, now)
         self.assertEqual([(b, start) for b, start, _ in found], [(build, None)])  # dated by its build ID
         self.assertIsNone(oldest)  # and it says nothing about how far back the tab reaches
 
     def test_a_bad_build_id_in_any_column_fails_the_tab(self):
-        t = table("bucket/logs/job", ["2", "abc"], {"o": ([12, 1], ["", ""])})
+        t = table("bucket/logs/job", ["2", "abc"], {"job.Overall": ([12, 1], ["", ""])})
         with self.assertRaisesRegex(ValueError, "unexpected build id"):
             frl.read_tab(t, time.time())
 
@@ -340,7 +339,7 @@ class ArchiveWorld(unittest.TestCase):
         self.key = f"job/{self.build}"
         self.base = f"/bucket/logs/job/{self.build}"
         self.srv.summary("dash", {"t": "FAILING"})
-        self.show([self.build], {"o": ([12], ["boom"])})
+        self.show([self.build], {"job.Overall": ([12], ["boom"])})
         self.srv.gcs_listing("bucket", [])
 
     def tearDown(self):
@@ -471,7 +470,7 @@ class ContentOverTimeTest(ArchiveWorld):
         self.fetch()
         m = self.meta()
         self.assertEqual((m["result"], m["settled"], m["final"]), (None, False, False))
-        self.show([snowflake(time.time())], {"o": ([1], [""])}, start=int(time.time()))  # off TestGrid now
+        self.show([snowflake(time.time())], {"job.Overall": ([1], [""])}, start=int(time.time()))  # off TestGrid now
         self.finished(ago=3 * HOUR)
         self.fetch()
         m = self.meta()
@@ -565,7 +564,7 @@ class LayoutTest(ArchiveWorld):
         self.srv.route(f"/bucket/logs/job/{second}/finished.json",
                        (200, {}, {"result": "FAILURE", "timestamp": self.start + 2 * HOUR}))
         self.srv.route(f"/bucket/logs/job/{second}/build-log.txt", obj(b"second\n"))
-        self.show([second, self.build], {"o": ([12, 12], ["", ""])})
+        self.show([second, self.build], {"job.Overall": ([12, 12], ["", ""])})
         self.fetch()
         one, two = frl.run_dirs(self.root)
         self.assertEqual(os.path.relpath(self.bdir(), self.root), f"{one}/job/{self.build}")
@@ -737,16 +736,16 @@ class BackfillTest(ArchiveWorld):
         self.now = now
         # TestGrid now shows one passing build from an hour ago; the last scan was 40 hours ago.
         self.visible = snowflake(now - HOUR)
-        self.show([self.visible], {"o": ([1], [""])}, start=int(now - HOUR))
+        self.show([self.visible], {"job.Overall": ([1], [""])}, start=int(now - HOUR))
         frl.write_json(os.path.join(self.root, "state.json"),
                        {"tabs": {"dash#t": {"scan": now - 40 * HOUR, "oldest": now - 60 * HOUR}}})
         self.failed, self.passed, self.running, self.too_old, self.crier, self.aborted, self.lower = (
             snowflake(now - h * HOUR) for h in (30, 20, 10, 60, 25, 26, 27))  # too_old: before the search window
         fins = {self.failed: ("FAILURE", False), self.passed: ("SUCCESS", True), self.too_old: ("FAILURE", False),
                 self.crier: ("failure", False), self.aborted: ("ABORTED", False), self.lower: ("failure", False)}
-        for b, (result, passed) in fins.items():
+        for b, (result, passed) in fins.items():  # finished two hours ago: settled for TestGrid
             self.srv.route(f"/bucket/logs/job/{b}/finished.json",
-                           (200, {}, {"result": result, "passed": passed, "timestamp": int(now)}))
+                           (200, {}, {"result": result, "passed": passed, "timestamp": int(now) - 2 * HOUR}))
         for b in (self.failed, self.passed, self.running, self.too_old, self.aborted, self.lower):
             self.srv.route(f"/bucket/logs/job/{b}/started.json", (200, {}, {"timestamp": int(now)}))
             self.srv.route(f"/bucket/logs/job/{b}/build-log.txt", obj(b"log of " + b.encode()))
@@ -788,6 +787,9 @@ class BackfillTest(ArchiveWorld):
         self.fetch()
         self.srv.route(f"/bucket/logs/job/{self.running}/finished.json",
                        (200, {}, {"result": "SUCCESS", "passed": True, "timestamp": int(time.time())}))
+        self.fetch()  # passed, but TestGrid still reads it again for its podinfo.json (up to an hour)
+        self.assertEqual(self.runs()[-1]["outcomes"].get("watching"), [f"job/{self.running}"])
+        self.srv.route(f"/bucket/logs/job/{self.running}/podinfo.json", (200, {}, {"pod": {"status": {"phase": "Succeeded"}}}))
         self.fetch()
         self.assertEqual(self.runs()[-1]["outcomes"].get("not-red"), [f"job/{self.running}"])
         self.assertIsNone(self.bdir(self.running))
@@ -864,7 +866,7 @@ class SelfReviewFixesTest(ArchiveWorld):
 class BackfillMergeTest(BackfillTest):
     def test_one_build_in_two_gap_tabs_is_archived_once_with_both_tabs(self):
         self.srv.summary("dash", {"t": "FAILING", "t2": "FAILING"})
-        self.srv.table("dash", "t2", table("bucket/logs/job", [self.visible], {"o": ([1], [""])},
+        self.srv.table("dash", "t2", table("bucket/logs/job", [self.visible], {"job.Overall": ([1], [""])},
                                            start=int((self.now - HOUR) * 1000)))
         frl.write_json(os.path.join(self.root, "state.json"), {"tabs": {
             "dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR},
@@ -878,7 +880,9 @@ class BackfillMergeTest(BackfillTest):
     def test_a_backfilled_build_shown_red_later_gains_its_red_cells(self):
         self.srv.gcs_listing("bucket", self.listing)
         self.fetch()
-        self.assertEqual(self.meta(self.failed)["tabs"][0]["red_cells"], [])
+        self.assertEqual(self.meta(self.failed)["tabs"][0]["red_cells"],
+                         [{"test": "job.Overall", "status": "FAIL", "message": "it did not pass; Prow result FAILURE"}])
+        self.assertTrue(self.meta(self.failed)["tabs"][0]["judged_from_gcs"])
         self.show([self.failed], {"Overall": ([12], ["boom"])}, start=int(self.now - 30 * HOUR))
         self.fetch()
         m = self.meta(self.failed)
@@ -898,9 +902,9 @@ class BackfillMergeTest(BackfillTest):
 
     def test_a_placeholder_column_in_the_gap_is_looked_up_in_gcs(self):
         # the failed build is still listed, but only as a grey "grid too large" column
-        self.show([self.visible, self.failed], {"o": ([1, 6], ["", "grid exceeds maximum size"])},
+        self.show([self.visible, self.failed], {"job.Overall": ([1, 6], ["", "grid exceeds maximum size"])},
                   start=int(self.now - HOUR))
-        t = table("bucket/logs/job", [self.visible, self.failed], {"o": ([1, 6], ["", "grid exceeds maximum size"])})
+        t = table("bucket/logs/job", [self.visible, self.failed], {"job.Overall": ([1, 6], ["", "grid exceeds maximum size"])})
         t["timestamps"] = [int((self.now - HOUR) * 1000), int((self.now - 30 * HOUR) * 1000)]
         self.srv.table("dash", "t", t)
         self.srv.gcs_listing("bucket", self.listing)
@@ -939,33 +943,6 @@ class MarginAndTimeoutTest(ArchiveWorld):
 
 
 class TestGridRuleTest(unittest.TestCase):
-    def test_overall_cell_rule(self):
-        now = 1_800_000_000
-        st = {"timestamp": now - 3600, "malformed": False}
-        old_st = {"timestamp": now - 25 * HOUR, "malformed": False}
-
-        def fin(**kw):
-            d = {"result": None, "timestamp": now - 60, "passed": None, "malformed": False} | kw
-            return d | {"stamp": kw.get("stamp", d["timestamp"])}
-        cases = [
-            (fin(passed=False, result="FAILURE"), st, True),
-            (fin(passed=True, result="FAILURE"), st, False),  # `passed` decides, not the result string
-            (fin(passed=None, result="SUCCESS"), st, False),  # no `passed`: SUCCESS means passed
-            (fin(passed=None, result="failure"), st, True),
-            (fin(passed=False, result="ABORTED"), st, True),
-            (fin(malformed=True, timestamp=None), st, True),  # a malformed artifact is red
-            (fin(), {"timestamp": None, "malformed": True}, True),
-            (None, st, False),  # running
-            (None, old_st, True),  # "did not complete within 24 hours"
-            (fin(timestamp=None), old_st, True),
-            (fin(passed=False), None, False),  # no started.json: TestGrid never lists it
-        ]
-        for finished, started, want in cases:
-            with self.subTest(finished=finished, started=started):
-                self.assertEqual(frl.painted_red(finished, started, now), want)
-                raw = None if finished is None else dict(finished, timestamp=finished["stamp"])
-                self.assertEqual(cc.testgrid_red(raw, started, now), want)
-
     def test_a_cut_timeout_binds_until_its_builds_must_have_ended(self):
         t1 = 1_791_000_000
         hours, state = frl.job_margin({}, 18.58, t1, 6)
@@ -979,55 +956,65 @@ class TestGridRuleTest(unittest.TestCase):
 
 
 class GoDecodingTest(unittest.TestCase):
-    """TestGrid reads started.json and finished.json with Go's JSON decoder: a field
-    it cannot decode fails its read of the build, which it paints TOOL_FAIL (red)."""
+    """A build TestGrid no longer shows is judged by its own rule, read from GCS
+    over HTTP as its updater reads it (testgrid_rule; test_testgrid_rule checks
+    the rule itself against TestGrid's code). Fields Go's JSON decoder cannot
+    decode fail TestGrid's read of the build: TOOL_FAIL, red."""
 
     def setUp(self):
         self.srv = FakeServer()
         self.addCleanup(self.srv.close)
+        self.srv.gcs_listing("bucket", [])
 
-    def judge(self, finished, started, build="1"):
-        base = f"{self.srv.url}/bucket/logs/job/{build}"
-        if finished is not None:  # None: GCS has no finished.json
-            self.srv.route(f"/bucket/logs/job/{build}/finished.json", (200, {}, finished))
-        self.srv.route(f"/bucket/logs/job/{build}/started.json", (200, {}, started))
-        now = time.time()
-        return (frl.painted_red(frl.read_finished(base), frl.read_started(base), now),
-                cc.testgrid_red(cc.try_json(base + "/finished.json"), cc.try_json(base + "/started.json"), now))
+    def verdict(self, finished, started, build=None):
+        build = build or str(snowflake(time.time() - HOUR))
+        for name, doc in (("finished.json", finished), ("started.json", started)):
+            if doc is not None:  # None: GCS has no such object
+                self.srv.route(f"/bucket/logs/job/{build}/{name}", (200, {}, doc))
+        col = frl.gcs_column(self.srv.url, "bucket/logs/job", build)
+        return frl.verdict(col, "job")[0]
 
     def test_a_field_testgrid_cannot_decode_paints_the_build_red(self):
         now = int(time.time())
-        st, ok = {"timestamp": now - 3600}, {"timestamp": now - 60, "passed": True, "result": "SUCCESS"}
-        self.assertEqual(self.judge(ok, st), (False, False))
-        self.assertEqual(self.judge(dict(ok, passed=None, result="SUCCESS"), st), (False, False))  # null is fine
-        self.assertEqual(self.judge(dict(ok, metadata={"x": 1}, extra=[1]), st), (False, False))  # other fields
+        st, ok = {"timestamp": now - 3 * HOUR}, {"timestamp": now - 2 * HOUR, "passed": True, "result": "SUCCESS"}
+        self.assertEqual(self.verdict(ok, st), "not-red")
+        self.assertEqual(self.verdict(dict(ok, passed=None, result="SUCCESS"), st), "not-red")  # null is fine
+        self.assertEqual(self.verdict(dict(ok, metadata={"x": 1}, extra=[1]), st), "not-red")  # other fields
         for finished, started in [(dict(ok, passed="true"), st),
                                   (dict(ok, passed=1), st),
-                                  (dict(ok, timestamp=float(now - 60)), st),  # Go cannot put 1.0 in an int64
-                                  (dict(ok, timestamp=str(now - 60)), st),
+                                  (dict(ok, timestamp=float(now - 2 * HOUR)), st),  # Go cannot put 1.0 in an int64
+                                  (dict(ok, timestamp=str(now - 2 * HOUR)), st),
                                   (dict(ok, timestamp=1 << 63), st),  # beyond int64
                                   (dict(ok, result=["SUCCESS"]), st),
-                                  (ok, {"timestamp": float(now - 3600)}),
-                                  (ok, {"timestamp": True})]:
+                                  (dict(ok, Running="yes"), st),  # a field TestGrid adds: a bool to Go
+                                  (ok, {"timestamp": float(now - 3 * HOUR)}),
+                                  (ok, {"timestamp": True}),
+                                  (ok, dict(st, repos={"org/repo": 1}))]:
             with self.subTest(finished=finished, started=started):
-                self.assertEqual(self.judge(finished, started), (True, True))
+                self.assertEqual(self.verdict(finished, started), "red")
 
     def test_finish_and_start_times_as_testgrid_reads_them(self):
         now = int(time.time())
         st = {"timestamp": now - 3600}
-        cases = [({"timestamp": 0, "passed": True}, st, True),  # not finished to TestGrid; its deadline is past
-                 ({"timestamp": -5, "passed": True}, st, True),
-                 ({"timestamp": now + 10 * DAY, "passed": True}, st, False),  # finished, however bogus the time
-                 ({"timestamp": now + 10 * DAY, "passed": False}, st, True),
-                 ({"passed": False}, st, False),  # no finish time: running until 24 hours have passed
-                 ({"passed": False}, {"timestamp": now - 25 * HOUR}, True),
-                 (None, {"timestamp": now - 25 * HOUR}, True),
-                 (None, {"timestamp": -5}, False),  # a start time it cannot date counts as none
-                 (None, {"timestamp": now + 10 * DAY}, False),
-                 (None, {}, False)]
-        for i, (finished, started, want) in enumerate(cases):
+        cases = [({"timestamp": 0, "passed": True}, st, "red"),  # not finished to TestGrid; its deadline is past
+                 ({"timestamp": -5, "passed": True}, st, "red"),
+                 # finished, however bogus the time; but its Pod row waits for podinfo.json until an hour
+                 # after that time, and TestGrid reads a column again while a cell of it runs
+                 ({"timestamp": now + 10 * DAY, "passed": True}, st, "undecided"),
+                 ({"timestamp": now - 2 * HOUR, "passed": True}, st, "not-red"),
+                 ({"timestamp": now - 60, "passed": True}, st, "undecided"),  # podinfo.json may still come
+                 ({"timestamp": now + 10 * DAY, "passed": False}, st, "red"),
+                 ({"passed": False}, st, "undecided"),  # no finish time: running until 24 hours have passed
+                 ({"passed": False}, {"timestamp": now - 25 * HOUR}, "red"),
+                 (None, {"timestamp": now - 25 * HOUR}, "red"),
+                 (None, {"timestamp": -5}, "not-red"),  # started long before it was made: too old to TestGrid
+                 (None, {"timestamp": now + 10 * DAY}, "undecided"),  # running until 24 hours after that start
+                 (None, {}, "undecided"),  # no start time: not started yet
+                 ({"timestamp": now - 60, "passed": False}, {}, "not-red"),  # finished without starting: never red
+                 ({"timestamp": now - 60, "passed": False}, None, "not-red")]
+        for finished, started, want in cases:
             with self.subTest(finished=finished, started=started):
-                self.assertEqual(self.judge(finished, started, build=str(100 + i)), (want, want))
+                self.assertEqual(self.verdict(finished, started), want)
 
 
 class Round3Test(BackfillTest):
@@ -1223,7 +1210,7 @@ class CrossCheckRobustnessTest(ArchiveWorld):
     def test_a_long_job_that_finished_inside_the_lag_is_not_missed(self):
         start = int(time.time()) - 9 * HOUR
         build = snowflake(start)
-        self.show([build], {"o": ([12], [""])}, start=start)
+        self.show([build], {"job.Overall": ([12], [""])}, start=start)
         self.srv.route(f"/bucket/logs/job/{build}/finished.json",
                        (200, {}, {"result": "FAILURE", "timestamp": int(time.time()) - 600}))
         self.fetch("--list-only")

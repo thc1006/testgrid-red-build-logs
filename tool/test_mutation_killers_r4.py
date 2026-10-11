@@ -12,7 +12,6 @@ import time
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 import test_mutation_killers_r3 as r3  # noqa: E402  (a module import: its tests are not collected again here)
 from test_fetch_red_logs import DAY, run_record, send, table  # noqa: E402
@@ -34,18 +33,6 @@ def run_folder(root, started, report=None):
 
 
 class Unit(unittest.TestCase):
-    def test_GI03_GI05_go_int64_is_exactly_the_int64_range(self):
-        for v in (0, -5, -(1 << 63), 1 << 62, (1 << 63) - 1, 1_791_000_000):
-            self.assertTrue(frl.go_int64(v), v)
-        for v in (1 << 63, -(1 << 63) - 1, True, 1.0, "5", None):
-            self.assertFalse(frl.go_int64(v), v)
-
-    def test_DC06_cross_check_decodes_exactly_the_int64_range(self):
-        for v in (0, -5, -(1 << 63), 1 << 62, (1 << 63) - 1):
-            self.assertTrue(cc.decodable({"timestamp": v}, {"timestamp": int}), v)
-        for v in (1 << 63, -(1 << 63) - 1, True, 1.0, "5"):
-            self.assertFalse(cc.decodable({"timestamp": v}, {"timestamp": int}), v)
-
     def test_JM03_JM04_JM05_malformed_remembered_margins_are_ignored(self):
         now = time.time()
         for entry in ({"job_hours": ["20"]}, {"job_hours": {"abc": now + HOUR}}, {"job_hours": {"20": "soon"}},
@@ -86,7 +73,7 @@ class Unit(unittest.TestCase):
         self.assertTrue(frl.is_text("line one\n\tline two"))
         for bad in ("a\x0bb", "a\rb", "a\x0cb", "a\x1bb"):
             self.assertFalse(frl.is_text(bad), repr(bad))
-        t = table("bucket/logs/job", ["1"], {"o": ([12], ["first line\n\tsecond line"])})
+        t = table("bucket/logs/job", ["1"], {"job.Overall": ([12], ["first line\n\tsecond line"])})
         self.assertEqual(frl.red_columns(t)[0][0]["message"], "first line\n\tsecond line")
 
     def test_AD02_the_earliest_copy_of_a_duplicate_wins(self):
@@ -193,7 +180,7 @@ class GapWorld(r3.World):
     def setUp(self):
         super().setUp()
         self.visible = snowflake(self.now - HOUR)
-        self.show([self.visible], {"o": ([1], [""])}, start=int(self.now - HOUR))
+        self.show([self.visible], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
         self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
 
     def listing(self, *builds):
@@ -241,8 +228,9 @@ class GapRule(GapWorld):
         cut_finished = self.gap_build(11, (200, {}, b"{cut"))
         bad_result = self.gap_build(12, (200, {}, {"timestamp": self.ago(2), "passed": True, "result": ["SUCCESS"]}))
         builds = [bad_started, list_started, list_finished, cut_finished, bad_result]
+        # each fails TestGrid's read of the build (Go cannot decode it): TOOL_FAIL
         self.judged(builds, backfilled=builds, watching=[],
-                    reasons={b: "an artifact is malformed)" for b in builds})
+                    reasons={b: "TestGrid could not read it from GCS (TOOL_FAIL))" for b in builds})
 
     def test_RF05_GI05_RS05_times_as_testgrid_reads_them(self):
         # TestGrid (deadline and overallCell in pkg/updater/gcs.go): a finish time of 0 is not
@@ -251,18 +239,31 @@ class GapRule(GapWorld):
         # time of 0 is no start time (Go decodes a missing one as 0 too): shown as running
         zero_finished = self.gap_build(5, (200, {}, {"timestamp": 0, "result": "FAILURE", "passed": False}))
         huge_finished = self.gap_build(6, (200, {}, {"timestamp": 1 << 62, "result": "SUCCESS", "passed": True}))
+        self.srv.route(f"/bucket/logs/job/{huge_finished}/podinfo.json", (200, {}, {"pod": {"status": {"phase": "Succeeded"}}}))
         zero_started = self.gap_build(7, started=(200, {}, {"timestamp": 0}))
         self.judged([zero_finished, huge_finished, zero_started], backfilled=[zero_finished],
                     watching=[zero_started], reasons={zero_finished: "it did not finish within 24 hours"})
         self.assertIsNone(self.meta(zero_finished)["finished"])  # not a time the archive can date
 
-    def test_BW01_BR03_never_started_and_passed_builds_are_neither_watched_nor_backfilled(self):
-        never = snowflake(self.now - 16 * HOUR)  # no started.json, no finished.json: TestGrid never lists it
+    def test_BW01_BR03_unstarted_and_unreadable_builds_are_watched_not_backfilled(self):
+        # no started.json and no finished.json: RUNNING to TestGrid until it starts
+        never = snowflake(self.now - 16 * HOUR)
         self.gcs_build(never, started=None, log=False)
+        # passed, but its started.json cannot be read now: TestGrid paints a build whose started.json
+        # it cannot read TOOL_FAIL, so it is not decided until it can be read
         passed = self.gap_build(17, (200, {}, {"result": "SUCCESS", "timestamp": self.ago(2)}), started=(500, {}, b""))
-        self.judged([never, passed], backfilled=[], watching=[], reasons={})
-        self.assertEqual(self.state()["watch"], {})
-        self.assertEqual(self.srv.hits(f"/bucket/logs/job/{passed}/started.json"), 0)
+        self.listing(never, passed)
+        self.assertEqual(self.fetch(), 1)  # a build whose files cannot be read is an error, and retried
+        run = self.runs()[-1]
+        self.assertEqual(run["outcomes"], {"watching": [f"job/{never}"]})
+        self.assertEqual([e["build"] for e in run["errors"]], [f"job/{passed}"])
+        self.assertEqual(sorted(self.state()["watch"]), sorted([f"job/{never}", f"job/{passed}"]))
+        self.assertGreater(self.srv.hits(f"/bucket/logs/job/{passed}/started.json"), 0)
+        # finished without ever starting: TestGrid shows it RUNNING for good, never red
+        self.srv.route(f"/bucket/logs/job/{never}/finished.json", (200, {}, {"result": "FAILURE", "timestamp": self.ago(1)}))
+        self.srv.route(f"/bucket/logs/job/{passed}/started.json", (200, {}, {"timestamp": frl.created(passed)}))
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"not-red": sorted([f"job/{never}", f"job/{passed}"])})
 
 
 class GapTimeout(GapWorld):
@@ -318,7 +319,7 @@ class WatchedRed(GapWorld):
 class Scans(r3.World):
     def show_recent(self):
         visible = snowflake(self.now - HOUR)
-        self.show([visible], {"o": ([1], [""])}, start=int(self.now - HOUR))
+        self.show([visible], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
         return visible
 
     def test_FS04_a_new_tab_in_a_young_archive_is_searched_back_to_the_archive_start_only(self):
@@ -367,7 +368,7 @@ class Scans(r3.World):
 
     def test_FS13_FS15_a_tab_showing_only_placeholders_keeps_its_last_scan(self):
         p = snowflake(self.now - HOUR)
-        self.show([p], {"o": ([6], ["grid exceeds maximum size"])}, start=int(self.now - HOUR))
+        self.show([p], {"job.Overall": ([6], ["grid exceeds maximum size"])}, start=int(self.now - HOUR))
         self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
         self.assertEqual(self.fetch(), 0)
         self.assertAlmostEqual(self.state()["tabs"]["dash#t"]["scan"], self.now - 40 * HOUR, delta=1)
@@ -375,7 +376,7 @@ class Scans(r3.World):
     def test_JC03_since_hours_honours_the_margin_in_effect_at_the_last_scan(self):
         start = int(self.now - 25 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([12], [""])}, start=start)
+        self.show([b], {"job.Overall": ([12], [""])}, start=start)
         self.gcs_build(b, finished=self.failed(ago=24 * HOUR))
         scan = self.now - 12 * HOUR  # a 20 h timeout was cut to 2 h before that scan; 20 h bound until 2 h ago
         self.put_state(tabs={"dash#t": {"scan": scan, "oldest": self.now - 30 * HOUR, "current_job_hours": 2,
@@ -453,7 +454,7 @@ class Store(r3.World):
     def test_RF04_a_result_that_is_not_short_clean_text_is_not_stored(self):
         start = int(self.now - 3 * DAY)
         builds = [snowflake(start - i * HOUR) for i in range(3)]
-        self.show(builds, {"o": ([12, 12, 12], ["", "", ""])}, start=start)
+        self.show(builds, {"job.Overall": ([12, 12, 12], ["", "", ""])}, start=start)
         for b, result in zip(builds, ("x" * 100, "FAIL\x00ED", "\ud800"), strict=True):
             self.gcs_build(b, finished=(200, {}, {"result": result, "passed": False, "timestamp": start + HOUR}))
         self.assertEqual(self.fetch(), 0)
@@ -463,7 +464,7 @@ class Store(r3.World):
     def test_ST02_a_red_build_with_nothing_in_gcs_15_hours_after_it_started_is_recorded(self):
         start = int(self.now - 15 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([12], [""])}, start=start)
+        self.show([b], {"job.Overall": ([12], [""])}, start=start)
         self.assertEqual(self.fetch(), 0)
         self.assertEqual(self.outcomes(), {"archived-without-log": [f"job/{b}"]})
 
@@ -511,7 +512,7 @@ class Check(r3.World):
 
     def test_TG02_TG07_TG08a_TG09_TG11_TJ01_TJ02_UL02_unlisted_builds_are_judged_by_testgrids_rule(self):
         visible = snowflake(self.now - HOUR)
-        self.show([visible], {"o": ([1], [""])}, start=int(self.now - HOUR))
+        self.show([visible], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
 
         def gcs(hours, finished=None, started="created"):
             b = snowflake(self.now - hours * HOUR)
@@ -536,7 +537,7 @@ class Check(r3.World):
 
     def test_OS01_a_build_older_than_the_oldest_column_with_results_is_checked(self):
         visible, ph = snowflake(self.now - HOUR), snowflake(self.now - 40 * HOUR)
-        t = table("bucket/logs/job", [visible, ph], {"o": ([1, 6], ["", "grid exceeds maximum size"])})
+        t = table("bucket/logs/job", [visible, ph], {"job.Overall": ([1, 6], ["", "grid exceeds maximum size"])})
         t["timestamps"] = [int((self.now - HOUR) * 1000), int((self.now - 40 * HOUR) * 1000)]
         self.srv.table("dash", "t", t)
         lost = snowflake(self.now - 30 * HOUR)  # not on TestGrid at all, between the two columns
@@ -549,7 +550,7 @@ class Check(r3.World):
 
     def test_OS02_a_build_newer_than_the_oldest_column_is_not_judged_as_scrolled_off(self):
         old, new = snowflake(self.now - 4 * DAY), snowflake(self.now - 2 * HOUR)
-        t = table("bucket/logs/job", [new, old], {"o": ([1, 1], ["", ""])})
+        t = table("bucket/logs/job", [new, old], {"job.Overall": ([1, 1], ["", ""])})
         t["timestamps"] = [int((self.now - 2 * HOUR) * 1000), int((self.now - 4 * DAY) * 1000)]
         self.srv.table("dash", "t", t)
         lagging = snowflake(self.now - 3 * HOUR)  # failed 2 h ago; TestGrid has not listed it yet
@@ -563,7 +564,7 @@ class Check(r3.World):
     def test_SO06_a_red_build_without_files_is_not_missed_within_twice_its_tabs_own_margin(self):
         start = int(self.now - 15 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([12], [""])}, start=start)
+        self.show([b], {"job.Overall": ([12], [""])}, start=start)
         self.srv.route(f"/bucket/logs/job/{b}/prowjob.json",
                        (200, {}, {"spec": {"decoration_config": {"timeout": "11h20m"}}}))
         self.assertEqual(self.fetch(), 0)
@@ -574,12 +575,12 @@ class Check(r3.World):
     def test_MB02_a_red_build_that_finished_hours_ago_is_missed_even_if_prow_says_success(self):
         start = int(self.now - 8 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([1], [""])}, start=start)  # not red yet when the fetch looks
+        self.show([b], {"job.Overall": ([1], [""])}, start=start)  # not red yet when the fetch looks
         self.srv.route(f"/bucket/logs/job/{b}/finished.json",
                        (200, {}, {"result": "SUCCESS", "passed": True, "timestamp": int(self.now - 5 * HOUR)}))
         self.srv.gcs_listing("bucket", [f"logs/job/{b}/finished.json"])
         self.assertEqual(self.fetch(), 0)
-        self.show([b], {"o": ([1], [""]), "test-x": ([12], ["boom"])}, start=start)  # a red cell by verification time
+        self.show([b], {"job.Overall": ([1], [""]), "test-x": ([12], ["boom"])}, start=start)  # a red cell by verification time
         code, out = self.check()
         self.assertIn(f"PROBLEM: MISSED red build job/{b}", out)
         self.assertEqual(code, 1, out)
@@ -587,9 +588,9 @@ class Check(r3.World):
     def test_MB07_a_red_build_that_started_long_ago_without_finished_json_is_missed(self):
         start = int(self.now - 30 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([4], [""])}, start=start)  # running when the fetch looks
+        self.show([b], {"job.Overall": ([4], [""])}, start=start)  # running when the fetch looks
         self.assertEqual(self.fetch(), 0)
-        self.show([b], {"o": ([12], ["Build did not complete within 24 hours"])}, start=start)
+        self.show([b], {"job.Overall": ([12], ["Build did not complete within 24 hours"])}, start=start)
         code, out = self.check()
         self.assertIn(f"PROBLEM: MISSED red build job/{b}", out)
         self.assertEqual(code, 1, out)
@@ -597,7 +598,7 @@ class Check(r3.World):
     def test_UL04_a_build_testgrid_lists_with_results_is_judged_by_its_cells_not_as_unlisted(self):
         start = int(self.now - 30 * HOUR)
         b = snowflake(start - 120)  # its pod started two minutes after the build was made
-        self.show([b], {"o": ([12], ["Build did not complete within 24 hours"])}, start=start)
+        self.show([b], {"job.Overall": ([12], ["Build did not complete within 24 hours"])}, start=start)
         self.srv.route(f"/bucket/logs/job/{b}/prowjob.json", (200, {}, {"spec": {"decoration_config": {"timeout": "16h"}}}))
         self.srv.route(f"/bucket/logs/job/{b}/started.json", (200, {}, {"timestamp": start}))
         self.srv.gcs_listing("bucket", [f"logs/job/{b}/started.json"])
@@ -613,7 +614,7 @@ class Check(r3.World):
         self.srv.route(self.base + "/started.json", (200, {}, {"timestamp": self.start}))
         self.fetch()
         recent = snowflake(self.now - HOUR)
-        self.show([recent], {"o": ([1], [""])}, start=int(self.now - HOUR))
+        self.show([recent], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
         self.srv.gcs_listing("bucket", [f"logs/job/{b}/finished.json" for b in (self.build, recent)])
         run_folder(self.root, self.now - 5 * DAY)
         code, out = self.check()
@@ -621,7 +622,7 @@ class Check(r3.World):
 
     def test_UL07_a_tab_without_result_columns_is_not_a_crash(self):
         p = snowflake(self.now - HOUR)
-        self.show([p], {"o": ([6], ["grid exceeds maximum size"])}, start=int(self.now - HOUR))
+        self.show([p], {"job.Overall": ([6], ["grid exceeds maximum size"])}, start=int(self.now - HOUR))
         c = snowflake(self.now - 10 * HOUR)
         self.gcs_build(c, finished=self.failed())
         self.srv.gcs_listing("bucket", [f"logs/job/{b}/finished.json" for b in (c, p)])
@@ -634,7 +635,7 @@ class Check(r3.World):
     def test_SO01_a_red_build_without_files_is_not_missed_while_the_fetch_waits_for_it(self):
         start = int(self.now - 8 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([12], [""])}, start=start)
+        self.show([b], {"job.Overall": ([12], [""])}, start=start)
         self.assertEqual(self.fetch(), 0)
         self.assertEqual(self.outcomes(), {"pending": [f"job/{b}"]})
         code, out = self.check()
@@ -643,7 +644,7 @@ class Check(r3.World):
     def test_SO04_an_old_run_report_without_tab_margins_uses_its_own_max_job_hours(self):
         start = int(self.now - 30 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([12], [""])}, start=start)
+        self.show([b], {"job.Overall": ([12], [""])}, start=start)
         rel = frl.new_run_dir(self.root, time.time())[1]
         frl.write_json(os.path.join(self.root, rel, "run.json"),
                        dict(run_record(time.time(), [{"dashboard": "dash", "tab": "t", "query": "bucket/logs/job",

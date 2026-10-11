@@ -4,10 +4,18 @@ version = "0.1.0"
 description = "Archive the Prow build-log.txt behind every red cell on the sig-release TestGrid dashboards"
 requires-python = ">=3.12"
 license = "Apache-2.0"
-dependencies = []
+dependencies = [
+    "urllib3>=2.5,<3",
+]
 
 [dependency-groups]
-dev = ["ruff"]
+dev = [
+    "actionlint-py>=1.7.12.25",
+    "hypothesis>=6.169",
+    "ruff",
+    "shellcheck-py>=0.11.0.1",
+    "zizmor>=1.30.1",
+]
 
 [tool.uv]
 package = false
@@ -18,3 +26,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# test inputs written out in full, and bytes formatting (no f-strings for bytes)
+"oracle/fuzz/edge.py" = ["E501", "UP031"]

@@ -33,4 +33,8 @@ jobs:
           cache-dependency-glob: tool/uv.lock
       # --locked: fail if uv.lock is out of date instead of re-resolving it in CI
       - run: uv run --locked ruff check .
+      # The workflows: expressions, action inputs and outputs, and their shell
+      # scripts (actionlint runs shellcheck on them), then security (zizmor).
+      - run: uv run --locked actionlint ../.github/workflows/*.yml
+      - run: uv run --locked zizmor --offline --persona auditor ../.github/workflows/
       - run: uv run --locked python -W error::ResourceWarning -m unittest -v

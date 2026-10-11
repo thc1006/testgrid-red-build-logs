@@ -2,25 +2,75 @@ name: Archive red TestGrid build logs
 
 on:
   schedule:
-    # 00:17 and 12:17 UTC (08:17 and 20:17 in Taiwan). Off the hour because
-    # GitHub delays or drops scheduled runs at busy times such as :00.
-    - cron: "17 0,12 * * *"
+    # Twice a day is the aim, but GitHub starts scheduled runs late (5-6 hours
+    # late here in October 2026) and may drop one when it is busy. So the
+    # schedule fires every 3 hours (off the hour, when GitHub is less busy), and
+    # a scheduled run archives only once the last archive is 11 hours old.
+    - cron: "17 */3 * * *"
   workflow_dispatch:
 
 permissions: {}
 
-# One run at a time per branch. A run still waiting when a newer one for the same
-# branch arrives is replaced by it, which loses nothing: every run rescans
-# everything that is still red.
+# A waiting run is replaced by a newer one of the same kind (scheduled, or started
+# by hand) for the same branch, which loses nothing: every run rescans everything
+# still red. The two kinds do not replace each other: a scheduled run that is not
+# due would otherwise drop a manual run waiting behind a running one. The archive
+# job itself runs one at a time per branch (its own concurrency group).
 concurrency:
-  group: red-build-logs-${{ github.ref }}
+  group: red-build-logs-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: false
 
 jobs:
-  archive:
-    name: Archive and verify
+  due:
+    name: Decide whether to archive now
     # The commit step pushes back to the branch the run was started on.
     if: github.ref_type == 'branch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read # when the archive last changed
+    outputs:
+      due: ${{ steps.age.outputs.due }}
+      age: ${{ steps.age.outputs.age }}
+    steps:
+      # Every archive run that gets to commit adds its folder under archive/runs/,
+      # so the last commit there is when the archive last ran. A run started by
+      # hand, or any re-run, always archives.
+      - id: age
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          if ! last=$(gh api -X GET "repos/$GITHUB_REPOSITORY/commits" -f sha="$BRANCH" -f path=archive/runs \
+              -f per_page=1 --jq '.[0].commit.committer.date // ""'); then
+            echo "::warning::Could not read when the archive last changed."
+            last=""
+          fi
+          # Not known (no archive yet, or the API failed): archive now, as one run too
+          # many costs little, and do not call the archive late.
+          if [ -z "$last" ] || ! changed=$(date -d "$last" +%s); then
+            echo "The archive's age is not known; archiving now."
+            echo "age=0" >> "$GITHUB_OUTPUT"
+            echo "due=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          age=$(( $(date +%s) - changed ))
+          echo "The archive last changed at $last, $((age / 3600)) hours ago."
+          echo "age=$age" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT" != schedule ] || [ "$GITHUB_RUN_ATTEMPT" -gt 1 ] || [ "$age" -ge $((11 * 3600)) ]; then
+            echo "due=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Not due yet: a scheduled run archives once the last archive is 11 hours old."
+          fi
+
+  archive:
+    name: Archive and verify
+    needs: due
+    if: needs.due.outputs.due == 'true'
+    concurrency:
+      group: red-build-logs-archive-${{ github.ref }}
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     # More than the step timeouts below (5 + 50 + 20 + 10) plus checkout and
     # setup-uv, so the commit step always gets to run.
@@ -81,6 +131,28 @@ jobs:
             echo "No archive/ to commit."
             exit 0
           fi
+          # GitHub rejects a push holding a file over 100 MB. The fetch stores a larger
+          # log in parts, so there should be none: a stored file of a build that is (a
+          # copy cut off part-way, fetched again by a later run) and a page every run
+          # writes anew are left out; any other file that large stops the commit here.
+          for kept in archive/runs archive/weeks archive/charts; do
+            [ -d "$kept" ] || continue
+            depth=1
+            [ "$kept" = archive/runs ] && depth=5
+            find "$kept" -mindepth "$depth" -maxdepth "$depth" -type f -size +95M \
+              -printf '::warning::Not committing %p: larger than 95 MiB\n' -delete
+          done
+          for page in archive/INDEX.md archive/index.json; do
+            if [ -f "$page" ] && [ "$(stat -c %s "$page")" -gt $((95 << 20)) ]; then
+              echo "::warning::Not committing $page: larger than 95 MiB"
+              rm -f -- "$page"
+            fi
+          done
+          big=$(find archive -type f -size +95M -print -quit)
+          if [ -n "$big" ]; then
+            echo "::error::$big is larger than 95 MiB: GitHub would reject the push."
+            exit 1
+          fi
           # A build folder without meta.json is a download that was cut off: leave
           # it out; the build is retried by a later run.
           shopt -s nullglob
@@ -132,3 +204,47 @@ jobs:
         run: |
           echo "fetch: $FETCH, verify: $VERIFY"
           exit 1
+
+  # A gap is searched in GCS, so nothing is lost, but a day without an archive
+  # means GitHub did not start the scheduled runs, or they did not get to commit:
+  # a scheduled run that finds the archive that old fails, to say so.
+  behind:
+    name: Check that archiving keeps up
+    needs: [due, archive]
+    if: ${{ !cancelled() && github.event_name == 'schedule' && needs.archive.result != 'skipped' && fromJSON(needs.due.outputs.age) > 93600 }} # 26 hours
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - env:
+          AGE: ${{ needs.due.outputs.age }}
+          ARCHIVE: ${{ needs.archive.result }}
+        run: |
+          echo "::error::The archive was $((AGE / 3600)) hours old when this scheduled run started: for more than a day, GitHub did not start the scheduled runs or they did not commit (this run's archive job: $ARCHIVE)."
+          exit 1
+
+  # An outside check that GitHub keeps starting the schedule: a dead man's switch
+  # (such as healthchecks.io) alerts when these pings stop, which GitHub cannot
+  # do when it is the one not starting the workflow (a failed run it does email
+  # about). Every scheduled run pings, about every 3 hours. Optional: set the
+  # repository variable HEARTBEAT to "on", and the check's ping URL as the secret
+  # HEARTBEAT_URL of the environment "heartbeat" (used without a deployment).
+  heartbeat:
+    name: Send the heartbeat
+    needs: due
+    if: vars.HEARTBEAT == 'on' && github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment:
+      name: heartbeat
+      deployment: false
+    permissions: {}
+    steps:
+      - env:
+          HEARTBEAT_URL: ${{ secrets.HEARTBEAT_URL }}
+        run: |
+          if [ -z "$HEARTBEAT_URL" ]; then
+            echo "::warning::HEARTBEAT is on but the heartbeat environment has no HEARTBEAT_URL secret."
+            exit 0
+          fi
+          curl -fsS -m 10 --retry 3 -o /dev/null "$HEARTBEAT_URL" || echo "::warning::The heartbeat could not be sent."

@@ -236,7 +236,7 @@ class World(ArchiveWorld):
 
     def quiet(self):
         """TestGrid shows one passing build and nothing red."""
-        self.show([snowflake(self.now)], {"o": ([1], [""])}, start=int(self.now))
+        self.show([snowflake(self.now)], {"job.Overall": ([1], [""])}, start=int(self.now))
 
     def state(self):
         return frl.read_json(os.path.join(self.root, "state.json"))
@@ -277,7 +277,7 @@ class Gap(World):
     def setUp(self):
         super().setUp()
         self.visible = snowflake(self.now - HOUR)
-        self.show([self.visible], {"o": ([1], [""])}, start=int(self.now - HOUR))
+        self.show([self.visible], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
         self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
 
     def listing(self, *builds):
@@ -297,13 +297,16 @@ class Gap(World):
         self.assertEqual(self.fetch(), 0)
         self.assertEqual(self.outcomes(), {"backfilled": [f"job/{b}"]})
 
-    def test_BW01_a_passed_gap_build_needs_no_started_json(self):
+    def test_BW01_a_passed_gap_build_is_judged_with_its_started_json(self):
+        """TestGrid paints a passed build TOOL_FAIL if it cannot decode its started.json, so a
+        passed build is not decided until its started.json can be read."""
         b = snowflake(self.now - 30 * HOUR)
         self.gcs_build(b, finished=(200, {}, {"result": "SUCCESS", "passed": True, "timestamp": int(self.now - HOUR)}),
                        started=(500, {}, b""))
         self.listing(b)
-        self.assertEqual(self.fetch(), 0)
-        self.assertEqual(self.srv.hits(f"/bucket/logs/job/{b}/started.json"), 0)
+        self.assertEqual(self.fetch(), 1)
+        self.assertGreater(self.srv.hits(f"/bucket/logs/job/{b}/started.json"), 0)
+        self.assertIn(f"job/{b}", frl.read_json(os.path.join(self.root, "state.json"))["watch"])
 
     def test_BW02_a_gap_build_whose_finished_json_has_no_time_is_watched(self):
         b = snowflake(self.now - 10 * HOUR)  # started 10 h ago: within TestGrid's 24-hour deadline
@@ -314,7 +317,7 @@ class Gap(World):
 
     def test_BW04_a_running_build_in_two_gap_tabs_keeps_both_tabs(self):
         self.srv.summary("dash", {"t": "FAILING", "t2": "FAILING"})
-        self.srv.table("dash", "t2", table("bucket/logs/job", [self.visible], {"o": ([1], [""])},
+        self.srv.table("dash", "t2", table("bucket/logs/job", [self.visible], {"job.Overall": ([1], [""])},
                                            start=int((self.now - HOUR) * 1000)))
         gap = {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}
         self.put_state(tabs={"dash#t": gap, "dash#t2": gap})
@@ -414,7 +417,7 @@ class Watch(World):
     def test_RW01_a_watched_build_now_red_on_testgrid_is_archived_once(self):
         key = self.watch(5 * HOUR, finished=self.failed())
         b = key.split("/")[1]
-        self.show([b], {"o": ([12], ["boom"])}, start=int(self.now - 5 * HOUR))
+        self.show([b], {"job.Overall": ([12], ["boom"])}, start=int(self.now - 5 * HOUR))
         self.fetch()
         self.assertEqual(sum(v.count(key) for v in self.outcomes().values()), 1, self.outcomes())
 
@@ -453,7 +456,7 @@ class Margins(World):
         self.assertAlmostEqual(self.tab()["max_job_hours"], 11.58, places=2)
 
     def test_MJ05_the_gap_floor_uses_the_tabs_own_margin(self):
-        self.show([self.build], {"o": ([1], [""])}, start=int(self.now - 20 * HOUR))
+        self.show([self.build], {"job.Overall": ([1], [""])}, start=int(self.now - 20 * HOUR))
         self.put_state(tabs={"dash#t": {"scan": self.now - 10 * HOUR, "oldest": self.now - 100 * HOUR,
                                         "current_job_hours": 20,
                                         "job_hours": {"20": self.now + 10 * HOUR}}})
@@ -463,7 +466,7 @@ class Margins(World):
     def test_MJ06_since_hours_keeps_builds_a_long_job_was_running_at_the_last_scan(self):
         start = int(self.now - 25 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([12], [""])}, start=start)
+        self.show([b], {"job.Overall": ([12], [""])}, start=start)
         self.gcs_build(b, finished=self.failed(ago=24 * HOUR))
         self.put_state(tabs={"dash#t": {"scan": self.now - 12 * HOUR, "oldest": self.now - 30 * HOUR,
                                         "current_job_hours": 20,
@@ -474,7 +477,7 @@ class Margins(World):
     def test_MJ07_a_long_job_without_uploads_is_pending(self):
         start = int(self.now - 15 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([12], [""])}, start=start)
+        self.show([b], {"job.Overall": ([12], [""])}, start=start)
         self.prowjob(b, "20h")
         self.fetch()
         self.assertEqual(self.outcomes(), {"pending": [f"job/{b}"]})
@@ -497,7 +500,7 @@ class Margins(World):
 
     def test_MJ11_the_margin_comes_from_the_newest_build(self):
         newer = snowflake(self.start + HOUR)
-        self.show([newer, self.build], {"o": ([1, 1], ["", ""])}, start=self.start + HOUR)
+        self.show([newer, self.build], {"job.Overall": ([1, 1], ["", ""])}, start=self.start + HOUR)
         self.prowjob(newer, "11h")
         self.prowjob(self.build, "1h")
         self.fetch()
@@ -508,7 +511,7 @@ class NoLog(World):
     def test_AN02_AN03_a_young_finished_build_without_a_log_is_recorded_without_a_note(self):
         start = int(self.now - 2 * HOUR)
         b = snowflake(start)
-        self.show([b], {"o": ([12], [""])}, start=start)
+        self.show([b], {"job.Overall": ([12], [""])}, start=start)
         self.gcs_build(b, finished=self.failed(), log=False)
         self.fetch()
         self.assertEqual(self.outcomes(), {"archived-without-log": [f"job/{b}"]})
@@ -520,7 +523,7 @@ class NoLog(World):
                 shutil.rmtree(os.path.join(self.root, "runs"), ignore_errors=True)
                 start = int(self.now - HOUR)
                 b = snowflake(start)
-                self.show([b], {"o": ([12], [""])}, start=start)
+                self.show([b], {"job.Overall": ([12], [""])}, start=start)
                 self.gcs_build(b, finished=(200, {}, body), log=False)
                 self.fetch()
                 self.assertEqual(self.outcomes(), {"archived-without-log": [f"job/{b}"]})
@@ -666,9 +669,11 @@ class Check(World):
         """A failed build created 30 h ago that TestGrid no longer lists and the archive lacks:
         the tab now shows only builds from the last hour."""
         recent = snowflake(self.now - HOUR)
-        self.show([recent], {"o": ([1], [""])}, start=int(self.now - HOUR))
+        self.show([recent], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
         b = snowflake(self.now - 30 * HOUR)
         self.srv.route(f"/bucket/logs/job/{b}/finished.json", self.failed(ago=29 * HOUR))
+        if started == "created":  # it started when its ID was made
+            started = (200, {}, {"timestamp": frl.created(b)})
         if started is not None:
             self.srv.route(f"/bucket/logs/job/{b}/started.json", started)
         self.srv.gcs_listing("bucket", [f"logs/job/{x}/finished.json" for x in (self.build, b, recent)])
@@ -681,11 +686,35 @@ class Check(World):
 
     def test_CC08_CC10_CC11_a_red_build_gone_from_testgrid_since_the_first_run_is_missed(self):
         self.archived()
-        b = self.unlisted(started=(200, {}, {}))
+        b = self.unlisted(started="created")
         frl.write_json(self.earlier_run(self.now - 50 * HOUR), dict(run_record(self.now - 50 * HOUR, []), run="old"))
         code, out = self.check()
         self.assertEqual(code, 1, out)
-        self.assertIn(f"MISSED red build job/{b}: TestGrid no longer lists it", out)
+        self.assertIn(f"MISSED red build job/{b} (dash#t): TestGrid no longer lists it", out)
+
+    def test_CC08b_a_build_that_never_started_is_not_called_a_miss(self):
+        """A started.json without a start time (or none at all) leaves the build RUNNING to TestGrid: never red."""
+        self.archived()
+        for started in ((200, {}, {}), None):
+            with self.subTest(started=started):
+                b = self.unlisted(started=started)
+                frl.write_json(self.earlier_run(self.now - 50 * HOUR), dict(run_record(self.now - 50 * HOUR, []), run="old"))
+                code, out = self.check()
+                self.assertEqual(code, 0, out)
+                self.assertNotIn(f"MISSED red build job/{b}", out)
+
+    def test_CC08c_a_build_that_passed_but_whose_tests_failed_is_missed(self):
+        """Passing builds count too: TestGrid paints a failing test case's cell red whatever the result."""
+        self.archived()
+        b = self.unlisted(started="created")
+        self.srv.route(f"/bucket/logs/job/{b}/finished.json", (200, {}, {"result": "SUCCESS", "passed": True,
+                                                                          "timestamp": int(self.now - 29 * HOUR)}))
+        self.srv.route(f"/bucket/logs/job/{b}/artifacts/junit_01.xml",
+                       (200, {}, b'<testsuite><testcase name="t"><failure>boom</failure></testcase></testsuite>'))
+        frl.write_json(self.earlier_run(self.now - 50 * HOUR), dict(run_record(self.now - 50 * HOUR, []), run="old"))
+        code, out = self.check()
+        self.assertEqual(code, 1, out)
+        self.assertIn(f"MISSED red build job/{b} (dash#t): TestGrid no longer lists it", out)
 
     def test_CC09_CC15_a_build_gone_before_the_first_run_is_only_noted(self):
         self.archived()
@@ -702,7 +731,7 @@ class Check(World):
         frl.write_json(self.earlier_run(self.now - 50 * HOUR), dict(run_record(self.now - 50 * HOUR, []), run="old"))
         code, out = self.check()
         self.assertEqual(code, 1, out)
-        self.assertIn(f"cannot check job/{b}: started.json", out)
+        self.assertIn(f"cannot check job/{b} by TestGrid's rule", out)
         self.assertNotIn("MISSED", out)
 
     def test_CC14_a_run_json_that_is_not_an_object_is_skipped(self):
@@ -724,7 +753,7 @@ class Check(World):
     def test_CC17_a_long_job_still_running_is_not_missed(self):
         start = int(self.now) - 10 * HOUR
         b = snowflake(start)
-        self.show([b], {"o": ([12], [""])}, start=start)
+        self.show([b], {"job.Overall": ([12], [""])}, start=start)
         rel = frl.new_run_dir(self.root, time.time())[1]
         frl.write_json(os.path.join(self.root, rel, "run.json"),
                        dict(run_record(time.time(), [{"dashboard": "dash", "tab": "t", "query": "bucket/logs/job",

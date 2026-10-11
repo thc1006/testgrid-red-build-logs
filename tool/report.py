@@ -11,7 +11,8 @@ Two things are drawn honestly rather than hidden:
     history covering all of it in some successful scan, after every build that
     started that day could have finished; other days are marked "partial
     history", because their counts can only be low;
-  * today is faded and labelled, because the day is not over.
+  * the day of the last run is drawn as unfinished and labelled with the time
+    its data ends, because the day was not over (charts are read long after).
 The 7-day average and the week-over-week change only use complete days, so a
 young archive, a missed run or a tab that never loads shows no trend instead
 of a false one.
@@ -34,7 +35,7 @@ THEMES = {
     "light": {
         "surface": "#fcfcfb", "ink": "#0b0b0b", "ink2": "#52514e", "muted": "#898781",
         "grid": "#e1e0d9", "axis": "#c3c2b7", "border": "rgba(11,11,11,0.10)",
-        "bar": "#5598e7", "line": "#104281", "band": "#f0efec",
+        "bar": "#5598e7", "line": "#104281", "band": "#f0efec", "edge": "#2a78d6",
         "empty": "#f0efec", "up": "#d03b3b", "down": "#006300",
         # ordinal ramp, light -> dark (validated: --ordinal --mode light)
         "ramp": ["#86b6ef", "#5598e7", "#2a78d6", "#1c5cab", "#0d366b"],
@@ -42,7 +43,7 @@ THEMES = {
     "dark": {
         "surface": "#1a1a19", "ink": "#ffffff", "ink2": "#c3c2b7", "muted": "#898781",
         "grid": "#2c2c2a", "axis": "#383835", "border": "rgba(255,255,255,0.10)",
-        "bar": "#256abf", "line": "#b7d3f6", "band": "#242422",
+        "bar": "#256abf", "line": "#b7d3f6", "band": "#242422", "edge": "#86b6ef",
         "empty": "#383835", "up": "#d03b3b", "down": "#0ca30c",
         # same hue, anchor flipped for the dark surface (validated: --ordinal --mode dark)
         "ramp": ["#184f95", "#256abf", "#3987e5", "#86b6ef", "#cde2fb"],
@@ -124,14 +125,15 @@ def overlaps(spans, lo, hi):
 
 def coverage(runs):
     """Per tab, the merged time spans whose red builds the archive has seen,
-    and per dashboard, the tabs its most recent summary listed.
+    per dashboard the tabs its most recent summary listed, and per tab the
+    spans TestGrid showed at all.
 
     A successful scan at time T shows the tab's columns back to its oldest
     start O, and every build that started before T - max_job_hours has
     finished by then, so the scan covers [O, T - max_job_hours] (clipped to
-    --since-hours). Tabs that failed to load cover nothing.
+    --since-hours); it has seen [O, T]. Tabs that failed to load cover nothing.
     """
-    spans, listed = {}, {}
+    spans, listed, seen_spans = {}, {}, {}
     for run in sorted(runs, key=lambda r: r["started"]):
         floor = run["started"] - run["since_hours"] * 3600 if run.get("since_hours") is not None else -math.inf
         seen = {}
@@ -147,8 +149,10 @@ def coverage(runs):
             lo, hi = max(t["oldest"], floor), run["started"] - hours * 3600
             if hi > lo:
                 spans.setdefault((t["dashboard"], t["tab"]), []).append((lo, hi))
+            if run["started"] > lo:
+                seen_spans.setdefault((t["dashboard"], t["tab"]), []).append((lo, run["started"]))
         listed.update(seen)
-    return {k: merge(v) for k, v in spans.items()}, listed
+    return {k: merge(v) for k, v in spans.items()}, listed, {k: merge(v) for k, v in seen_spans.items()}
 
 
 def membership(runs):
@@ -184,7 +188,7 @@ def tabs_during(epochs, lo, hi):
 def summarize(entries, runs, now):
     today = day_of(now)
     days = [today - dt.timedelta(days=i) for i in range(TREND_DAYS - 1, -1, -1)]
-    spans, listed = coverage(runs)
+    spans, listed, seen = coverage(runs)
     history = membership(runs)
     dashboards = sorted(set(listed) | {t.split("#", 1)[0] for e in entries for t in e["tabs"]},
                         key=lambda d: (d not in LABELS, list(LABELS).index(d) if d in LABELS else 0, d))
@@ -235,10 +239,11 @@ def summarize(entries, runs, now):
         if not in_window:
             continue
         rows.append({"dashboard": dash, "tab": tab, "counts": in_window, "spans": spans.get((dash, tab), []),
+                     "seen": seen.get((dash, tab), []),
                      "last7": sum(c for d, c in in_window.items() if d > today - dt.timedelta(days=7))})
     order = {d: i for i, d in enumerate(dashboards)}
     rows.sort(key=lambda r: (order.get(r["dashboard"], 99), -r["last7"], -sum(r["counts"].values()), r["tab"]))
-    return {"today": today, "days": days, "heat_days": heat_days, "panels": panels, "rows": rows}
+    return {"today": today, "as_of": now, "days": days, "heat_days": heat_days, "panels": panels, "rows": rows}
 
 
 def nice_scale(peak):
@@ -254,6 +259,27 @@ def xml_text(s):
     """Escaped text without the characters XML 1.0 forbids, even escaped (control
     characters, and lone surrogates from a JSON escape)."""
     return escape(re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]", " ", str(s)))
+
+
+def short_day(d):
+    return f"{d:%b} {d.day}"
+
+
+def as_of(s):
+    """When the charts' data ends, e.g. "Oct 10 17:20 UTC" (they are read long after)."""
+    t = dt.datetime.fromtimestamp(s["as_of"], dt.UTC)
+    return f"{short_day(t.date())} {t:%H:%M} UTC"
+
+
+def so_far(s):
+    """The last day, which was not over when the data was taken, e.g. "Oct 10 to 17:20 UTC"."""
+    return f"{short_day(s['today'])} to {dt.datetime.fromtimestamp(s['as_of'], dt.UTC):%H:%M} UTC"
+
+
+def unfinished_bar(x, y, w, h, c):
+    """A bar for the day still in progress: light fill and a strong outline, visible in both themes."""
+    return (f'<rect x="{x + 0.75:.1f}" y="{y + 0.75:.1f}" width="{max(w - 1.5, 0):.1f}" height="{max(h - 0.75, 0):.1f}" '
+            f'rx="3" fill="{c["bar"]}" fill-opacity="0.35" stroke="{c["edge"]}" stroke-width="1.5"/>')
 
 
 def text(x, y, s, size=12, fill="#000", weight=400, anchor="start", extra=""):
@@ -309,7 +335,8 @@ def render_trend(s, mode):
     ymax, ticks = nice_scale(peak)
     H = top + len(s["panels"]) * (plot_h + axis_h + gap + 24) + 8
     b = [text(24, 34, "Red builds per day", 17, c["ink"], 600),
-         text(24, 56, "UTC days · a build counts once per dashboard on the day it started", 12, c["ink2"])]
+         text(24, 56, f"UTC days · a build counts once per dashboard on the day it started · data to {as_of(s)}",
+              12, c["ink2"])]
     # legend: mirrors the marks (rect for bars, line for the line)
     lx = 24
     b.append(f'<rect x="{lx}" y="68" width="12" height="12" rx="2" fill="{c["bar"]}"/>')
@@ -321,8 +348,8 @@ def render_trend(s, mode):
     b.append(f'<rect x="{lx}" y="68" width="12" height="12" rx="2" fill="{c["band"]}" stroke="{c["axis"]}"/>')
     b.append(text(lx + 18, 78.5, "partial history (counts may be low)", 12, c["ink2"]))
     lx += 250
-    b.append(f'<rect x="{lx}" y="68" width="12" height="12" rx="2" fill="{c["bar"]}" fill-opacity="0.5"/>')
-    b.append(text(lx + 18, 78.5, "today so far", 12, c["ink2"]))
+    b.append(unfinished_bar(lx, 68, 12, 12, c))
+    b.append(text(lx + 18, 78.5, f"{short_day(s['today'])} so far (to {as_of(s)[-9:]})", 12, c["ink2"]))
 
     y0 = top
     for p in s["panels"]:
@@ -365,7 +392,7 @@ def render_trend(s, mode):
                 continue
             h = plot_h * v / ymax
             x = left + i * slot + (slot - bw) / 2
-            b.append(column(x, base - h, bw, h, 4, c["bar"], 0.5 if d == s["today"] else 1.0))
+            b.append(unfinished_bar(x, base - h, bw, h, c) if d == s["today"] else column(x, base - h, bw, h, 4, c["bar"], 1.0))
             if i == top_i:
                 b.append(text(x + bw / 2, base - h - 6, str(v), 11, c["ink2"], 600, "middle"))
         # one line per stretch of days with an average: never bridge days without one
@@ -397,13 +424,9 @@ def render_trend(s, mode):
             b.append(text(left + pw + 10, base - plot_h / 2, "7-day average:", 11, c["muted"]))
             b.append(text(left + pw + 10, base - plot_h / 2 + 15, "needs 7 full days", 11, c["muted"]))
         for i, d in enumerate(s["days"]):
-            if d == s["today"]:
-                label = "today"
-            elif (n - 1 - i) % 7 == 0:
-                label = f"{d:%b} {d.day}"
-            else:
-                continue
-            b.append(text(left + i * slot + slot / 2, base + 16, label, 11, c["muted"], 400, "middle"))
+            if (n - 1 - i) % 7 == 0:  # weekly ticks, ending at the last run's day
+                b.append(text(left + i * slot + slot / 2, base + 16, short_day(d), 11,
+                              c["ink2"] if d == s["today"] else c["muted"], 400, "middle"))
         y0 = base + axis_h + gap
     return svg(W, H, b, c, "Red builds per day")
 
@@ -440,18 +463,19 @@ def render_heatmap(s, mode):
         groups.setdefault(r["dashboard"], []).append(r)
     top = 112
     gx = left + label_w
-    b = [text(24, 34, f"Red builds per tab, last {len(days)} days", 17, c["ink"], 600),
+    b = [text(24, 34, f"Red builds per tab, {len(days)} days to {short_day(s['today'])}", 17, c["ink"], 600),
          text(24, 56, "Rows: tabs with a red build in the window, busiest last 7 days first · "
-              "number = red builds started that day", 12, c["ink2"])]
+              f"number = red builds started that day · data to {as_of(s)}", 12, c["ink2"])]
     if not s["rows"]:
         b.append(text(24, 92, "No red builds in this window.", 13, c["ink2"]))
         return svg(W, 120, b, c, "Red builds per tab")
     for i, d in enumerate(days):
         x = gx + i * cell_w + cell_w / 2
-        label = "today" if d == s["today"] else (f"{d:%b} {d.day}" if i == 0 or d.day == 1 else str(d.day))
-        b.append(text(x, top - 12, label, 11, c["ink"] if d == s["today"] else c["muted"], 400, "middle"))
+        label = short_day(d) if i == 0 or d.day == 1 else str(d.day)
+        b.append(text(x, top - 12, label, 11, c["ink"] if d == s["today"] else c["muted"], 600 if d == s["today"] else 400,
+                      "middle"))
     b.append(text(W - 24, top - 26, "7 days", 11, c["muted"], 400, "end"))
-    b.append(text(W - 24, top - 12, "incl. today", 11, c["muted"], 400, "end"))
+    b.append(text(W - 24, top - 12, f"to {short_day(s['today'])}", 11, c["muted"], 400, "end"))
     y = top
     for dash, rows in groups.items():
         b.append(text(24, y + 16, LABELS.get(dash, dash), 13, c["ink"], 600))
@@ -462,8 +486,8 @@ def render_heatmap(s, mode):
             for i, d in enumerate(days):
                 x = gx + i * cell_w + 1
                 v = r["counts"].get(d, 0)
-                if not v and not overlaps(r["spans"], day_start(d), day_start(d) + 86400):
-                    # no TestGrid history for this tab that day: outline only
+                if not v and not overlaps(r["seen"], day_start(d), day_start(d) + 86400):
+                    # TestGrid showed nothing of this tab that day to any run: outline only
                     b.append(f'<rect x="{x + 0.5:.1f}" y="{y + 0.5:.1f}" width="{cell_w - 3:.1f}" height="{cell_h - 1}" '
                              f'rx="3" fill="none" stroke="{c["grid"]}"/>')
                     continue
@@ -521,12 +545,12 @@ def write_charts(root, entries, now, current_run=None):
         _, wt = week_text(p["week"])
         headline.append(f"{LABELS.get(p['dashboard'], p['dashboard'])}: {wt}")
     busiest = sorted(s["rows"], key=lambda r: -r["last7"])[:5]
-    tabs_alt = (f"Red builds per tab, last {HEAT_DAYS} days. Busiest over the 7 days including today: "
+    tabs_alt = (f"Red builds per tab, {HEAT_DAYS} days to {so_far(s)}. Busiest over the last 7 of them: "
                 + ", ".join(f"{r['tab']} {r['last7']}" for r in busiest if r["last7"]) + ".")
-    lines = [picture("trend", "Red builds per day. " + "; ".join(headline)), "",
+    lines = [picture("trend", f"Red builds per day, data to {as_of(s)}. " + "; ".join(headline)), "",
              picture("tabs", tabs_alt), "",
              "<details><summary>Red builds per tab (table)</summary>", "",
-             "| Dashboard | Tab | 7 days incl. today | " + f"{HEAT_DAYS} days |", "|---|---|---:|---:|"]
+             f"| Dashboard | Tab | 7 days to {short_day(s['today'])} | {HEAT_DAYS} days |", "|---|---|---:|---:|"]
     for r in s["rows"]:
         lines.append(f"| {md_cell(LABELS.get(r['dashboard'], r['dashboard']))} | {md_cell(r['tab'])} | "
                      f"{r['last7']} | {sum(r['counts'].values())} |")
@@ -539,7 +563,7 @@ def write_charts(root, entries, now, current_run=None):
         for p in s["panels"]:
             v = str(p["counts"][d])
             if d == s["today"]:
-                v += " (today so far)"
+                v += f" (so far, to {as_of(s)[-9:]})"
             elif d not in p["complete"]:
                 v += " (partial)"
             cells.append(v)

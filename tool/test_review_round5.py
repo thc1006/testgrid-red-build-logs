@@ -30,7 +30,7 @@ class D1SharedGapRedAndWatched(r4.World):
         self.srv.summary("dash", {"t": "FAILING", "t2": "FAILING"})
         visible = snowflake(self.now - HOUR)
         for tab in ("t", "t2"):
-            self.srv.table("dash", tab, table("bucket/logs/job", [visible], {"o": ([1], [""])},
+            self.srv.table("dash", tab, table("bucket/logs/job", [visible], {"job.Overall": ([1], [""])},
                                               start=int((self.now - HOUR) * 1000)))
         gap = {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}
         self.put_state(tabs={"dash#t": gap, "dash#t2": gap})
@@ -89,7 +89,7 @@ class D3PassedGapBuildCheck(r4.World):
     def run_it(self, started):
         self.earlier_run(self.now - 50 * HOUR)
         visible = snowflake(self.now - HOUR)
-        self.show([visible], {"o": ([1], [""])}, start=int(self.now - HOUR))
+        self.show([visible], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
         self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
         p = snowflake(self.now - 30 * HOUR)
         self.srv.route(f"/bucket/logs/job/{p}/finished.json",
@@ -114,7 +114,7 @@ class BogusColumnDateTest(unittest.TestCase):
         build = snowflake(now - HOUR)
         for stamp in (int((now + 30 * 86400) * 1000), 10 ** 400, -5):
             with self.subTest(stamp=stamp):
-                t = table("bucket/logs/job", [build], {"o": ([12], [""])})
+                t = table("bucket/logs/job", [build], {"job.Overall": ([12], [""])})
                 t["timestamps"] = [stamp]
                 _, _, oldest, found, _ = frl.read_tab(t, now)
                 self.assertEqual([(b, start) for b, start, _ in found], [(build, None)])
@@ -126,14 +126,18 @@ class JsonOrFetchTest(unittest.TestCase):
     """A file that is not JSON is malformed (red to TestGrid); one that cannot be fetched is not."""
 
     def test_the_fetch_tells_a_bad_file_from_a_failed_read(self):
+        # a finished.json that is not JSON still says the build is over (TestGrid judges its bytes)
         with mock.patch.object(frl, "get_json", side_effect=frl.BadJSON("bad JSON")):
-            self.assertTrue(frl.read_finished("base")["malformed"])
-            self.assertTrue(frl.read_started("base")["malformed"])
+            self.assertEqual(frl.read_finished("base"), {"result": None, "timestamp": None})
         with mock.patch.object(frl, "get_json", side_effect=frl.IntegrityError("got 2 of 100 bytes")):
             with self.assertRaises(frl.IntegrityError):
                 frl.read_finished("base")
+        # the bytes TestGrid's rule reads: none for a missing object, a failed read raises
+        with mock.patch.object(frl, "request", side_effect=frl.NotFound("url")):
+            self.assertIsNone(frl.read_artifact("url", 10))
+        with mock.patch.object(frl, "request", side_effect=frl.IntegrityError("got 2 of 100 bytes")):
             with self.assertRaises(frl.IntegrityError):
-                frl.read_started("base")
+                frl.read_artifact("url", 10)
 
     def test_cross_check_tells_them_apart_too(self):
         with mock.patch.object(cc, "get_json", side_effect=frl.BadJSON("bad JSON")):
@@ -149,7 +153,7 @@ class MalformedMissTest(r4.World):
         self.srv.route(f"/bucket/logs/job/{lost}/finished.json", (200, {}, b"{not json"))
         self.srv.route(f"/bucket/logs/job/{lost}/started.json", (200, {}, {"timestamp": int(self.now - 30 * HOUR)}))
         self.srv.gcs_listing("bucket", [f"logs/job/{b}/finished.json" for b in (lost, recent)])
-        self.show([recent], {"o": ([1], [""])}, start=int(self.now - HOUR))
+        self.show([recent], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
         # the last scan was an hour ago, so this run does not search back to `lost`: as if an earlier run lost it
         self.put_state(tabs={"dash#t": {"scan": self.now - HOUR, "oldest": self.now - 60 * HOUR}})
         self.fetch()
@@ -170,7 +174,7 @@ class MutationReviewDefects(r3.World):
         self.srv.summary("dash", {"t": "FAILING", "t2": "FAILING"})
         visible = snowflake(self.now - HOUR)
         for tab in ("t", "t2"):
-            self.srv.table("dash", tab, table("bucket/logs/job", [visible], {"o": ([1], [""])},
+            self.srv.table("dash", tab, table("bucket/logs/job", [visible], {"job.Overall": ([1], [""])},
                                               start=int((self.now - HOUR) * 1000)))
         gap = {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}
         self.put_state(tabs={"dash#t": gap, "dash#t2": gap})
@@ -194,17 +198,24 @@ class MutationReviewDefects(r3.World):
         self.assertEqual(sum(v.count(f"job/{red}") for v in outcomes.values()), 1, outcomes)
 
     def test_D2_a_watched_build_that_never_started_is_decided_even_if_its_finished_json_is_malformed(self):
-        """test_AW05: a watched build without started.json is "not-red" once finished.json exists
-        (TestGrid never lists it). With a malformed or unreadable finished.json, `stamp` is None, so
-        archive() keeps it "watching" for 14 days and then warns it is "still not finished"."""
+        """test_AW05: a watched build without started.json is "not-red" once finished.json exists:
+        TestGrid shows it RUNNING for good. With a finished.json Go cannot decode, readResult's
+        reads race: "no start" (RUNNING) or the decode error (TOOL_FAIL) comes first, and as
+        TestGrid reads a RUNNING column again until it is not, TOOL_FAIL is where it ends: red.
+        An empty finished.json is only malformed, not an error: RUNNING, not red."""
         self.quiet()
-        for finished in ((200, {}, {"result": "FAILURE", "timestamp": "yesterday"}), (200, {}, b"{cut")):
+        cases = [((200, {}, {"result": "FAILURE", "timestamp": "yesterday"}), "backfilled"),
+                 ((200, {}, b"{cut"), "backfilled"),
+                 ((200, {"Content-Length": "0"}, b""), "not-red")]
+        for i, (finished, outcome) in enumerate(cases):
             with self.subTest(finished=finished[2]):
-                b = snowflake(self.now - 5 * HOUR)
+                b = snowflake(self.now - (5 + i) * HOUR)
                 self.gcs_build(b, finished=finished, started=None)
                 self.put_state(watch=self.watched(b))
                 self.fetch()
-                self.assertEqual(self.outcomes(), {"not-red": [f"job/{b}"]})
+                self.assertIn(f"job/{b}", self.outcomes()[outcome])  # (beside the earlier cases' builds)
+                if outcome == "backfilled":
+                    self.assertIn("TOOL_FAIL", self.meta(b)["backfilled"])
 
     def test_D4_a_watched_build_found_red_but_pending_is_tracked_as_red(self):
         """A watched build red by TestGrid's 24-hour deadline whose files are not in GCS yet (a
