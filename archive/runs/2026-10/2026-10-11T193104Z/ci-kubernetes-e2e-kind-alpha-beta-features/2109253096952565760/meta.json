@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2109253096952565760",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1791720129,
+  "created": 1791720100,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod Allocated Endpoint [FeatureGate:KubeletAllocatedPodsEndpoint] should return all allocated pods with status cleared when listing [Alpha] [Feature:OffByDefault] [FeatureGate:InPlacePodVerticalScaling]",
+          "status": "FAIL",
+          "message": "[FAILED] Pod pod-allocated-6657/pod-allocated-list-8f7d32dd-f828-431d-...es/test/e2e/node/allocated_subresource.go:103 @ 10/11/26 12:23:10.954\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791721717,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2109253096952565760",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2109253096952565760/build-log.txt",
+  "log": {
+    "bytes": 133433,
+    "md5": "e5b8ef919a7e10b9e2a2179ae6c9b804",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20418,
+    "gcs": {
+      "generation": "1791721733711441",
+      "md5": "e5b8ef919a7e10b9e2a2179ae6c9b804",
+      "crc32c": "0e37f315",
+      "bytes": 133433,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-11T193104Z",
+  "archived_at": 1791747064.0,
+  "settled": true,
+  "final": false
+}

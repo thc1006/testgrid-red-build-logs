@@ -1,15 +1,15 @@
 # Red TestGrid builds
 
-Updated 2026-10-11T11:49:14Z. Every build with a red cell on sig-release-master-blocking and sig-release-master-informing; times are UTC. Each run's downloads are in its own folder under [runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
+Updated 2026-10-11T19:31:17Z. Every build with a red cell on sig-release-master-blocking and sig-release-master-informing; times are UTC. Each run's downloads are in its own folder under [runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/trend-dark.svg">
-  <img alt="Red builds per day, data to Oct 11 11:49 UTC. Blocking: week-over-week change appears after 14 fully covered days; Informing: week-over-week change appears after 14 fully covered days" src="charts/trend-light.svg">
+  <img alt="Red builds per day, data to Oct 11 19:31 UTC. Blocking: week-over-week change appears after 14 fully covered days; Informing: week-over-week change appears after 14 fully covered days" src="charts/trend-light.svg">
 </picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/tabs-dark.svg">
-  <img alt="Red builds per tab, 14 days to Oct 11 to 11:49 UTC. Busiest over the last 7 of them: gce-ubuntu-master-containerd 18, gce-cos-master-slow 14, gce-cos-alphafeatures-master 13, ci-node-e2e 10, integration-arm64-master 10." src="charts/tabs-light.svg">
+  <img alt="Red builds per tab, 14 days to Oct 11 to 19:31 UTC. Busiest over the last 7 of them: gce-ubuntu-master-containerd 18, gce-cos-master-slow 14, gce-cos-alphafeatures-master 13, integration-arm64-master 11, ci-node-e2e 10." src="charts/tabs-light.svg">
 </picture>
 
 <details><summary>Red builds per tab (table)</summary>
@@ -18,8 +18,8 @@ Updated 2026-10-11T11:49:14Z. Every build with a red cell on sig-release-master-
 |---|---|---:|---:|
 | Blocking | gce-ubuntu-master-containerd | 18 | 18 |
 | Blocking | gce-cos-alphafeatures-master | 13 | 26 |
+| Blocking | integration-arm64-master | 11 | 17 |
 | Blocking | ci-node-e2e | 10 | 19 |
-| Blocking | integration-arm64-master | 10 | 16 |
 | Blocking | gce-cos-master-default | 10 | 10 |
 | Blocking | integration-master | 8 | 14 |
 | Blocking | ci-kubernetes-unit | 8 | 8 |
@@ -39,7 +39,7 @@ Updated 2026-10-11T11:49:14Z. Every build with a red cell on sig-release-master-
 | Informing | gce-cos-serial-master | 7 | 8 |
 | Informing | kind-master-alpha-beta-enabled | 5 | 6 |
 | Informing | gce-cos-slow-master | 4 | 60 |
-| Informing | kind-master-alpha-beta-features | 3 | 8 |
+| Informing | kind-master-alpha-beta-features | 4 | 9 |
 | Informing | kind-master-beta-enabled | 2 | 6 |
 | Informing | ec2-master-scale-performance-5000 | 1 | 4 |
 | Informing | ci-node-crio-dra | 1 | 1 |
@@ -56,8 +56,8 @@ Updated 2026-10-11T11:49:14Z. Every build with a red cell on sig-release-master-
 
 | Day (UTC) | Blocking | Informing |
 |---|---:|---:|
-| 2026-10-11 | 9 (so far, to 11:49 UTC) | 4 (so far, to 11:49 UTC) |
-| 2026-10-10 | 16 | 8 (partial) |
+| 2026-10-11 | 10 (so far, to 19:31 UTC) | 5 (so far, to 19:31 UTC) |
+| 2026-10-10 | 16 | 8 |
 | 2026-10-09 | 21 | 12 |
 | 2026-10-08 | 22 | 17 |
 | 2026-10-07 | 16 (partial) | 5 |
@@ -93,6 +93,7 @@ Updated 2026-10-11T11:49:14Z. Every build with a red cell on sig-release-master-
 
 | Run (UTC) | New builds | Updated | Result |
 |---|---:|---:|---|
+| [2026-10-11 19:31:04](runs/2026-10/2026-10-11T193104Z/) | 2 | 0 | ok |
 | [2026-10-11 11:49:02](runs/2026-10/2026-10-11T114902Z/) | 5 | 0 | ok |
 | [2026-10-11 05:44:07](runs/2026-10/2026-10-11T054407Z/) | 16 | 0 | ok |
 | [2026-10-10 17:20:02](runs/2026-10/2026-10-10T172002Z/) | 11 | 0 | ok |
@@ -106,13 +107,15 @@ Updated 2026-10-11T11:49:14Z. Every build with a red cell on sig-release-master-
 
 ## Builds from the last 14 days
 
-492 archived builds that started since 2026-09-28 (UTC), newest first.
+494 archived builds that started since 2026-09-28 (UTC), newest first.
 
 ### 2026-10-11
 
 | Time | Tab | Build | Red tests | Files |
 |---|---|---|---|---|
-| 10:05 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2109223651525005312](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109223651525005312) | \[sig-api-machinery\] k8s.io/client-go.rest (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T114902Z/ci-kubernetes-unit/2109223651525005312/build-log.txt.gz) (provisional) |
+| 16:12 | blocking#integration-arm64-master | [ci-kubernetes-integration-arm64-master 2109315005022212096](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2109315005022212096) | \[sig-instrumentation\] k8s.io/kubernetes/test/integration.events (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T193104Z/ci-kubernetes-integration-arm64-master/2109315005022212096/build-log.txt.gz) |
+| 12:02 | informing#kind-master-alpha-beta-features | [ci-kubernetes-e2e-kind-alpha-beta-features 2109253096952565760](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2109253096952565760) | Kubernetes e2e suite.\[It\] \[sig-node\] Pod Allocated Endpoint \[FeatureGate:KubeletAllocatedP (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T193104Z/ci-kubernetes-e2e-kind-alpha-beta-features/2109253096952565760/build-log.txt.gz) |
+| 10:05 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2109223651525005312](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109223651525005312) | \[sig-api-machinery\] k8s.io/client-go.rest (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T114902Z/ci-kubernetes-unit/2109223651525005312/build-log.txt.gz) |
 | 08:57 | blocking#build-master | [ci-kubernetes-build 2109206538877931520](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-build/2109206538877931520) | ci-kubernetes-build.Overall | [build-log.txt.gz](runs/2026-10/2026-10-11T114902Z/ci-kubernetes-build/2109206538877931520/build-log.txt.gz) |
 | 08:05 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2109193453102436352](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109193453102436352) | \[sig-node\] k8s.io/kubernetes/pkg/kubelet.volumemanager (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T114902Z/ci-kubernetes-unit/2109193453102436352/build-log.txt.gz) |
 | 07:34 | informing#kind-master-alpha-beta-enabled | [ci-kubernetes-e2e-kind-alpha-beta-enabled 2109185650841358336](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2109185650841358336) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS with Single PV - PVC pairs c (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T114902Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2109185650841358336/build-log.txt.gz) |
@@ -674,13 +677,13 @@ Updated 2026-10-11T11:49:14Z. Every build with a red cell on sig-release-master-
 
 | | Builds |
 |---|---:|
-| Archived builds | 699 |
-| … with a log | 694 |
+| Archived builds | 701 |
+| … with a log | 696 |
 | … with only podinfo.json (the pod never ran) | 5 |
 | … without a file (GCS had none) | 0 |
 | … with a file stored in parts (too large for one file in git) | 0 |
-| … provisional (taken before Prow finished uploading) | 1 |
-| … still compared with GCS on every run | 59 |
+| … provisional (taken before Prow finished uploading) | 0 |
+| … still compared with GCS on every run | 52 |
 | … taken from GCS, judged by TestGrid's rule (not seen red on TestGrid) | 0 |
 | Red builds waiting to be archived | 0 |
 | … of them with a damaged copy here, to be fetched again | 0 |
@@ -689,7 +692,7 @@ Updated 2026-10-11T11:49:14Z. Every build with a red cell on sig-release-master-
 
 ## Every week
 
-- [2026-W41](weeks/2026-W41.md): Oct 5 – Oct 11, 161 builds
+- [2026-W41](weeks/2026-W41.md): Oct 5 – Oct 11, 163 builds
 - [2026-W40](weeks/2026-W40.md): Sep 28 – Oct 4, 331 builds
 - [2026-W39](weeks/2026-W39.md): Sep 21 – Sep 27, 201 builds
 - [2026-W38](weeks/2026-W38.md): Sep 14 – Sep 20, 5 builds
