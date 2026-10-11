@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2109012508449705984",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1791662740,
+  "created": 1791662740,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should only target nodes with endpoints [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 136.80.105.127:8081 afte...ernetes/test/e2e/framework/service/util.go:49 @ 10/10/26 20:20:20.897\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791666179,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109012508449705984",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109012508449705984/build-log.txt",
+  "log": {
+    "bytes": 144011,
+    "md5": "395a507defe03f71b216f94738d26ea4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23662,
+    "gcs": {
+      "generation": "1791666193399824",
+      "md5": "395a507defe03f71b216f94738d26ea4",
+      "crc32c": "b25b8785",
+      "bytes": 144011,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-11T054407Z",
+  "archived_at": 1791697447.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2109016032776556544",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1791663608,
+  "created": 1791663580,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.diffResources",
+          "status": "FAIL",
+          "message": "Error: 2 leaked resources\n+NAME                     ADDRESS/RANGE  TYP....9.138.254   EXTERNAL                    us-central1          RESERVED"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791670118,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109016032776556544",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109016032776556544/build-log.txt",
+  "log": {
+    "bytes": 55057,
+    "md5": "21e512c716efb0a39b94671997b94cd1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 11301,
+    "gcs": {
+      "generation": "1791670120731013",
+      "md5": "21e512c716efb0a39b94671997b94cd1",
+      "crc32c": "b02fbb7c",
+      "bytes": 55057,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-11T054407Z",
+  "archived_at": 1791697447.0,
+  "settled": true,
+  "final": false
+}

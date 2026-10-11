@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2109079450065833984",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1791678700,
+  "created": 1791678700,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and use it multiple times in a single pod",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-dttvr\" failed to reach Success: Timed out aft...es/test/e2e/storage/persistent_volumes.go:232 @ 10/11/26 01:00:39.977\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791681297,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109079450065833984",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109079450065833984/build-log.txt",
+  "log": {
+    "bytes": 152481,
+    "md5": "23c8e36eacb226e66b891d76c7ea3e97",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25302,
+    "gcs": {
+      "generation": "1791681312171218",
+      "md5": "23c8e36eacb226e66b891d76c7ea3e97",
+      "crc32c": "d95cd57e",
+      "bytes": 152481,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-11T054407Z",
+  "archived_at": 1791697447.0,
+  "settled": true,
+  "final": false
+}

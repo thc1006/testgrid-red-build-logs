@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2109117955181645824",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1791687967,
+  "created": 1791687880,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-storage] k8s.io/kubernetes/pkg/scheduler/framework/plugins.volumebinding",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCheckBindings/tolerate-provisioning-pvc-bound-pv-...ings\n=== CONT  TestCheckBindings\n--- FAIL: TestCheckBindings (13.66s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791689324,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109117955181645824",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109117955181645824/build-log.txt",
+  "log": {
+    "bytes": 281046,
+    "md5": "0a7f671277f03040e003d47a68ebf4e3",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 34269,
+    "gcs": {
+      "generation": "1791689324874502",
+      "md5": "0a7f671277f03040e003d47a68ebf4e3",
+      "crc32c": "04d5e404",
+      "bytes": 281046,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-11T054407Z",
+  "archived_at": 1791697447.0,
+  "settled": true,
+  "final": false
+}

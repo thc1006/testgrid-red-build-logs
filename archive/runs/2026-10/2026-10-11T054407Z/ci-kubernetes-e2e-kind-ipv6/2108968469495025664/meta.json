@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2108968469495025664",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1791652269,
+  "created": 1791652240,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Proxy server should support proxy with --port 0 [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Expected at least one supported apiversion, got error Failed ...o/kubernetes/test/e2e/kubectl/kubectl.go:1744 @ 10/10/26 17:26:04.781\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791653841,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2108968469495025664",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2108968469495025664/build-log.txt",
+  "log": {
+    "bytes": 124844,
+    "md5": "5773932de1e8c9b5407a4e0f9cf2b8f1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20045,
+    "gcs": {
+      "generation": "1791653857327676",
+      "md5": "5773932de1e8c9b5407a4e0f9cf2b8f1",
+      "crc32c": "3b1a0bea",
+      "bytes": 124844,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-11T054407Z",
+  "archived_at": 1791697447.0,
+  "settled": true,
+  "final": false
+}

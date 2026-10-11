@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2109076682680832000",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1791678070,
+  "created": 1791678040,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        },
+        {
+          "test": "kubetest.listResources After",
+          "status": "FAIL",
+          "message": "Failed to list resources (error during ./cluster/gce/list-resources.sh...: gce\n\n\n[ compute instance-templates ]\n\n\n\n[ compute instance-groups ]\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791685273,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109076682680832000",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109076682680832000/build-log.txt",
+  "log": {
+    "bytes": 54831,
+    "md5": "0814b68a187a44747dcbfd809c029786",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 11224,
+    "gcs": {
+      "generation": "1791685275686891",
+      "md5": "0814b68a187a44747dcbfd809c029786",
+      "crc32c": "24dcfe88",
+      "bytes": 54831,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-11T054407Z",
+  "archived_at": 1791697447.0,
+  "settled": true,
+  "final": false
+}

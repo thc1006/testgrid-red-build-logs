@@ -1,6 +1,6 @@
 # Red TestGrid builds
 
-Updated 2026-10-10T17:20:18Z. Every build with a red cell on sig-release-master-blocking and sig-release-master-informing; times are UTC. Each run's downloads are in its own folder under [runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
+Updated 2026-10-11T05:44:21Z. Every build with a red cell on sig-release-master-blocking and sig-release-master-informing; times are UTC. Each run's downloads are in its own folder under [runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/trend-dark.svg">
@@ -9,47 +9,45 @@ Updated 2026-10-10T17:20:18Z. Every build with a red cell on sig-release-master-
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/tabs-dark.svg">
-  <img alt="Red builds per tab, last 14 days. Busiest over the 7 days including today: gce-ubuntu-master-containerd 16, gce-cos-master-slow 12, gce-cos-alphafeatures-master 11, integration-master 10, gce-cos-master-default 9." src="charts/tabs-light.svg">
+  <img alt="Red builds per tab, last 14 days. Busiest over the 7 days including today: gce-ubuntu-master-containerd 18, gce-cos-master-slow 14, gce-cos-alphafeatures-master 13, ci-node-e2e 10, integration-arm64-master 10." src="charts/tabs-light.svg">
 </picture>
 
 <details><summary>Red builds per tab (table)</summary>
 
 | Dashboard | Tab | 7 days incl. today | 14 days |
 |---|---|---:|---:|
-| Blocking | gce-ubuntu-master-containerd | 16 | 16 |
-| Blocking | gce-cos-alphafeatures-master | 11 | 26 |
-| Blocking | integration-master | 10 | 15 |
-| Blocking | gce-cos-master-default | 9 | 9 |
-| Blocking | ci-node-e2e | 8 | 17 |
-| Blocking | integration-arm64-master | 8 | 15 |
-| Blocking | gce-cos-default-master | 6 | 14 |
-| Blocking | ci-kubernetes-unit | 5 | 5 |
+| Blocking | gce-ubuntu-master-containerd | 18 | 18 |
+| Blocking | gce-cos-alphafeatures-master | 13 | 26 |
+| Blocking | ci-node-e2e | 10 | 19 |
+| Blocking | integration-arm64-master | 10 | 16 |
+| Blocking | gce-cos-master-default | 10 | 10 |
+| Blocking | integration-master | 8 | 14 |
+| Blocking | gce-cos-default-master | 6 | 13 |
+| Blocking | ci-kubernetes-unit | 6 | 6 |
 | Blocking | kind-master-beta-features | 5 | 5 |
+| Blocking | kind-ipv6-master | 4 | 4 |
 | Blocking | kind-master | 4 | 4 |
-| Blocking | gce-device-plugin-gpu-master | 3 | 8 |
+| Blocking | gce-device-plugin-gpu-master | 3 | 6 |
 | Blocking | cmd-master | 3 | 3 |
-| Blocking | kind-ipv6-master | 3 | 3 |
 | Blocking | build-master | 2 | 68 |
 | Blocking | build-master-fast | 1 | 1 |
 | Blocking | gce-master-scale-performance-100 | 0 | 11 |
 | Blocking | sig-network-kind, loadbalancer | 0 | 1 |
-| Informing | gce-cos-master-slow | 12 | 157 |
-| Informing | capz-windows-master | 8 | 14 |
+| Informing | gce-cos-master-slow | 14 | 133 |
 | Informing | gce-cos-master-serial | 8 | 11 |
-| Informing | gce-cos-serial-master | 7 | 9 |
-| Informing | kind-master-alpha-beta-features | 4 | 7 |
-| Informing | kind-master-beta-enabled | 4 | 6 |
+| Informing | capz-windows-master | 7 | 14 |
+| Informing | gce-cos-serial-master | 7 | 8 |
+| Informing | gce-cos-slow-master | 4 | 60 |
 | Informing | kind-master-alpha-beta-enabled | 4 | 5 |
-| Informing | gce-cos-slow-master | 3 | 71 |
-| Informing | ec2-master-scale-performance-5000 | 2 | 4 |
+| Informing | kind-master-alpha-beta-features | 2 | 7 |
+| Informing | kind-master-beta-enabled | 2 | 6 |
+| Informing | ec2-master-scale-performance-5000 | 1 | 4 |
 | Informing | ci-node-crio-dra | 1 | 1 |
 | Informing | ci-node-e2e-containerd-2-1-cos-dra | 1 | 1 |
 | Informing | gce-cos-master-alpha-features | 1 | 1 |
 | Informing | kind-master-beta-enabled-conformance | 1 | 1 |
 | Informing | gce-master-scale-correctness | 0 | 6 |
 | Informing | periodic-kubernetes-e2e-kind-kms | 0 | 3 |
-| Informing | Conformance - EC2 - master | 0 | 1 |
-| Informing | ci-kind-dra | 0 | 1 |
 | Informing | gce-master-scale-performance-5000 | 0 | 1 |
 
 </details>
@@ -58,7 +56,8 @@ Updated 2026-10-10T17:20:18Z. Every build with a red cell on sig-release-master-
 
 | Day (UTC) | Blocking | Informing |
 |---|---:|---:|
-| 2026-10-10 | 10 (today so far) | 6 (today so far) |
+| 2026-10-11 | 6 (today so far) | 2 (today so far) |
+| 2026-10-10 | 16 (partial) | 8 (partial) |
 | 2026-10-09 | 21 | 12 |
 | 2026-10-08 | 22 | 17 |
 | 2026-10-07 | 16 (partial) | 5 |
@@ -87,7 +86,6 @@ Updated 2026-10-10T17:20:18Z. Every build with a red cell on sig-release-master-
 | 2026-09-14 | 0 (partial) | 1 (partial) |
 | 2026-09-13 | 0 (partial) | 0 (partial) |
 | 2026-09-12 | 0 (partial) | 0 (partial) |
-| 2026-09-11 | 0 (partial) | 0 (partial) |
 
 </details>
 
@@ -95,6 +93,7 @@ Updated 2026-10-10T17:20:18Z. Every build with a red cell on sig-release-master-
 
 | Run (UTC) | New builds | Updated | Result |
 |---|---:|---:|---|
+| [2026-10-11 05:44:07](runs/2026-10/2026-10-11T054407Z/) | 16 | 0 | ok |
 | [2026-10-10 17:20:02](runs/2026-10/2026-10-10T172002Z/) | 11 | 0 | ok |
 | [2026-10-10 05:49:48](runs/2026-10/2026-10-10T054948Z/) | 14 | 0 | ok |
 | [2026-10-09 18:20:53](runs/2026-10/2026-10-09T182053Z/) | 19 | 0 | ok |
@@ -106,15 +105,36 @@ Updated 2026-10-10T17:20:18Z. Every build with a red cell on sig-release-master-
 
 ## Builds from the last 14 days
 
-521 archived builds that started since 2026-09-27 (UTC), newest first.
+487 archived builds that started since 2026-09-28 (UTC), newest first.
+
+### 2026-10-11
+
+| Time | Tab | Build | Red tests | Files |
+|---|---|---|---|---|
+| 03:06 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2109117955181645824](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109117955181645824) | \[sig-storage\] k8s.io/kubernetes/pkg/scheduler/framework/plugins.volumebinding (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-unit/2109117955181645824/build-log.txt.gz) |
+| 02:10 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2109104113722593280](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2109104113722593280) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers ExternalTrafficPolicy: Local \[Featur (+2) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-gce-cos-slow-master/2109104113722593280/build-log.txt.gz) |
+| 02:08 | blocking#integration-arm64-master | [ci-kubernetes-integration-arm64-master 2109103609449811968](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2109103609449811968) | \[sig-scheduling\] k8s.io/kubernetes/test/integration/scheduler.prequeueinghint (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-integration-arm64-master/2109103609449811968/build-log.txt.gz) |
+| 01:08 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2109088761466851328](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109088761466851328) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers \[Feature:LoadBalancer\] should be abl (+2) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-gci-gce-slow/2109088761466851328/build-log.txt.gz) |
+| 00:56 | blocking#ci-node-e2e | [ci-kubernetes-node-e2e-containerd 2109085491071553536](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2109085491071553536) | kubetest.Node Tests (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-node-e2e-containerd/2109085491071553536/build-log.txt.gz) |
+| 00:31 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2109079450065833984](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109079450065833984) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS with Single PV - PVC pairs c (+2) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-gci-gce/2109079450065833984/build-log.txt.gz) |
+| 00:21 | blocking#gce-cos-alphafeatures-master | [ci-kubernetes-e2e-gce-cos-alphafeatures-master 2109076682680832000](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109076682680832000) | kubetest.Timeout (+2) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109076682680832000/build-log.txt.gz) |
+| 00:06 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2109073158655971328](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2109073158655971328) | Kubernetes e2e suite.\[It\] \[sig-apps\] Deployment should not disrupt a cloud load-balancer's (+2) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109073158655971328/build-log.txt.gz) |
 
 ### 2026-10-10
 
 | Time | Tab | Build | Red tests | Files |
 |---|---|---|---|---|
-| 15:58 | informing#kind-master-alpha-beta-features | [ci-kubernetes-e2e-kind-alpha-beta-features 2108950098028269568](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2108950098028269568) | Kubernetes e2e suite.\[It\] \[sig-node\] Pod Allocated Endpoint \[FeatureGate:KubeletAllocatedP (+1) | [build-log.txt.gz](runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-alpha-beta-features/2108950098028269568/build-log.txt.gz) (provisional) |
+| 21:28 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2109033397014761472](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2109033397014761472) | Kubernetes e2e suite.\[It\] \[sig-node\] Pods Extended (pod generation) Pod Generation pod gen (+2) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109033397014761472/build-log.txt.gz) |
+| 20:56 | blocking#ci-node-e2e | [ci-kubernetes-node-e2e-containerd 2109025092506750976](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2109025092506750976) | kubetest.Node Tests (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-node-e2e-containerd/2109025092506750976/build-log.txt.gz) |
+| 20:20 | blocking#gce-cos-alphafeatures-master | [ci-kubernetes-e2e-gce-cos-alphafeatures-master 2109016032776556544](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109016032776556544) | kubetest.diffResources (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109016032776556544/build-log.txt.gz) |
+| 20:05 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2109012508449705984](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109012508449705984) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers ExternalTrafficPolicy: Local \[Featur (+2) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-gci-gce-slow/2109012508449705984/build-log.txt.gz) |
+| 19:03 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2108996906498658304](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108996906498658304) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers \[Feature:LoadBalancer\] should be abl (+2) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-gci-gce-slow/2108996906498658304/build-log.txt.gz) |
+| 18:55 | blocking#ci-node-e2e | [ci-kubernetes-node-e2e-containerd 2108994640983101440](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2108994640983101440) | kubetest.Node Tests (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-node-e2e-containerd/2108994640983101440/build-log.txt.gz) |
+| 18:04 | blocking#integration-arm64-master | [ci-kubernetes-integration-arm64-master 2108981806161203200](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2108981806161203200) | \[sig-apps\] k8s.io/kubernetes/test/integration.statefulset (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-integration-arm64-master/2108981806161203200/build-log.txt.gz) |
+| 17:11 | blocking#kind-ipv6-master | [ci-kubernetes-e2e-kind-ipv6 2108968469495025664](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2108968469495025664) | Kubernetes e2e suite.\[It\] \[sig-cli\] Kubectl client Proxy server should support proxy with (+1) | [build-log.txt.gz](runs/2026-10/2026-10-11T054407Z/ci-kubernetes-e2e-kind-ipv6/2108968469495025664/build-log.txt.gz) |
+| 15:58 | informing#kind-master-alpha-beta-features | [ci-kubernetes-e2e-kind-alpha-beta-features 2108950098028269568](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2108950098028269568) | Kubernetes e2e suite.\[It\] \[sig-node\] Pod Allocated Endpoint \[FeatureGate:KubeletAllocatedP (+1) | [build-log.txt.gz](runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-alpha-beta-features/2108950098028269568/build-log.txt.gz) |
 | 14:29 | informing#ci-node-crio-dra | [ci-node-crio-dra 2108927951822131200](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-dra/2108927951822131200) | kubetest2.Test (+1) | [build-log.txt.gz](runs/2026-10/2026-10-10T172002Z/ci-node-crio-dra/2108927951822131200/build-log.txt.gz) |
-| 12:09 | informing#gce-cos-serial-master | [ci-kubernetes-e2e-gce-cos-serial-master 2108892466282237952](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108892466282237952) | Kubernetes e2e suite.\[It\] \[sig-node\] Pod InPlace Resize Container (deferred-resizes) \[Feat (+2) | [build-log.txt.gz](runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gce-cos-serial-master/2108892466282237952/build-log.txt.gz) (provisional) |
+| 12:09 | informing#gce-cos-serial-master | [ci-kubernetes-e2e-gce-cos-serial-master 2108892466282237952](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2108892466282237952) | Kubernetes e2e suite.\[It\] \[sig-node\] Pod InPlace Resize Container (deferred-resizes) \[Feat (+2) | [build-log.txt.gz](runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gce-cos-serial-master/2108892466282237952/build-log.txt.gz) |
 | 12:02 | blocking#kind-master-beta-features | [ci-kubernetes-e2e-kind-beta-features 2108889699211808768](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108889699211808768) | Kubernetes e2e suite.\[It\] \[sig-cli\] Kubectl client Simple pod should support inline execut (+1) | [build-log.txt.gz](runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-beta-features/2108889699211808768/build-log.txt.gz) |
 | 10:57 | blocking#kind-master-beta-features | [ci-kubernetes-e2e-kind-beta-features 2108874347878813696](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2108874347878813696) | Kubernetes e2e suite.\[It\] \[sig-storage\] In-tree Volumes \[Driver: nfs3\] \[Testpattern: Pre-p (+1) | [build-log.txt.gz](runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-kind-beta-features/2108874347878813696/build-log.txt.gz) |
 | 10:52 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2108873341405237248](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2108873341405237248) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers \[Feature:LoadBalancer\] should be abl (+2) | [build-log.txt.gz](runs/2026-10/2026-10-10T172002Z/ci-kubernetes-e2e-gci-gce-slow/2108873341405237248/build-log.txt.gz) |
@@ -644,64 +664,9 @@ Updated 2026-10-10T17:20:18Z. Every build with a red cell on sig-release-master-
 | 01:21 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104380789113229312](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104380789113229312) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104380789113229312/build-log.txt.gz) |
 | 00:48 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104372735089053696](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104372735089053696) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104372735089053696/build-log.txt.gz) |
 
-### 2026-09-27
-
-| Time | Tab | Build | Red tests | Files |
-|---|---|---|---|---|
-| 23:52 | blocking#gce-cos-default-master | [ci-kubernetes-e2e-gce-cos-default-master 2104358391299182592](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2104358391299182592) | Kubernetes e2e suite.\[It\] \[sig-api-machinery\] CustomResourceDefinition resources \[Privileg (+2) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-default-master/2104358391299182592/build-log.txt.gz) |
-| 23:50 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104358138839830528](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104358138839830528) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104358138839830528/build-log.txt.gz) |
-| 23:20 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104350338382303232](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104350338382303232) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104350338382303232/build-log.txt.gz) |
-| 22:49 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104342788341501952](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104342788341501952) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104342788341501952/build-log.txt.gz) |
-| 21:49 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104327688754827264](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104327688754827264) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104327688754827264/build-log.txt.gz) |
-| 21:20 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104320138005188608](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104320138005188608) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104320138005188608/build-log.txt.gz) |
-| 20:57 | informing#ci-kind-dra | [ci-kind-dra 2104314601444216832](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kind-dra/2104314601444216832) | Kubernetes e2e suite.\[It\] \[sig-node\] \[DRA\] \[FeatureGate:DRAExtendedResource\] \[Feature:Dyna (+1) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kind-dra/2104314601444216832/build-log.txt.gz) |
-| 20:51 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104313091805155328](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104313091805155328) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104313091805155328/build-log.txt.gz) |
-| 19:57 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104299501891096576](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104299501891096576) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104299501891096576/build-log.txt.gz) |
-| 19:41 | informing#Conformance - EC2 - master | [ci-kubernetes-ec2-conformance-latest 2104295224636346368](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-ec2-conformance-latest/2104295224636346368) | Kubernetes e2e suite.\[SynchronizedBeforeSuite\] (+2) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-ec2-conformance-latest/2104295224636346368/build-log.txt.gz) |
-| 19:20 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104289939272241152](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104289939272241152) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104289939272241152/build-log.txt.gz) |
-| 19:06 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104286667144695808](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104286667144695808) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104286667144695808/build-log.txt.gz) |
-| 18:16 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104274084496936960](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104274084496936960) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104274084496936960/build-log.txt.gz) |
-| 17:26 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104261501048066048](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104261501048066048) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104261501048066048/build-log.txt.gz) |
-| 17:19 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104259488872665088](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104259488872665088) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104259488872665088/build-log.txt.gz) |
-| 16:40 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104249924659974144](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104249924659974144) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104249924659974144/build-log.txt.gz) |
-| 15:39 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104234574258114560](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104234574258114560) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104234574258114560/build-log.txt.gz) |
-| 15:19 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104229289334411264](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104229289334411264) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104229289334411264/build-log.txt.gz) |
-| 14:40 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104219725134303232](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104219725134303232) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104219725134303232/build-log.txt.gz) |
-| 14:05 | informing#gce-cos-serial-master | [ci-kubernetes-e2e-gce-cos-serial-master 2104210665487994880](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2104210665487994880) | Kubernetes e2e suite.\[It\] \[sig-apps\] Daemon set should surge pods onto nodes when spec was (+2) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-serial-master/2104210665487994880/build-log.txt.gz) |
-| 13:56 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104208652289183744](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104208652289183744) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104208652289183744/build-log.txt.gz) |
-| 13:31 | blocking#gce-device-plugin-gpu-master | [ci-kubernetes-e2e-gce-device-plugin-gpu 2104202109195915264](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2104202109195915264) | Kubernetes e2e suite.\[It\] \[sig-node\] \[Feature:GPUDevicePlugin\] Sanity test using nvidia-sm (+2) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2104202109195915264/build-log.txt.gz) |
-| 13:19 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104199090387554304](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104199090387554304) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104199090387554304/build-log.txt.gz) |
-| 12:56 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104193552849309696](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104193552849309696) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104193552849309696/build-log.txt.gz) |
-| 12:03 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104180214719320064](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104180214719320064) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104180214719320064/build-log.txt.gz) |
-| 12:03 | blocking#gce-cos-alphafeatures-master | [ci-kubernetes-e2e-gce-cos-alphafeatures-master 2104179964092878848](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2104179964092878848) | kubetest.TearDown (+2) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2104179964092878848/build-log.txt.gz) |
-| 11:19 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104168890115297280](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104168890115297280) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104168890115297280/build-log.txt.gz) |
-| 11:15 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104168134834393088](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104168134834393088) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104168134834393088/build-log.txt.gz) |
-| 10:31 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104157061905387520](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104157061905387520) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104157061905387520/build-log.txt.gz) |
-| 09:43 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104144983488466944](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104144983488466944) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104144983488466944/build-log.txt.gz) |
-| 09:19 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104138690728038400](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104138690728038400) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104138690728038400/build-log.txt.gz) |
-| 08:46 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104130638029262848](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104130638029262848) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104130638029262848/build-log.txt.gz) |
-| 07:51 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104116796419215360](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104116796419215360) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104116796419215360/build-log.txt.gz) |
-| 07:31 | blocking#gce-device-plugin-gpu-master | [ci-kubernetes-e2e-gce-device-plugin-gpu 2104111512309207040](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2104111512309207040) | Kubernetes e2e suite.\[It\] \[sig-node\] \[Feature:GPUDevicePlugin\] Sanity test using nvidia-sm (+2) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2104111512309207040/build-log.txt.gz) |
-| 07:19 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104108500010405888](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104108500010405888) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104108500010405888/build-log.txt.gz) |
-| 07:07 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104105723087556608](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104105723087556608) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104105723087556608/build-log.txt.gz) |
-| 06:17 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104093140901171200](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104093140901171200) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104093140901171200/build-log.txt.gz) |
-| 05:25 | blocking#integration-master | [ci-kubernetes-integration-master 2104079801819074560](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2104079801819074560) | \[sig-scheduling\] k8s.io/kubernetes/test/integration/scheduler.preemption (+1) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-integration-master/2104079801819074560/build-log.txt.gz) |
-| 05:20 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104078795186114560](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104078795186114560) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104078795186114560/build-log.txt.gz) |
-| 05:19 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104078291878023168](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104078291878023168) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104078291878023168/build-log.txt.gz) |
-| 04:28 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104065708999577600](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104065708999577600) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104065708999577600/build-log.txt.gz) |
-| 03:26 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104050106826231808](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104050106826231808) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104050106826231808/build-log.txt.gz) |
-| 03:19 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104048092478181376](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104048092478181376) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104048092478181376/build-log.txt.gz) |
-| 02:32 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104036515993620480](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104036515993620480) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104036515993620480/build-log.txt.gz) |
-| 02:28 | blocking#integration-arm64-master | [ci-kubernetes-integration-arm64-master 2104035258801328128](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2104035258801328128) | \[sig-instrumentation\] k8s.io/kubernetes/test/integration.events (+1) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-integration-arm64-master/2104035258801328128/build-log.txt.gz) |
-| 02:00 | blocking#gce-cos-alphafeatures-master | [ci-kubernetes-e2e-gce-cos-alphafeatures-master 2104028212261556224](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2104028212261556224) | kubetest.TearDown (+2) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2104028212261556224/build-log.txt.gz) |
-| 01:52 | blocking#ci-node-e2e | [ci-kubernetes-node-e2e-containerd 2104026198320353280](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2104026198320353280) | kubetest.Node Tests (+1) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-node-e2e-containerd/2104026198320353280/build-log.txt.gz) |
-| 01:39 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104023178803154944](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104023178803154944) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104023178803154944/build-log.txt.gz) |
-| 01:19 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2104017893191585792](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104017893191585792) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers ExternalTrafficPolicy: Local \[Featur (+16) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104017893191585792/build-log.txt.gz) |
-| 00:39 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2104008079564607488](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104008079564607488) | Kubernetes e2e suite.\[It\] \[sig-node\] PLR Pod InPlace Resize \[FeatureGate:InPlacePodLevelRe (+15) | [build-log.txt.gz](runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104008079564607488/build-log.txt.gz) |
-
 ## Every week
 
-- [2026-W41](weeks/2026-W41.md): Oct 5 – Oct 11, 140 builds
+- [2026-W41](weeks/2026-W41.md): Oct 5 – Oct 11, 156 builds
 - [2026-W40](weeks/2026-W40.md): Sep 28 – Oct 4, 331 builds
 - [2026-W39](weeks/2026-W39.md): Sep 21 – Sep 27, 201 builds
 - [2026-W38](weeks/2026-W38.md): Sep 14 – Sep 20, 5 builds

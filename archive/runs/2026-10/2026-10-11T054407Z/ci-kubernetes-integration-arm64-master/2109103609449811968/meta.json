@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2109103609449811968",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1791684496,
+  "created": 1791684460,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.prequeueinghint",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestPreQueueingHintNarrowsPodSet/feature_disabled:_al...HintNarrowsPodSet\n--- FAIL: TestPreQueueingHintNarrowsPodSet (14.62s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791686768,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2109103609449811968",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2109103609449811968/build-log.txt",
+  "log": {
+    "bytes": 199267,
+    "md5": "fd4e1f50b5e089debaac9d8f85526dac",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 18249,
+    "gcs": {
+      "generation": "1791686772658363",
+      "md5": "fd4e1f50b5e089debaac9d8f85526dac",
+      "crc32c": "fa6ea9a2",
+      "bytes": 199267,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-11T054407Z",
+  "archived_at": 1791697447.0,
+  "settled": true,
+  "final": false
+}
