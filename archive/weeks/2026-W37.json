@@ -10,6 +10,7 @@
     "red_tests": [
       "kubetest.Up"
     ],
+    "red_test_count": 1,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2098094429171617792",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -20,6 +21,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2098094429171617792"
   }
 ]

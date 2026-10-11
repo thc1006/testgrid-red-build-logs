@@ -10,6 +10,7 @@
     "red_tests": [
       "kubetest.Up"
     ],
+    "red_test_count": 1,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2101718462521937920",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -20,6 +21,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2101718462521937920"
   },
   {
@@ -33,6 +37,7 @@
     "red_tests": [
       "kubetest.Up"
     ],
+    "red_test_count": 1,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2100993681061318656",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -43,6 +48,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2100993681061318656"
   },
   {
@@ -62,6 +70,7 @@
       "kubetest2.Test",
       "ci-kubernetes-e2e-gce-scale-performance-5000.Overall"
     ],
+    "red_test_count": 7,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-performance-5000/2100631134294511616",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -72,6 +81,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-5000/2100631134294511616"
   },
   {
@@ -85,6 +97,7 @@
     "red_tests": [
       "kubetest.Up"
     ],
+    "red_test_count": 1,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2100268741915840512",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -95,6 +108,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2100268741915840512"
   },
   {
@@ -108,6 +124,7 @@
     "red_tests": [
       "kubetest.Up"
     ],
+    "red_test_count": 1,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2099543956789399552",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -118,6 +135,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2099543956789399552"
   }
 ]

@@ -12,6 +12,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-default-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-default-master/2104358391299182592",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -22,6 +23,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2104358391299182592"
   },
   {
@@ -50,6 +54,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104358138839830528",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -60,6 +65,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104358138839830528"
   },
   {
@@ -88,6 +96,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104350338382303232",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -98,6 +107,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104350338382303232"
   },
   {
@@ -126,6 +138,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104342788341501952",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -136,6 +149,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104342788341501952"
   },
   {
@@ -164,6 +180,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104327688754827264",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -174,6 +191,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104327688754827264"
   },
   {
@@ -202,6 +222,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104320138005188608",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -212,6 +233,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104320138005188608"
   },
   {
@@ -226,6 +250,7 @@
       "Kubernetes e2e suite.[It] [sig-node] [DRA] [FeatureGate:DRAExtendedResource] [Feature:DynamicResourceAllocation] must cleanup extended resource claims when pods fail [KubeletMinVersion:1.34] [kubelet: [>=1.34]]",
       "ci-kind-dra.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kind-dra/2104314601444216832",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -236,6 +261,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kind-dra/2104314601444216832"
   },
   {
@@ -264,6 +292,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104313091805155328",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -274,6 +303,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104313091805155328"
   },
   {
@@ -302,6 +334,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104299501891096576",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -312,6 +345,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104299501891096576"
   },
   {
@@ -327,6 +363,7 @@
       "kubetest2.Test",
       "ci-kubernetes-ec2-conformance-latest.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-ec2-conformance-latest/2104295224636346368",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -337,6 +374,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-ec2-conformance-latest/2104295224636346368"
   },
   {
@@ -365,6 +405,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104289939272241152",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -375,6 +416,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104289939272241152"
   },
   {
@@ -403,6 +447,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104286667144695808",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -413,6 +458,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104286667144695808"
   },
   {
@@ -441,6 +489,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104274084496936960",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -451,6 +500,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104274084496936960"
   },
   {
@@ -479,6 +531,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104261501048066048",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -489,6 +542,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104261501048066048"
   },
   {
@@ -517,6 +573,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104259488872665088",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -527,6 +584,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104259488872665088"
   },
   {
@@ -555,6 +615,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104249924659974144",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -565,6 +626,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104249924659974144"
   },
   {
@@ -593,6 +657,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104234574258114560",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -603,6 +668,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104234574258114560"
   },
   {
@@ -631,6 +699,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104229289334411264",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -641,6 +710,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104229289334411264"
   },
   {
@@ -669,6 +741,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104219725134303232",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -679,6 +752,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104219725134303232"
   },
   {
@@ -694,6 +770,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-serial-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-serial-master/2104210665487994880",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -704,6 +781,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2104210665487994880"
   },
   {
@@ -732,6 +812,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104208652289183744",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -742,6 +823,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104208652289183744"
   },
   {
@@ -757,6 +841,7 @@
       "kubetest2.Test",
       "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2104202109195915264",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -767,6 +852,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2104202109195915264"
   },
   {
@@ -795,6 +883,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104199090387554304",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -805,6 +894,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104199090387554304"
   },
   {
@@ -833,6 +925,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104193552849309696",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -843,6 +936,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104193552849309696"
   },
   {
@@ -871,6 +967,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104180214719320064",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -881,6 +978,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104180214719320064"
   },
   {
@@ -896,6 +996,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2104179964092878848",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -906,6 +1007,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2104179964092878848"
   },
   {
@@ -934,6 +1038,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104168890115297280",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -944,6 +1049,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104168890115297280"
   },
   {
@@ -972,6 +1080,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104168134834393088",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -982,6 +1091,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104168134834393088"
   },
   {
@@ -1010,6 +1122,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104157061905387520",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1020,6 +1133,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104157061905387520"
   },
   {
@@ -1048,6 +1164,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104144983488466944",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1058,6 +1175,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104144983488466944"
   },
   {
@@ -1086,6 +1206,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104138690728038400",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1096,6 +1217,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104138690728038400"
   },
   {
@@ -1124,6 +1248,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104130638029262848",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1134,6 +1259,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104130638029262848"
   },
   {
@@ -1162,6 +1290,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104116796419215360",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1172,6 +1301,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104116796419215360"
   },
   {
@@ -1187,6 +1319,7 @@
       "kubetest2.Test",
       "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2104111512309207040",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1197,6 +1330,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2104111512309207040"
   },
   {
@@ -1225,6 +1361,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104108500010405888",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1235,6 +1372,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104108500010405888"
   },
   {
@@ -1263,6 +1403,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104105723087556608",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1273,6 +1414,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104105723087556608"
   },
   {
@@ -1301,6 +1445,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104093140901171200",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1311,6 +1456,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104093140901171200"
   },
   {
@@ -1325,6 +1473,7 @@
       "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
       "ci-kubernetes-integration-master.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-integration-master/2104079801819074560",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1335,6 +1484,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2104079801819074560"
   },
   {
@@ -1363,6 +1515,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104078795186114560",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1373,6 +1526,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104078795186114560"
   },
   {
@@ -1401,6 +1557,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104078291878023168",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1411,6 +1568,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104078291878023168"
   },
   {
@@ -1439,6 +1599,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104065708999577600",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1449,6 +1610,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104065708999577600"
   },
   {
@@ -1477,6 +1641,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104050106826231808",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1487,6 +1652,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104050106826231808"
   },
   {
@@ -1515,6 +1683,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104048092478181376",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1525,6 +1694,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104048092478181376"
   },
   {
@@ -1553,6 +1725,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104036515993620480",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1563,6 +1736,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104036515993620480"
   },
   {
@@ -1577,6 +1753,7 @@
       "[sig-instrumentation] k8s.io/kubernetes/test/integration.events",
       "ci-kubernetes-integration-arm64-master.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-integration-arm64-master/2104035258801328128",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1587,6 +1764,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2104035258801328128"
   },
   {
@@ -1602,6 +1782,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2104028212261556224",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1612,6 +1793,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2104028212261556224"
   },
   {
@@ -1626,6 +1810,7 @@
       "kubetest.Node Tests",
       "ci-kubernetes-node-e2e-containerd.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-node-e2e-containerd/2104026198320353280",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1636,6 +1821,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2104026198320353280"
   },
   {
@@ -1664,6 +1852,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104023178803154944",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1674,6 +1863,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104023178803154944"
   },
   {
@@ -1703,6 +1895,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2104017893191585792",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1713,6 +1906,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2104017893191585792"
   },
   {
@@ -1741,6 +1937,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2104008079564607488",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1751,6 +1948,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2104008079564607488"
   },
   {
@@ -1766,6 +1966,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103997256901332992",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1776,6 +1977,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103997256901332992"
   },
   {
@@ -1804,6 +2008,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103995244117757952",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1814,6 +2019,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103995244117757952"
   },
   {
@@ -1842,6 +2050,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103987443903500288",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1852,6 +2061,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103987443903500288"
   },
   {
@@ -1880,6 +2092,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103982661109288960",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1890,6 +2103,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103982661109288960"
   },
   {
@@ -1904,6 +2120,7 @@
       "[sig-apps] k8s.io/kubernetes/test/integration.job",
       "ci-kubernetes-integration-arm64-master.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-integration-arm64-master/2103973852915699712",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1914,6 +2131,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2103973852915699712"
   },
   {
@@ -1942,6 +2162,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103967309604327424",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1952,6 +2173,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103967309604327424"
   },
   {
@@ -1967,6 +2191,7 @@
       "kubetest2.Test",
       "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103960514559217664",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -1977,6 +2202,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2103960514559217664"
   },
   {
@@ -2005,6 +2233,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103956991385800704",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2015,6 +2244,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103956991385800704"
   },
   {
@@ -2043,6 +2275,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103955984639594496",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2053,6 +2286,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103955984639594496"
   },
   {
@@ -2081,6 +2317,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103944661855899648",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2091,6 +2328,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103944661855899648"
   },
   {
@@ -2119,6 +2359,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103929309612740608",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2129,6 +2370,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103929309612740608"
   },
   {
@@ -2157,6 +2401,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103926541699256320",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2167,6 +2412,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103926541699256320"
   },
   {
@@ -2195,6 +2443,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103916977310404608",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2205,6 +2454,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103916977310404608"
   },
   {
@@ -2233,6 +2485,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103901877702758400",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2243,6 +2496,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103901877702758400"
   },
   {
@@ -2271,6 +2527,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103896341196312576",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2281,6 +2538,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103896341196312576"
   },
   {
@@ -2294,6 +2554,7 @@
     "red_tests": [
       "kubetest.Up"
     ],
+    "red_test_count": 1,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2103892820203933696",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2304,6 +2565,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2103892820203933696"
   },
   {
@@ -2332,6 +2596,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103886779386957824",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2342,6 +2607,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103886779386957824"
   },
   {
@@ -2370,6 +2638,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103875454283812864",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2380,6 +2649,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103875454283812864"
   },
   {
@@ -2409,6 +2681,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103865891539128320",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2419,6 +2692,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103865891539128320"
   },
   {
@@ -2447,6 +2723,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103859850420162560",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2457,6 +2734,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103859850420162560"
   },
   {
@@ -2485,6 +2765,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103845255068520448",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2495,6 +2776,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103845255068520448"
   },
   {
@@ -2510,6 +2794,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103844248041295872",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2520,6 +2805,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103844248041295872"
   },
   {
@@ -2548,6 +2836,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103835690901966848",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2558,6 +2847,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103835690901966848"
   },
   {
@@ -2586,6 +2878,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103830154517155840",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2596,6 +2889,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103830154517155840"
   },
   {
@@ -2624,6 +2920,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103814551345565696",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2634,6 +2931,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103814551345565696"
   },
   {
@@ -2662,6 +2962,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103805492328402944",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2672,6 +2973,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103805492328402944"
   },
   {
@@ -2700,6 +3004,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103801716913737728",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2710,6 +3015,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103801716913737728"
   },
   {
@@ -2738,6 +3046,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103790643779211264",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2748,6 +3057,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103790643779211264"
   },
   {
@@ -2776,6 +3088,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103777306513248256",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2786,6 +3099,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103777306513248256"
   },
   {
@@ -2814,6 +3130,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103775293566095360",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2824,6 +3141,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103775293566095360"
   },
   {
@@ -2852,6 +3172,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103765981141667840",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2862,6 +3183,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103765981141667840"
   },
   {
@@ -2890,6 +3214,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103752391869337600",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2900,6 +3225,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103752391869337600"
   },
   {
@@ -2928,6 +3256,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103745094619238400",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2938,6 +3267,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103745094619238400"
   },
   {
@@ -2966,6 +3298,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103738047509041152",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -2976,6 +3309,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103738047509041152"
   },
   {
@@ -3004,6 +3340,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103724457506902016",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3014,6 +3351,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103724457506902016"
   },
   {
@@ -3043,6 +3383,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103714895722713088",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3053,6 +3394,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103714895722713088"
   },
   {
@@ -3081,6 +3425,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103711622907301888",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3091,6 +3436,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103711622907301888"
   },
   {
@@ -3119,6 +3467,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103695517585248256",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3129,6 +3478,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103695517585248256"
   },
   {
@@ -3159,6 +3511,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 18,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103684696377397248",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3169,6 +3522,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103684696377397248"
   },
   {
@@ -3197,6 +3553,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103683437029232640",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3207,6 +3564,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103683437029232640"
   },
   {
@@ -3235,6 +3595,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103670854956093440",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3245,6 +3606,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103670854956093440"
   },
   {
@@ -3273,6 +3637,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103657766882119680",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3283,6 +3648,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103657766882119680"
   },
   {
@@ -3311,6 +3679,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103654496910446592",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3321,6 +3690,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103654496910446592"
   },
   {
@@ -3349,6 +3721,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103642667303833600",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3359,6 +3732,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103642667303833600"
   },
   {
@@ -3387,6 +3763,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103627567469694976",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3397,6 +3774,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103627567469694976"
   },
   {
@@ -3426,6 +3806,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103624296726269952",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3436,6 +3817,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103624296726269952"
   },
   {
@@ -3464,6 +3848,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103611713176735744",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3474,6 +3859,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103611713176735744"
   },
   {
@@ -3489,6 +3877,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103601394719133696",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3499,6 +3888,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103601394719133696"
   },
   {
@@ -3527,6 +3919,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103597368233431040",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3537,6 +3930,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103597368233431040"
   },
   {
@@ -3565,6 +3961,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103593845995343872",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3575,6 +3972,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103593845995343872"
   },
   {
@@ -3603,6 +4003,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103586547755388928",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3613,6 +4014,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103586547755388928"
   },
   {
@@ -3641,6 +4045,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103570946488012800",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3651,6 +4056,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103570946488012800"
   },
   {
@@ -3679,6 +4087,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103563393997737984",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3689,6 +4098,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103563393997737984"
   },
   {
@@ -3717,6 +4129,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103558613770440704",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3727,6 +4140,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103558613770440704"
   },
   {
@@ -3755,6 +4171,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103546534640488448",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3765,6 +4182,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103546534640488448"
   },
   {
@@ -3793,6 +4213,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103532943120011264",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3803,6 +4224,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103532943120011264"
   },
   {
@@ -3831,6 +4255,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103530929849896960",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3841,6 +4266,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103530929849896960"
   },
   {
@@ -3869,6 +4297,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103517591904456704",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3879,6 +4308,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103517591904456704"
   },
   {
@@ -3907,6 +4339,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103502743736946688",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3917,6 +4350,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103502743736946688"
   },
   {
@@ -3945,6 +4381,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103501989819191296",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3955,6 +4392,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103501989819191296"
   },
   {
@@ -3983,6 +4423,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103487392974376960",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -3993,6 +4434,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103487392974376960"
   },
   {
@@ -4021,6 +4465,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103475062089715712",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4031,6 +4476,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103475062089715712"
   },
   {
@@ -4059,6 +4507,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103472293685497856",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4069,6 +4518,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103472293685497856"
   },
   {
@@ -4097,6 +4549,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103462227133599744",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4107,6 +4560,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103462227133599744"
   },
   {
@@ -4135,6 +4591,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103450398764306432",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4145,6 +4602,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103450398764306432"
   },
   {
@@ -4173,6 +4633,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103441843193647104",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4183,6 +4644,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103441843193647104"
   },
   {
@@ -4212,6 +4676,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103435048626688000",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4222,6 +4687,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103435048626688000"
   },
   {
@@ -4250,6 +4718,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103421961597095936",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4260,6 +4729,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103421961597095936"
   },
   {
@@ -4275,6 +4747,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-default-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-default-master/2103420199410601984",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4285,6 +4758,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2103420199410601984"
   },
   {
@@ -4315,6 +4791,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 18,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103411643345014784",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4325,6 +4802,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103411643345014784"
   },
   {
@@ -4353,6 +4833,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103408875540582400",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4363,6 +4844,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103408875540582400"
   },
   {
@@ -4391,6 +4875,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103394530211401728",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4401,6 +4886,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103394530211401728"
   },
   {
@@ -4416,6 +4904,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-default-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-default-master/2103390000002371584",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4426,6 +4915,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2103390000002371584"
   },
   {
@@ -4454,6 +4946,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103381694898769920",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4464,6 +4957,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103381694898769920"
   },
   {
@@ -4492,6 +4988,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103381444024864768",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4502,6 +4999,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103381444024864768"
   },
   {
@@ -4516,6 +5016,7 @@
       "[sig-instrumentation] k8s.io/kubernetes/test/integration.events",
       "ci-kubernetes-integration-master.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-integration-master/2103380688358084608",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4526,6 +5027,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2103380688358084608"
   },
   {
@@ -4554,6 +5058,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103368357058187264",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4564,6 +5069,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103368357058187264"
   },
   {
@@ -4593,6 +5101,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103356277060014080",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4603,6 +5112,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103356277060014080"
   },
   {
@@ -4631,6 +5143,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103351244146872320",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4641,6 +5154,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103351244146872320"
   },
   {
@@ -4669,6 +5185,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103341680936620032",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4679,6 +5196,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103341680936620032"
   },
   {
@@ -4707,6 +5227,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103328846202802176",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4717,6 +5238,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103328846202802176"
   },
   {
@@ -4745,6 +5269,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103321044688310272",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4755,6 +5280,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103321044688310272"
   },
   {
@@ -4783,6 +5311,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103316264440041472",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4793,6 +5322,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103316264440041472"
   },
   {
@@ -4808,6 +5340,7 @@
       "kubetest2.Test",
       "ci-node-crio-dra.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-node-crio-dra/2103308210961125376",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4818,6 +5351,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-dra/2103308210961125376"
   },
   {
@@ -4846,6 +5382,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103300914445029376",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4856,6 +5393,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103300914445029376"
   },
   {
@@ -4870,6 +5410,7 @@
       "kubetest.Node Tests",
       "ci-kubernetes-node-e2e-containerd.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-node-e2e-containerd/2103299152099151872",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4880,6 +5421,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2103299152099151872"
   },
   {
@@ -4895,6 +5439,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103296383124508672",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4905,6 +5450,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103296383124508672"
   },
   {
@@ -4933,6 +5481,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103290845380743168",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4943,6 +5492,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103290845380743168"
   },
   {
@@ -4971,6 +5523,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103288077345624064",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -4981,6 +5534,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103288077345624064"
   },
   {
@@ -5009,6 +5565,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103273229203279872",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5019,6 +5576,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103273229203279872"
   },
   {
@@ -5033,6 +5593,7 @@
       "kubetest.Node Tests",
       "ci-kubernetes-node-e2e-containerd.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-node-e2e-containerd/2103268951382298624",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5043,6 +5604,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2103268951382298624"
   },
   {
@@ -5058,6 +5622,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103265176005382144",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5068,6 +5633,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103265176005382144"
   },
   {
@@ -5082,6 +5650,7 @@
       "[sig-instrumentation] k8s.io/kubernetes/test/integration.events",
       "ci-kubernetes-integration-arm64-master.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-integration-arm64-master/2103260646714904576",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5092,6 +5661,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2103260646714904576"
   },
   {
@@ -5120,6 +5692,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103260646387748864",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5130,6 +5703,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103260646387748864"
   },
   {
@@ -5158,6 +5734,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103258633725808640",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5168,6 +5745,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103258633725808640"
   },
   {
@@ -5196,6 +5776,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103242778589794304",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5206,6 +5787,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103242778589794304"
   },
   {
@@ -5221,6 +5805,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103232963415117824",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5231,6 +5816,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103232963415117824"
   },
   {
@@ -5245,6 +5833,7 @@
       "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
       "ci-kubernetes-integration-arm64-master.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-integration-arm64-master/2103230447713521664",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5255,6 +5844,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2103230447713521664"
   },
   {
@@ -5283,6 +5875,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103230447453474816",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5293,6 +5886,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103230447453474816"
   },
   {
@@ -5321,6 +5917,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103230447566721024",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5331,6 +5928,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103230447566721024"
   },
   {
@@ -5359,6 +5959,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103218367778263040",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5369,6 +5970,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103218367778263040"
   },
   {
@@ -5397,6 +6001,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103205532633403392",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5407,6 +6012,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103205532633403392"
   },
   {
@@ -5422,6 +6030,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103201506009288704",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5432,6 +6041,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2103201506009288704"
   },
   {
@@ -5460,6 +6072,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103200247533539328",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5470,6 +6083,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103200247533539328"
   },
   {
@@ -5498,6 +6114,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103191692038377472",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5508,6 +6125,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103191692038377472"
   },
   {
@@ -5536,6 +6156,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103177347149598720",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5546,6 +6167,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103177347149598720"
   },
   {
@@ -5574,6 +6198,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103169798140596224",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5584,6 +6209,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103169798140596224"
   },
   {
@@ -5597,6 +6225,7 @@
     "red_tests": [
       "kubetest.Up"
     ],
+    "red_test_count": 1,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2103168036499361792",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5607,6 +6236,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2103168036499361792"
   },
   {
@@ -5635,6 +6267,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103164008688259072",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5645,6 +6278,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103164008688259072"
   },
   {
@@ -5673,6 +6309,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103148658848436224",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5683,6 +6320,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103148658848436224"
   },
   {
@@ -5698,6 +6338,7 @@
       "kubetest2.Test",
       "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103145134752272384",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5708,6 +6349,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2103145134752272384"
   },
   {
@@ -5736,6 +6380,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103139346075881472",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5746,6 +6391,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103139346075881472"
   },
   {
@@ -5760,6 +6408,7 @@
       "ci-kubernetes-e2e-kind-alpha-beta-conformance.Pod",
       "ci-kubernetes-e2e-kind-alpha-beta-conformance.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-kind-alpha-beta-conformance/2103134566595170304",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5770,6 +6419,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-conformance/2103134566595170304"
   },
   {
@@ -5799,6 +6451,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103134566226071552",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5809,6 +6462,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103134566226071552"
   },
   {
@@ -5837,6 +6493,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103120974684622848",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5847,6 +6504,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103120974684622848"
   },
   {
@@ -5862,6 +6522,7 @@
       "kubetest2.Test",
       "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103114934853308416",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5872,6 +6533,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2103114934853308416"
   },
   {
@@ -5900,6 +6564,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103108895143628800",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5910,6 +6575,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103108895143628800"
   },
   {
@@ -5938,6 +6606,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103106883123417088",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5948,6 +6617,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103106883123417088"
   },
   {
@@ -5976,6 +6648,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103094055964512256",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -5986,6 +6659,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103094055964512256"
   },
   {
@@ -6014,6 +6690,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103080963398438912",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6024,6 +6701,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103080963398438912"
   },
   {
@@ -6052,6 +6732,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103078453350764544",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6062,6 +6743,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103078453350764544"
   },
   {
@@ -6091,6 +6775,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103067371366256640",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6101,6 +6786,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103067371366256640"
   },
   {
@@ -6115,6 +6803,7 @@
       "kubetest2.Up",
       "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6125,6 +6814,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600"
   },
   {
@@ -6153,6 +6845,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103052774693408768",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6163,6 +6856,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103052774693408768"
   },
   {
@@ -6191,6 +6887,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103048004347891712",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6201,6 +6898,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103048004347891712"
   },
   {
@@ -6229,6 +6929,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103039939804401664",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6239,6 +6940,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103039939804401664"
   },
   {
@@ -6253,6 +6957,7 @@
       "[sig-apps] k8s.io/kubernetes/test/integration.job",
       "ci-kubernetes-integration-arm64-master.Overall"
     ],
+    "red_test_count": 2,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-integration-arm64-master/2103031636084920320",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6263,6 +6968,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2103031636084920320"
   },
   {
@@ -6291,6 +6999,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103027116709777408",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6301,6 +7010,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103027116709777408"
   },
   {
@@ -6329,6 +7041,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2103017793694732288",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6339,6 +7052,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2103017793694732288"
   },
   {
@@ -6367,6 +7083,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2103013515714367488",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6377,6 +7094,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2103013515714367488"
   },
   {
@@ -6406,6 +7126,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102999926513340416",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6416,6 +7137,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102999926513340416"
   },
   {
@@ -6444,6 +7168,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102988601259200512",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6454,6 +7179,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102988601259200512"
   },
   {
@@ -6482,6 +7210,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2102987594483634176",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6492,6 +7221,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2102987594483634176"
   },
   {
@@ -6520,6 +7252,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102976279300018176",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6530,6 +7263,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102976279300018176"
   },
   {
@@ -6558,6 +7294,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102962429011955712",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6568,6 +7305,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102962429011955712"
   },
   {
@@ -6596,6 +7336,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2102957396220448768",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6606,6 +7347,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2102957396220448768"
   },
   {
@@ -6634,6 +7378,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102948586881814528",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6644,6 +7389,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102948586881814528"
   },
   {
@@ -6672,6 +7420,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102937263737409536",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6682,6 +7431,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102937263737409536"
   },
   {
@@ -6710,6 +7462,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2102927196426342400",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6720,6 +7473,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2102927196426342400"
   },
   {
@@ -6735,6 +7491,7 @@
       "kubetest.Timeout",
       "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
     ],
+    "red_test_count": 3,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2102926694053580800",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6745,6 +7502,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2102926694053580800"
   },
   {
@@ -6773,6 +7533,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102923672296624128",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6783,6 +7544,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102923672296624128"
   },
   {
@@ -6811,6 +7575,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102911593393164288",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6821,6 +7586,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102911593393164288"
   },
   {
@@ -6850,6 +7618,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2102896997710172160",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6860,6 +7629,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2102896997710172160"
   },
   {
@@ -6888,6 +7660,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102895993577017344",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6898,6 +7671,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102895993577017344"
   },
   {
@@ -6926,6 +7702,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102882149555245056",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6936,6 +7713,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102882149555245056"
   },
   {
@@ -6964,6 +7744,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 16,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102868811714662400",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -6974,6 +7755,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102868811714662400"
   },
   {
@@ -7003,6 +7787,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2102866797249171456",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -7013,6 +7798,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2102866797249171456"
   },
   {
@@ -7042,6 +7830,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 17,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102857990053826560",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -7052,6 +7841,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102857990053826560"
   },
   {
@@ -7090,6 +7882,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gci-gce-slow.Overall"
     ],
+    "red_test_count": 26,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce-slow/2102842136100605952",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -7100,6 +7893,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2102842136100605952"
   },
   {
@@ -7141,6 +7937,7 @@
       "kubetest.Test",
       "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
     ],
+    "red_test_count": 29,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-cos-slow-master/2102836599111815168",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -7151,6 +7948,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2102836599111815168"
   },
   {
@@ -7164,6 +7964,7 @@
     "red_tests": [
       "kubetest.Up"
     ],
+    "red_test_count": 1,
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2102443254543814656",
     "run": "2026-10-08T192522Z",
     "files": [
@@ -7174,6 +7975,9 @@
     "settled": true,
     "final": true,
     "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2102443254543814656"
   }
 ]

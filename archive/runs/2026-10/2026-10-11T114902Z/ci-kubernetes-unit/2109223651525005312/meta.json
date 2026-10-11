@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2109223651525005312",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1791713108,
+  "created": 1791713080,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/client-go.rest",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestReconnectBrokenTCP\n2026/10/11 10:23:13 http: TLS ...\": context deadline exceeded\n--- FAIL: TestReconnectBrokenTCP (4.01s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791714474,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109223651525005312",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109223651525005312/build-log.txt",
+  "log": {
+    "bytes": 277919,
+    "md5": "ce38bd45f2371a5c991a8b2e0a086164",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 33665,
+    "gcs": {
+      "generation": "1791714474882164",
+      "md5": "ce38bd45f2371a5c991a8b2e0a086164",
+      "crc32c": "ce869def",
+      "bytes": 277919,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-11T114902Z",
+  "archived_at": 1791719342.0,
+  "settled": false,
+  "final": false
+}
