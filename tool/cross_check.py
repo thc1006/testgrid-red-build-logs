@@ -14,7 +14,8 @@ For one run (default: the latest):
              before the run, is archived (red cells recomputed here)
   gcs        every build of the dashboards' jobs from the last --hours that
              TestGrid no longer shows, but painted red by its own rule (read
-             from GCS as its updater reads it: testgrid_rule), is archived; and
+             from GCS as its updater reads it: testgrid_rule, on the rows each tab
+             shows as the run had TestGrid's config), is archived; and
              every failed one is archived, or the reason it is not is shown
 A difference in GCS for a build whose copy is not settled yet (taken before
 Prow finished uploading) is only noted: the next fetch compares it again.
@@ -34,6 +35,7 @@ import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_red_logs as frl  # noqa: E402
+import testgrid_config as tgc  # noqa: E402
 from fetch_red_logs import GCS, PROW_EPOCH_MS, TESTGRID, NotFound, get_json, iso, request, table_url  # noqa: E402
 
 # Recomputed here on purpose: TestGrid's UI maps these statuses to its red
@@ -484,6 +486,8 @@ def check(args, problems, notes):
         margin = h * 3600 if number(h) and h > 0 else default_settle
         settle_of[t["query"]] = max(settle_of.get(t["query"], 0), margin)
     red_now, statuses, oldest_shown, undecoded, shown, rows_of = {}, {}, {}, set(), set(), {}
+    # TestGrid's config for each tab, as the run had it: the rows the tab shows, its days of results
+    rules = {(t["dashboard"], t["tab"]): tgc.TabRule(t["config"]) for t in tabs if tgc.valid_entry(t.get("config"))}
     for (dashboard, tab), table in tables.items():
         if table is None:
             continue
@@ -555,15 +559,31 @@ def check(args, problems, notes):
                 and (job_of[q], b) not in archived and (job_of[q], b) not in shown
                 and created(b) >= archive_start and q not in unread and q in oldest_shown and created(b) < oldest_shown[q]]
 
+    def tab_verdict(col, t, made):
+        """The build's verdict on tab t, by the tab's rule as the fetch takes it (frl.tab_verdict)."""
+        rows, rule = rows_of.get((t["dashboard"], t["tab"])), rules.get((t["dashboard"], t["tab"]))
+        if rule is None:
+            return frl.tab_verdict(col, job_of[t["query"]], {"rows": rows}, made)
+        m = t.get("config_mismatch")
+        until = -math.inf
+        if isinstance(m, dict):  # (a build made before the tab agreed with its config again: its table's rows count too)
+            until = m["until"] if number(m.get("until")) else math.inf
+        return frl.tab_verdict(col, job_of[t["query"]], {"rows": rows, "shows": None if rule.filter_problem else rule.shows,
+                                                        "problem": rule.group_problem, "unreliable_until": until}, made)
+
+    def days_of(query):  # (the longest of the job's tabs, as the fetch takes it)
+        known = [rules[(t["dashboard"], t["tab"])].days for t in tabs
+                 if t["query"] == query and (t["dashboard"], t["tab"]) in rules]
+        return max(known) if known else frl.tab_days(oldest_shown[query], t0)
+
     def judge(qb):
         try:
-            col = frl.gcs_column(args.gcs, qb[0], qb[1], frl.tab_days(oldest_shown[qb[0]], t0), now=t0)
+            col = frl.gcs_column(args.gcs, qb[0], qb[1], days_of(qb[0]), now=t0)
         except Exception as e:
             return Unreachable(e)
         # a finished column not red without its junit files, which cannot be read now, cannot be checked
-        if frl.unreadable_junit(col) and not any(
-                frl.verdict(col, job_of[qb[0]], rows_of.get((t["dashboard"], t["tab"])))[0] == "red"
-                for t in tabs if t["query"] == qb[0]):
+        if frl.unreadable_junit(col) and not any(tab_verdict(col, t, created(qb[1]))[0] == "red"
+                                                 for t in tabs if t["query"] == qb[0]):
             return Unreachable(ValueError(col.partial))
         return col
     judged = dict(zip(unlisted, pool.map(judge, unlisted), strict=True))
@@ -573,8 +593,7 @@ def check(args, problems, notes):
             problems.append(f"cannot check {job_of[q]}/{b} by TestGrid's rule: {col.error}")
             judged_as["unreadable"] = judged_as.get("unreadable", 0) + 1
             continue
-        verdicts = {f"{t['dashboard']}#{t['tab']}": frl.verdict(col, job_of[q], rows_of.get((t["dashboard"], t["tab"])))
-                    for t in tabs if t["query"] == q}
+        verdicts = {f"{t['dashboard']}#{t['tab']}": tab_verdict(col, t, created(b)) for t in tabs if t["query"] == q}
         red_in = sorted(k for k, (state, _) in verdicts.items() if state == "red")
         if red_in:
             problems.append(f"MISSED red build {job_of[q]}/{b} ({', '.join(red_in)}): TestGrid no longer lists it, "

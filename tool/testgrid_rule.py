@@ -3,23 +3,23 @@
 The fetch takes red cells straight from TestGrid's tables. A build that scrolled
 off a tab before the archive saw it (a gap between runs) can only be judged
 from GCS, and is judged here by the rule TestGrid's updater applied when it
-read the build: readResult and convertResult in pkg/updater at f15bfa4808a4,
-the commit TestGrid production runs since 2026-09-02, with the Go behaviour that
-rule rests on: Go 1.26.5 encoding/json (the Decoder TestGrid reads
-started.json, finished.json and podinfo.json with), encoding/xml (junit),
-time.Parse and strconv, and the k8s.io/apimachinery v0.27.4 types in
-podinfo.json. tool/oracle builds TestGrid's own code at that commit to check
-this port against; test_testgrid_rule.py replays what it answered.
+read the build: readResult and convertResult in pkg/updater at the commit
+TestGrid production runs (tool/oracle/pinned.json names it, and the Go it is
+built with), with the Go behaviour that rule rests on: encoding/json (the
+Decoder TestGrid reads started.json, finished.json and podinfo.json with),
+encoding/xml (junit), time.Parse and strconv, and the k8s.io/api and
+k8s.io/apimachinery types in podinfo.json (testgrid_types.json). tool/oracle
+builds TestGrid's own code at that commit to check this port against;
+test_testgrid_rule.py replays what it answered.
 
-What GCS cannot tell, and is therefore assumed:
-- the test group's options are TestGrid's defaults (rows of the same name
-  merged, the Pod row shown, no custom evaluator rules, tests named as they
-  are), which is what test-infra's config/testgrids/default.yaml and the jobs'
-  annotations give these tabs;
-- which rows a tab hides (its base options are not public): the caller says,
-  from the tab's own table, whether the job's Overall and Pod rows are shown;
-  test rows count as shown;
-- when TestGrid last read the build, and errors it hit reading GCS itself.
+The column is the one TestGrid paints with its default cell options (rows of
+the same name merged, the Pod row shown, no custom evaluator rules, tests named
+as they are): every tab of the archive's dashboards has them, and the fetch
+does not judge a tab whose test group sets another (testgrid_config.py reads
+the config TestGrid builds from test-infra). Which of the column's rows a tab
+shows is the caller's (its base options, see testgrid_config.TabRule).
+What GCS cannot tell: when TestGrid last read the build, and errors it hit
+reading GCS itself.
 When readResult hits more than one error, whichever its goroutines report first
 decides the column; every outcome possible is kept, and a build counts as red
 when any of them is.
@@ -1450,22 +1450,13 @@ class Column:
     "nostart", "ancient", "finished"), .malformed, .results (the Overall results
     possible: with read errors whichever error comes first decides) and .cells
     ({row: status}, None with read errors), and .notes: why the job's Overall and
-    Pod cells are what they are."""
+    Pod cells are what they are. .started and .finished: the timestamps TestGrid
+    took from started.json and finished.json (None when it read none)."""
 
-    def __init__(self, errors, malformed, results, cells, notes=None):
+    def __init__(self, errors, malformed, results, cells, notes=None, started=None, finished=None):
         self.errors, self.malformed, self.results, self.cells = errors, malformed, results, cells
         self.notes = notes or {}  # why the job's Overall and Pod cells are what they are
-
-    def red(self, job, overall_shown=True, pod_shown=True):
-        """Whether a tab that shows (or hides) the job's Overall and Pod rows can show this column red."""
-        if self.errors:
-            return "TOOL_FAIL" in self.results  # (a column TestGrid could not read: its row "Overall")
-        hidden = set()
-        if not overall_shown:
-            hidden.add(job + ".Overall")
-        if not pod_shown:
-            hidden.add(job + ".Pod")
-        return any(status in RED for row, status in self.cells.items() if row not in hidden)
+        self.started, self.finished = started, finished
 
     def red_rows(self):
         return sorted(row for row, status in (self.cells or {}).items() if status in RED)
@@ -1508,14 +1499,14 @@ def column(job, started, finished, podinfo, junits, stop, now, folder=""):
         errors.append("podinfo")
     pod = _get(pi, "Pod") if kind == "ok" else None
 
-    started_ts = 0
+    started_ts, started_seen = 0, None
     kind, st = read_json(started, "started")
     if kind == "eof":
         malformed.append("started.json")
     elif kind == "error":
         errors.append("started")
     else:
-        ts = _get(st, "Started", "Timestamp", default=0) if kind == "ok" else 0  # missing: pending
+        ts = started_seen = _get(st, "Started", "Timestamp", default=0) if kind == "ok" else 0  # missing: pending
         if _unix(ts) < _unix(stop):  # time.Unix(ts, 0).Before(stop)
             errors.append("nostart" if ts == 0 else "ancient")
         else:
@@ -1548,7 +1539,7 @@ def column(job, started, finished, podinfo, junits, stop, now, folder=""):
 
     if errors:
         results = {"RUNNING" if e == "nostart" else "UNKNOWN" if e == "ancient" else "TOOL_FAIL" for e in errors}
-        return Column(errors, sorted(malformed), results, None)
+        return Column(errors, sorted(malformed), results, None, started=started_seen, finished=fin_ts)
 
     # gcsResult.deadline(), compared with time.Now() as Go compares times: in whole
     # seconds plus the fraction now has (integers only: a float the size of Go's
@@ -1588,4 +1579,4 @@ def column(job, started, finished, podinfo, junits, stop, now, folder=""):
     merged = {name: merge(statuses) for name, statuses in cells.items()}
     # (the messages of the rows TestGrid adds; a junit row of the same name is merged into them)
     notes = {name: why if name == job + ".Overall" else message for name in injected}
-    return Column([], sorted(malformed), {merged[job + ".Overall"]}, merged, notes)
+    return Column([], sorted(malformed), {merged[job + ".Overall"]}, merged, notes, started=started_ts, finished=fin_ts)

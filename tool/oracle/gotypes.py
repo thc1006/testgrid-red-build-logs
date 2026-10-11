@@ -20,7 +20,7 @@ for name, t in d["types"].items():
     types[name] = k
 doc = {"about": (f"The Go types TestGrid decodes podinfo.json, started.json and finished.json into, as "
                  f"encoding/json sees them; written by tool/oracle/schemadump from TestGrid "
-                 f"{pinned['testgrid_commit']} (production since 2026-09-02, k8s.io/api v0.27.4, Go {pinned['go']}). "
+                 f"{pinned['testgrid_commit']} (Go {pinned['go']}). "
                  f"fields: [Go name, json name, options, type, embedded, exported]; caps: the "
                  f"capacities reflect.Value.Grow(1) gives a full slice, from 0 up."),
        "roots": d["roots"], "ascii_folds": d["ascii_folds"], "types": types}

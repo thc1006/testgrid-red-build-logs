@@ -14,11 +14,13 @@ port against.
   real `readSuites` and `convertResult`. It reads a build like `readResult`, with
   the four reads one after another and every error kept, because `readResult`
   returns whichever error arrives first.
+- `go/pkg/tabulator/zz_oracle.go`: added to TestGrid's `pkg/tabulator`, so it calls
+  the real `filterGrid`: the rows a tab's base options keep.
 - `go/cmd/tgoracle`: judges builds held in memory, one JSON object per line.
 - `go/cmd/schemadump`: the Go types podinfo.json, started.json and finished.json
   decode into. `gotypes.py` turns its output into `../testgrid_types.json`.
 - `go/cmd/gocheck`: what Go's strconv, time.Parse and resource.ParseQuantity make
-  of strings.
+  of strings, and the rows `filterGrid` keeps.
 - `fuzz/`:
   - `edge.py`: about 250 cases, one Go behaviour each.
   - `gen.py` and `run.py`: random builds.
@@ -27,24 +29,41 @@ port against.
     by TestGrid's code and by the port.
   - `golden.py`: writes `../testdata/testgrid_rule_golden.jsonl.gz`, which
     `../test_testgrid_rule.py` replays without Go.
+  - `filterdiff.py`: `../testgrid_config.py`'s row filter (Go's url.ParseQuery and
+    regexp, matched without backtracking) against `filterGrid`: the base options
+    of testgrid.k8s.io's tabs, about 250 edge cases, and random ones. Where
+    TestGrid rejects base options the port must not apply them; where it keeps
+    rows the port must keep the same ones; patterns of the syntax the port
+    follows must be applied.
 
-The workflow `.github/workflows/oracle.yml` runs weekly, and on a change to the
+The workflow `.github/workflows/oracle.yml` runs daily, and on a change to the
 port. It does all of this:
 
 - builds TestGrid's code;
 - checks that the types match `testgrid_types.json`;
 - runs the edge cases, 5000 random builds (a seed per run; the cases that differ are
   attached to a failed run) and 2 real builds of each job;
-- fails if TestGrid production no longer runs the pinned commit (checked even when
-  another check failed).
+- runs the filter's edge cases and 20,000 random ones;
+- fails if TestGrid production's updater or tabulator no longer runs the pinned
+  commit (`drift.sh`, checked even when another check failed; every archive run
+  checks it too, and warns);
+- then, if production moved, `follow.sh` builds TestGrid's code at the commit it
+  runs, runs every check above against it, and lists what changed between the
+  two commits in the code the port follows (`relevant_diff.py`). When nothing did
+  and every check passes, it moves `pinned.json` (and regenerates
+  `testgrid_types.json`) on the branch `follow-testgrid-<commit>` and proposes it
+  as a pull request; GitHub Actions may not open pull requests in this repository
+  (Settings, Actions, General), so the run then links to open one from the branch.
+  Otherwise it fails with what changed, for a person to compare.
 
 ## Run it
 
 ```sh
 tool/oracle/build.sh /tmp/oracle          # Go (pinned.json's version) and the network
-export TGORACLE=/tmp/oracle/tgoracle
+export TGORACLE=/tmp/oracle/tgoracle GOCHECK=/tmp/oracle/gocheck
 cd tool
 python3 -I oracle/fuzz/edge.py
+python3 -I oracle/fuzz/filterdiff.py 1 20000
 python3 -I oracle/fuzz/run.py 1 5000     # seed, cases; mismatches go to bad-<seed>.jsonl
 uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 3   # the fetch's code and environment
 /tmp/oracle/schemadump | python3 -I oracle/gotypes.py | cmp - testgrid_types.json
@@ -53,29 +72,37 @@ python3 -I oracle/fuzz/golden.py testdata/testgrid_rule_golden.jsonl.gz   # only
 
 ## When TestGrid production moves to another commit
 
+The daily workflow notices, and proposes the new commit itself when nothing the
+port follows changed. When something did:
+
 1. Compare the new commit with the pinned one. The code that matters is in
    `pkg/updater` (`read.go`, `gcs.go`, `inflate.go`, `updater.go`), `util/gcs`
-   (`read.go`), `metadata` and `metadata/junit`, plus `go.mod` (k8s.io/api is the
-   Pod type, and the Go version decides encoding/json and encoding/xml).
+   (`read.go`), `metadata` and `metadata/junit`, `pkg/tabulator` (`filter.go`,
+   and where `tabulate` calls it), plus `go.mod` (k8s.io/api is the Pod type, and
+   the Go version decides encoding/json, encoding/xml, net/url and regexp). A
+   TestGroup field the updater newly reads belongs in `testgrid_config.py`'s
+   `GROUP_FIELDS` and `group_problems`.
 2. Port any change into `testgrid_rule.py`.
 3. Update `pinned.json`.
 4. Rebuild, regenerate `testgrid_types.json`, and run the checks above.
 5. Regenerate the golden vectors, and make sure no other test changed.
 
+## The config the port judges by
+
+- **Test-group options and the rows a tab shows.** TestGrid production reads its
+  config from GCS buckets that are not public, but it is built from public
+  sources: test-infra's `config/testgrids` and its Prow jobs' `testgrid-*`
+  annotations, by the configurator image test-infra's
+  `post-test-infra-upload-testgrid-config` job runs. `../testgrid_config.sh` runs
+  that image with that job's arguments on test-infra's tip, and
+  `../testgrid_config.py` keeps each tab's base options and the TestGroup fields
+  `pkg/updater` paints cells by. The port follows TestGrid's default cell options
+  (rows of the same name merged, the Pod row, no custom evaluator rules, test
+  names as they are); a tab whose group sets another is not judged from GCS. The
+  fetch checks each tab's table against its config on every run.
+
 ## What the port cannot know
 
-- **Test-group options.** TestGrid's config is not public (`gs://k8s-testgrid/config`
-  is 403). The port takes TestGrid's defaults from test-infra's
-  `config/testgrids/default.yaml`: rows of the same name merged, the Pod row
-  shown, no custom evaluator rules, test names as they are. A tab's days of
-  results is taken as the longer of 15 (the default) and the history its table shows.
-- **Rows a tab hides.** The fetch learns these from the tab's table: every column
-  has its job's Overall and Pod rows, so the one missing while the other is
-  there is hidden, and both are when the table has results without either. A
-  tab not read in a run keeps the rows it showed when last read. A filter on test
-  names cannot be learned this way, so test rows count as shown; so does the
-  bare `Overall` row of a column TestGrid could not read (TOOL_FAIL), as no table
-  shows whether a tab's filter would hide it.
 - **Timing.** TestGrid's last read of a build happened when it read it, not now.
   An error TestGrid itself hit reading GCS is also invisible from here.
 - **Racing reads.** When `readResult`'s reads race, every outcome is possible,

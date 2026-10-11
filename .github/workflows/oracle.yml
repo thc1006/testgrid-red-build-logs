@@ -3,17 +3,19 @@ name: Check the TestGrid rule
 # tool/testgrid_rule.py ports the rule TestGrid paints a build's cells by, to
 # judge builds TestGrid no longer shows. This builds TestGrid's own code at the
 # commit the port follows (tool/oracle/pinned.json) and checks the port against
-# it, and checks that TestGrid production still runs that commit.
+# it, and checks that TestGrid production still runs that commit; when it does not,
+# checks the port against the commit it runs, and proposes it when nothing the
+# port follows changed.
 on:
   schedule:
-    - cron: "41 5 * * 1" # Mondays
+    - cron: "41 5 * * *" # daily
   workflow_dispatch:
   push:
-    paths: ["tool/testgrid_rule.py", "tool/testgrid_types.json", "tool/fetch_red_logs.py", "tool/oracle/**",
-            ".github/workflows/oracle.yml"]
+    paths: ["tool/testgrid_rule.py", "tool/testgrid_types.json", "tool/testgrid_config.py", "tool/fetch_red_logs.py",
+            "tool/oracle/**", ".github/workflows/oracle.yml"]
   pull_request:
-    paths: ["tool/testgrid_rule.py", "tool/testgrid_types.json", "tool/fetch_red_logs.py", "tool/oracle/**",
-            ".github/workflows/oracle.yml"]
+    paths: ["tool/testgrid_rule.py", "tool/testgrid_types.json", "tool/testgrid_config.py", "tool/fetch_red_logs.py",
+            "tool/oracle/**", ".github/workflows/oracle.yml"]
 
 permissions:
   contents: read # check out the code, nothing else
@@ -27,6 +29,10 @@ jobs:
     name: Port against TestGrid's own code
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    outputs:
+      moved: ${{ steps.drift.outputs.moved }}
+      updater: ${{ steps.drift.outputs.updater }}
+      tabulator: ${{ steps.drift.outputs.tabulator }}
     defaults:
       run:
         working-directory: tool
@@ -68,6 +74,13 @@ jobs:
           python3 -I oracle/fuzz/edge.py
           python3 -I oracle/fuzz/run.py "$GITHUB_RUN_ID" 5000
 
+      # The rows a tab's base options keep: TestGrid's tabulator against testgrid_config.py.
+      - name: Tab filters, edge cases then random
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          export GOCHECK="$RUNNER_TEMP/oracle/gocheck"
+          python3 -I oracle/fuzz/filterdiff.py "$GITHUB_RUN_ID" 20000
+
       # (the cases a random seed found to differ, to replay them: run.py writes them to bad-<seed>.jsonl)
       - name: Keep the random builds that differ
         if: ${{ failure() && hashFiles('tool/bad-*.jsonl') != '' }}
@@ -83,20 +96,54 @@ jobs:
           export TGORACLE="$RUNNER_TEMP/oracle/tgoracle"
           uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 2
 
-      # TestGrid's image tags end in -g<commit>: a newer one may paint cells by another rule.
       - name: TestGrid production still runs the pinned commit
+        id: drift
         if: ${{ !cancelled() }}
+        run: oracle/drift.sh
+
+  # When production runs another commit: the port checked against TestGrid's code at
+  # that commit, and pinned.json moved there on a branch (and proposed as a pull
+  # request, where GitHub Actions may open one) when nothing the port follows changed.
+  follow:
+    name: Port against production's new commit
+    needs: oracle
+    if: ${{ !cancelled() && needs.oracle.outputs.moved == 'true' && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write # push the branch that moves pinned.json
+      pull-requests: write # and propose it
+    defaults:
+      run:
+        working-directory: tool
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - id: pinned
+        run: echo "go=$(python3 -c 'import json; print(json.load(open("oracle/pinned.json"))["go"])')" >> "$GITHUB_OUTPUT"
+
+      # (a newer Go that the new commit's go.mod asks for is fetched by the go command itself)
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ steps.pinned.outputs.go }}
+          cache: false
+
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.11.16"
+          enable-cache: true
+          cache-dependency-glob: tool/uv.lock
+
+      - name: Check the port against the new commit, and propose it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPDATER: ${{ needs.oracle.outputs.updater }}
+          TABULATOR: ${{ needs.oracle.outputs.tabulator }}
         run: |
-          tag=$(curl -fsS --retry 3 https://raw.githubusercontent.com/GoogleCloudPlatform/testgrid/main/cluster/prod/updater.yaml |
-            sed -n 's|.*image: gcr.io/k8s-testgrid/updater:\(.*\)$|\1|p' | head -n 1)
-          if [ -z "$tag" ]; then
-            echo "::error::Could not read the updater image tag from TestGrid's cluster/prod/updater.yaml."
+          if [ -z "$UPDATER" ] || [ "$UPDATER" != "$TABULATOR" ]; then
+            echo "::error::Production's updater (${UPDATER:-unknown}) and tabulator (${TABULATOR:-unknown}) do not run one commit: compare each with the port by hand."
             exit 1
           fi
-          running=${tag##*-g}
-          pinned=$(python3 -c 'import json; print(json.load(open("oracle/pinned.json"))["testgrid_commit"])')
-          echo "production: $tag (commit $running), pinned: $pinned"
-          if [ -z "$running" ] || { [ "${pinned#"$running"}" = "$pinned" ] && [ "${running#"$pinned"}" = "$running" ]; }; then
-            echo "::error::TestGrid production now runs $tag, not the pinned commit $pinned: compare its pkg/updater, util/gcs and metadata with the port, then update tool/oracle/pinned.json (see tool/oracle/README.md)."
-            exit 1
-          fi
+          oracle/follow.sh "$UPDATER" "$GITHUB_RUN_ID"

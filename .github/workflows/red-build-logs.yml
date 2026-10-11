@@ -72,9 +72,9 @@ jobs:
       group: red-build-logs-archive-${{ github.ref }}
       cancel-in-progress: false
     runs-on: ubuntu-24.04
-    # More than the step timeouts below (5 + 50 + 20 + 10) plus checkout and
+    # More than the step timeouts below (5 + 2 + 10 + 50 + 20 + 10) plus checkout and
     # setup-uv, so the commit step always gets to run.
-    timeout-minutes: 95
+    timeout-minutes: 110
     permissions:
       contents: write # push the archive back to the branch
     steps:
@@ -99,6 +99,26 @@ jobs:
         timeout-minutes: 5
         run: uv sync --no-dev --locked --project tool
 
+      # The rule builds TestGrid no longer shows are judged by follows the commit TestGrid
+      # production runs (tool/oracle/pinned.json). If production moved, this run warns;
+      # the oracle workflow (daily) checks the port against the new commit.
+      - name: TestGrid production still runs the commit the port follows
+        continue-on-error: true
+        timeout-minutes: 2
+        run: tool/oracle/drift.sh
+
+      # TestGrid's config for the tabs, built from test-infra the way testgrid.k8s.io's
+      # is (tool/testgrid_config.sh: the configurator image test-infra's upload job
+      # runs, with no network): the rows each tab shows and the options its builds
+      # are read with, to judge builds TestGrid no longer shows. If this fails, the
+      # fetch uses the config the last run read, and says so.
+      - name: Read TestGrid's config from test-infra
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          PYTHON: tool/.venv/bin/python
+        run: tool/testgrid_config.sh "$RUNNER_TEMP/testgrid-config.json"
+
       # On a timeout or cancel the runner signals only the step's own process:
       # SIGINT, then SIGTERM, then SIGKILL. exec makes that process Python itself,
       # so the tool stops cleanly; a bash or a uv in between would die first and
@@ -107,7 +127,7 @@ jobs:
         id: fetch
         continue-on-error: true
         timeout-minutes: 50
-        run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --gzip
+        run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --gzip --testgrid-config "$RUNNER_TEMP/testgrid-config.json"
 
       - name: Verify the archive against TestGrid and GCS
         id: verify

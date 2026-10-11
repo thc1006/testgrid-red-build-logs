@@ -4,14 +4,14 @@ realdiff.py ARCHIVE BUILDS_PER_JOB (the jobs are the tabs of the archive's lates
 TestGrid's code is given each build as read here, independently of the fetch (a
 plain paged listing of the build's folder, objects named as listed, a gzip-stored
 one of unknown size, the junit files read decompressed, as TestGrid's GCS client
-reads them). The fetch's side is fetch_red_logs.gcs_column itself: its listing, its
-pages, the junit files it picks and reads, their sizes and encodings, made again at
-the moment TestGrid's code judged the build. A mistake in either reading shows."""
+reads them). The fetch's side is what fetch_red_logs.gcs_column itself read (its
+listing, its pages, the junit files it picks and reads, their sizes and
+encodings), judged by the port with TestGrid's stop and at the moment TestGrid's
+code judged the build. A mistake in either reading shows."""
 import concurrent.futures as cf
 import json
 import os
 import sys
-import threading
 import time
 import urllib.error
 import urllib.parse
@@ -78,17 +78,6 @@ def oracle_case(query, build):
             "artifacts": artifacts}
 
 
-fetch_side = threading.local()  # the rule's arguments gcs_column assembled, on this thread
-real_column = tr.column
-
-
-def column(*args, **kwargs):
-    fetch_side.args = (args, kwargs)
-    return real_column(*args, **kwargs)
-
-
-tr.column = column
-
 
 def settled(query, build, now):
     """Whether nothing changes between the two readings of a build: it finished more than an
@@ -114,11 +103,10 @@ def judge(query, build, now):
         if not settled(query, build, now):
             return None
         case = oracle_case(query, build)
-        fetch_side.args = None
         col = frl.gcs_column(GCS, query, build, tr.DAYS_OF_RESULTS, now)
         if col.partial:
             return f"{query}/{build}: {col.partial}"
-        return case, fetch_side.args
+        return case, (col.inputs, f"{query.partition('/')[2]}/{build}/")
     except Exception as e:  # noqa: BLE001
         return f"{query}/{build}: {type(e).__name__}: {e}"
 
@@ -145,10 +133,12 @@ for (q, _), r in sorted(zip(jobs, results, strict=True), key=lambda x: -int(x[0]
 print(len(queries), "jobs,", len(failed) + len(judged), "settled builds")
 got = harness.run_oracle([case for case, _ in judged])
 bad, reds = [], 0
-for (case, (args, kwargs)), g in zip(judged, got, strict=True):
+for (case, (inputs, folder)), g in zip(judged, got, strict=True):
     if g is None:
         continue
-    col = real_column("job", *args[1:6], g["now"], **kwargs)  # TestGrid's row names, at the moment it judged
+    # what the fetch read (its listing, pages, sizes, encodings), judged by the port as TestGrid's code
+    # judged the build: the same stop, at the same moment (TestGrid's row names: "job")
+    col = tr.column("job", *inputs, case["stop"], g["now"], folder=folder)
     problems = harness.compare(case, g, col)
     reds += bool(col.errors and "TOOL_FAIL" in col.results or col.red_rows())
     if problems:

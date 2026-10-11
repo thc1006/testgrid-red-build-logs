@@ -76,6 +76,7 @@ import urllib3
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import report  # noqa: E402
+import testgrid_config as tgc  # noqa: E402
 import testgrid_rule as tr  # noqa: E402
 
 TESTGRID = "https://testgrid.k8s.io"
@@ -110,6 +111,7 @@ MAX_DOWNLOAD_BYTES = 4 << 30  # a GCS object larger than this is refused rather 
 MAX_LIST_PAGES = 1000  # a GCS listing that pages on longer than this is broken
 GUNZIP_STEP = 256 << 10  # gunzip yields at most this many bytes per step, whatever the ratio
 GIVE_UP_DAYS = 14  # stop retrying a build GCS still lacks after this long
+HELD_DAYS = 60  # watch a build only its tab's unfollowed config keeps undecided this long
 # Prow's last upload for a build comes within about 20 minutes of its finished.json
 # time, and GCS may keep serving a public object's old content from cache for up to
 # 60 minutes after an overwrite (https://cloud.google.com/storage/docs/consistency),
@@ -117,7 +119,10 @@ GIVE_UP_DAYS = 14  # stop retrying a build GCS still lacks after this long
 SETTLE_HOURS = 2
 RECHECK_HOURS = 48  # compare an archived build with GCS on every run until this long after it finished
 UNLISTED_DAYS = 30  # forget a tab missing from its dashboard's summary after this long
-SERIOUS = ("may be missing", "state.json", "no longer listed", "old layout")  # warnings that fail the run
+SERIOUS = ("may be missing", "state.json", "no longer listed", "old layout",  # warnings that fail the run
+           "cannot be judged from GCS", "TestGrid's config was last read", "TestGrid's config was never read",
+           "the filters cannot be applied here", "does not match the tab")
+CONFIG_STALE_DAYS = 3  # TestGrid's config not read for this long is a serious warning
 BACKFILL_SLACK_HOURS = 6  # a build may start this long after its ID was made
 PROWJOB_WAIT = 30  # seconds to wait for prowjob.json; without it a tab keeps the margin it had
 GIVEN_UP_KEEP_DAYS = 30  # a build given up on stays listed this long, then only the run reports name it
@@ -264,7 +269,47 @@ def bind_context(ctx):
 # requests are small HEADs and GETs to the same two hosts, and reusing a
 # connection saves its TLS handshake (measured: 15-37% faster). request()
 # does the retrying, and follows redirects itself (same host only).
+MAX_INTERIM = 50  # interim (1xx) responses taken before a final one ...
+INTERIM_SECONDS = 60.0  # ... and for at most this long (each is read with the request's timeout)
+
+
+class FinalResponse(http.client.HTTPResponse):
+    """http.client's response, past every interim (1xx) response before it, as an HTTP/1.1
+    client must take them: http.client skips only 100 Continue, so a 102 or a 103 (Early
+    Hints) would be taken for the response, and the real one left on the connection for
+    the next request. 101 (Switching Protocols) is final, and refused by fetch_once."""
+
+    def _read_status(self):
+        start = time.monotonic()
+        for _ in range(MAX_INTERIM + 1):
+            version, status, reason = super()._read_status()
+            if not 100 <= status < 200 or status == 101:
+                return version, status, reason
+            if time.monotonic() - start > INTERIM_SECONDS:
+                raise http.client.HTTPException(f"interim responses for more than {INTERIM_SECONDS:.0f} s")
+            http.client.parse_headers(self.fp)  # its headers (bounded as any response's are)
+        raise http.client.HTTPException(f"more than {MAX_INTERIM} interim responses")
+
+
+class _HTTPConnection(urllib3.connection.HTTPConnection):
+    response_class = FinalResponse
+
+
+class _HTTPSConnection(urllib3.connection.HTTPSConnection):
+    response_class = FinalResponse
+
+
+class _HTTPPool(urllib3.HTTPConnectionPool):
+    ConnectionCls = _HTTPConnection
+
+
+class _HTTPSPool(urllib3.HTTPSConnectionPool):
+    ConnectionCls = _HTTPSConnection
+
+
+POOL_CLASSES = {"http": _HTTPPool, "https": _HTTPSPool}
 HTTP = urllib3.PoolManager(num_pools=16, maxsize=64, block=False, retries=False)
+HTTP.pool_classes_by_scheme = POOL_CLASSES
 _PROXIES, _PROXY_POOLS, _PROXY_LOCK = urllib.request.getproxies(), {}, threading.Lock()
 MAX_REDIRECTS = 10
 
@@ -288,6 +333,7 @@ def pool_for(url):
                 maxsize=HTTP.connection_pool_kw["maxsize"], block=False, retries=False,
                 proxy_headers=urllib3.make_headers(proxy_basic_auth=auth, proxy_basic_auth_encoding="utf-8")
                 if auth else None)
+            _PROXY_POOLS[proxy].pool_classes_by_scheme = POOL_CLASSES
         return _PROXY_POOLS[proxy]
 
 
@@ -352,10 +398,8 @@ def fetch_once(url, consume, headers, timeout, method):
                     raise
         consumed = False
         try:
-            if raw.status < 200:
-                # an interim response (103 Early Hints) is followed by the real one on the same
-                # connection: never read past it, or the next request would get that
-                raise IntegrityError(f"{url}: unexpected interim response {raw.status}")
+            if raw.status < 200:  # (101: FinalResponse takes every other 1xx as interim)
+                raise IntegrityError(f"{url}: unexpected informational response {raw.status}")
             if raw.status in (301, 302, 303, 307, 308) and raw.headers.getlist("Location"):
                 if len(raw.headers.getlist("Location")) != 1:
                     raise urllib.error.HTTPError(url, raw.status, "more than one Location header",
@@ -857,13 +901,16 @@ def list_build_ids(gcs, query, lo, hi):
     raise IntegrityError(f"the GCS listing of gs://{query}/ did not end after {MAX_LIST_PAGES} pages")
 
 
-def scan(testgrid, gcs, dashboards, pool, deadline):
+def scan(testgrid, gcs, dashboards, pool, deadline, check=None):
     """Read every tab of every dashboard.
 
     Returns (tab reports, red builds by (job, build), every build each query
-    shows, builds shown as still running by (job, build)). A tab's report says
+    shows, builds shown as still running by (job, build), every build each tab
+    read shows, by "dashboard#tab"). A tab's report says
     how far back it shows results ("oldest") and how long its job can run
-    ("max_job_hours", from prowjob.json when known).
+    ("max_job_hours", from prowjob.json when known). check(dashboard, tab, table,
+    query): how the tab's config disagrees with its table ("" when it agrees, None
+    when it has no config), the report's "config_disagrees".
     """
     now = time.time()
     tabs, reports = [], []
@@ -891,7 +938,7 @@ def scan(testgrid, gcs, dashboards, pool, deadline):
     cf.wait(futures, timeout=max(0, deadline - time.monotonic()))
     if not all(f.done() for f in futures):
         context().abandon()
-    builds, visible, newest, running = {}, {}, {}, {}
+    builds, visible, newest, running, shown_on = {}, {}, {}, {}, {}
     for (dashboard, tab, status), fut in zip(tabs, futures, strict=True):
         report_ = {"dashboard": dashboard, "tab": tab, "status": status}
         reports.append(report_)
@@ -910,7 +957,11 @@ def scan(testgrid, gcs, dashboards, pool, deadline):
         columns = fut.result()["changelists"]
         report_.update(query=query, columns=len(columns), oldest=oldest, red_builds=len(found),
                        rows=tab_rows(fut.result(), job, results=bool(shown)))
+        disagrees = check(dashboard, tab, fut.result(), query) if check else None
+        if disagrees is not None:  # ("" when the table agrees with the tab's config)
+            report_["config_disagrees"] = disagrees
         visible.setdefault(query, set()).update(shown)
+        shown_on[f"{dashboard}#{tab}"] = set(shown)
         if columns:
             newest[id(report_)] = pool.submit(prow_job_hours, gcs, query, columns[0])
         for build, started, cells in found:
@@ -927,7 +978,7 @@ def scan(testgrid, gcs, dashboards, pool, deadline):
         fut = newest.get(id(r))
         if fut and fut.done() and fut.exception() is None and fut.result():
             r["max_job_hours"] = fut.result()
-    return reports, builds, visible, running
+    return reports, builds, visible, running, shown_on
 
 
 def gcs_hashes(headers):
@@ -1432,34 +1483,46 @@ def read_finished(base):
 MAX_JUNIT_BYTES = 256 << 20  # a junit file larger than this (only one stored gzipped can be) is not judged here
 
 
-def read_artifact(url, limit):
+def read_artifact(url, limit, when=False):
     """An object's bytes as TestGrid's GCS client reads them (gunzipped when GCS
-    serves them gzipped), None when there is no such object."""
+    serves them gzipped), None when there is no such object. With when: (its bytes,
+    when GCS says it was last written (Last-Modified), or None)."""
     def consume(r):
         encoding = (r.headers.get("Content-Encoding") or "identity").strip().lower()
         if encoding == "identity":
-            return read_body(r, limit)
-        if encoding != "gzip":
+            body = read_body(r, limit)
+        elif encoding != "gzip":
             raise IntegrityError(f"{r.url}: unsupported Content-Encoding {encoding!r}")
-        out, total = [], 0
-        for piece in gunzipped(chunks(r, r.url)):
-            total += len(piece)
-            if total > limit:
-                raise IntegrityError(f"{r.url}: more than the {limit} byte limit")
-            out.append(piece)
-        return b"".join(out)
+        else:
+            out, total = [], 0
+            for piece in gunzipped(chunks(r, r.url)):
+                total += len(piece)
+                if total > limit:
+                    raise IntegrityError(f"{r.url}: more than the {limit} byte limit")
+                out.append(piece)
+            body = b"".join(out)
+        return (body, last_modified(r.headers)) if when else body
     try:
         return request(url, consume=consume)
     except NotFound:
+        return (None, None) if when else None
+
+
+def last_modified(headers):
+    """The Last-Modified header as a Unix time, None if there is no usable one."""
+    try:
+        t = email.utils.parsedate_to_datetime(headers.get("Last-Modified") or "").timestamp()
+    except (TypeError, ValueError, OverflowError, IndexError):
         return None
+    return t if plausible_time(t, time.time()) else None
 
 
 def list_objects(gcs, bucket, folder):
     """Every object under gs://bucket/folder, as TestGrid lists a build's artifacts:
-    {name: (size, stored gzipped?)}."""
+    {name: (size, stored gzipped?, when GCS says it was written (None if not known))}."""
     out, token = {}, None
     for _ in range(MAX_LIST_PAGES):
-        params = {"prefix": folder, "fields": "items(name,size,contentEncoding),nextPageToken"}
+        params = {"prefix": folder, "fields": "items(name,size,contentEncoding,timeCreated),nextPageToken"}
         if token:
             params["pageToken"] = token
         page = get_json(f"{gcs}/storage/v1/b/{quote(bucket)}/o?{urllib.parse.urlencode(params)}")
@@ -1471,47 +1534,109 @@ def list_objects(gcs, bucket, folder):
             if not isinstance(name, str) or not name.startswith(folder) or not isinstance(size, str) \
                     or not size.isascii() or not size.isdigit():
                 raise IntegrityError(f"unexpected object in the GCS listing of gs://{bucket}/{folder}")
-            out[name] = (int(size), str(item.get("contentEncoding") or "").strip().lower() == "gzip")
+            out[name] = (int(size), str(item.get("contentEncoding") or "").strip().lower() == "gzip",
+                         rfc3339_time(item.get("timeCreated")))
         token = page.get("nextPageToken")
         if not token:
             return out
     raise IntegrityError(f"the GCS listing of gs://{bucket}/{folder} did not end after {MAX_LIST_PAGES} pages")
 
 
+def rfc3339_time(text):
+    """A GCS timestamp ("2026-10-11T12:34:56.789Z") as a Unix time, None if it is not one."""
+    try:
+        t = dt.datetime.fromisoformat(text).timestamp() if isinstance(text, str) and len(text) <= 40 else None
+    except (ValueError, OverflowError):
+        return None
+    return t if t is not None and plausible_time(t, time.time()) else None
+
+
+DEADLINE = 24 * 3600  # TestGrid paints a build not finished this long after it started FAIL
+POD_WAIT = 3600  # its Pod row waits this long after finished.json's timestamp for podinfo.json
+UPDATE_SPAN = 20 * 60  # one update of a group takes at most this long (--group-timeout=20m), its stop set at the start
+DEADLINE_RACE = 2 * 3600 + UPDATE_SPAN  # its updater updates each group at least every 2 hours (--wait=2h)
+
+
 def gcs_column(gcs, query, build, days=tr.DAYS_OF_RESULTS, now=None):
     """TestGrid's column for a build, from GCS read as its updater reads it (see
     testgrid_rule): started.json, finished.json, podinfo.json and, unless reading
     those failed (that error is then the column), every junit file it would parse.
-    A build that started more than `days` (the tab's days of results) before it was
-    made counts as too old, as TestGrid then calls it. Reads of those three files
-    that fail raise; if the junit files cannot be listed or read, the column is the
-    one without them, with .partial saying why (see verdict)."""
+    Reads of those three files that fail raise; if the junit files cannot be listed
+    or read, the column is the one without them, with .partial saying why (see
+    verdict).
+
+    The column is the one TestGrid read last, from what GCS held then (objects by when
+    GCS says they were written; one without a time counts as there): its read once
+    finished.json is in and the Pod row has stopped waiting (podinfo.json is in, or an
+    hour after finished.json's timestamp passed), or, for a build without finished.json
+    24 hours after it started, its read after that deadline: its Overall cell is FAIL
+    then and no cell of it runs, so TestGrid does not read it again, even when it
+    finishes later. TestGrid updates a job's builds at least every 2 hours, an update
+    taking up to 20 minutes, so what was written that long after such a moment may be
+    in its read instead: that column is in .alternatives. A build that started more
+    than `days` (the tab's days of results)
+    before the update that read it began counts as too old. Without finished.json's
+    time, the column is the one GCS holds now. .inputs: what GCS holds, as given to the rule."""
     base = f"{gcs}/{query}/{build}"
     job = query.rsplit("/", 1)[-1]
-    files = [read_artifact(f"{base}/{name}", MAX_JSON_BYTES) for name in ("started.json", "finished.json", "podinfo.json")]
+    started = read_artifact(f"{base}/started.json", MAX_JSON_BYTES)
+    finished, finished_at = read_artifact(f"{base}/finished.json", MAX_JSON_BYTES, when=True)
+    podinfo, podinfo_at = read_artifact(f"{base}/podinfo.json", MAX_JSON_BYTES, when=True)
     now = time.time() if now is None else now
-    stop = created(build) - int(days * 86400)
-    col = tr.column(job, *files, [], stop, now)
-    partial = None
-    if not col.errors:
+    made, span = created(build), int(days * 86400)
+    probe = tr.column(job, started, finished, podinfo, [], made - span, now)
+    s, f = probe.started, probe.finished
+    ended = finished is not None and f is not None and f > 0  # (TestGrid takes it as finished once it reads that)
+    if s and now > s + DEADLINE and not (ended and (finished_at is None or finished_at <= s + DEADLINE)):
+        last = s + DEADLINE + 1  # its deadline passed first
+    elif ended and finished_at is not None:
+        # (a podinfo.json without a pod leaves the Pod row waiting, as none does)
+        has_pod = not probe.errors and probe.notes.get(job + ".Pod") != tr.MISSING_POD_INFO
+        in_time = podinfo is not None and has_pod and (podinfo_at is None or podinfo_at <= f + POD_WAIT)
+        last = max(finished_at, podinfo_at or finished_at) if in_time else max(finished_at, f + POD_WAIT + 1)
+    else:
+        last = None
+    last = max(last, made) if last is not None else None  # (TestGrid reads a build only once it exists)
+    last = last if last is not None and last <= now else None  # (None: still read again; as of now)
+
+    def view(at, junits, folder=""):
+        """The column TestGrid read at `at` (None: from what GCS holds now)."""
+        if at is None:
+            return tr.column(job, started, finished, podinfo, [j[:3] for j in junits], made - span, now, folder=folder)
+        held = lambda written: written is None or written <= at  # noqa: E731
+        return tr.column(job, started, finished if held(finished_at) else None, podinfo if held(podinfo_at) else None,
+                         [j[:3] for j in junits if held(j[3])], at - UPDATE_SPAN - span, at, folder=folder)
+
+    partial, junits = None, []
+    if not probe.errors or not view(last, []).errors:  # (TestGrid lists the junit files of a build it could read)
         bucket, _, path = query.partition("/")
         folder = f"{path}/{build}/"
         try:
             listing = list_objects(gcs, bucket, folder)
-            junits = []
             for _, opened in tr.junit_reads(sorted(listing)):
-                size, gzipped = listing.get(opened, (None, False))
+                size, gzipped, written = listing.get(opened, (None, False, None))
                 if size is None:
-                    junits.append((opened, None, None))  # TestGrid cannot open it either
+                    junits.append((opened, None, None, None))  # TestGrid cannot open it either
                     continue
                 size = -1 if gzipped else size  # read decompressed, of unknown length
                 data = b"" if size > tr.JUNIT_MAX_SIZE else read_artifact(
                     f"{gcs}/{bucket}/{urllib.parse.quote(opened, safe='/')}", MAX_JUNIT_BYTES)
-                junits.append((opened, size, data))
-            col = tr.column(job, *files, junits, stop, now, folder=folder)
+                junits.append((opened, size, data, written))
         except (urllib.error.HTTPError, *TRANSIENT) as e:  # TestGrid read them then; they cannot be read now
             partial = f"its junit files cannot be read: {type(e).__name__}: {e}"[:300]
-    col.has_finished, col.partial = files[1] is not None, partial
+            junits = []
+    else:
+        folder = ""
+    # (a later read, for each object written within the window: right after it, the update that
+    # made it begun at most UPDATE_SPAN before)
+    later = sorted({w for w in (finished_at, podinfo_at, *(j[3] for j in junits))
+                    if w is not None and last is not None and last < w <= min(last + DEADLINE_RACE, now)})
+    later = later if len(later) <= 4 else later[:3] + later[-1:]  # (the last read has them all)
+    cols = [view(at, junits, folder) for at in [last, *(min(w + 1, now) for w in later)]]
+    for c in cols:
+        c.has_finished, c.partial = finished is not None, partial
+    col = cols[0]
+    col.alternatives, col.inputs = cols[1:], (started, finished, podinfo, [j[:3] for j in junits])
     return col
 
 
@@ -1521,34 +1646,76 @@ def unreadable_junit(col):
     return col.partial if getattr(col, "partial", None) and "RUNNING" not in (col.cells or {}).values() else None
 
 
-def verdict(col, job, rows=None):
+def verdict(col, job, rows=None, shows=None):
     """What TestGrid's column for the build shows on a tab: ("red", red rows), or,
     when it is not red there, ("undecided", []) while TestGrid would still read it
     again (not started, or a cell still RUNNING: the build, or its Pod row waiting
     for podinfo.json) or its junit files cannot be read, else ("not-red", []).
-    rows: {"overall": shown?, "pod": shown?} for the tab (shown when not known). Of
-    the columns readResult's racing reads can give, the build counts as red when
-    any is."""
-    rows = rows or {}
-    if col.errors:
-        if "TOOL_FAIL" in col.results:
-            return "red", [{"test": "Overall", "status": "TOOL_FAIL", "message": "TestGrid could not read the build from GCS"}]
-        if "UNKNOWN" in col.results or col.has_finished:
-            return "not-red", []  # too old, or finished without ever starting: never red
+    shows(row): whether the tab shows a row (its config's filters, see
+    testgrid_config.TabRule); without it, rows: {"overall": shown?, "pod": shown?},
+    as learned from the tab's table (shown when not known), and every other row is
+    shown. Of the columns readResult's racing reads can give, and of the columns
+    TestGrid may have ended with (col.alternatives, see gcs_column), the build
+    counts as red when any is."""
+    return combine([column_verdict(c, job, rows, shows) for c in (col, *getattr(col, "alternatives", ()))])
+
+
+def combine(verdicts):
+    """One verdict from several: red with every red row when any is red, else undecided when any is."""
+    red = {}
+    for state, cells in verdicts:
+        for c in cells if state == "red" else ():
+            red.setdefault(c["test"], c)
+    if red:
+        return "red", list(red.values())
+    return ("undecided" if any(state == "undecided" for state, _ in verdicts) else "not-red"), []
+
+
+def tab_verdict(col, job, rule, made):
+    """verdict() on a tab by its rule (see run()): undecided for a tab whose columns
+    the port cannot paint as TestGrid does ("problem"); by its config's filters
+    ("shows"), or, where they cannot be applied, the rows its table showed ("rows");
+    and both, red when either is, for a build made before the tab's config last
+    agreed with its table ("unreliable_until")."""
+    if rule.get("problem"):
         return "undecided", []
-    if not col.red(job, rows.get("overall", True), rows.get("pod", True)):
-        # TestGrid reads a column again while any cell of it runs (truncateRunning): the build,
-        # or its Pod row waiting for podinfo.json; what it reads then can still turn it red.
-        # And without its junit files a column is only as red as its job's rows: a failing
+    shows = rule.get("shows")
+    if shows is None:
+        return verdict(col, job, rule.get("rows"))
+    try:
+        by_config = verdict(col, job, rule.get("rows"), shows)
+    except tgc.Unsupported:  # (its filters ran out of time: TabRule keeps that as its filter_problem)
+        return verdict(col, job, rule.get("rows"))
+    if made < rule.get("unreliable_until", -math.inf):
+        return combine([by_config, verdict(col, job, rule.get("rows"))])
+    return by_config
+
+
+def column_verdict(col, job, rows=None, shows=None):
+    """verdict() for one column."""
+    if shows is None:
+        rows = rows or {}
+        hidden = {job + ".Overall"} if not rows.get("overall", True) else set()
+        hidden |= {job + ".Pod"} if not rows.get("pod", True) else set()
+        shows = lambda row: row not in hidden  # noqa: E731
+    if col.errors:
+        # (a column TestGrid could not read has one row, "Overall"; a tab that hides it shows no such column)
+        if "TOOL_FAIL" in col.results and shows("Overall"):
+            return "red", [{"test": "Overall", "status": "TOOL_FAIL", "message": "TestGrid could not read the build from GCS"}]
+        if "UNKNOWN" in col.results or col.has_finished or "RUNNING" not in col.results:
+            return "not-red", []  # too old, finished without ever starting, or a TOOL_FAIL the tab hides: never red
+        return "undecided", []
+    red = [row for row in col.red_rows() if shows(row)]
+    if not red:
+        # TestGrid reads a column again while any cell of it runs (truncateRunning), shown or not:
+        # the build, or its Pod row waiting for podinfo.json; what it reads then can still turn it
+        # red. And without its junit files a column is only as red as its job's rows: a failing
         # test could still make it red.
         running = "RUNNING" in col.cells.values()
         return ("undecided" if running or getattr(col, "partial", None) else "not-red"), []
     # Red now is red: what makes a cell red comes from objects GCS writes whole and once
     # (finished.json, podinfo.json, junit files), so reading them again keeps it red.
-    hidden = {job + ".Overall"} if not rows.get("overall", True) else set()
-    hidden |= {job + ".Pod"} if not rows.get("pod", True) else set()
-    return "red", [{"test": row, "status": col.cells[row], "message": col.notes.get(row) or None}
-                   for row in col.red_rows() if row not in hidden]
+    return "red", [{"test": row, "status": col.cells[row], "message": col.notes.get(row) or None} for row in red]
 
 
 def tab_rows(table, job, results=False):
@@ -1569,6 +1736,33 @@ def known_rows(rows):
     if isinstance(rows, dict) and set(rows) == {"overall", "pod"} and all(isinstance(v, bool) for v in rows.values()):
         return rows
     return None
+
+
+def read_config(path, warnings):
+    """TestGrid's config for the tabs, as testgrid_config.sh wrote it to `path`:
+    ({"dashboard#tab": entry}, its source), or (None, None) with a warning."""
+    try:
+        return tgc.load(path)
+    except (OSError, ValueError) as e:
+        warnings.append(f"TestGrid's config could not be read from {path} ({type(e).__name__}: {str(e)[:200]})")
+        return None, None
+
+
+def config_mismatch(rule, table, query):
+    """How a tab's table disagrees with its config (a testgrid_config.TabRule): builds
+    read from another GCS prefix, or rows shown that its base options hide; "" when it
+    agrees, None when that is not known (its filters cannot be applied)."""
+    problems = []
+    if rule.prefix != query:
+        problems.append(f"its test group reads gs://{rule.prefix}, the tab shows gs://{query}")
+    try:
+        hidden = [t["name"] for t in table.get("tests", []) if isinstance(t, dict) and isinstance(t.get("name"), str)
+                  and not rule.shows(t["name"])]
+    except tgc.Unsupported:  # (TabRule.filter_problem says why)
+        return "; ".join(problems) or None
+    if hidden:
+        problems.append(f"the tab shows {len(hidden)} rows its base options hide, such as {hidden[0][:200]!r}")
+    return "; ".join(problems)
 
 
 def tab_days(oldest, scanned):
@@ -1708,6 +1902,8 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
             return "not-red", rec  # finished (or never started, or too old) and not red on any of its tabs
         if partial:  # finished, and only its junit files keep it from being judged: an error
             raise IntegrityError(f"cannot be judged by TestGrid's rule: {partial}")
+        if held_by(rec, tab_rules or {}):  # until the port follows its tab's config, for as long as GCS keeps it
+            return ("held" if now - rec["created"] <= HELD_DAYS * 86400 else "stopped-holding"), rec
         return ("watching" if now - rec["created"] <= GIVE_UP_DAYS * 86400 else "stopped-watching"), rec
     rec = {k: v for k, v in rec.items() if k != "watch"}
     rec["tabs"] = tabs
@@ -1723,19 +1919,27 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
 def judge_in_tabs(gcs, rec, tab_rules):
     """("red", its tabs with their red cells) when TestGrid's column for the build is
     red on one of the tabs in rec["tabs"], else ("not-red" | "undecided", []); and the
-    column's .partial (why its junit files were not read, else None)."""
+    column's .partial (why its junit files were not read, else None). A tab whose
+    config is not followed here (its rule's "problem") leaves the build undecided."""
     rules = [tab_rules.get(f"{t['dashboard']}#{t['tab']}", {}) for t in rec["tabs"]]
     col = gcs_column(gcs, rec["query"], rec["build"], max([r.get("days", tr.DAYS_OF_RESULTS) for r in rules] or
                                                           [tr.DAYS_OF_RESULTS]))
     states, red = [], []
     for t, rule in zip(rec["tabs"], rules, strict=True):
-        state, cells = verdict(col, rec["job"], rule.get("rows"))
+        state, cells = tab_verdict(col, rec["job"], rule, rec["created"])
         states.append(state)
         if state == "red":
             red.append(dict(t, red_cells=cells, judged_from_gcs=True))
     if red:
         return "red", red, getattr(col, "partial", None)
     return ("undecided" if "undecided" in states else "not-red"), [], unreadable_junit(col)
+
+
+def held_by(rec, tab_rules):
+    """Why the port cannot judge the build on one of its tabs (a test group option of
+    the tab's config it does not follow), or None."""
+    return next((tab_rules[k]["problem"] for k in (f"{t['dashboard']}#{t['tab']}" for t in rec["tabs"])
+                 if (tab_rules.get(k) or {}).get("problem")), None)
 
 
 def backfill_note(tabs, partial=None):
@@ -2223,6 +2427,13 @@ def write_run_readme(root, rel, run, entries):
                                                                        if updated else "") + ".")
         if run.get("interrupted") is True:
             lines.append("The run was interrupted; unfinished builds are retried by the next run.")
+        read = run.get("testgrid_config")
+        source = read.get("source") if isinstance(read, dict) else None
+        if isinstance(source, dict) and isinstance(source.get("test_infra"), str) and \
+                plausible_time(source.get("committed"), time.time()) and plausible_time(read.get("read"), time.time()):
+            when = "by this run" if read["read"] == run.get("started") else f"by the run of {iso(read['read'])}"
+            lines.append(f"TestGrid's config: built from test-infra {md_cell(source['test_infra'][:12])} of "
+                         f"{iso(source['committed'])}, read {when}.")
     else:
         lines.append("This run was cut off before it wrote its report.")
     lines += ["", f"[run.json](run.json) has the details; [INDEX.md]({up}INDEX.md) lists every build. "
@@ -2414,9 +2625,43 @@ def load_state(root, warnings):
                     tabs[k][name] = v[name]
         else:
             warnings.append(f"state.json: dropped a malformed tabs entry {str(k)[:80]!r}")
+    # each tab's TestGrid config: {"config": entry, "read": when, "mismatch": record}, kept apart from
+    # its scans (a tab can lose those, or be forgotten, while builds of it are still judged)
+    configs = {}
+    value = state.get("tab_configs")
+    if value is not None and not isinstance(value, dict):
+        warnings.append("state.json: tab_configs is not an object; dropped it")
+    for k, v in (value.items() if isinstance(value, dict) else ()):
+        if not isinstance(v, dict) or not set(v) <= {"config", "read", "mismatch"}:
+            warnings.append(f"state.json: dropped a malformed tab_configs entry {str(k)[:80]!r}")
+            continue
+        kept = {}
+        if "config" in v:
+            if tgc.valid_entry(v["config"]):
+                kept["config"] = v["config"]
+                if plausible_time(v.get("read"), now):
+                    kept["read"] = v["read"]
+            else:
+                warnings.append(f"state.json: dropped the malformed TestGrid config of {str(k)[:80]!r}")
+        m = v.get("mismatch")
+        if m is not None:
+            if isinstance(m, dict) and set(m) == {"detail", "since", "until"} and is_text(m["detail"], 4096) \
+                    and plausible_time(m["since"], now) and (m["until"] is None or plausible_time(m["until"], now)):
+                kept["mismatch"] = m
+            else:
+                warnings.append(f"state.json: dropped a malformed config mismatch record of {str(k)[:80]!r}")
+        if kept:
+            configs[k] = kept
+    read = state.get("testgrid_config")
+    if read is not None and not (isinstance(read, dict) and plausible_time(read.get("read"), now)
+                                 and isinstance(read.get("source"), dict)
+                                 and isinstance(read["source"].get("test_infra"), str)
+                                 and plausible_time(read["source"].get("committed"), now)):
+        warnings.append("state.json: dropped a malformed testgrid_config record")
+        read = None
     # Older archives also kept "no_log" here; the builds' own meta.json now says what to re-check.
     return {"tabs": tabs, "unresolved": entries("unresolved"), "given_up": entries("given_up"),
-            "watch": entries("watch")}
+            "watch": entries("watch"), "tab_configs": configs, **({"testgrid_config": read} if read else {})}
 
 
 def valid_rec(rec, now):
@@ -2589,7 +2834,7 @@ def backfill_gaps(gaps, gcs, pool, deadline, visible, skip, known=frozenset(), t
             continue
         job = r["query"].rsplit("/", 1)[-1]
         if fut.exception() is None:
-            state, cells = verdict(fut.result(), job, tab_rules.get(key, {}).get("rows"))
+            state, cells = tab_verdict(fut.result(), job, tab_rules.get(key, {}), created(b))
             partial = fut.result().partial
         else:
             state, cells, partial = "undecided", [], "unreadable"
@@ -2647,6 +2892,10 @@ def main(argv=None):
     p.add_argument("--max-file-mb", type=positive(float), default=95,
                    help="store a file larger than this (MiB) as numbered parts of this size, as GitHub rejects "
                         "files over 100 MB (default: 95)")
+    p.add_argument("--testgrid-config", metavar="PATH",
+                   help="TestGrid's config for the tabs, as testgrid_config.sh writes it: the rows each tab shows and "
+                        "its test group's options, to judge builds TestGrid no longer shows (default, or when it "
+                        "cannot be read: the config the last run read, kept in state.json)")
     p.add_argument("--list-only", action="store_true", help="print the red builds without downloading")
     p.add_argument("--testgrid", default=TESTGRID)
     p.add_argument("--gcs", default=GCS)
@@ -2701,7 +2950,19 @@ def run(args, root, run_start, pool, deadline):
     folders = run_dirs(root)
     archive_start = folder_time(folders[0].rsplit("/", 1)[1]) if folders else None
     dashboards = args.dashboards or DASHBOARDS
-    reports, builds, visible, running = scan(args.testgrid, args.gcs, dashboards, pool, deadline)
+    # TestGrid's config for each tab (what it was built from test-infra into): the one read
+    # now, else the one an earlier run read (each tab's with when it was read)
+    config, config_source = read_config(args.testgrid_config, warnings) if args.testgrid_config else (None, None)
+    tab_config = {k: c["config"] for k, c in state["tab_configs"].items() if "config" in c}
+    config_read = {k: c.get("read") for k, c in state["tab_configs"].items() if "config" in c}
+    tab_config.update(config or {})
+    config_read.update(dict.fromkeys(config or (), run_start))
+    rules = {key: tgc.TabRule(entry) for key, entry in tab_config.items()}
+
+    def check(dashboard, tab, table, query):
+        rule = rules.get(f"{dashboard}#{tab}")
+        return config_mismatch(rule, table, query) if rule else None
+    reports, builds, visible, running, shown_on = scan(args.testgrid, args.gcs, dashboards, pool, deadline, check)
     timings = {"scan": round(time.time() - run_start, 2)}
     job_hours = {}  # per tab, the job durations to remember for the next run
     for r in reports:
@@ -2717,6 +2978,63 @@ def run(args, root, run_start, pool, deadline):
                  for key, t in state["tabs"].items()}
     tab_rules.update({f"{r['dashboard']}#{r['tab']}": {"rows": r.get("rows"), "days": tab_days(r.get("oldest"), run_start)}
                       for r in reports if r.get("tab") is not None and not r.get("error") and r.get("oldest")})
+    # A tab whose table shows a row its config's filters hide (or builds of another GCS
+    # folder) does not follow that config (yet): remembered per tab, and a build made before
+    # the tab agrees with it again is judged by the rows its table showed too (tab_verdict).
+    mismatch_of = {k: c["mismatch"] for k, c in state["tab_configs"].items() if "mismatch" in c}
+    for r in reports:
+        if r.get("tab") is None or "config_disagrees" not in r:
+            continue
+        key, found = f"{r['dashboard']}#{r['tab']}", r.pop("config_disagrees")
+        prev = mismatch_of.get(key)
+        if found:
+            mismatch_of[key] = {"detail": found, "since": prev["since"] if prev and prev["until"] is None else run_start,
+                                "until": None}
+        elif prev and prev["until"] is None:
+            mismatch_of[key] = dict(prev, until=run_start)
+    mismatch_of = {k: m for k, m in mismatch_of.items()
+                   if m["until"] is None or run_start - m["until"] <= (HELD_DAYS + 1) * 86400}
+    # ... and where TestGrid's config is known, the rows its base options keep and its days of
+    # results; a tab whose test group the port does not follow is not judged
+    for key, rule in rules.items():
+        m = mismatch_of.get(key)
+        tab_rules[key] = dict(tab_rules.get(key, {}), days=rule.days, shows=None if rule.filter_problem else rule.shows,
+                              problem=rule.group_problem, unreliable_until=(m["until"] or math.inf) if m else -math.inf)
+    listed_ok = sorted(f"{r['dashboard']}#{r['tab']}" for r in reports if r.get("tab") is not None and not r.get("error"))
+    previous_read = state.get("testgrid_config") or {}
+    source = config_source or previous_read.get("source") or {}
+    about = (f"test-infra {source['test_infra'][:12]} of {iso(source['committed'])}" if source else "source unknown")
+    if config is not None:
+        absent = [key for key in listed_ok if key not in config]
+        if absent:
+            warnings.append(f"TestGrid's config read now ({about}) has no tab {', '.join(absent[:3])}"
+                            f"{', ...' if len(absent) > 3 else ''}: for it, the config read before, if any, is used")
+
+    def config_warnings(involved):
+        """Warn about the config of tabs the run reads or judges builds of."""
+        for key in sorted(involved & set(rules)):
+            rule, m = rules[key], mismatch_of.get(key)
+            if rule.group_problem:
+                warnings.append(f"{key}: TestGrid's config for the tab ({about}): {rule.group_problem}; builds the tab "
+                                "no longer shows cannot be judged from GCS until this is fixed")
+            if rule.filter_problem:
+                warnings.append(f"{key}: TestGrid's config for the tab ({about}): {rule.filter_problem}; the filters "
+                                "cannot be applied here, so builds the tab no longer shows are judged by the rows its "
+                                "table shows")
+            if m and m["until"] is None:
+                warnings.append(f"{key}: TestGrid's config ({about}) does not match the tab since {iso(m['since'])}: "
+                                f"{m['detail']}; builds it no longer shows are judged by the rows its table shows too")
+        stale = [k for k in sorted(involved & set(tab_config)) if not (plausible_time(config_read.get(k), run_start)
+                                                                    and run_start - config_read[k] <= CONFIG_STALE_DAYS * 86400)]
+        if stale:
+            last = min((config_read[k] for k in stale if plausible_time(config_read.get(k), run_start)), default=None)
+            warnings.append(f"TestGrid's config was last read {iso(last) if last else 'at an unknown time'} for "
+                            f"{len(stale)} tabs ({', '.join(stale[:3])}{', ...' if len(stale) > 3 else ''}): changes to "
+                            "their filters or test groups since then are not followed")
+        never = [k for k in listed_ok if k not in tab_config] if args.testgrid_config else []
+        if never:
+            warnings.append(f"TestGrid's config was never read for {len(never)} tabs ({', '.join(never[:3])}"
+                            f"{', ...' if len(never) > 3 else ''}): rows their filters hide count as shown")
     read_ok, gaps = {}, []
     for r in reports:
         if r.get("tab") is None or r.get("error"):
@@ -2783,19 +3101,47 @@ def run(args, root, run_start, pool, deadline):
     # Builds a history gap showed still running, or TestGrid showed running long past their
     # time: judged by TestGrid's rule from GCS, once TestGrid no longer shows them (while it
     # does, what it shows decides, and they stay watched).
-    shown_now = {f"{q.rsplit('/', 1)[-1]}/{b}" for q, bs in visible.items() for b in bs}
-    running_now = {f"{job}/{build}" for job, build in running}
+    running_on = {}
+    for (_, build), rec in running.items():
+        for t in rec["tabs"]:
+            running_on.setdefault(f"{t['dashboard']}#{t['tab']}", set()).add(build)
     watched = {k: u for k, u in state["watch"].items()
                if k not in chosen and k not in given_up and k not in state["unresolved"] and k not in known}
-    retry += [u["rec"] for k, u in watched.items() if k not in shown_now]
-    # shown, no longer running and not red (it would be chosen): TestGrid has decided it, unless
-    # a tab that may show it red could not be read now (one of its job, as last read, or any
-    # tab when a dashboard's summary, which lists them, could not be read)
+    # A tab of a watched build that shows it now decides it there: red, it is chosen; running,
+    # it stays watched; else it is not red there. On its tabs that do not show it (not read
+    # now, or scrolled off) it is judged by the rule. It is decided, not red, once every tab
+    # of it shows it, unless a tab that may show it red could not be read now (one of its job,
+    # as last read, or any tab when a dashboard's summary, which lists them, could not be read).
     unread = {(state["tabs"].get(f"{r['dashboard']}#{r['tab']}") or {}).get("query") if r.get("tab") is not None
               else None for r in reports if r.get("error")}
-    shown_settled = sorted(k for k, u in watched.items() if k in shown_now and k not in running_now
-                           and None not in unread and u["rec"]["query"] not in unread)
-    still_shown = [u["rec"] for k, u in watched.items() if k in shown_now and k not in shown_settled]
+    query_of = {k: t.get("query") for k, t in state["tabs"].items()}
+    query_of.update({f"{r['dashboard']}#{r['tab']}": r["query"] for r in reports if r.get("query")})
+
+    def alike(a, b):
+        """Whether tabs a and b show a build's column alike (one renamed, or two of one test group
+        with the same base options), as far as their configs, or else their GCS folders, tell."""
+        ca, cb = tab_config.get(a), tab_config.get(b)
+        if ca and cb:
+            return ca["test_group"] == cb["test_group"] and ca.get("base_options", "") == cb.get("base_options", "")
+        return query_of.get(a) is not None and query_of.get(a) == query_of.get(b)
+
+    shown_settled, still_shown = [], []
+    for k, u in sorted(watched.items()):
+        rec, build = u["rec"], u["rec"]["build"]
+        showing_tabs = {key for key, builds in shown_on.items() if build in builds}
+        showing = {key for key in (f"{t['dashboard']}#{t['tab']}" for t in rec["tabs"])
+                   if any(key == other or alike(key, other) for other in showing_tabs)}
+        rest = [t for t in rec["tabs"] if f"{t['dashboard']}#{t['tab']}" not in showing]
+        if not showing:
+            retry.append(rec)
+        elif any(build in running_on.get(other, ()) for other in showing_tabs):
+            still_shown.append(rec)
+        elif rest:
+            retry.append(dict(rec, tabs=rest))
+        elif None not in unread and rec["query"] not in unread:
+            shown_settled.append(k)
+        else:
+            still_shown.append(rec)
     # Archived builds that are not final yet are compared with GCS again, even
     # after TestGrid drops them: their logs may still be replaced by Prow.
     queued = chosen | set(state["unresolved"]) | set(given_up) | set(state["watch"])
@@ -2822,7 +3168,7 @@ def run(args, root, run_start, pool, deadline):
             rechecks += 1
     # A gap in a tab's history: list the job's builds from that time in GCS and
     # archive the ones TestGrid painted red by its own rule, since it no longer shows them.
-    backfill_errors, backfilled, new_watch, taken, running_gap = [], 0, {}, set(), []
+    backfill_errors, backfilled, new_watch, taken, running_gap, searched = [], 0, {}, set(), [], set()
 
     def last_scan(key):
         return (state["tabs"].get(key) or {"scan": archive_start})["scan"]
@@ -2869,6 +3215,7 @@ def run(args, root, run_start, pool, deadline):
                     tab_scans.pop(key, None)
                 outcome = "looking them up in GCS failed; the next run tries again"
             else:
+                searched.add(key)
                 new = [rec for rec in found if f"{rec['job']}/{rec['build']}" not in taken]  # also in another tab's gap
                 taken.update(f"{rec['job']}/{rec['build']}" for rec in new)
                 retry += new
@@ -2889,8 +3236,19 @@ def run(args, root, run_start, pool, deadline):
                      f"({iso(last_scan(key))}) needed them from {iso(floor)}; red builds in between "
                      "may be missing" for key, r, floor in gaps]
     tab_errors = [r for r in reports if r.get("error")]
+    # tabs whose builds this run judges from GCS (a history gap, or watched builds) without their config
+    judged = searched | {f"{t['dashboard']}#{t['tab']}" for x in retry + running_gap + list(stalled.values()) + still_shown
+                         if x.get("watch") for t in x["tabs"]}
+    involved = set(listed_ok) | judged
+    without = sorted(judged - set(rules))
+    if without:
+        warnings.append(f"no TestGrid config known for {len(without)} tabs ({', '.join(without[:3])}"
+                        f"{', ...' if len(without) > 3 else ''}): for the builds they no longer show, judged from GCS "
+                        "now, rows their base options may hide count as shown, and their days of results are taken "
+                        "from their history")
 
     if args.list_only:
+        config_warnings(involved)
         for b in sorted(selected + retry, key=lambda b: b["started"] or b["created"]):
             print(iso(b["started"] or b["created"]), b["job"], b["build"], json.dumps([t["tab"] for t in b["tabs"]]))
         print(f"{len(reports)} tabs read ({len(tab_errors)} failed), {len(selected)} red builds, "
@@ -2902,15 +3260,22 @@ def run(args, root, run_start, pool, deadline):
         return 1 if tab_errors else 0
 
     run_id, run_rel = new_run_dir(root, run_start)
+    for r in reports:  # (what cross_check judges the run's builds by)
+        key = f"{r['dashboard']}#{r['tab']}" if r.get("tab") is not None else None
+        if key in tab_config:
+            r.update(config=tab_config[key], config_read=config_read.get(key))
+        if key in mismatch_of:
+            r["config_mismatch"] = mismatch_of[key]
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors), 0, {}, {}
     # judged by the gap search just now and still running, overdue on TestGrid, or watched and still
     # shown by TestGrid: watched without a look now, for as long as a build is ever watched
     for w in running_gap + list(stalled.values()) + still_shown:
         key = f"{w['job']}/{w['build']}"
-        if run_start - w["created"] > GIVE_UP_DAYS * 86400:
-            outcomes.setdefault("stopped-watching", []).append(key)
+        held = held_by(w, tab_rules)
+        if run_start - w["created"] > (HELD_DAYS if held else GIVE_UP_DAYS) * 86400:
+            outcomes.setdefault("stopped-holding" if held else "stopped-watching", []).append(key)
             continue
-        outcomes.setdefault("watching", []).append(key)
+        outcomes.setdefault("held" if held else "watching", []).append(key)
         watch[key] = {"rec": w, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
     if shown_settled:
         outcomes.setdefault("not-red", []).extend(shown_settled)
@@ -2977,7 +3342,7 @@ def run(args, root, run_start, pool, deadline):
                 downloaded += sum(meta[k]["bytes"] for k in ("log", "podinfo") if meta.get(k))
             if outcome == "pending":  # (a watched build found red is queued as red from now on)
                 unresolved[key] = {"rec": meta, "first_seen": previous.get("first_seen", run_start), "last_error": None}
-            elif outcome == "watching":
+            elif outcome in ("watching", "held"):
                 watch[key] = {"rec": b, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
         except RecheckError as e:
             # The archived copy stays as it is; it is not final, so the next run compares it again.
@@ -2987,10 +3352,11 @@ def run(args, root, run_start, pool, deadline):
             if b.get("watch") and not getattr(e, "red_rec", None):
                 # not known to be red yet: keep watching rather than list it as missing,
                 # as long as a build is ever watched
-                if run_start - b["created"] <= GIVE_UP_DAYS * 86400:
+                limit = HELD_DAYS if held_by(b, tab_rules) else GIVE_UP_DAYS
+                if run_start - b["created"] <= limit * 86400:
                     watch[key] = {"rec": b, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
                 else:
-                    message = f"no longer watched after {GIVE_UP_DAYS} days, as it could not be judged: {message}"
+                    message = f"no longer watched after {limit} days, as it could not be judged: {message}"
                 errors.append({"build": key, "error": message})
                 continue
             b = getattr(e, "red_rec", None) or b  # a watched build found red is handled like any other
@@ -3007,13 +3373,20 @@ def run(args, root, run_start, pool, deadline):
     warnings += [f"{key}: still not decided {GIVE_UP_DAYS} days after it was made (not finished, or TestGrid still "
                  "shows it running, or it has no usable start time, so TestGrid never paints it red); no longer watched"
                  for key in outcomes.get("stopped-watching", [])]
+    recs = {f"{b['job']}/{b['build']}": b for b in selected + retry + running_gap + list(stalled.values()) + still_shown}
+    warnings += [f"{key}: cannot be judged from GCS: {held_by(recs[key], tab_rules) or 'its tab config'}; no longer "
+                 f"watched {HELD_DAYS} days after it was made, though TestGrid may have shown it red"
+                 for key in outcomes.get("stopped-holding", []) if key in recs]
+    config_warnings(involved)
 
     timings["downloads"] = round(time.time() - run_start - sum(timings.values()), 2)  # (with the gap search)
     # A possible gap in TestGrid history, a tab gone from its dashboard or a lost
     # retry list means builds may be missing without an error naming them.
     serious = [w for w in warnings if any(k in w for k in SERIOUS)]
+    config_record = {"source": config_source, "read": run_start} if config_source else previous_read or None
     report_ = {"run": run_id, "dir": run_rel, "started": run_start, "since_hours": args.since_hours,
-               "max_job_hours": args.max_job_hours, "tabs": reports, "red_builds_seen": len(builds),
+               "max_job_hours": args.max_job_hours, "testgrid_config": config_record, "tabs": reports,
+               "red_builds_seen": len(builds),
                "retried_from_state": len(retry) - rechecks - backfilled - (len(new_watch) - len(running_gap)),
                "rechecked": rechecks, "watched": len(watch),
                "backfilled_from_gcs": len(outcomes.get("backfilled", [])), "outcomes": outcomes,
@@ -3021,8 +3394,21 @@ def run(args, root, run_start, pool, deadline):
     run_json = os.path.join(root, run_rel, "run.json")
     # Save what the next run needs before drawing the pages and charts: a failure
     # there must not lose a build that is about to scroll off TestGrid.
+    referenced = set(tab_scans) | set(config or ()) | listed | {
+        f"{t['dashboard']}#{t['tab']}" for kept in (unresolved, given_up, watch) for u in kept.values() for t in u["rec"]["tabs"]}
+    tab_configs = {}
+    for key in sorted(referenced & (set(tab_config) | set(mismatch_of))):
+        c = {}
+        if key in tab_config:
+            c["config"] = tab_config[key]
+            if plausible_time(config_read.get(key), run_start):
+                c["read"] = config_read[key]
+        if key in mismatch_of:
+            c["mismatch"] = mismatch_of[key]
+        tab_configs[key] = c
     write_json(os.path.join(root, "state.json"),
-               {"tabs": tab_scans, "unresolved": unresolved, "given_up": given_up, "watch": watch})
+               {"tabs": tab_scans, "unresolved": unresolved, "given_up": given_up, "watch": watch,
+                "tab_configs": tab_configs, **({"testgrid_config": config_record} if config_record else {})})
     write_json(run_json, dict(report_, errors=errors + [{"build": None, "error": "the run stopped before it finished"}]))
     # What failed or cut-off downloads left (a build folder without meta.json, stored files
     # a meta.json does not list, an empty job folder) goes now, so it is not committed;

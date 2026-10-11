@@ -126,11 +126,12 @@ class FakeServer:
     def route(self, path, value):
         self.httpd.routes[path] = value
 
-    def gcs_listing(self, bucket, objects, page=None, sizes=None):
+    def gcs_listing(self, bucket, objects, page=None, sizes=None, written=None):
         """Serve the GCS JSON list API for `bucket`, honouring prefix/delimiter like GCS does:
         with a delimiter, the "folders" among `objects`; without, every object under the
         prefix, from `objects` and the objects this server serves (with their sizes, or the
-        ones `sizes` gives, and contentEncoding gzip for one served gzipped), `page` per page."""
+        ones `sizes` gives, contentEncoding gzip for one served gzipped, and timeCreated for
+        those `written` gives a Unix time), `page` per page."""
         def serve(h):
             q = urllib.parse.parse_qs(urllib.parse.urlsplit(h.path).query)
             prefix = q["prefix"][0]
@@ -151,6 +152,9 @@ class FakeServer:
                             items[name]["contentEncoding"] = "gzip"
                 for name, size in (sizes or {}).items():
                     items[name]["size"] = str(size)
+                for name, when in (written or {}).items():
+                    if name in items:
+                        items[name]["timeCreated"] = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(when))
                 listed = [{"items": [items[n]]} for n in sorted(items)]
             start = int(q.get("pageToken", ["0"])[0])
             chunk = listed[start:start + page] if page else listed[start:]

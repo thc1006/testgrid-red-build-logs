@@ -2,13 +2,15 @@
 # Build the oracle: TestGrid's own code at the pinned commit (pinned.json), with
 # go/pkg/updater/zz_oracle.go added to its updater package, and the commands in
 # go/cmd: tgoracle (judges builds as TestGrid does), schemadump (the Go types,
-# for ../testgrid_types.json) and gocheck (strconv, time and quantity parsing).
-# Usage: build.sh OUTDIR. Needs Go (the version in pinned.json) and the network.
+# for ../testgrid_types.json) and gocheck (strconv, time and quantity parsing, and
+# the tabulator's row filter, with go/pkg/tabulator/zz_oracle.go added to it).
+# Usage: build.sh OUTDIR [VERSION]: TestGrid's module at VERSION instead of the
+# pinned one (follow.sh does that). Needs Go and the network.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 mkdir -p "$1"
 out=$(cd "$1" && pwd)
-version=$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["testgrid_module_version"])' "$here/pinned.json")
+version=${2:-$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["testgrid_module_version"])' "$here/pinned.json")}
 work=$(mktemp -d)
 trap 'chmod -R u+w "$work"; rm -rf "$work"' EXIT
 # go mod download needs a main module to run in; on failure its JSON says why
@@ -22,6 +24,7 @@ src=$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["Dir"])' 
 cp -r "$src" "$work/testgrid"
 chmod -R u+w "$work/testgrid"
 cp "$here/go/pkg/updater/zz_oracle.go" "$work/testgrid/pkg/updater/"
+cp "$here/go/pkg/tabulator/zz_oracle.go" "$work/testgrid/pkg/tabulator/"
 for cmd in tgoracle schemadump gocheck; do
   mkdir -p "$work/testgrid/cmd/$cmd"
   cp "$here/go/cmd/$cmd/main.go" "$work/testgrid/cmd/$cmd/"

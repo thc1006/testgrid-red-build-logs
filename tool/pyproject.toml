@@ -5,7 +5,8 @@ description = "Archive the Prow build-log.txt behind every red cell on the sig-r
 requires-python = ">=3.12"
 license = "Apache-2.0"
 dependencies = [
-    "urllib3>=2.5,<3",
+    "pyyaml>=6.0.3",
+    "urllib3>=2.8,<3",  # (2.8: make_headers(proxy_basic_auth_encoding=...))
 ]
 
 [dependency-groups]

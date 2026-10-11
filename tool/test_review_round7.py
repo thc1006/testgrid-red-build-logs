@@ -283,14 +283,36 @@ class HttpHardening(unittest.TestCase):
         self.addCleanup(srv.close)
         return srv
 
-    def test_an_interim_response_never_hands_its_answer_to_the_next_request(self):
+    def test_interim_responses_are_skipped_and_never_hand_their_answer_to_the_next_request(self):
+        interims = {"/early": b"HTTP/1.1 103 Early Hints\r\nLink: </x>\r\n\r\n",
+                    "/processing": b"HTTP/1.1 102 Processing\r\n\r\n",
+                    "/chain": b"HTTP/1.1 100 Continue\r\n\r\nHTTP/1.1 103 Early Hints\r\nLink: </y>\r\n\r\n"
+                              b"HTTP/1.1 199 Misc\r\nX: 1\r\n\r\n"}
+
         def script(n, s, read_request):
             while (path := read_request()) is not None:
-                interim = b"HTTP/1.1 103 Early Hints\r\nLink: </x>\r\n\r\n" if path == "/early" else b""
-                s.sendall(interim + response(200, b"for " + path.encode()))
+                s.sendall(interims.get(path, b"") + response(200, b"for " + path.encode()))
         srv = self.raw(script)
-        with self.assertRaisesRegex(frl.IntegrityError, "interim response 103"):
-            frl.request(srv.url + "/early")
+        for path in ("/early", "/processing", "/chain", "/next", "/early", "/next"):
+            self.assertEqual(frl.request(srv.url + path), b"for " + path.encode())
+        self.assertEqual(srv.connections, 1)  # one kept-alive connection, each answer to its own request
+
+    def test_101_is_refused_and_endless_interim_responses_are_cut_off(self):
+        def script(n, s, read_request):
+            while (path := read_request()) is not None:
+                if path == "/switch":
+                    s.sendall(b"HTTP/1.1 101 Switching Protocols\r\nUpgrade: x\r\nConnection: Upgrade\r\n\r\n")
+                    return
+                if path == "/endless":
+                    s.sendall(b"HTTP/1.1 103 Early Hints\r\n\r\n" * (frl.MAX_INTERIM + 1) + response(200, b"late"))
+                    return
+                s.sendall(response(200, b"for " + path.encode()))
+        srv = self.raw(script)
+        with self.assertRaisesRegex(frl.IntegrityError, "unexpected informational response 101"):
+            frl.request(srv.url + "/switch")
+        with self.assertRaisesRegex(urllib3.exceptions.ProtocolError, "interim responses") as caught:
+            frl.fetch_once(srv.url + "/endless", frl.read_body, None, 10, "GET")
+        self.assertIsInstance(caught.exception, frl.TRANSIENT)  # (retried, like any broken response)
         self.assertEqual(frl.request(srv.url + "/next"), b"for /next")
 
     def test_a_connection_the_server_closed_is_replaced_at_once(self):
