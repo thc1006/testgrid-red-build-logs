@@ -286,7 +286,8 @@ def pool_for(url):
             _PROXY_POOLS[proxy] = urllib3.ProxyManager(
                 p._replace(netloc=p.netloc.rsplit("@", 1)[-1]).geturl(), num_pools=16,
                 maxsize=HTTP.connection_pool_kw["maxsize"], block=False, retries=False,
-                proxy_headers=urllib3.make_headers(proxy_basic_auth=auth) if auth else None)
+                proxy_headers=urllib3.make_headers(proxy_basic_auth=auth, proxy_basic_auth_encoding="utf-8")
+                if auth else None)
         return _PROXY_POOLS[proxy]
 
 
@@ -2044,6 +2045,7 @@ def index_entry(job, build, meta, now, rel=None):
         raise ValueError(f"implausible time {t!r}")
     red_tests = sorted({c["test"] for tab in meta["tabs"] for c in tab["red_cells"]},
                        key=lambda name: (name == f"{job}.Overall", name.startswith(f"{job}."), name))
+    job_rows = [name for name in red_tests if name.startswith(f"{job}.")]
     files = [((meta.get(key) or {}).get("file", name), meta.get(key))
              for name, key in (("build-log.txt", "log"), ("podinfo.json", "podinfo"))]
     base = (meta.get("log_url") or "").rsplit("/", 1)[0]
@@ -2058,7 +2060,8 @@ def index_entry(job, build, meta, now, rel=None):
         "tabs": [f"{t['dashboard']}#{t['tab']}" for t in meta["tabs"]],
         # specific failing tests first, then job-level rows such as .Pod, .Overall last (at most
         # INDEX_TESTS of them: a mass failure would make each week's page huge)
-        "red_tests": red_tests[:INDEX_TESTS],
+        "red_tests": red_tests[:max(0, INDEX_TESTS - len(job_rows))] + job_rows if len(red_tests) > INDEX_TESTS
+        else red_tests,
         "red_test_count": len(red_tests),
         "dir": rel,
         "run": rel.split("/")[2] if rel else None,
@@ -2404,6 +2407,8 @@ def load_state(root, warnings):
             tabs[k].setdefault("oldest", None)
             if known_rows(v.get("rows")):
                 tabs[k]["rows"] = v["rows"]
+            if isinstance(v.get("query"), str) and QUERY_RE.fullmatch(v["query"]):
+                tabs[k]["query"] = v["query"]
             for name in ("current_job_hours", "job_hours", "margin"):  # checked again where they are used
                 if name in v:
                     tabs[k][name] = v[name]
@@ -2739,7 +2744,7 @@ def run(args, root, run_start, pool, deadline):
                                     f"before {iso(horizon)} may be missing, as GCS is searched {GIVE_UP_DAYS} days back")
                 gaps.append((key, r, max(floor, horizon)))
         if r.get("oldest"):
-            read_ok[key] = {"scan": run_start, "oldest": r["oldest"], "margin": r["max_job_hours"],
+            read_ok[key] = {"scan": run_start, "oldest": r["oldest"], "margin": r["max_job_hours"], "query": r["query"],
                             **job_hours.get(key, {}), **({"rows": r["rows"]} if known_rows(r.get("rows")) else {})}
     summaries_ok = {r["dashboard"] for r in reports if r.get("tab") is not None}
     listed = {f"{r['dashboard']}#{r['tab']}" for r in reports if r.get("tab") is not None}
@@ -2771,7 +2776,8 @@ def run(args, root, run_start, pool, deadline):
             # never skip builds that finished since an earlier scan saw them running
             cutoff = min(cutoff, min(t["scan"] - job_margin(t, None, t["scan"], args.max_job_hours)[0] * 3600
                                      for t in state["tabs"].values()))
-        selected = [b for b in selected if (b["started"] or b["created"]) >= cutoff]
+        selected = [b for b in selected if (b["started"] or b["created"]) >= cutoff
+                    or f"{b['job']}/{b['build']}" in state["watch"]]  # (one watched is followed to its end)
     chosen = {f"{b['job']}/{b['build']}" for b in selected}
     retry = [u["rec"] for k, u in state["unresolved"].items() if k not in chosen and k not in given_up]
     # Builds a history gap showed still running, or TestGrid showed running long past their
@@ -2783,9 +2789,12 @@ def run(args, root, run_start, pool, deadline):
                if k not in chosen and k not in given_up and k not in state["unresolved"] and k not in known}
     retry += [u["rec"] for k, u in watched.items() if k not in shown_now]
     # shown, no longer running and not red (it would be chosen): TestGrid has decided it, unless
-    # a tab could not be read now, which may be one that shows it red
-    every_tab = not any(r.get("error") for r in reports)
-    shown_settled = sorted(k for k in watched if k in shown_now and k not in running_now and every_tab)
+    # a tab that may show it red could not be read now (one of its job, as last read, or any
+    # tab when a dashboard's summary, which lists them, could not be read)
+    unread = {(state["tabs"].get(f"{r['dashboard']}#{r['tab']}") or {}).get("query") if r.get("tab") is not None
+              else None for r in reports if r.get("error")}
+    shown_settled = sorted(k for k, u in watched.items() if k in shown_now and k not in running_now
+                           and None not in unread and u["rec"]["query"] not in unread)
     still_shown = [u["rec"] for k, u in watched.items() if k in shown_now and k not in shown_settled]
     # Archived builds that are not final yet are compared with GCS again, even
     # after TestGrid drops them: their logs may still be replaced by Prow.
@@ -2854,7 +2863,7 @@ def run(args, root, run_start, pool, deadline):
                 if key in state["tabs"]:
                     old = state["tabs"][key]
                     tab_scans[key] = dict(job_hours.get(key, {}), scan=old["scan"], oldest=old["oldest"],
-                                          **({"margin": old["margin"]} if "margin" in old else {}),
+                                          query=r["query"], **({"margin": old["margin"]} if "margin" in old else {}),
                                           **({"rows": r["rows"]} if known_rows(r.get("rows")) else {}))
                 else:
                     tab_scans.pop(key, None)

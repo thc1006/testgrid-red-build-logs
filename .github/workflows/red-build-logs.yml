@@ -132,21 +132,20 @@ jobs:
             exit 0
           fi
           # GitHub rejects a push holding a file over 100 MB. The fetch stores a larger
-          # log in parts, so there should be none: a stored file of a build that is (a
-          # copy cut off part-way, fetched again by a later run) and a page every run
-          # writes anew are left out; any other file that large stops the commit here.
-          for kept in archive/runs archive/weeks archive/charts; do
-            [ -d "$kept" ] || continue
-            depth=1
-            [ "$kept" = archive/runs ] && depth=5
-            find "$kept" -mindepth "$depth" -maxdepth "$depth" -type f -size +95M \
-              -printf '::warning::Not committing %p: larger than 95 MiB\n' -delete
-          done
-          for page in archive/INDEX.md archive/index.json; do
-            if [ -f "$page" ] && [ "$(stat -c %s "$page")" -gt $((95 << 20)) ]; then
-              echo "::warning::Not committing $page: larger than 95 MiB"
-              rm -f -- "$page"
-            fi
+          # log in parts, so there should be none. A stored log (a copy cut off part-way,
+          # fetched again by a later run) or a page every run writes anew that is that
+          # large is not committed: the version last committed stays, if any. Any other
+          # file that large stops the commit here.
+          {
+            [ -d archive/runs ] && find archive/runs -mindepth 5 -maxdepth 5 -type f -size +95M \
+              \( -name 'build-log.txt*' -o -name 'podinfo.json*' \) -print
+            for pages in archive/weeks archive/charts; do
+              [ -d "$pages" ] && find "$pages" -mindepth 1 -maxdepth 1 -type f -size +95M -print
+            done
+            find archive -maxdepth 1 \( -name INDEX.md -o -name index.json \) -type f -size +95M -print
+          } | while IFS= read -r large; do
+            echo "::warning::Not committing $large: larger than 95 MiB"
+            git checkout -q HEAD -- "$large" 2>/dev/null || rm -f -- "$large"
           done
           big=$(find archive -type f -size +95M -print -quit)
           if [ -n "$big" ]; then

@@ -54,7 +54,7 @@ in the folder of the run that first archived it.
 | `archive/runs/<YYYY-MM>/<run>/<job>/<build>/podinfo.json` | only for builds whose pod never ran, so there is no log |
 | `archive/runs/<YYYY-MM>/<run>/<job>/<build>/meta.json` | tabs, red tests, TestGrid messages, Prow result, links, and what GCS held |
 | `archive/INDEX.md` | the charts, red builds not archived yet, the runs and builds of the last 14 days, and what the archive holds |
-| `archive/weeks/<year>-W<week>.md`, `.json` | every archived build, one page per ISO week (UTC); `archive/index.json` lists them |
+| `archive/weeks/<year>-W<week>.md`, `.json` | every archived build, one page per ISO week (UTC), with up to 100 of its red tests and their count (`meta.json` has them all); `archive/index.json` lists them |
 | `archive/charts/*.svg` | the charts above, in light and dark versions |
 | `archive/state.json` | each tab's last scan, builds to retry, and builds given up on after 14 days |
 
@@ -130,7 +130,7 @@ notification settings).
 | GCS replaces a log after it was archived | the next run fetches the new copy into the same folder and records it in `meta.json` |
 | A step times out | what finished is committed with the run's report; the rest is retried next run |
 | A download is cut off part-way (a timeout, an interrupt, a full disk) | what it left is removed by the run (or, if the run was killed outright, by the next one), and the build is fetched again |
-| A log is too large for one file in git (over 95 MiB after gzip) | it is stored in numbered parts, and a file over 95 MiB is never committed whole (any other file that large stops the commit) |
+| A log is too large for one file in git (over 95 MiB after gzip) | it is stored in numbered parts, so no file over 95 MiB is committed: a stored log or a generated page that large keeps its last committed version, and any other file that large stops the commit |
 | A tab holds more than 500,000 red cells (a mass failure) | every red build is archived; each lists its first red cells, and counts the rest |
 | A test's output puts control characters into TestGrid's messages | they are stored as spaces; the tab is read all the same |
 | A run is cancelled, or hits the job's 95-minute limit | nothing is pushed; the next run fetches everything again |

@@ -927,5 +927,112 @@ class ThirdWaveUnits(unittest.TestCase):
                 self.assertNotIn("@", pool.proxy.host or "")
 
 
+
+class FourthWave(r4.World):
+    """The fourth review: of the third review's fixes."""
+
+    def deny_junit_listing(self, b):
+        real = self.srv.httpd.prefix_routes["/storage/v1/b/bucket/o?"]
+        self.srv.httpd.prefix_routes["/storage/v1/b/bucket/o?"] = \
+            lambda h: send(h, 403, {}, b"") if f"logs/job/{b}/" in urllib.parse.unquote(h.path) else real(h)
+
+    def test_cross_check_notes_a_running_build_with_unreadable_junit_files(self):
+        self.earlier_run(self.now - 3 * DAY)
+        visible, running = snowflake(self.now - HOUR), snowflake(self.now - 5 * HOUR)
+        self.show([visible], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
+        self.srv.gcs_listing("bucket", [f"logs/job/{visible}/finished.json"])
+        self.fetch()
+        self.srv.route(f"/bucket/logs/job/{running}/started.json", (200, {}, {"timestamp": frl.created(running)}))
+        self.srv.gcs_listing("bucket", [f"logs/job/{x}/started.json" for x in (visible, running)])
+        self.deny_junit_listing(running)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = cc.main(["--archive", self.root, "--testgrid", self.srv.url, "--gcs", self.srv.url, "--hours", "48"])
+        self.assertNotIn(f"cannot check job/{running}", out.getvalue())
+        self.assertIn(f"job/{running}: TestGrid no longer lists it and it is not decided yet", out.getvalue())
+        self.assertEqual(code, 0, out.getvalue())
+
+    def test_a_finished_build_waiting_for_podinfo_with_unreadable_junit_is_watched(self):
+        b = snowflake(self.now - 2 * HOUR)
+        self.srv.gcs_listing("bucket", [])
+        self.srv.route(f"/bucket/logs/job/{b}/started.json", (200, {}, {"timestamp": frl.created(b)}))
+        self.srv.route(f"/bucket/logs/job/{b}/finished.json",
+                       (200, {}, {"result": "SUCCESS", "passed": True, "timestamp": int(self.now - 600)}))
+        self.deny_junit_listing(b)
+        self.show([snowflake(self.now)], {"job.Overall": ([1], [""])}, start=int(self.now))
+        self.put_state(watch={f"job/{b}": {"rec": self.watched(b), "first_seen": self.now - HOUR}})
+        self.assertEqual(self.fetch(), 0, self.runs()[-1]["errors"])
+        self.assertEqual(self.runs()[-1]["outcomes"], {"watching": [f"job/{b}"]})
+
+    def watched_and_shown_settled(self):
+        b = snowflake(self.now - 10 * HOUR)
+        self.show([b], {"job.Overall": ([1], [""])}, start=int(self.now - 10 * HOUR))  # settled, not red, on dash#t
+        self.srv.gcs_listing("bucket", [])
+        return b
+
+    def test_a_failed_summary_keeps_a_settled_watched_build_watched(self):
+        b = self.watched_and_shown_settled()
+        self.srv.route("/dash2/summary", (500, {}, b""))
+        self.put_state(watch={f"job/{b}": {"rec": self.watched(b), "first_seen": self.now - HOUR}})
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            frl.main(["--archive", self.root, "--dashboard", "dash", "--dashboard", "dash2", "--testgrid",
+                      self.srv.url, "--gcs", self.srv.url])
+        self.assertEqual(self.runs()[-1]["outcomes"].get("watching"), [f"job/{b}"])
+
+    def test_only_a_failed_tab_of_the_builds_job_keeps_it_watched(self):
+        b = self.watched_and_shown_settled()
+        self.srv.summary("dash", {"t": "FAILING", "other": "FAILING"})
+        self.srv.table("dash", "other", (500, {}, b""))
+        for other_query, want in (("bucket/logs/job2", {"not-red": [f"job/{b}"]}),  # another job's tab: settled
+                                  ("bucket/logs/job", {"watching": [f"job/{b}"]})):  # its own job's: watched
+            with self.subTest(other_query):
+                self.put_state(tabs={"dash#other": {"scan": self.now - HOUR, "oldest": self.now - DAY,
+                                                    "query": other_query}},
+                               watch={f"job/{b}": {"rec": self.watched(b), "first_seen": self.now - HOUR}})
+                self.fetch()
+                self.assertEqual(self.runs()[-1]["outcomes"], want)
+
+    def test_since_hours_does_not_drop_a_watched_build_testgrid_now_shows_red(self):
+        b = snowflake(self.now - 30 * HOUR)
+        start = int(self.now - 30 * HOUR)
+        self.show([b], {"job.Overall": ([12], ["did not finish within 24 hours"])}, start=start)  # red now
+        self.srv.route(f"/bucket/logs/job/{b}/build-log.txt", obj(b"log\n"))
+        self.srv.gcs_listing("bucket", [])
+        self.put_state(tabs={"dash#t": {"scan": self.now - HOUR, "oldest": self.now - 40 * HOUR}},
+                       watch={f"job/{b}": {"rec": dict(self.watched(b), started=start), "first_seen": self.now - DAY}})
+        self.fetch("--since-hours", "6")
+        self.assertEqual(self.runs()[-1]["outcomes"].get("archived"), [f"job/{b}"])
+
+
+class FourthWaveUnits(unittest.TestCase):
+    def test_a_capped_index_entry_keeps_its_job_rows(self):
+        cells = [{"test": f"t{i:03d}", "status": "FAIL", "message": None} for i in range(150)]
+        cells += [{"test": "job.Overall", "status": "FAIL", "message": "x"},
+                  {"test": "job.Pod", "status": "FAIL", "message": "y"}]
+        meta = {"started": None, "created": time.time() - 3600, "query": "b/logs/job", "log": None, "podinfo": None,
+                "tabs": [{"dashboard": "d", "tab": "t", "red_cells": cells}]}
+        entry = frl.index_entry("job", "1", meta, time.time())
+        self.assertEqual((len(entry["red_tests"]), entry["red_test_count"]), (frl.INDEX_TESTS, 152))
+        self.assertEqual(entry["red_tests"][-2:], ["job.Pod", "job.Overall"])
+
+    def test_the_index_row_counts_the_other_red_tests(self):
+        def row(n):
+            return "".join(frl.build_rows([{"time": time.time(), "job": "j", "build": "1", "tabs": ["d#t"],
+                                            "red_tests": [f"t{i}" for i in range(min(n, 3))], "red_test_count": n,
+                                            "prow_url": "u", "status": "s"}], files=False))
+        self.assertIn("t0 |", row(1))
+        self.assertIn("t0 (+1)", row(2))
+        self.assertIn("t0 (+99)", row(100))
+
+    def test_proxy_credentials_go_out_in_utf8(self):
+        proxy = "http://u:%C3%A9@proxy.invalid:3128"
+        with mock.patch.dict(frl._PROXIES, {"http": proxy}, clear=True), \
+                mock.patch.dict(os.environ, {k: v for k, v in os.environ.items() if "proxy" not in k.lower()},
+                                clear=True):
+            frl._PROXY_POOLS.pop(proxy, None)
+            headers = {k.lower(): v for k, v in frl.pool_for("http://example.invalid/x").proxy_headers.items()}
+        self.assertEqual(headers["proxy-authorization"], "Basic " + base64.b64encode("u:é".encode()).decode())
+
+
 if __name__ == "__main__":
     unittest.main()

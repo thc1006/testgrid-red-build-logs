@@ -94,18 +94,17 @@ def settled(query, build, now):
     """Whether nothing changes between the two readings of a build: it finished more than an
     hour ago (so its podinfo.json is in), or, without finished.json, it started more than 25
     hours ago (TestGrid then calls it failed)."""
-    def stamp(name):
+    def stamp(body):
         try:
-            value = json.loads(get(f"{GCS}/{query}/{build}/{name}") or b"null").get("timestamp")
+            value = json.loads(body).get("timestamp")
         except (TypeError, ValueError, AttributeError):
             return None
         return value if isinstance(value, int) and not isinstance(value, bool) else None
-    finished = get(f"{GCS}/{query}/{build}/finished.json")
-    if finished is None:
-        started = stamp("started.json")
-        return started is not None and 0 < started < now - 25 * 3600
-    finished_at = stamp("finished.json")
-    return finished_at is not None and 0 < finished_at < now - 3600
+    finished_at = stamp(get(f"{GCS}/{query}/{build}/finished.json"))
+    if finished_at is not None:
+        return 0 < finished_at < now - 3600
+    started = stamp(get(f"{GCS}/{query}/{build}/started.json"))  # none, or one without a usable time
+    return started is not None and 0 < started < now - 25 * 3600
 
 
 def judge(query, build, now):
