@@ -1,0 +1,49 @@
+{
+  "job": "ci-node-e2e-containerd-2-1-ubuntu-dra",
+  "build": "2109708853191905280",
+  "query": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-ubuntu-dra",
+  "started": 1791828770,
+  "created": 1791828761,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ci-node-e2e-containerd-2-1-ubuntu-dra",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-node-e2e-containerd-2-1-ubuntu-dra.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791828827,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-ubuntu-dra/2109708853191905280",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-ubuntu-dra/2109708853191905280/build-log.txt",
+  "log": {
+    "bytes": 47010,
+    "md5": "8966fb364085f5c426e8fdad57ac36d5",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 10500,
+    "gcs": {
+      "generation": "1791828827454120",
+      "md5": "8966fb364085f5c426e8fdad57ac36d5",
+      "crc32c": "bcd1a24d",
+      "bytes": 47010,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-12T215102Z",
+  "archived_at": 1791841862.0,
+  "settled": true,
+  "final": false
+}

@@ -1,7 +1,7 @@
 # Run 2026-10-12 15:22:36 UTC
 
 46 tabs read (0 failed), 499 red builds on TestGrid. This run archived 18 new builds.
-TestGrid's config: built from test-infra 8201dc74eda9 of 2026-10-12T14:28:13Z, read by this run.
+TestGrid's config: test-infra 8201dc74eda9 of 2026-10-12T14:28:13Z, read by this run.
 
 [run.json](run.json) has the details; [INDEX.md](../../../INDEX.md) lists every build. A file marked provisional was taken before Prow finished uploading and is re-checked against GCS on every run until it settles.
 
@@ -11,9 +11,9 @@ TestGrid's config: built from test-infra 8201dc74eda9 of 2026-10-12T14:28:13Z, r
 
 | Time | Tab | Build | Red tests | Files |
 |---|---|---|---|---|
-| 15:03 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2109661290002649088](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2109661290002649088) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109661290002649088/build-log.txt.gz) (provisional) |
-| 14:07 | blocking#integration-master | [ci-kubernetes-integration-master 2109646945063538688](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2109646945063538688) | \[sig-scheduling\] k8s.io/kubernetes/test/integration/scheduler.podgroup (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-master/2109646945063538688/build-log.txt.gz) (provisional) |
-| 13:40 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2109640401877995520](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109640401877995520) | Kubernetes e2e suite.\[It\] \[sig-network\] Services should implement NodePort and HealthCheck (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109640401877995520/build-log.txt.gz) (provisional) |
+| 15:03 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2109661290002649088](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2109661290002649088) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109661290002649088/build-log.txt.gz) |
+| 14:07 | blocking#integration-master | [ci-kubernetes-integration-master 2109646945063538688](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2109646945063538688) | \[sig-scheduling\] k8s.io/kubernetes/test/integration/scheduler.podgroup (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-master/2109646945063538688/build-log.txt.gz) |
+| 13:40 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2109640401877995520](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109640401877995520) | Kubernetes e2e suite.\[It\] \[sig-network\] Services should implement NodePort and HealthCheck (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109640401877995520/build-log.txt.gz) |
 | 11:57 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2109614480756314112](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2109614480756314112) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109614480756314112/build-log.txt.gz) |
 | 10:24 | blocking#Conformance - GCE - master | [ci-kubernetes-gce-conformance-latest 2109590824076447744](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-gce-conformance-latest/2109590824076447744) | kubetest2.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-12T152236Z/ci-kubernetes-gce-conformance-latest/2109590824076447744/build-log.txt.gz) |
 | 09:26 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2109576479556767744](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109576479556767744) | Kubernetes e2e suite.\[It\] \[sig-api-machinery\] AdmissionWebhook \[Privileged:ClusterAdmin\] l (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109576479556767744/build-log.txt.gz) |
