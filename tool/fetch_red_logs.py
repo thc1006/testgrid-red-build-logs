@@ -1948,10 +1948,11 @@ class HoldModel:
             [(spans_within(pins(without, c, anyway=True), gone, math.inf), spans_within(pins(without, c), gone, math.inf))
              for c in newer]
         # (listed again at the earliest once no column but one that vanishes itself pins it out; and, as those
-        # may not vanish, at the end of any column's pin after that)
+        # may not vanish, at the end of any column's pin after that, but while one that does not pins it out)
         least = spans_union([p for _, some in later for p in some])
         back = next((hi for lo, hi in least if lo <= gone <= hi), gone)
-        ends = sorted({back} | {hi for every, _ in later for _, hi in every if hi > back})
+        ends = sorted({back} | {hi for every, _ in later for _, hi in every
+                               if hi > back and not any(lo < hi < end for lo, end in least)})
         return gone - READ_GAP, gone, pinned, back, ends
 
 

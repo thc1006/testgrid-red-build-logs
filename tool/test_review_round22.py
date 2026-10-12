@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_red_logs as frl  # noqa: E402
 import test_mutation_killers_r8 as k8  # noqa: E402
 import test_mutation_killers_r9 as k9  # noqa: E402
+import test_mutation_killers_w7 as w7  # noqa: E402
 
 MINUTE, HOUR, DAY = 60, 3600, 86400
 FAILING = b'<testsuite><testcase name="t"><failure/></testcase></testsuite>'
@@ -48,6 +49,29 @@ class APinnerThatMayNeverVanish(k8.Reads):
 
     def test_d_which_makes_c_vanish_does_not_make_x_not_red(self):
         self.assertNotEqual(self.judged_with(self.c, self.d), "not-red")
+
+
+
+class NotWhileAColumnThatDoesNotVanishPinsItOut(unittest.TestCase):
+    """(review W7a on the fix above) A time a column that vanishes itself stops pinning the build
+    out is a time it may be listed again only if no column that does not vanish pins it out then:
+    that one keeps the build out in every world. X (pending 5 h, runs on) vanishes once D1 settles;
+    D2 pins it out until a day after D2 started (`back`); C, which D2 pins out of the grid, would
+    pin X until a day after C started, inside the pin of E (a higher ID, made a day after X, done
+    in half an hour, so settled from M+1d+3h30m on, a column that sorts newer, out of the grid)."""
+
+    def test_the_end_of_a_pin_inside_one_of_a_column_that_stays_is_no_time_to_list_it(self):
+        M, runs, INF = k9.M, w7.runs, float("inf")
+        x = runs(M, started=5 * HOUR, running_until=INF)
+        d1 = runs(M + 1, started=2 * HOUR - 1, running_until=M + 2.5 * HOUR)
+        c = runs(M + 2, started=4 * HOUR - 2, running_until=M + 8 * HOUR)
+        d2 = runs(M + 3, started=3 * HOUR - 3, running_until=M + 3.5 * HOUR)
+        e = runs(M + DAY, started=MINUTE, running_until=M + DAY + 30 * MINUTE)
+        model = frl.HoldModel([x, d1, c, d2, e], DAY)
+        self.assertIn(c.build, model.gone)
+        _, _, _, back, ends = model.vanishing(x.build, x.started)
+        self.assertEqual((back, ends), (d2.started + DAY, [d2.started + DAY, e.started + DAY]))
+        self.assertNotIn(c.started + DAY, ends)
 
 
 if __name__ == "__main__":
