@@ -18,7 +18,8 @@ jobs:
   test:
     name: Lint and unit tests
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    # (the suite takes about 10 minutes, most of it waiting on the time limits it tests)
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: tool

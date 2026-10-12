@@ -31,6 +31,14 @@ PINNED = {
     "x+y": ["xy", "xxy", "y"], "x*y": ["y", "zy"], "^x?y$": ["y", "xy", "xxy"],
     "(?:a|ab)c": ["abc", "ac", "bc"], "a|b|c": ["c", "d"], "(a)|b": ["b"],
     "^$": ["", "a"], "": ["", "x"],
+    # flags, named groups, quoting, Unicode and POSIX classes, octal escapes, case folding
+    "(?i)k": ["K", "k", chr(0x212A), "x"], "(?i)\u017f": ["s", "S", "x"], "(?i)\u03c3": ["\u03a3", "\u03c2", "x"],
+    "(?i:a)b": ["Ab", "AB"], "a(?i)b": ["aB", "AB"], "(?i)a(?-i)b": ["Ab", "AB"], "(?m)^b$": ["a\nb\nc", "ab"],
+    "(?s)a.b": ["a\nb", "ab"], "(?U)a+?": ["a", "b"], "(?P<n>a)b": ["ab", "b"], "(?<n>a)b": ["ab", "b"],
+    r"\Q.*\E": [".*", "ab"], r"\pL": ["\u00e9", "1"], r"\p{Greek}+": ["\u03b1\u03b2", "ab"], r"\P{Greek}": ["\u03b1", "a"],
+    r"\p{Letter}": ["x", "1"], r"\p{lu}": ["A", "a"], r"(?i)\p{Lu}": ["a", "1"], r"\p{ASCII}": ["\u00e9", "e"],
+    "[[:alpha:]]+": ["abc", "123"], "[[:^digit:]]": ["1", "a"], r"\101": ["A", "B"], r"\012": ["\n", "a"],
+    "x{1000}": ["x" * 1000, "x" * 999], "^*a": ["a"], r"\b+a": ["a"], r"\x{D800}": ["a"],
 }
 TWO_FILTERS = [
     "exclude-filter-by-regex=a&exclude-filter-by-regex=b",

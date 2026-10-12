@@ -103,7 +103,7 @@ def judge(query, build, now):
         if not settled(query, build, now):
             return None
         case = oracle_case(query, build)
-        col = frl.gcs_column(GCS, query, build, tr.DAYS_OF_RESULTS, now)
+        col = frl.gcs_column(GCS, query, build, tr.DAYS_OF_RESULTS, now, timelines.get(GCS, query))
         if col.partial:
             return f"{query}/{build}: {col.partial}"
         return case, (col.inputs, f"{query.partition('/')[2]}/{build}/")
@@ -118,6 +118,7 @@ if run is None:
     sys.exit(0)
 queries = sorted({t["query"] for t in frl.read_json(run)["tabs"] if t.get("query")})
 now = int(time.time())
+timelines = frl.Timelines(now)
 jobs = []
 for q in queries:  # the newest builds, a few more than needed: some are still running
     builds = frl.list_build_ids(GCS, q, now - 7 * 86400, now - 3600)

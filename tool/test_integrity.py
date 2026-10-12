@@ -743,11 +743,13 @@ class BackfillTest(ArchiveWorld):
             snowflake(now - h * HOUR) for h in (30, 20, 10, 60, 25, 26, 27))  # too_old: before the search window
         fins = {self.failed: ("FAILURE", False), self.passed: ("SUCCESS", True), self.too_old: ("FAILURE", False),
                 self.crier: ("failure", False), self.aborted: ("ABORTED", False), self.lower: ("failure", False)}
-        for b, (result, passed) in fins.items():  # finished two hours ago: settled for TestGrid
+        # each finished two hours after it was made: settled for TestGrid (its last read of them,
+        # after their Pod rows stopped waiting for podinfo.json an hour after that, is long past)
+        for b, (result, passed) in fins.items():
             self.srv.route(f"/bucket/logs/job/{b}/finished.json",
-                           (200, {}, {"result": result, "passed": passed, "timestamp": int(now) - 2 * HOUR}))
+                           (200, {}, {"result": result, "passed": passed, "timestamp": int(frl.created(b)) + 2 * HOUR}))
         for b in (self.failed, self.passed, self.running, self.too_old, self.aborted, self.lower):
-            self.srv.route(f"/bucket/logs/job/{b}/started.json", (200, {}, {"timestamp": int(now)}))
+            self.srv.route(f"/bucket/logs/job/{b}/started.json", (200, {}, {"timestamp": int(frl.created(b)) + 60}))
             self.srv.route(f"/bucket/logs/job/{b}/build-log.txt", obj(b"log of " + b.encode()))
         # self.crier: a pod that never started (no started.json): TestGrid never lists it
         self.listing = [f"logs/job/{b}/finished.json"
@@ -967,7 +969,7 @@ class GoDecodingTest(unittest.TestCase):
         self.srv.gcs_listing("bucket", [])
 
     def verdict(self, finished, started, build=None):
-        build = build or str(snowflake(time.time() - HOUR))
+        build = build or str(snowflake(time.time() - 8 * HOUR))  # (TestGrid's reads of it can be over)
         for name, doc in (("finished.json", finished), ("started.json", started)):
             if doc is not None:  # None: GCS has no such object
                 self.srv.route(f"/bucket/logs/job/{build}/{name}", (200, {}, doc))
@@ -976,18 +978,18 @@ class GoDecodingTest(unittest.TestCase):
 
     def test_a_field_testgrid_cannot_decode_paints_the_build_red(self):
         now = int(time.time())
-        st, ok = {"timestamp": now - 3 * HOUR}, {"timestamp": now - 2 * HOUR, "passed": True, "result": "SUCCESS"}
+        st, ok = {"timestamp": now - 5 * HOUR}, {"timestamp": now - 4 * HOUR, "passed": True, "result": "SUCCESS"}
         self.assertEqual(self.verdict(ok, st), "not-red")
         self.assertEqual(self.verdict(dict(ok, passed=None, result="SUCCESS"), st), "not-red")  # null is fine
         self.assertEqual(self.verdict(dict(ok, metadata={"x": 1}, extra=[1]), st), "not-red")  # other fields
         for finished, started in [(dict(ok, passed="true"), st),
                                   (dict(ok, passed=1), st),
-                                  (dict(ok, timestamp=float(now - 2 * HOUR)), st),  # Go cannot put 1.0 in an int64
-                                  (dict(ok, timestamp=str(now - 2 * HOUR)), st),
+                                  (dict(ok, timestamp=float(now - 4 * HOUR)), st),  # Go cannot put 1.0 in an int64
+                                  (dict(ok, timestamp=str(now - 4 * HOUR)), st),
                                   (dict(ok, timestamp=1 << 63), st),  # beyond int64
                                   (dict(ok, result=["SUCCESS"]), st),
                                   (dict(ok, Running="yes"), st),  # a field TestGrid adds: a bool to Go
-                                  (ok, {"timestamp": float(now - 3 * HOUR)}),
+                                  (ok, {"timestamp": float(now - 5 * HOUR)}),
                                   (ok, {"timestamp": True}),
                                   (ok, dict(st, repos={"org/repo": 1}))]:
             with self.subTest(finished=finished, started=started):
@@ -995,13 +997,13 @@ class GoDecodingTest(unittest.TestCase):
 
     def test_finish_and_start_times_as_testgrid_reads_them(self):
         now = int(time.time())
-        st = {"timestamp": now - 3600}
+        st = {"timestamp": now - 5 * HOUR}
         cases = [({"timestamp": 0, "passed": True}, st, "red"),  # not finished to TestGrid; its deadline is past
                  ({"timestamp": -5, "passed": True}, st, "red"),
                  # finished, however bogus the time; but its Pod row waits for podinfo.json until an hour
                  # after that time, and TestGrid reads a column again while a cell of it runs
                  ({"timestamp": now + 10 * DAY, "passed": True}, st, "undecided"),
-                 ({"timestamp": now - 2 * HOUR, "passed": True}, st, "not-red"),
+                 ({"timestamp": now - 4 * HOUR, "passed": True}, st, "not-red"),
                  ({"timestamp": now - 60, "passed": True}, st, "undecided"),  # podinfo.json may still come
                  ({"timestamp": now + 10 * DAY, "passed": False}, st, "red"),
                  ({"passed": False}, st, "undecided"),  # no finish time: running until 24 hours have passed

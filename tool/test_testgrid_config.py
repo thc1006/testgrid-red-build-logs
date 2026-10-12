@@ -1,6 +1,7 @@
 """TestGrid's config for the tabs (testgrid_config.py), and how the fetch and cross_check use it."""
 import contextlib
 import gzip
+import hashlib
 import io
 import json
 import os
@@ -26,7 +27,39 @@ GROUP = {"name": "job", "gcs_prefix": "bucket/logs/job", "days_of_results": 15, 
 
 
 def entry(base_options="", **group):
-    return {"test_group": "job", "base_options": base_options, "group": dict(GROUP, **group)}
+    return {"test_group": "job", "base_options": base_options, "group": dict(GROUP, **group),
+            "group_digest": tgc.group_digest(dict(GROUP, **group))}
+
+
+def recipe_of(commit):
+    """The recipe the fixtures give a commit's config (testgrid_config.recipe_id's form)."""
+    return commit[:12] + "-" + hashlib.sha1(commit.encode()).hexdigest()[:12]
+
+
+def write_config(path, runs, configs, after=None, changes=None, failed=None):
+    """A config file as testgrid_config.sh writes it: the upload job's `runs` ({"build",
+    "commit", "started", "finished"}) listed after `after` (by default, just before the
+    first), the configs built ({commit: {"committed", "image", "dashboards"}}), how runs
+    changed their tabs' test groups ({build: changes}) and the configs that could not be
+    built ({commit: why})."""
+    if after is None:
+        after = min((frl.created(r["build"]) for r in runs), default=2) - 1
+    frl.write_json(path, {"format": tgc.FORMAT, "after": after,
+                          "runs": [dict(r, recipe=recipe_of(r["commit"])) for r in runs],
+                          "configs": {recipe_of(c): dict(v, commit=c) for c, v in configs.items()},
+                          "group_changes": changes or {},
+                          "failed": {recipe_of(c): why for c, why in (failed or {}).items()}})
+    return path
+
+
+def config_file(path, dashboards, uploaded, commit=None):
+    """A config as testgrid_config.sh writes it: one run of the upload job, which uploaded
+    `dashboards` ({dashboard: {tab: entry}}) at `uploaded`, from test-infra `commit` (one
+    made from that time when not given)."""
+    commit = commit or "c0cc6281b102" + hashlib.sha1(str(uploaded).encode()).hexdigest()[:28]
+    return write_config(path, [{"build": str(snowflake(uploaded)), "commit": commit, "started": int(uploaded) - 5,
+                                "finished": int(uploaded)}],
+                        {commit: {"committed": int(uploaded) - 60, "image": "img:v1", "dashboards": dashboards}})
 
 
 class QueryParsing(unittest.TestCase):
@@ -80,12 +113,91 @@ class GoRegexpSemantics(unittest.TestCase):
         for pattern, text, want in cases:
             self.assertEqual(self.matches(pattern, text), want, (pattern, text))
 
-    def test_what_is_not_followed_or_go_rejects(self):
-        for pattern in ("(?i)a", "(?s).", "(?P<n>a)", "(?<n>a)", r"\pL", r"\p{Greek}", r"\Q.\E", r"\C", "[[:alpha:]]",
-                        "a**", "a*+", "a{2}{3}", "*a", "(*)", "a|*", "^*", r"\b+", "a{1001}", "a{3,2}",
-                        "(?:a{20}){60}", "(a", "a)", "[a", "a\\", r"\e", r"\1", r"[\b]", "[z-a]", r"[\D]", r"\x{D800}"):
-            with self.assertRaises(tgc.Unsupported, msg=pattern):
+    def test_flags_unicode_classes_and_the_rest_of_gos_syntax(self):
+        cases = [  # (pattern, text, Go's answer: regexp.MatchString in Go 1.26.5)
+            ('(?i)kubetest', 'KUBETEST.Test', True),
+            ('(?i)kubetest', 'kubetest', True),
+            ('(?i)k', '\u212a', True),
+            ('(?i)k', 'K', True),
+            ('(?i)\u017f', 'S', True),
+            ('(?i)\u017f', 's', True),
+            ('(?i)[k-l]', '\u212a', True),
+            ('(?i)[k-l]', 'L', True),
+            ('(?i:a)b', 'Ab', True),
+            ('(?i:a)b', 'AB', False),
+            ('a(?i)b', 'aB', True),
+            ('a(?i)b', 'AB', False),
+            ('(?i)a(?-i)b', 'Ab', True),
+            ('(?i)a(?-i)b', 'AB', False),
+            ('(?m)^b$', 'a\nb\nc', True),
+            ('(?m)^b$', 'ab', False),
+            ('^b$', 'a\nb\nc', False),
+            ('(?s)a.b', 'a\nb', True),
+            ('a.b', 'a\nb', False),
+            ('(?U)a+?', 'a', True),
+            ('(?P<x>a)b', 'ab', True),
+            ('(?<x>a)b', 'ab', True),
+            ('\\Q.*\\E', '.*', True),
+            ('\\Q.*\\E', 'ab', False),
+            ('\\Q.*', '.*x', True),
+            ('\\pL', '\xe9', True),
+            ('\\pL', '1', False),
+            ('\\p{Greek}+', '\u03b1\u03b2\u03b3', True),
+            ('\\p{Greek}+', 'abc', False),
+            ('\\P{Greek}', '\u03b1', False),
+            ('\\P{Greek}', 'a', True),
+            ('\\p{^Greek}', '\u03b1', False),
+            ('\\p{Letter}', 'x', True),
+            ('\\p{lu}', 'A', True),
+            ('\\p{lu}', 'a', False),
+            ('(?i)\\p{Lu}', 'a', True),
+            ('\\p{Any}', '\n', True),
+            ('\\p{ASCII}', '\xe9', False),
+            ('\\p{ASCII}', 'e', True),
+            ('\\p{Assigned}', 'a', True),
+            ('\\p{Assigned}', '\U000e0080', False),
+            ('[[:alpha:]]+', 'abc', True),
+            ('[[:alpha:]]+', '123', False),
+            ('[[:^digit:]]', '1', False),
+            ('[[:^digit:]]', 'a', True),
+            ('[\\d\\pL]', '\xe9', True),
+            ('[\\d\\pL]', '-', False),
+            ('\\101', 'A', True),
+            ('\\0', '\x00', True),
+            ('\\012', '\n', True),
+            ('[\\x41-\\x43]', 'B', True),
+            ('[\\x41-\\x43]', 'D', False),
+            ('^*a', 'a', True),
+            ('\\b+a', 'a', True),
+            ('[\\D]', '1', False),
+            ('[\\D]', 'a', True),
+            ('(?i)\u01c5', '\u01c4', True),
+            ('(?i)\u01c5', '\u01c6', True),
+            ('(?i)\u03c3', '\u03a3', True),
+            ('(?i)\u03c3', '\u03c2', True),
+            ('x{1000}', "x" * 1000, True),
+            ('x{1000}', "x" * 999, False),
+            ('(?:ab){2,}', 'abab', True),
+            ('(?:ab){2,}', 'ab', False),
+            ('a|b|c', 'c', True),
+            ('abc|abd|aef', 'aef', True),
+            ('abc|abd|aef', 'ab', False),
+        ]
+        for pattern, text, want in cases:
+            self.assertEqual(self.matches(pattern, text), want, (pattern, text))
+
+    def test_what_go_rejects_is_broken(self):
+        # (TestGrid's tabulator fails a tab with such a filter: tab_filters raises Broken)
+        for pattern in (r"\C", "a**", "a*+", "a{2}{3}", "*a", "(*)", "a|*", "a{1001}", "a{3,2}", "(?:a{20}){60}", "(a",
+                        "a)", "[a", "a\\", r"\e", r"\1", r"[\b]", "[z-a]", "(?P<>a)", "(?P<a-b>a)", "(?x)a", "(?i-)a",
+                        r"\p{Bogus}", "[[:bogus:]]", r"\x{110000}", "(" * 1000 + "a" + ")" * 1000):
+            with self.assertRaises(tgc.Broken, msg=pattern[:40]):
                 tgc.go_regexp(pattern)
+
+    def test_what_go_accepts_is_applied(self):
+        for pattern in ("(?i)a", "(?s).", "(?P<n>a)", "(?<n>a)", r"\pL", r"\p{Greek}", r"\Q.\E", "[[:alpha:]]", "^*",
+                        r"\b+", r"[\D]", r"\x{D800}", "a" * 5000, "(" * 999 + "a" + ")" * 999, "(?:" * 1000 + "a" + ")" * 1000):
+            tgc.go_regexp(pattern)
 
     def test_linear_time_where_backtracking_is_exponential(self):
         start = time.monotonic()
@@ -115,23 +227,97 @@ class Rules(unittest.TestCase):
         self.assertEqual(tgc.TabRule({"test_group": "job", "base_options": "", "group": {"name": "job", "gcs_prefix": "b/j",
                                                                                         "use_kubernetes_client": True}}).days, 7)
 
-    def test_drawing_options_are_fine_and_unknown_ones_are_not(self):
-        self.assertIsNone(tgc.TabRule(entry("width=10&sort-by-name=&group-by-directory=&expand-groups=")).problem)
-        self.assertIn("options not known here: hide-rows", tgc.TabRule(entry("hide-rows=x")).problem)
+    def test_options_other_than_the_filters_are_ignored_as_testgrid_does(self):
+        rule = tgc.TabRule(entry("width=10&sort-by-name=&group-by-directory=&expand-groups="))
+        self.assertEqual((rule.problem, rule.unknown_options), (None, []))
+        # (one not known here is named, for a warning; the filters still apply, as in TestGrid's tabulator)
+        rule = tgc.TabRule(entry("hide-rows=x&exclude-filter-by-regex=a"))
+        self.assertEqual((rule.problem, rule.unknown_options), (None, ["hide-rows"]))
+        self.assertEqual([rule.shows("a"), rule.shows("b")], [False, True])
 
     def test_base_options_testgrid_cannot_parse(self):
-        self.assertIn("TestGrid cannot parse them", tgc.TabRule(entry("exclude-filter-by-regex=a;b")).problem)
-        self.assertIn("invalid UTF-8", tgc.TabRule(entry("exclude-filter-by-regex=%ff")).problem)
-        self.assertIn("nested repetition", tgc.TabRule(entry("exclude-filter-by-regex=a**")).problem)
+        # (its tabulator fails the tab: .broken, not a problem of the port's)
+        for options, why in (("exclude-filter-by-regex=a;b", "TestGrid cannot parse them"),
+                             ("exclude-filter-by-regex=%ff", "invalid UTF-8"),
+                             ("exclude-filter-by-regex=a**", "invalid nested repetition operator")):
+            rule = tgc.TabRule(entry(options))
+            self.assertIn(why, rule.broken, options)
+            self.assertIsNone(rule.problem, options)
+            with self.assertRaises(tgc.Broken):
+                rule.shows("x")
 
     def test_group_options_the_port_does_not_follow(self):
-        for option, value in (("disable_prowjob_analysis", True), ("disable_merged_status", True), ("ignore_skip", True),
-                              ("ignore_old_results", True), ("test_name_config", {"name_format": "%s"}),
-                              ("build_override_strftime", "%Y"), ("build_override_configuration_value", "x"),
-                              ("custom_evaluator_rule_set", {"rules": [{}]}), ("result_source", {"gcs_config": {}}),
-                              ("gcs_prefix", "a/b,c/d"), ("use_kubernetes_client", False)):
-            self.assertIsNotNone(tgc.TabRule(entry(**{option: value})).problem, option)
+        # (one column holds builds of several jobs, or several builds; or a custom evaluator rule that
+        # compares a test result, which test-infra's configurator cannot write)
+        compared = {"rules": [{"computed_status": 12, "test_result_comparisons": [
+            {"TestResultInfo": {"PropertyKey": "k"}, "comparison": {"op": 1}}]}]}
+        for option, value in (("build_override_strftime", "%Y"), ("build_override_configuration_value", "x"),
+                              ("gcs_prefix", "a/b,c/d"), ("result_source", {"gcs_config": {"gcs_prefix": "a/b,c/d"}}),
+                              ("custom_evaluator_rule_set", compared),
+                              ("custom_evaluator_rule_set", {"rules": [{"computed_status": 16}]}),
+                              ("custom_evaluator_rule_set", {"rules": ["x"]}),
+                              ("test_name_config", {"name_format": 5}),
+                              ("test_name_config", {"name_elements": [{"target_config": 5}]})):
+            self.assertIsNotNone(tgc.TabRule(entry(**{option: value})).problem, (option, value))
         self.assertIsNone(tgc.TabRule(entry(custom_evaluator_rule_set={"rules": []})).problem)
+
+    def test_the_cell_options_the_port_follows(self):
+        never = {"computed_status": 12, "test_result_comparisons": [{"TestResultInfo": None, "comparison": {
+            "ComparisonValue": None, "op": 2}}]}
+        for group, options in (
+                ({}, tr.Options()),
+                ({"disable_prowjob_analysis": True}, tr.Options(pod=False)),
+                ({"disable_merged_status": True}, tr.Options(merge=False)),
+                ({"test_name_config": {"name_format": "%s [%s]", "name_elements": [
+                    {"target_config": "Tests name"}, {"target_config": "Context"}, {"test_property": "k"}, {}]}},
+                 tr.Options(names=("%s [%s]", ("Tests name", "Context", "k", "")))),
+                ({"test_name_config": {}}, tr.Options(names=("", ()))),
+                ({"custom_evaluator_rule_set": {"rules": [never, {"computed_status": 9}, {"computed_status": 12}]}},
+                 tr.Options(all_tests="TIMED_OUT")),  # (the first rule without comparisons)
+                ({"custom_evaluator_rule_set": {"rules": [never, {"test_result_comparisons": [{"TestResultInfo": None}]}]}},
+                 tr.Options()),  # (no rule matches: a comparison without its Comparison never does)
+                ({"custom_evaluator_rule_set": {"rules": [{}]}}, tr.Options(all_tests="NO_RESULT"))):
+            rule = tgc.TabRule(entry(**group))
+            self.assertEqual((rule.problem, rule.options), (None, options), group)
+    def test_a_table_is_compared_with_its_config_only_where_testgrid_updates_its_group(self):
+        table = {"tests": [{"name": "kubetest.Test"}]}
+        self.assertEqual(frl.config_mismatch(tgc.TabRule(entry()), table, "bucket/logs/job"), "")
+        self.assertIn("its test group reads gs://bucket/logs/job, the tab shows gs://other/job",
+                      frl.config_mismatch(tgc.TabRule(entry()), table, "other/job"))
+        self.assertIsNone(frl.config_mismatch(tgc.TabRule(entry(use_kubernetes_client=False)), table, "other/job"))
+
+    def test_group_options_testgrid_production_does_not_apply(self):
+        # (its updater runs without --enable-ignore-skip; ignore_old_results only picks among the
+        # columns a build override merges)
+        for option in ("ignore_skip", "ignore_old_results"):
+            rule = tgc.TabRule(entry(**{option: True}))
+            self.assertEqual((rule.problem, rule.not_updated, rule.prefix), (None, None, GROUP["gcs_prefix"]), option)
+
+    def test_where_testgrid_reads_a_groups_builds_from(self):
+        # (cmd/updater's source() and gcsPrefix(), as TestGrid production runs them)
+        for group, source in (
+                ({"use_kubernetes_client": True, "gcs_prefix": "a/b"}, ("a/b", None)),
+                ({"use_kubernetes_client": True, "gcs_prefix": "a/b",
+                  "result_source": {"gcs_config": {"gcs_prefix": "c/d"}}}, ("c/d", None)),
+                ({"result_source": {"gcs_config": {"gcs_prefix": "c/d", "pubsub_project": "p"}}}, ("c/d", None)),
+                ({"result_source": {"gcs_config": {}}}, ("", None)),
+                ({"use_kubernetes_client": True, "gcs_prefix": "a/b",
+                  "result_source": {"resultstore_config": {"project": "p"}}}, ("a/b", None)),
+                ({"use_kubernetes_client": True}, ("", None))):
+            self.assertEqual(tgc.group_source(group), source, group)
+        for group, why in (({"gcs_prefix": "a/b"}, "sets no source of results"),
+                           ({"gcs_prefix": "a/b", "use_kubernetes_client": False}, "sets no source of results"),
+                           ({"gcs_prefix": "a/b", "result_source": {}}, "sets no source of results"),
+                           ({"result_source": {"resultstore_config": {"project": "p"}}}, "ResultStore")):
+            prefix, not_updated = tgc.group_source(group)
+            self.assertIsNone(prefix, group)
+            self.assertIn(why, not_updated, group)
+            rule = tgc.TabRule({"test_group": "job", "base_options": "", "group": dict(group, name="job")})
+            self.assertEqual((rule.not_updated, rule.problem), (not_updated, None), group)
+        # (a tab whose test group the config lacks: not known)
+        rule = tgc.TabRule({"test_group": "gone", "base_options": "", "group": None})
+        self.assertEqual((rule.prefix, rule.not_updated), (None, None))
+        self.assertIn("not in the config", rule.problem)
 
     def test_a_missing_group_or_a_duplicate_tab(self):
         self.assertIn("not in the config", tgc.TabRule({"test_group": "x", "base_options": "", "group": None}).problem)
@@ -150,10 +336,25 @@ class Extract(unittest.TestCase):
     def test_the_dashboards_tabs_with_the_fields_that_matter(self):
         out = tgc.extract(self.CONFIG, ["dash"])
         self.assertEqual(sorted(out), ["dash"])
-        self.assertEqual(out["dash"]["t"], {"test_group": "other", "base_options": "",
-                                            "group": {"name": "other", "gcs_prefix": "b/o", "use_kubernetes_client": True},
-                                            "duplicate": True})
-        self.assertEqual(out["dash"]["gone"], {"test_group": "missing", "base_options": "", "group": None})
+        other = {"name": "other", "gcs_prefix": "b/o", "use_kubernetes_client": True}
+        self.assertEqual(out["dash"]["t"], {"test_group": "other", "base_options": "", "group": other,
+                                            "group_digest": tgc.group_digest(other), "duplicate": True})
+        self.assertEqual(out["dash"]["gone"], {"test_group": "missing", "base_options": "", "group": None,
+                                               "group_digest": None})
+
+    def test_the_digest_tells_any_change_of_the_group_apart(self):
+        # (TestGrid's updater reads a group's columns again after any field of it changed: one the
+        # entry does not keep too)
+        job = tgc.extract(self.CONFIG, ["dash"])["dash"]["gone"]
+        changed = dict(self.CONFIG, test_groups=[dict(GROUP, num_columns_recent=4, alert_stale_results_hours=24),
+                                                 *self.CONFIG["test_groups"][1:]])
+        before = tgc.extract(dict(self.CONFIG, dashboards=[{"name": "d", "dashboard_tab": [
+            {"name": "t", "test_group_name": "job"}]}]), ["d"])["d"]["t"]
+        after = tgc.extract(dict(changed, dashboards=[{"name": "d", "dashboard_tab": [
+            {"name": "t", "test_group_name": "job"}]}]), ["d"])["d"]["t"]
+        self.assertEqual(before["group"], after["group"])  # (num_columns_recent is not kept)
+        self.assertNotEqual(before["group_digest"], after["group_digest"])
+        self.assertIsNone(job["group_digest"])
 
     def write(self, data):
         d = tempfile.mkdtemp()
@@ -164,20 +365,45 @@ class Extract(unittest.TestCase):
         return path
 
     def test_load_checks_what_it_reads(self):
-        good = {"format": 1, "source": {"test_infra": "abc", "committed": 1_790_000_000, "image": "img"},
-                "dashboards": {"dash": {"t": entry(CORRECTNESS)}}}
-        tabs, source = tgc.load(self.write(good))
-        self.assertEqual((sorted(tabs), source["test_infra"]), (["dash#t"], "abc"))
-        for bad in ({}, dict(good, format=2), dict(good, source={"test_infra": "abc", "image": "i", "committed": True}),
-                    dict(good, source={"test_infra": "", "image": "i", "committed": 1}),
-                    dict(good, source={"test_infra": "a", "image": "i", "committed": 1 << 41}),
-                    dict(good, dashboards={"dash": {"t": {"test_group": 1}}}),
-                    dict(good, dashboards={"dash": {"t": dict(entry(), extra=1)}}),
-                    dict(good, dashboards={"dash": {"t": entry(days_of_results=True)}}),
-                    dict(good, dashboards={"dash": {"t": dict(entry(), duplicate=False)}}),
-                    dict(good, dashboards={"dash": {"t": dict(entry(), group=dict(GROUP, bogus=1))}})):
+        commit, recipe = "c" * 40, recipe_of("c" * 40)
+        run = {"build": "2109000000000000000", "commit": commit, "started": 1_790_000_000, "finished": 1_790_000_005,
+               "recipe": recipe}
+        built = {"commit": commit, "committed": 1_789_990_000, "image": "img",
+                 "dashboards": {"dash": {"t": entry(CORRECTNESS)}}}
+        good = {"format": 3, "after": 1_789_999_000.5, "runs": [run, dict(run, build="2109000000000000001", finished=None)],
+                "configs": {recipe: built}, "group_changes": {"2109000000000000000": {"job": "new"}},
+                "failed": {"a" * 12 + "-" + "b" * 12: "why"}}
+        loaded = tgc.load(self.write(good))
+        self.assertEqual([r["finished"] for r in loaded["runs"]], [1_790_000_005, None])
+        tabs, source = loaded["configs"][recipe]
+        self.assertEqual((sorted(tabs), source), (["dash#t"], {"test_infra": commit, "committed": 1_789_990_000,
+                                                               "image": "img"}))
+        self.assertEqual((loaded["after"], loaded["group_changes"], loaded["failed"]),
+                         (1_789_999_000.5, good["group_changes"], good["failed"]))
+        for bad in ({}, dict(good, format=2), dict(good, runs={}), dict(good, configs=[]), dict(good, after="x"),
+                    dict(good, after=-1), dict(good, after=True), dict(good, group_changes=[]), dict(good, failed=[]),
+                    dict(good, group_changes={"x": {}}), dict(good, group_changes={"1": {"job": "gone"}}),
+                    dict(good, group_changes={"1": []}), dict(good, failed={"x": "why"}),
+                    dict(good, failed={recipe: 1}),
+                    dict(good, runs=[dict(run, build="x")]), dict(good, runs=[dict(run, commit="c" * 39)]),
+                    dict(good, runs=[dict(run, started=True)]), dict(good, runs=[dict(run, finished=1)]),
+                    dict(good, runs=[dict(run, extra=1)]), dict(good, runs=[dict(run, recipe="x")]),
+                    dict(good, runs=[{k: v for k, v in run.items() if k != "recipe"}]),
+                    dict(good, configs={"x": built}), dict(good, configs={recipe: dict(built, commit="x")}),
+                    dict(good, configs={recipe: {k: v for k, v in built.items() if k != "commit"}}),
+                    dict(good, configs={recipe: dict(built, committed=True)}),
+                    dict(good, configs={recipe: dict(built, committed=1 << 41)}),
+                    dict(good, configs={recipe: dict(built, image="")})):
             with self.assertRaises(ValueError, msg=bad):
                 tgc.load(self.write(bad))
+        # (a config with an entry extract does not write is not taken, as one that could not be built)
+        for entries in ({"t": {"test_group": 1}}, {"t": dict(entry(), extra=1)}, {"t": entry(days_of_results=True)},
+                        {"t": dict(entry(), duplicate=False)}, {"t": dict(entry(), group_digest="x")},
+                        {"t": dict(entry(), group=dict(GROUP, bogus=1))}, []):
+            loaded = tgc.load(self.write(dict(good, configs={recipe: dict(built, dashboards={"dash": entries})})))
+            self.assertEqual(loaded["configs"], {}, entries)
+            self.assertIn("its config as written", loaded["failed"][recipe], entries)
+            self.assertEqual(loaded["failed"]["a" * 12 + "-" + "b" * 12], "why")
 
     def test_the_command_line(self):
         d = tempfile.mkdtemp()
@@ -187,13 +413,45 @@ class Extract(unittest.TestCase):
             yaml.safe_dump(self.CONFIG, f)
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            code = tgc.main(["extract", os.path.join(d, "config.yaml"), "--commit", "abc", "--committed", "1790000000",
-                             "--image", "img", "--dashboard", "dash"])
+            code = tgc.main(["extract", os.path.join(d, "config.yaml"), "--recipe", "r", "--commit", "abc",
+                             "--committed", "1790000000", "--image", "img", "--dashboard", "dash"])
         self.assertEqual(code, 0)
-        self.assertEqual(json.loads(out.getvalue())["dashboards"], tgc.extract(self.CONFIG, ["dash"]))
+        got = json.loads(out.getvalue())
+        self.assertEqual(got["dashboards"], tgc.extract(self.CONFIG, ["dash"]))
+        self.assertEqual(got["groups"], {g["name"]: tgc.group_digest(g) for g in self.CONFIG["test_groups"]})
+        self.assertEqual((got["recipe"], got["commit"], got["committed"], got["image"]), ("r", "abc", 1790000000, "img"))
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-            self.assertEqual(tgc.main(["extract", os.path.join(d, "config.yaml"), "--commit", "abc", "--committed",
-                                       "1790000000", "--image", "img", "--dashboard", "nope"]), 1)
+            self.assertEqual(tgc.main(["extract", os.path.join(d, "config.yaml"), "--recipe", "r", "--commit", "abc",
+                                       "--committed", "1790000000", "--image", "img", "--dashboard", "nope"]), 1)
+
+    def test_merge_works_out_how_runs_changed_their_test_groups(self):
+        a, b, c = ({"build": str(1000 + i), "commit": x * 40, "started": 1_790_000_000 + i, "finished": 1_790_000_005 + i,
+                    "recipe": tgc.recipe_id(x * 40, None)} for i, x in enumerate("abc"))
+        job, other = dict(GROUP), {"name": "other", "gcs_prefix": "b/o", "use_kubernetes_client": True}
+
+        def built(r, *groups, tabs=("job",)):
+            config = {"test_groups": list(groups), "dashboards": [{"name": "dash", "dashboard_tab": [
+                {"name": f"t{i}", "test_group_name": g} for i, g in enumerate(tabs)]}]}
+            return {"recipe": r["recipe"], "commit": r["commit"], "committed": 1, "image": "i",
+                    "dashboards": tgc.extract(config, ["dash"]), "groups": {g["name"]: tgc.group_digest(g) for g in groups}}
+        planned = {"after": 999, "runs": [a, b, c], "build": [], "compare": [
+            {"build": a["build"], "recipe": a["recipe"], "prev": None},
+            {"build": b["build"], "recipe": b["recipe"], "prev": a["recipe"]},
+            {"build": c["build"], "recipe": c["recipe"], "prev": b["recipe"]}]}
+        # a: job alone; b: job changed, other added (for another dashboard); c: a tab of other, which b had
+        extracts = [built(a, job), built(b, dict(job, num_columns_recent=4), other),
+                    built(c, dict(job, num_columns_recent=4), other, tabs=("job", "other"))]
+        out = tgc.merge(planned, extracts, {"x" * 12 + "-" + "y" * 12: "why", a["recipe"]: "built after all"})
+        self.assertEqual(out["group_changes"], {a["build"]: {}, b["build"]: {"job": "changed"}, c["build"]: {}})
+        self.assertEqual(out["failed"], {"x" * 12 + "-" + "y" * 12: "why"})
+        self.assertNotIn("groups", out["configs"][a["recipe"]])
+        # (a run whose run before was not built: not worked out)
+        out = tgc.merge(planned, extracts[1:], {})
+        self.assertNotIn(b["build"], out["group_changes"])
+        self.assertEqual(out["group_changes"][c["build"]], {})
+        # a group none of the config before had at all: new
+        extracts[1] = built(b, dict(job, num_columns_recent=4))
+        self.assertEqual(tgc.merge(planned, extracts, {})["group_changes"][c["build"]], {"other": "new"})
 
 
 class UploadJob(unittest.TestCase):
@@ -224,11 +482,28 @@ class UploadJob(unittest.TestCase):
         self.assertEqual((image, command), ("gcr.io/k8s-staging-test-infra/configurator:v1", ["configurator"]))
         self.assertEqual(tgc.printing_args(args), ["--yaml=config/testgrids", "--prowjob-url-prefix=https://x/",
                                                    "--update-description", "--oneshot", "--print-text", "--output-yaml"])
-        out = io.StringIO()
-        with contextlib.redirect_stdout(out):
-            self.assertEqual(tgc.main(["job", self.tree(self.JOB)]), 0)
-        self.assertEqual(out.getvalue().split("\0")[:3],
-                         ["gcr.io/k8s-staging-test-infra/configurator:v1", "configurator", "--yaml=config/testgrids"])
+        d = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, d)
+        uploads = os.path.join(d, "uploads.json")
+        ran = {"image": "gcr.io/k8s-staging-test-infra/configurator:v0", "command": ["configurator"],
+               "args": ["--yaml=config/testgrids", "--output=gs://x"]}
+        with open(uploads, "w") as f:
+            json.dump({"build": [{"recipe": "r1", "commit": "a" * 40, "job": None},
+                                 {"recipe": "r2", "commit": "b" * 40, "job": ran},
+                                 {"recipe": "r3", "commit": "c" * 40, "job": {"error": "no good"}}]}, f)
+        tree = self.tree(self.JOB)
+        for recipe, want in (("r1", ["gcr.io/k8s-staging-test-infra/configurator:v1", "configurator",
+                                     "--yaml=config/testgrids"]),  # (no prowjob.json: as defined at the commit)
+                             ("r2", ["gcr.io/k8s-staging-test-infra/configurator:v0", "configurator",
+                                     "--yaml=config/testgrids", "--oneshot"])):  # (as the run ran it)
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(tgc.main(["job", uploads, recipe, tree]), 0)
+            self.assertEqual(out.getvalue().split("\0")[:len(want)], want)
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            self.assertEqual(tgc.main(["job", uploads, "r3", tree]), 1)
+        self.assertIn("no good", err.getvalue())
 
     def test_none_or_two_is_an_error(self):
         with self.assertRaises(ValueError):
@@ -308,11 +583,15 @@ class ConfigWorld(r4.World):
         self.srv.gcs_listing("bucket", [f"logs/job/{x}/finished.json" for x in (self.visible, b)])
 
     def config(self, base_options="", **group):
-        path = os.path.join(self.dir, "testgrid-config.json")
-        frl.write_json(path, {"format": 1, "source": {"test_infra": "c0cc6281b102" + "0" * 28,
-                                                      "committed": int(self.now - DAY), "image": "img:v1"},
-                              "dashboards": {"dash": {"t": entry(base_options, **group)}}})
-        return path
+        return self.config_of({"dash": {"t": entry(base_options, **group)}})
+
+    def config_of(self, dashboards, uploaded=None):
+        """A config file for a new run of the upload job, at `uploaded` (else a minute after the
+        last, from 30 days ago: the builds of these tests were all made under the config it
+        uploaded)."""
+        self.uploads = getattr(self, "uploads", 0) + 1
+        return config_file(os.path.join(self.dir, f"testgrid-config-{self.uploads}.json"), dashboards,
+                           uploaded or self.now - 30 * DAY + 60 * self.uploads)
 
     def fetch_with(self, path, *extra):
         return self.fetch("--testgrid-config", path, *extra)
@@ -370,9 +649,9 @@ class FetchWithConfig(ConfigWorld):
         self.assertEqual(run["outcomes"], {"backfilled": [f"job/{self.b}"]})
 
     def test_an_option_the_port_does_not_follow_stops_judging_the_tab(self):
-        self.assertEqual(self.fetch_with(self.config("", disable_prowjob_analysis=True)), 1)
+        self.assertEqual(self.fetch_with(self.config("", build_override_configuration_value="x")), 1)
         warning = " ".join(self.runs()[-1]["serious_warnings"])
-        self.assertIn("disable_prowjob_analysis, which testgrid_rule.py does not follow", warning)
+        self.assertIn("build_override_configuration_value, which testgrid_rule.py does not follow", warning)
         self.assertIn("cannot be judged from GCS", warning)
         self.assertEqual(self.runs()[-1]["outcomes"], {"held": [f"job/{self.b}"]})
         self.assertIn(f"job/{self.b}", self.state()["watch"])
@@ -400,7 +679,8 @@ class FetchWithConfig(ConfigWorld):
         self.assertNotIn("backfilled", run["outcomes"])  # hidden by the kept filter
         self.assertEqual(self.state()["testgrid_config"]["read"], read)
         self.assertEqual(run["testgrid_config"]["read"], read)
-        self.assertIn("TestGrid's config: built from test-infra c0cc6281b102", self.readme())
+        self.assertIn("TestGrid's config: test-infra c0cc6281b102 of ", self.readme())
+        self.assertIn(", uploaded ", self.readme())
 
     def readme(self):
         with open(os.path.join(self.root, self.runs()[-1]["dir"], "README.md")) as f:
@@ -437,12 +717,19 @@ class FetchWithConfig(ConfigWorld):
         self.assertEqual(self.fetch_with(self.config(self.HIDE)), 0)
         code, out = self.check()
         self.assertEqual(code, 0, out)
-        # the same run judged without its config: the build is red on kubetest.Test
+        # the same run without its config: judged by the config over time the archive keeps
         run_path = os.path.join(self.root, self.runs()[-1]["dir"], "run.json")
         run = frl.read_json(run_path)
         for t in run["tabs"]:
             t.pop("config", None)
         frl.write_json(run_path, run)
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        # ... and without that too: the build is red on kubetest.Test
+        state = self.state()
+        for k in ("config_uploads", "config_entries"):
+            state.pop(k)
+        frl.write_json(os.path.join(self.root, "state.json"), state)
         code, out = self.check()
         self.assertEqual(code, 1)
         self.assertIn(f"MISSED red build job/{self.b}", out)
@@ -519,23 +806,25 @@ class RelevantDiff(unittest.TestCase):
 
 class FilterGolden(unittest.TestCase):
     """What TestGrid's own filterGrid kept, recorded by tool/oracle/fuzz/filtergolden.py (with
-    Go), replayed without it: where TestGrid rejects base options the port must not apply
-    them; where it keeps rows the port keeps the same ones, or, for syntax it does not
-    follow, does not apply them."""
+    Go), replayed without it: where TestGrid rejects base options the port says so (Broken);
+    where it keeps rows the port keeps the same ones."""
 
     def test_the_port_keeps_what_testgrid_keeps(self):
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testdata", "testgrid_filter_golden.jsonl.gz")
         with gzip.open(path, "rt", encoding="utf-8") as f:
             cases = [json.loads(line) for line in f]
         self.assertGreater(len(cases), 1500)
-        applied = 0
+        applied = rejected = 0
         for c in cases:
             rule = tgc.TabRule(entry(c["options"]))
-            if rule.filter_problem:
-                self.assertFalse(c["ok"] and c["plain"] and "options not known here" not in rule.filter_problem, c)
+            if not c["ok"]:  # (TestGrid's tabulator fails the tab)
+                self.assertTrue(rule.broken, c)
+                rejected += 1
                 continue
-            self.assertTrue(c["ok"], c)
+            self.assertIsNone(rule.broken, c)
+            self.assertIsNone(rule.filter_problem, c)
             self.assertEqual([n for n in c["names"] if rule.shows(n)], c["kept"], c["options"])
             applied += 1
         self.assertGreater(applied, 1000)
+        self.assertGreater(rejected, 100)
 

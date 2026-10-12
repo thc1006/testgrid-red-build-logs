@@ -169,8 +169,9 @@ class GapRule(r4.GapWorld):
         self.listing(b)
         self.assertEqual(self.fetch(), 1)  # what TestGrid read there decides: retried until it can be read
         self.assertIn(f"job/{b}", self.state()["watch"])
-        # (a 403 is not retried; the build is looked at a second time in the run, as one that was unreadable)
-        self.assertEqual(self.srv.hits(f"/bucket/logs/job/{b}/started.json"), 2)
+        # (a 403 is not retried; the build is looked at a second time in the run, as one that was
+        # unreadable; and read once as one of its job's builds, for the reads of newer ones: Timeline)
+        self.assertEqual(self.srv.hits(f"/bucket/logs/job/{b}/started.json"), 3)
         self.srv.route(f"/bucket/logs/job/{b}/started.json", (200, {}, {"timestamp": frl.created(b)}))
         self.assertEqual(self.fetch(), 0)
         self.assertEqual(self.outcomes(), {"not-red": [f"job/{b}"]})  # passed, with a finish time however bogus
@@ -230,15 +231,26 @@ class Margins(r3.World):
 
 
 class Horizon(r3.World):
-    def test_LB10_LB12_a_gap_entirely_before_the_14_day_horizon_needs_no_gcs_listing(self):
+    def test_LB10_LB12_a_gap_entirely_before_the_14_day_horizon_is_searched_in_its_own_chunk(self):
         recent, old = snowflake(self.now - HOUR), snowflake(self.now - 16 * DAY)
         t = table("bucket/logs/job", [recent, old], {"job.Overall": ([1, 1], ["", ""])})
         t["timestamps"] = [int((self.now - HOUR) * 1000), int((self.now - 16 * DAY) * 1000)]
         self.srv.table("dash", "t", t)  # TestGrid still shows 16 days ...
         self.put_state(tabs={"dash#t": {"scan": self.now - 20 * DAY, "oldest": self.now - 30 * DAY}})  # ... after 20 unseen
-        self.srv.httpd.prefix_routes.clear()  # a GCS listing would fail
-        self.assertEqual(self.fetch(), 1)  # red builds before the 14-day horizon may be missing: a serious warning
-        self.assertEqual(self.runs()[-1]["errors"], [])  # but nothing was searched, so nothing failed
+        listed = []
+        real = frl.list_build_ids
+
+        def list_build_ids(gcs, query, lo, hi):
+            listed.append((lo, hi))
+            return real(gcs, query, lo, hi)
+        with mock.patch.object(frl, "list_build_ids", list_build_ids):
+            self.assertEqual(self.fetch(), 0)
+        # (only the stretch it does not show: from the last scan, less its margin, to the oldest it shows)
+        (lo, hi), = listed
+        self.assertAlmostEqual(hi, frl.created(old), delta=1)
+        self.assertLess(lo, self.now - 20 * DAY)
+        self.assertEqual(self.runs()[-1]["errors"], [])
+        self.assertNotIn("unsearched", self.state()["tabs"]["dash#t"])
         self.assertGreater(self.state()["tabs"]["dash#t"]["scan"], self.now - HOUR)
 
 

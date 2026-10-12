@@ -12,9 +12,11 @@ def cases():
     pod_ok = json.dumps({"pod": {"status": {"phase": "Succeeded"}}}).encode()
     out = []
 
-    def add(name, started=ok_started, finished=ok_passed, podinfo=pod_ok, artifacts=(), stop_=None):
+    def add(name, started=ok_started, finished=ok_passed, podinfo=pod_ok, artifacts=(), stop_=None, stop_ns=0,
+            group=None):
         out.append({"id": name, "started": started, "finished": finished, "podinfo": podinfo,
-                    "artifacts": list(artifacts), "stop": stop if stop_ is None else stop_})
+                    "artifacts": list(artifacts), "stop": stop if stop_ is None else stop_,
+                    **({"stop_ns": stop_ns} if stop_ns else {}), **({"group": group} if group is not None else {})})
 
     def junit(name, data, **kw):
         add(name, artifacts=[{"name": "artifacts/junit_01.xml", "data": data}], **kw)
@@ -35,6 +37,10 @@ def cases():
     add("started-ts-zero", started=b'{"timestamp": 0}')
     add("started-ts-negative", started=b'{"timestamp": -5}')
     add("started-ts-old", started=b'{"timestamp": %d}' % (now - 16 * 86400))
+    # too old: time.Unix(ts, 0).Before(stop), with stop's fraction of a second
+    for d in (-1, 0, 1):
+        for k in (0, 1, 256, 511):
+            add(f"started-ts-stop{d:+d}-frac{k}", started=b'{"timestamp": %d}' % (stop + d), stop_ns=k * 1953125)
     add("started-ts-max", started=b'{"timestamp": 9223372036854775807}')
     add("started-ts-wraps", started=b'{"timestamp": 9223371974719179008}')
     add("started-ts-no-wrap", started=b'{"timestamp": 9223371974719179007}')
@@ -238,6 +244,51 @@ def cases():
         add("name-" + n, artifacts=[{"name": n, "data": b'<testsuite><testcase name="x"><failure/></testcase></testsuite>'}])
     add("name-dot-target-exists", artifacts=[{"name": "artifacts/./junit_2.xml", "data": b"<x/>"},
                                              {"name": "artifacts/junit_2.xml", "data": b"<testsuite><testcase name='y'><failure/></testcase></testsuite>"}])
+    # --- a test group's cell options (as the configurator prints them)
+    def junits(*files):
+        return [{"name": n, "data": d.encode()} for n, d in files]
+    two = ("artifacts/junit_01.xml", "<testsuite name='s'><testcase name='a'><failure/></testcase>"
+           "<testcase name='a'/><testcase name='b'><skipped/></testcase></testsuite>")
+    for name, podinfo in (("pod-ok", pod_ok), ("pod-missing", None)):
+        add("opt-no-pod-" + name, podinfo=podinfo, artifacts=junits(two), group={"disable_prowjob_analysis": True})
+        add("opt-no-pod-running-" + name, finished=None, podinfo=podinfo, artifacts=junits(two),
+            group={"disable_prowjob_analysis": True})
+    add("opt-split", artifacts=junits(two), group={"disable_merged_status": True})
+    add("opt-split-overflow", artifacts=junits(("artifacts/junit.xml", "<testsuite>" + "<testcase name='a'/>" * 19 +
+                                                "<testcase name='a'><failure/></testcase>" * 3 + "</testsuite>")),
+        group={"disable_merged_status": True})
+    add("opt-split-twenty", artifacts=junits(("artifacts/junit.xml", "<testsuite>" + "<testcase name='a'/>" * 20 +
+                                              "</testsuite>")), group={"disable_merged_status": True})
+    add("opt-split-overall", artifacts=junits(("artifacts/junit.xml", "<testsuite><testcase name='job.Overall'>"
+                                               "<failure/></testcase></testsuite>")),
+        group={"disable_merged_status": True})
+    context = {"test_name_config": {"name_format": "%s [%s]", "name_elements": [{"target_config": "Tests name"},
+                                                                                 {"target_config": "Context"}]}}
+    add("opt-name-context", artifacts=junits(("artifacts/junit_runner_20260101-1200_02.xml", two[1]),
+                                             ("artifacts/junit_02.xml", two[1]), ("artifacts/junit.xml", two[1]),
+                                             ("artifacts/junitfoo.xml", two[1]), ("artifacts/x/test.xml", two[1])),
+        group=context)
+    props = ("artifacts/junit_c_1.xml", "<testsuite><testcase name='t'><properties><property name='Context' "
+             "value='p1'/><property name='Context' value='p2'/><property name='k' value='v'/></properties>"
+             "<properties><property name='m' value='w'/></properties></testcase><testcase name='u'/></testsuite>")
+    for parts in (["Tests name", "Context"], ["k", "m", "Thread"], ["Job name", "Tests name"], ["meta", "Timestamp"],
+                  ["missing"], []):
+        add("opt-name-" + "-".join(p.replace(" ", "_") for p in parts) if parts else "opt-name-none",
+            finished=json.dumps({"timestamp": now - 600, "passed": True,
+                                 "metadata": {"meta": "from-finished", "k": "not-first", "num": 1}}).encode(),
+            artifacts=junits(props), group={"test_name_config": {"name_format": "%s|%s|%s", "name_elements": [
+                {"target_config": p} if i % 2 else {"test_property": p} for i, p in enumerate(parts)]}})
+    for fmt in ("", "%d", "%[2]s", "%q %x", "%s%%"):
+        add("opt-name-format-" + fmt.replace("%", "pct"), artifacts=junits(two),
+            group={"test_name_config": {"name_format": fmt, "name_elements": [{"target_config": "Tests name"}]}})
+    for status in (0, 4, 9, 12, 13, 15):
+        add(f"opt-rule-all-{status}", artifacts=junits(two),
+            group={"custom_evaluator_rule_set": {"rules": [{"computed_status": status}]}})
+    add("opt-rule-never-then-all", artifacts=junits(two), group={"custom_evaluator_rule_set": {"rules": [
+        {"computed_status": 12, "test_result_comparisons": [{"TestResultInfo": None, "comparison": {
+            "ComparisonValue": None, "op": 1}}]},
+        {"computed_status": 3, "test_result_comparisons": [{"TestResultInfo": None, "comparison": None}]},
+        {"test_result_comparisons": []}]}})
     return out
 
 

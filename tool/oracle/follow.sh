@@ -28,11 +28,18 @@ dir_of() {
 old_dir=$(dir_of "$pinned")
 new_dir=$(dir_of "$version")
 changed=$(python3 -I oracle/relevant_diff.py "$old_dir" "$new_dir")
-go_version=$(sed -n 's/^go \([0-9][0-9.]*\)$/\1/p' "$new_dir/go.mod")
-go_version=${go_version%%$'\n'*}
+# The Go TestGrid's production images are built with (its Bazel WORKSPACE; else go.mod's): the
+# oracle is built with it too (setup-go's GOTOOLCHAIN=local would refuse a newer one).
+go_version=$(python3 -I -c 'import sys
+sys.path.insert(0, "oracle")
+import relevant_diff
+print(relevant_diff.bazel(sys.argv[1])["go"] or relevant_diff.go_mod(sys.argv[1]).get("go") or "")' "$new_dir")
+export GOTOOLCHAIN=${go_version:+go$go_version}
+export GOTOOLCHAIN=${GOTOOLCHAIN:-auto}
 
 oracle/build.sh "$work/oracle" "$version"
-export TGORACLE="$work/oracle/tgoracle" GOCHECK="$work/oracle/gocheck" SCHEMADUMP="$work/oracle/schemadump"
+export TGORACLE="$work/oracle/tgoracle" GOCHECK="$work/oracle/gocheck" SCHEMADUMP="$work/oracle/schemadump" \
+  UNIDUMP="$work/oracle/unidump"
 failed=()
 check() {
   local name=$1
@@ -48,9 +55,13 @@ a, b = (json.load(open(p)) for p in sys.argv[1:])
 sys.exit(a.pop("about") is None or b.pop("about") is None or a != b)' "$work/types.json" testgrid_types.json
 }
 check "Go types" types
+# (the tables of the Go the new commit is built with; a change there changes Go's regexp: a person compares)
+unicode() { "$UNIDUMP" | python3 -I oracle/gounicode.py check go_unicode.json.gz --any-go; }
+check "Go's unicode tables" unicode
 check "edge cases" python3 -I oracle/fuzz/edge.py
 check "random builds" python3 -I oracle/fuzz/run.py "$seed" 5000
 check "tab filters" python3 -I oracle/fuzz/filterdiff.py "$seed" 20000
+check "test names" python3 -I oracle/fuzz/fmtdiff.py "$seed" 20000
 check "real builds" uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 2
 
 {
@@ -68,7 +79,7 @@ check "real builds" uv run --locked --no-dev python -I oracle/fuzz/realdiff.py .
   if [ ${#failed[@]} -gt 0 ]; then
     echo "Checks that failed against the new commit: ${failed[*]}."
   else
-    echo "Every check passed against the new commit (Go types, edge cases, random builds, tab filters, real builds)."
+    echo "Every check passed against the new commit (Go types, Go's unicode tables, edge cases, random builds, tab filters, test names, real builds)."
   fi
 } >> "$summary"
 if [ -n "$changed" ] || [ ${#failed[@]} -gt 0 ]; then
@@ -76,8 +87,13 @@ if [ -n "$changed" ] || [ ${#failed[@]} -gt 0 ]; then
   exit 1
 fi
 
-# Nothing the port follows changed, and the checks pass: propose the new pinned.json.
+# Nothing the port follows changed, and the checks pass: propose the new pinned.json. (A
+# pseudo-version ends in its commit; a release's version is the release, which drift.sh
+# compares as it is.)
 short=${version##*-}
+if ! [[ $short =~ ^[0-9a-f]{12}$ ]]; then
+  short=$version
+fi
 branch="follow-testgrid-$short"
 python3 - "$short" "$version" "$go_version" <<'PY'
 import json, sys
@@ -90,6 +106,7 @@ with open(path, "w") as f:
 PY
 "$SCHEMADUMP" | python3 -I oracle/gotypes.py > "$work/types.json"  # (its "about" names the new commit)
 mv "$work/types.json" testgrid_types.json
+"$UNIDUMP" | python3 -I oracle/gounicode.py write go_unicode.json.gz  # (it names the Go it came from)
 auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
 echo "::add-mask::$auth"
 if git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" ls-remote --exit-code origin "refs/heads/$branch" > /dev/null; then
@@ -98,7 +115,7 @@ else
   git config user.name "github-actions[bot]"
   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
   git switch -q -c "$branch"
-  git add oracle/pinned.json testgrid_types.json
+  git add oracle/pinned.json testgrid_types.json go_unicode.json.gz
   git commit -q -m "oracle: follow TestGrid production to $short" \
     -m "Nothing in the code the port follows changed since the pinned commit, and every check of the oracle workflow passed against $version."
   git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" push -q origin "HEAD:refs/heads/$branch"

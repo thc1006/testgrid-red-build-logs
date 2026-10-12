@@ -44,6 +44,8 @@ port. It does all of this:
 - runs the edge cases, 5000 random builds (a seed per run; the cases that differ are
   attached to a failed run) and 2 real builds of each job;
 - runs the filter's edge cases and 20,000 random ones;
+- runs Go's `fmt.Sprintf` against `gofmt.py` (a test group's `test_name_config`
+  names its rows with it) on 20,000 random formats (`gocheck`'s "sprintf");
 - fails if TestGrid production's updater or tabulator no longer runs the pinned
   commit (`drift.sh`, checked even when another check failed; every archive run
   checks it too, and warns);
@@ -64,6 +66,7 @@ export TGORACLE=/tmp/oracle/tgoracle GOCHECK=/tmp/oracle/gocheck
 cd tool
 python3 -I oracle/fuzz/edge.py
 python3 -I oracle/fuzz/filterdiff.py 1 20000
+python3 -I oracle/fuzz/fmtdiff.py 1 20000
 python3 -I oracle/fuzz/run.py 1 5000     # seed, cases; mismatches go to bad-<seed>.jsonl
 uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 3   # the fetch's code and environment
 /tmp/oracle/schemadump | python3 -I oracle/gotypes.py | cmp - testgrid_types.json
@@ -79,9 +82,9 @@ port follows changed. When something did:
    `pkg/updater` (`read.go`, `gcs.go`, `inflate.go`, `updater.go`), `util/gcs`
    (`read.go`), `metadata` and `metadata/junit`, `pkg/tabulator` (`filter.go`,
    and where `tabulate` calls it), plus `go.mod` (k8s.io/api is the Pod type, and
-   the Go version decides encoding/json, encoding/xml, net/url and regexp). A
-   TestGroup field the updater newly reads belongs in `testgrid_config.py`'s
-   `GROUP_FIELDS` and `group_problems`.
+   the Go version decides encoding/json, encoding/xml, net/url, fmt and regexp).
+   A TestGroup field the updater newly reads belongs in `testgrid_config.py`'s
+   `GROUP_FIELDS`, and `cell_options` or `group_problems`.
 2. Port any change into `testgrid_rule.py`.
 3. Update `pinned.json`.
 4. Rebuild, regenerate `testgrid_types.json`, and run the checks above.
@@ -93,18 +96,21 @@ port follows changed. When something did:
   config from GCS buckets that are not public, but it is built from public
   sources: test-infra's `config/testgrids` and its Prow jobs' `testgrid-*`
   annotations, by the configurator image test-infra's
-  `post-test-infra-upload-testgrid-config` job runs. `../testgrid_config.sh` runs
-  that image with that job's arguments on test-infra's tip, and
-  `../testgrid_config.py` keeps each tab's base options and the TestGroup fields
-  `pkg/updater` paints cells by. The port follows TestGrid's default cell options
-  (rows of the same name merged, the Pod row, no custom evaluator rules, test
-  names as they are); a tab whose group sets another is not judged from GCS. The
-  fetch checks each tab's table against its config on every run.
+  `post-test-infra-upload-testgrid-config` job runs. `../testgrid_config.sh`
+  builds the config of each of that job's runs as the run did (at its commit, with
+  the image and arguments of its `prowjob.json`), and `../testgrid_config.py` keeps
+  each tab's base options and the TestGroup fields `pkg/updater` reads them by.
+  The port follows a group's cell options (`testgrid_config.cell_options`; the
+  oracle's random builds come with random ones); a tab whose group sets build
+  overrides or several GCS prefixes is not judged from GCS. The fetch checks each
+  tab's table against its config on every run.
 
 ## What the port cannot know
 
-- **Timing.** TestGrid's last read of a build happened when it read it, not now.
-  An error TestGrid itself hit reading GCS is also invisible from here.
+- **Timing.** TestGrid read a build when it did, not now: the fetch works out when
+  it may have from TestGrid's updater code and GCS's object times (see
+  `fetch_red_logs.gcs_column`), and judges every column it may have read then.
+  An error TestGrid itself hit reading GCS is invisible from here.
 - **Racing reads.** When `readResult`'s reads race, every outcome is possible,
   and the build counts as red if any is. This is mostly what TestGrid ends with:
   it keeps re-reading a column while any cell of it is RUNNING (the build, or its

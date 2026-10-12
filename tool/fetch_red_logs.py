@@ -44,6 +44,7 @@ under --archive:
   state.json                        per-tab last scan, builds to retry or given up on
 """
 import argparse
+import bisect
 import base64
 import concurrent.futures as cf
 import contextlib
@@ -81,7 +82,7 @@ import testgrid_rule as tr  # noqa: E402
 
 TESTGRID = "https://testgrid.k8s.io"
 GCS = "https://storage.googleapis.com"
-DASHBOARDS = ["sig-release-master-blocking", "sig-release-master-informing"]
+DASHBOARDS = tgc.DASHBOARDS  # (TestGrid's config is built for these: one list)
 # TestGrid TestStatus values its UI paints red (#a00). BUILD_FAIL (11) is
 # painted black and UNKNOWN (6) grey, so those cells are not red.
 RED = {9: "TIMED_OUT", 10: "CATEGORIZED_FAIL", 12: "FAIL", 14: "TOOL_FAIL"}
@@ -111,6 +112,8 @@ MAX_DOWNLOAD_BYTES = 4 << 30  # a GCS object larger than this is refused rather 
 MAX_LIST_PAGES = 1000  # a GCS listing that pages on longer than this is broken
 GUNZIP_STEP = 256 << 10  # gunzip yields at most this many bytes per step, whatever the ratio
 GIVE_UP_DAYS = 14  # stop retrying a build GCS still lacks after this long
+VANISH_ROUNDS = 4  # how many times HoldModel works out again which builds vanish, as they change each other
+MAX_LOOKBACK = 21 * 86400  # how far before a build its job's other builds are read, at most (see Timeline.most)
 HELD_DAYS = 60  # watch a build only its tab's unfollowed config keeps undecided this long
 # Prow's last upload for a build comes within about 20 minutes of its finished.json
 # time, and GCS may keep serving a public object's old content from cache for up to
@@ -121,8 +124,10 @@ RECHECK_HOURS = 48  # compare an archived build with GCS on every run until this
 UNLISTED_DAYS = 30  # forget a tab missing from its dashboard's summary after this long
 SERIOUS = ("may be missing", "state.json", "no longer listed", "old layout",  # warnings that fail the run
            "cannot be judged from GCS", "TestGrid's config was last read", "TestGrid's config was never read",
-           "the filters cannot be applied here", "does not match the tab")
+           "the filters cannot be applied here", "does not match the tab", "still not known",
+           "lacks tabs TestGrid shows", "has not run since")
 CONFIG_STALE_DAYS = 3  # TestGrid's config not read for this long is a serious warning
+CONFIG_KEEP_DAYS = HELD_DAYS + 17  # TestGrid's config over time is kept this long (a held build's days of results)
 BACKFILL_SLACK_HOURS = 6  # a build may start this long after its ID was made
 PROWJOB_WAIT = 30  # seconds to wait for prowjob.json; without it a tab keeps the margin it had
 GIVEN_UP_KEEP_DAYS = 30  # a build given up on stays listed this long, then only the run reports name it
@@ -881,10 +886,15 @@ def list_build_ids(gcs, query, lo, hi):
     bucket, _, prefix = query.partition("/")
     prefix += "/"
     first = (max(0, int(lo * 1000) - PROW_EPOCH_MS)) << 22
+    last = (max(0, int(hi * 1000) + 1001 - PROW_EPOCH_MS)) << 22  # (IDs of the next second on: past hi)
     ids, token = [], None
     for _ in range(MAX_LIST_PAGES):
-        params = {"prefix": prefix, "delimiter": "/", "startOffset": f"{prefix}{first}",
-                  "fields": "prefixes,nextPageToken"}
+        # (names are compared as strings, which orders IDs only among those of as many digits: with
+        # first and last of as many, every ID in between is in the range, and the check below keeps
+        # [lo, hi] exactly; else, before 2018-05-25 or around 2086, every build is listed)
+        params = {"prefix": prefix, "delimiter": "/", "fields": "prefixes,nextPageToken"}
+        if len(str(first)) == len(str(last)):
+            params.update(startOffset=f"{prefix}{first}", endOffset=f"{prefix}{last}")
         if token:
             params["pageToken"] = token
         page = get_json(f"{gcs}/storage/v1/b/{quote(bucket)}/o?{urllib.parse.urlencode(params)}")
@@ -1554,10 +1564,614 @@ def rfc3339_time(text):
 DEADLINE = 24 * 3600  # TestGrid paints a build not finished this long after it started FAIL
 POD_WAIT = 3600  # its Pod row waits this long after finished.json's timestamp for podinfo.json
 UPDATE_SPAN = 20 * 60  # one update of a group takes at most this long (--group-timeout=20m), its stop set at the start
-DEADLINE_RACE = 2 * 3600 + UPDATE_SPAN  # its updater updates each group at least every 2 hours (--wait=2h)
+# TestGrid's updater hands each group out every 2 hours (--wait=2h; util/queue sets the next time
+# as it hands one out), and drops a hand-out while an update of the group still runs: a column it
+# reads again (within an update's 20 minutes) is read again within this long. An update appends the
+# columns after its first only until its grace, half its 20 minutes (updater.go:572-580, 680-699):
+# when its reads wait (for the result reader lock, or the pool), the others are read by the update
+# that follows at once (unprocessed, updater.go:420-423), in its own 20 minutes. (An update that
+# fails is tried again 30 to 60 minutes later, and one whose follow-ups are cut by the grace too
+# reads the others an update later each, which TestGrid's records, not public, would show.)
+READ_GAP = 2 * 3600 + 3 * UPDATE_SPAN
+REPROCESS = 20 * 60  # an update that begins less than this long after a build started reads its column again
+REPROCESS_DAYS = 7  # after its test group's config changed, it reads again its columns of builds started this recently
+# TestGrid's components take a config this long after a run of the upload job uploaded it at
+# most: its config merger copies it into the config they read every 15 minutes
+# (cluster/prod/config_merger.yaml: --wait=15m), a merge taking up to 10 (cmd/config_merger),
+# and they read that config every minute (config/snapshot; a failed read is tried again twice,
+# 5 and 10 seconds later). (A merge that fails, such as when one of its sources cannot be
+# read, keeps the config before until the next one: that cannot be seen from here.)
+PICKUP = (15 + 10 + 1) * 60 + 30
+# TestGrid's tabulator applies a tab's new filters when it next writes the tab: at its test
+# group's next grid write (a column read), or within an hour (cluster/prod/tabulator.yaml:
+# --wait=1h; a new config keeps each group's next time in its queue), so the old ones may
+# show the columns read before this long more.
+TABULATE = 3600
+PENDING = BACKFILL_SLACK_HOURS * 3600  # a build may start this long after its ID was made
+OLDER = PENDING + DEADLINE + READ_GAP + POD_WAIT + READ_GAP  # a build's column may run this long after its ID was made
 
 
-def gcs_column(gcs, query, build, days=tr.DAYS_OF_RESULTS, now=None):
+def column_marks(probe, finished_at, podinfo_at, junits=()):
+    """The times the column TestGrid reads of a build may change at (probe: the column as
+    of now, for its start and finish times)."""
+    marks = [finished_at, podinfo_at, *(j[3] for j in junits)]
+    if probe.started:
+        marks += [probe.started + DEADLINE, probe.started + DEADLINE - UPDATE_SPAN, probe.started + REPROCESS,
+                  probe.started + REPROCESS + UPDATE_SPAN]
+    if probe.finished:
+        marks += [probe.finished + POD_WAIT, probe.finished + POD_WAIT - UPDATE_SPAN]
+    return marks
+
+
+def made_columns(column, at):
+    """The columns an update may make of what GCS held at `at`: TestGrid compares a
+    build's deadlines (24 hours to finish, an hour for podinfo.json) with the time it
+    makes the column, after it read the build's files, up to UPDATE_SPAN later
+    (convertResult, then time.Now()): column(at, clock) for both ends, one when alike."""
+    first, later = column(at, at), column(at, at + UPDATE_SPAN)
+    return (first,) if signature(first) == signature(later) else (first, later)
+
+
+def runs(col):
+    """Whether TestGrid reads the column again at its next update because of the column
+    itself: a cell of it is RUNNING (the build, or its Pod row waiting for podinfo.json);
+    a build without a start, until finished.json is in (then it never starts: its column
+    stays where its read put it)."""
+    if col.errors:
+        return "RUNNING" in col.results and not getattr(col, "finished_seen", getattr(col, "has_finished", False))
+    return "RUNNING" in (col.cells or {}).values()
+
+
+def spans_union(spans):
+    """The union of closed spans [(from, to)], as disjoint spans in order."""
+    out = []
+    for lo, hi in sorted(s for s in spans if s[0] <= s[1]):
+        if out and lo <= out[-1][1]:
+            out[-1] = (out[-1][0], max(out[-1][1], hi))
+        else:
+            out.append((lo, hi))
+    return out
+
+
+def spans_within(spans, lo, hi):
+    """The parts of the spans within [lo, hi]."""
+    return [(max(a, lo), min(b, hi)) for a, b in spans if max(a, lo) <= min(b, hi)]
+
+
+def spans_minus(spans, cuts):
+    """The parts of the spans outside the open cuts (from, to)."""
+    out = []
+    for piece in spans:
+        pieces = [piece]
+        for c_lo, c_hi in cuts:
+            pieces = [p for a, b in pieces
+                      for p in ([(a, b)] if c_hi <= a or c_lo >= b else [(a, c_lo)] * (a < c_lo) + [(c_hi, b)] * (c_hi < b))]
+        out += pieces
+    return spans_union(out)
+
+
+def possible_reads(view, made, marks, holds, now, seeds=()):
+    """When TestGrid may read a build's column, as its updater reads columns: first
+    within READ_GAP after the build was made, then again within READ_GAP after each read
+    at which the column runs (see runs()) or that falls in one of the spans `holds`
+    gives as (from, to) (when an update reads it again for another reason: a column
+    older than it runs in the grid then; it may be read at any time from `from` to a
+    READ_GAP after `to`), and at any time in the spans `seeds` gives as (from, to) (an
+    update that reads every column again, such as after its test group's config
+    changed). view(t): the columns a read at t may make (see made_columns); marks: the
+    times they may change at, so each moment and each stretch of time between marks
+    reads alike. Returns (the reads up to now, per moment and stretch and column, as
+    [(t, until, column)]: from t (the moment, or the start of the stretch) its tabs may
+    show that column until the next read must replace it (within READ_GAP of the read
+    when the column is read again; else inf); the last time a read may happen (inf:
+    unbounded); the last time a read may find the column running). Each read is
+    (t, until, column, end): `end` the last time it may happen."""
+    seeds = [(max(lo, made), hi) for lo, hi in (*seeds, *((lo, hi + READ_GAP) for lo, hi in holds)) if hi >= made]
+    marks = sorted({made, now, *(t for t in (*marks, *(x for span in (*holds, *seeds) for x in span))
+                                 if t is not None and math.isfinite(t) and t > made)})
+    reach, running_until, reads, last_cols = made + READ_GAP, -math.inf, [], ()
+    last = max([reach, *(hi for _, hi in seeds)])
+    for i, a in enumerate(marks):
+        b = marks[i + 1] if i + 1 < len(marks) else math.inf
+        for lo, hi in ((a, a), (a, b)):  # the moment a, then the stretch after it
+            moment = hi == lo
+            if lo > now or (lo == now and not moment):  # not read yet
+                return reads, max(last, reach), math.inf if any(runs(c) for c in last_cols) else running_until
+            seeded = any(s_lo <= lo <= s_hi if moment else s_lo < hi and lo < s_hi for s_lo, s_hi in seeds)
+            if (lo > reach or (lo == reach and not moment)) and not seeded:  # no read can happen then
+                continue
+            cols = view(lo if moment else (lo + hi) / 2)
+            cols = last_cols = cols if isinstance(cols, tuple) else (cols,)
+            again_then = any(h_lo <= lo <= h_hi if moment else h_lo < hi and lo < h_hi for h_lo, h_hi in holds)
+            running = any(runs(c) for c in cols)
+            end = hi if moment or running or again_then else \
+                min(hi, max([reach, *(s_hi for s_lo, s_hi in seeds if s_lo < hi and lo < s_hi)]))  # (when it may come)
+            reads += [(lo, hi + READ_GAP if runs(c) or again_then else math.inf, c, end) for c in cols]
+            if running:
+                running_until = max(running_until, hi)
+            if running or again_then:
+                reach = max(reach, hi + READ_GAP)
+    return reads, max(last, reach), running_until
+
+
+def relevant_events(made, started, events):
+    """Of `events` (see gcs_column), those after which an update may read again the column
+    of a build made at `made` that started at `started` (None: not known; then PENDING
+    after it was made at the latest): one that may begin after it was made, and, for a
+    changed test group, less than REPROCESS_DAYS after it started."""
+    recent = (made + PENDING if started is None else started) + REPROCESS_DAYS * 86400
+    return [(lo, hi, how) for lo, hi, how in events if hi >= made and (how != "changed" or lo < recent)]
+
+
+class BuildRuns:
+    """When TestGrid's column of one of a job's builds may run (see Timeline), from its
+    started.json, finished.json and podinfo.json as of the Timeline's now: .started (its
+    start; None for a build without a usable one), .nostart (it has no start: TestGrid
+    reads it as running), .good_until (from when a read finds its column errored, by a
+    finished.json or podinfo.json that is not JSON: an errored column, like one without a
+    start or one too old, does not set the start TestGrid puts a later column without one
+    at; inf: never), .running_until (the last time a read may find it running; -inf:
+    never; inf: it may still run now), .reach (the last time TestGrid may read it of its
+    own accord: first, while it runs, and while it is new) and .runs_at(t) (whether the
+    columns a read at t may make run: every one, or, with every=False, any)."""
+
+    def __init__(self, timeline, build):
+        self.build = build
+        started, finished, finished_at, podinfo, podinfo_at = timeline.files(build)
+        now, made, job = timeline.now, created(build), timeline.job
+        floor = made - OLDER  # (any stop: only whether it is a start TestGrid takes matters here)
+        parsed = {}  # (each file decoded once, for every column made of it)
+        probe = tr.column(job, started, finished, podinfo, [], floor, now, parsed=parsed)
+        self.nostart = "nostart" in probe.errors
+        self.started = probe.started if probe.started and not {"ancient", "started"} & set(probe.errors) else None
+        written = {"finished": finished_at, "podinfo": podinfo_at}  # (one without a time counts as there)
+        self.good_until = min((-math.inf if written[e] is None else written[e] for e in probe.errors if e in written),
+                              default=math.inf)
+
+        def column(at, clock):
+            held = lambda written: written is None or written <= at  # noqa: E731
+            col = tr.column(job, started, finished if held(finished_at) else None,
+                            podinfo if held(podinfo_at) else None, [], floor, clock, parsed=parsed,
+                            options=timeline.options)
+            col.finished_seen = finished is not None and held(finished_at)
+            return col
+        self._column = column
+        _, self.reach, self.running_until = possible_reads(
+            lambda at: made_columns(column, at), made, column_marks(probe, finished_at, podinfo_at), [], now,
+            [(made, self.started + REPROCESS + UPDATE_SPAN)] if self.started else [])
+
+    def runs_at(self, t, every=True):
+        return (all if every else any)(runs(c) for c in made_columns(self._column, t))
+
+
+def listed_again(pinned, back, old, runs_at):
+    """When an update may list again, and read, a build whose column vanished (see
+    HoldModel.vanishing: pinned, back): within READ_GAP after `back`, and, if its column may
+    run then (runs_at(back)), back in the grid, after each time a column that sorts older
+    stops pinning it out; but by an update that begins then, not once the build is too old
+    for it (`old`: its start and its tab's days of results): [(from, to)]."""
+    if back >= old:
+        return []
+    return [(back, back + READ_GAP)] + ([(hi, hi + READ_GAP) for _, hi in pinned if back < hi < old]
+                                        if runs_at(back) else [])
+
+
+def order_key(started, build):
+    """Where TestGrid's grid puts a column: by start, newest first; of the same start, the
+    lower ID newer (the columns an update reads, in ID order, before the stable sort)."""
+    return started, -int(build)
+
+
+class HoldModel:
+    """How a job's other builds (BuildRuns, `others`) make TestGrid's updater read a
+    column again or drop it, as its grid holds their columns: an update re-reads every
+    column from the oldest one that runs (truncateRunning), listing only the builds
+    after the highest ID of the columns it keeps (hintStarted, listBuilds), and a build
+    without a start is read as a running column put at the start of the good column read
+    before it in the same update (readColumns; with none, at the epoch, where the next
+    update drops it). span: the days of results of the tab, in seconds (a column that
+    started before the update's stop is too old: it does not run, nor set that start);
+    events: the updates after changes to the test group that read columns again (see
+    gcs_column).
+
+    Columns run, in the grid, from when the build was made until their last running read
+    (.run_end), and the last read of the update that reads one done (READ_GAP later) is
+    the last they hold: a column older than another holds it until then. A build without
+    a start is put, by each update that reads it with good columns of lower IDs, at the
+    start of the highest of them good then (as long as it is: until a file of it that is
+    not JSON is written, and while it is not too old), and holds every column newer than
+    that with a higher ID than its own until the next update: so each read of that good
+    column (.reads: its own, those that columns older than it hold, and the update after
+    a change that reads it again) is a hold of those columns (.entries). And a build
+    whose column sorts newer than a column with a higher ID (it started later, or at the
+    same time) vanishes from the grid once that column is settled there and nothing older
+    than it runs, at the first update that cuts the grid at it or drops it as new (see
+    vanishing()): it then no longer runs there, and is read again only by an update that
+    lists it again, once no such column pins it out (that one too old, or cut at an older
+    running column), or after a change that reads again all those columns (and then
+    holds, while it runs, the columns newer than it with a higher ID than theirs until
+    the next update). But an update appends the columns after its first only until its
+    grace (updater.go:680-699), so when its reads come slowly that column may never be
+    appended, and the build never vanish: the model reads and holds as it would then too
+    (both: a vanished build is read, and holds, as if it never vanished, and once listed
+    again; and pins nothing out)."""
+
+    def __init__(self, others, span, events=()):
+        self.span, self.events = span, events
+        self.by_id = sorted(others, key=lambda r: int(r.build))
+        self.good = sorted((r for r in others if r.started), key=lambda r: order_key(r.started, r.build))
+        self.gone, self.out = {}, None
+        self._pass()
+        # (a build vanishes only past a column of a higher ID that sorts older: none in most jobs)
+        bad, top = [], -1
+        for x in self.good:  # (oldest first)
+            if top > int(x.build):
+                bad.append(x)
+            top = max(top, int(x.build))
+        # (each from the same model, so the order they are taken in does not matter; then again from the
+        # model with them gone, while that changes them, VANISH_ROUNDS times at most)
+        for _ in range(VANISH_ROUNDS):
+            gone = {}
+            for x in bad:
+                v = self.vanishing(x.build, x.started)
+                if v is not None and x.runs_at(v[1]):  # (it runs at every read until it vanishes)
+                    # (and is read again only once listed again, from `back` on while no column pins it out)
+                    gone[x.build] = (*v, spans_minus([(v[3], math.inf)], v[2]))
+            if gone == self.gone:
+                break
+            self.gone = gone
+            self._pass()
+
+    def vanish(self, build, started):
+        """vanishing() of a build, as the model took it (for one that vanishes, what it found last)."""
+        return self.gone[build][:4] if build in self.gone else self.vanishing(build, started)
+
+    def run_end(self, r):
+        """The last time a read may find r's column running in the grid (one that vanishes may
+        also never vanish; but not in the world `out` is of, see vanishing())."""
+        end = min(r.running_until, r.started + self.span + UPDATE_SPAN)  # (a column too old does not run)
+        return min(end, self.gone[r.build][1]) if r.build == self.out else end
+
+    def held_by(self, end, at):
+        """The end of a hold by a running column put at `at` (a start) whose last running read
+        may happen by `end`: the update after it reads the columns newer than it again, within
+        READ_GAP, if it begins before that column is too old; one that begins later drops it
+        first (InflateGrid), and reads nothing again."""
+        return min(end, at + self.span + UPDATE_SPAN - READ_GAP)
+
+    def _pass(self):
+        span, gone = self.span, self.gone
+        self.keys = [order_key(r.started, r.build) for r in self.good]
+        self.ran = list(itertools.accumulate((self.held_by(self.run_end(r), r.started) for r in self.good), max))
+        # (from, to, the start it is put at, the ID it holds columns above): a running column that holds
+        # the columns that started after that start and have a higher ID, from `from` to `to`
+        self.entries = []
+        self.reads = {}  # per good build: when a read may find its column good
+        below = []  # the good builds so far, in ID order
+        for r in self.by_id:
+            made = created(r.build)
+            if r.started:
+                held = self.hold_spans(made, r.started, r.build)
+                spans = [(made, r.reach), *((lo, hi + READ_GAP) for lo, hi in held)]
+                recent = r.started + REPROCESS_DAYS * 86400
+                spans += [(lo, (hi if how != "changed" else min(hi, recent)) + UPDATE_SPAN) for lo, hi, how in self.events
+                          if hi >= made and (how != "changed" or lo < recent)]
+                if r.build in gone:  # (read as if it never vanished, and again once listed again)
+                    _, until, pinned, back, listed = gone[r.build]
+                    spans = spans_within(spans, -math.inf, until) if r.build == self.out else \
+                        spans + listed_again(pinned, back, r.started + span, r.runs_at)
+                    # (listed again, running: it holds the newer columns until the next update, those of
+                    # a lower ID too, as the update lists every build after the highest ID kept, now lower)
+                    self.entries += [(lo, max(lo, self.held_by(min(hi, r.running_until), r.started)), r.started, -1)
+                                     for lo, hi in listed if r.runs_at(lo, every=False)]
+                cap = min(r.good_until, r.started + span + UPDATE_SPAN)
+                self.reads[r.build] = spans_union(spans_within(spans, -math.inf, cap))
+                below.append(r)
+            elif r.nostart:
+                start = made  # (from when it is listed)
+                for g in reversed(below):  # (the highest good one below it is the one it is put at, while it is good)
+                    cap = min(g.good_until, g.started + span + UPDATE_SPAN)
+                    if cap <= start:
+                        continue
+                    # (a read of it less than a gap before it is too old holds them too, if the next
+                    # update begins in time: from that read on)
+                    self.entries += [(lo, max(lo, min(hi, self.held_by(cap, g.started))), g.started, int(r.build))
+                                     for lo, hi in spans_within(self.reads[g.build], start, cap)]
+                    start = cap
+                    if start == math.inf:
+                        break
+
+    def hold_spans(self, made, started, build):
+        """When the grid may hold a running column older than a build's (made at `made`, that
+        started at `started`, ID `build`), from when it was made: [(from, to)]."""
+        bid = int(build)
+        i = bisect.bisect_left(self.keys, order_key(started, build))
+        end = self.ran[i - 1] if i else -math.inf
+        out = [(made, end)] if end >= made else []
+        out += [(max(lo, made), hi) for lo, hi, at, above in self.entries if above < bid and at < started and hi >= made]
+        return spans_union(out)
+
+    def holds(self, build, started):
+        """hold_spans() of a build, or for one without a start (None): any column of a lower ID
+        that runs, or one without a start of a lower ID put at a good start."""
+        if started is not None:
+            return self.hold_spans(created(build), started, build)
+        made, bid = created(build), int(build)
+        end = max((self.held_by(self.run_end(r), r.started) for r in self.good if int(r.build) < bid), default=-math.inf)
+        return spans_union(([(made, end)] if end >= made else []) +
+                           [(max(lo, made), hi) for lo, hi, _, above in self.entries if above < bid and hi >= made])
+
+    def vanishing(self, build, started):
+        """(done, gone, pinned, back) when the build's column vanishes from the grid if it runs at
+        every read from `done` to `gone` (else None). A column of a higher ID that sorts older than it
+        (it started earlier, or at the same time) pins it out of the listing while it is settled
+        in the grid: from when its update that reads it done (or first) is over; while it is
+        good (read errored, it is put at the start of the good column read before it, not its
+        own) and not too old (the updates after that drop it); and but while a column older
+        than it runs (the grid is cut there, and the build listed again) or an update after a
+        change reads it again: an update then lists only the builds after it (truncateRunning,
+        then listBuilds from the highest hint of the columns kept). pinned: [(from, to)]: when
+        one pins it, not read then. The first update in them cuts the grid at its running
+        column, and drops it: the update before reads it for the last time, by `gone`. Out of
+        the grid, a column of a higher ID pins it out so whatever its start: `back` is when none
+        does any more (inf: never), and the update after lists it again, and reads it; while it
+        then runs in the grid, only one that sorts older pins it out (see listed_again). Until
+        then the build holds no column, nor is one put at its start: the columns that sort newer
+        pin it out as they do in the grid without it from `gone` on (not as its own reads after
+        that, which come only once it is listed again, would hold them)."""
+        bid, key = int(build), order_key(started, build)
+
+        def pins(model, c):  # (when c, of a higher ID, is settled in the grid, and kept by every update)
+            if c.build in model.gone or c.running_until == math.inf:
+                return []  # (it vanishes itself, or may run on: not settled in the grid, or not yet)
+            made = created(c.build)
+            settled = max(max(model.run_end(c), made) + READ_GAP, c.started + REPROCESS + UPDATE_SPAN)
+            if c.good_until <= settled:
+                return []  # (read done, it is errored: put at the start of the good column read before it)
+            recent = c.started + REPROCESS_DAYS * 86400
+            cut = [(lo, hi + READ_GAP) for lo, hi in model.hold_spans(made, c.started, c.build)]
+            cut += [(lo, (hi if how != "changed" else min(hi, recent)) + UPDATE_SPAN) for lo, hi, how in self.events
+                    if hi >= made and (how != "changed" or lo < recent)]
+            return spans_minus([(settled, c.started + self.span)], cut)
+        higher = [c for c in self.good if int(c.build) > bid]
+        pinned = spans_union([p for c in higher if order_key(c.started, c.build) < key for p in pins(self, c)])
+        if not pinned:
+            return None
+        gone = pinned[0][0]
+        newer = [c for c in higher if order_key(c.started, c.build) > key]
+        out = pinned
+        if newer:  # (the model with the build gone from `gone` on, never listed again)
+            without = copy.copy(self)
+            without.gone, without.out = {**self.gone, build: (gone - READ_GAP, gone, pinned, math.inf, [])}, build
+            without._pass()
+            out = spans_union(pinned + [p for c in newer for p in spans_within(pins(without, c), gone, math.inf)])
+        back = next(hi for lo, hi in out if lo <= gone <= hi)
+        return gone - READ_GAP, gone, pinned, back
+
+
+class Timeline:
+    """A job's other builds, as far as TestGrid's reads of one of them depend on them (see
+    HoldModel). Each build's started.json, finished.json and podinfo.json are read once,
+    as of the Timeline's `now`, so one Timeline serves every build of the job a run
+    judges (a build's own files are read by gcs_column, as of when it judges it)."""
+
+    def __init__(self, gcs, query, now=None, options=None, shared=None):
+        self.gcs, self.query, self.now = gcs, query, time.time() if now is None else now
+        self.options = options or tr.DEFAULT_OPTIONS  # (its test group's cell options: a column runs by them)
+        self.job = query.rsplit("/", 1)[-1]
+        self._lock = threading.Lock()
+        shared = shared if shared is not None else Timelines.shared()
+        self._listing, self._list_lock = shared["listing"], shared["list_lock"]  # (one for every options)
+        self._files, self._files_lock = shared["files"], shared["lock"]  # build -> Future of its files
+        self._runs = {}  # build -> Future of its BuildRuns
+        self._models = {}  # (days of results, events) -> (from, to, the HoldModel of the builds made then)
+        self._model_lock = threading.Lock()  # (one made at a time: they take CPU, and a later build may reuse it)
+
+    def files(self, build):
+        """A build's started.json, finished.json (with when it was written) and podinfo.json
+        (with when), read once for every Timeline of the job."""
+        with self._files_lock:
+            fut = self._files.get(build)
+            mine = fut is None
+            if mine:
+                fut = self._files[build] = cf.Future()
+        if mine:
+            base = f"{self.gcs}/{self.query}/{build}"
+            try:
+                started = read_artifact(f"{base}/started.json", MAX_JSON_BYTES)
+                finished, finished_at = read_artifact(f"{base}/finished.json", MAX_JSON_BYTES, when=True)
+                podinfo, podinfo_at = read_artifact(f"{base}/podinfo.json", MAX_JSON_BYTES, when=True)
+                fut.set_result((started, finished, finished_at, podinfo, podinfo_at))
+            except BaseException as e:
+                fut.set_exception(e)
+        return fut.result()
+
+    def offer(self, build, files):
+        """Take a build's files (as files() returns them) read elsewhere, unless they were read."""
+        with self._files_lock:
+            if build not in self._files:
+                fut = self._files[build] = cf.Future()
+                fut.set_result(files)
+
+    def builds(self, lo, hi):
+        """The job's build IDs made in [lo, hi]: what of that was not listed yet is listed
+        (once for every Timeline of the job), then kept."""
+        with self._list_lock:
+            have = self._listing  # {"lo", "hi", "ids"}: every build made in [lo, hi]
+            if have["ids"] is None or lo < have["lo"] or hi > have["hi"]:
+                parts = [(lo, hi)] if have["ids"] is None else \
+                    [p for p in ((lo, have["lo"]), (have["hi"], hi)) if p[0] < p[1]]
+                got = set(have["ids"] or ())
+                for a, b in parts:
+                    try:
+                        got.update(list_build_ids(self.gcs, self.query, a, b))
+                    except NotFound:  # no such bucket: TestGrid lists no builds either (storage.ErrBucketNotExist)
+                        pass
+                first = have["ids"] is None
+                have.update(ids=sorted(got, key=int), lo=lo if first else min(lo, have["lo"]),
+                            hi=hi if first else max(hi, have["hi"]))
+            return [b for b in have["ids"] if lo <= created(b) <= hi]
+
+    def listed(self):
+        """[from, to]: when the builds listed so far were made (an empty span if none were)."""
+        with self._list_lock:
+            return self._listing["lo"], self._listing["hi"]
+
+    def runs(self, build):
+        """The build's BuildRuns, read once."""
+        with self._lock:
+            fut = self._runs.get(build)
+            mine = fut is None
+            if mine:
+                fut = self._runs[build] = cf.Future()
+        if mine:
+            try:
+                fut.set_result(BuildRuns(self, build))
+            except BaseException as e:
+                fut.set_exception(e)
+        return fut.result()
+
+    def read(self, build):
+        """The build's BuildRuns if it was read, else None (also if reading it failed)."""
+        with self._lock:
+            fut = self._runs.get(build)
+        return fut.result() if fut is not None and fut.done() and fut.exception() is None else None
+
+    @staticmethod
+    def back(made, events=(), span=tr.DAYS_OF_RESULTS * 86400, nostart=0, started=None):
+        """How long before a build made at `made` (that started at `started`; None: not known
+        yet) the builds TestGrid's reads of it depend on were made, at most: OLDER, a READ_GAP
+        more for each build without a start among them (the chains they make), and, for each
+        of `events` (see gcs_column) that may read it again, or start a chain of holds that
+        reaches it, back to the builds that update may read again (it puts every build without
+        a start it reads at the start of a good column, and the updates after it read the
+        newer columns again as they take them off, one an update: a READ_GAP for each, and one
+        more); MAX_LOOKBACK at most."""
+        back = OLDER + READ_GAP * nostart
+        recent = (made + PENDING if started is None else started) + REPROCESS_DAYS * 86400
+        reach = READ_GAP * (nostart + 1) + UPDATE_SPAN
+        for lo, hi, how in events:
+            if hi + reach >= made and (how != "changed" or lo < recent):
+                back = max(back, made - lo + (span if how != "changed" else REPROCESS_DAYS * 86400) + PENDING)
+        return min(back, Timeline.most(span))
+
+    @staticmethod
+    def most(span):
+        """How far back a window reaches at most: MAX_LOOKBACK, or, on a tab of more days of
+        results, those and the week an update after a change reads again."""
+        return max(MAX_LOOKBACK, span + REPROCESS_DAYS * 86400 + PENDING)
+
+    def window(self, made, events=(), span=tr.DAYS_OF_RESULTS * 86400, started=None, exclude=None):
+        """(from, to): when the builds TestGrid's reads of a build made at `made` depend on
+        were made: back() before it, counting the builds without a start in that window (but
+        `exclude`, the build itself), to PENDING after it."""
+        nostart = 0
+        while True:
+            lo, hi = made - self.back(made, events, span, nostart, started), made + PENDING
+            n = sum(1 for b in self.builds(lo, hi) if b != exclude and self.runs(b).nostart)
+            if self.back(made, events, span, n, started) <= made - lo:
+                return lo, hi
+            nostart = n
+
+    def grid(self, build, started, days=tr.DAYS_OF_RESULTS, events=()):
+        """How the job's other builds make TestGrid read the build's column again, or drop it:
+        (holds, vanish), as HoldModel's holds() and vanishing() (vanish None for a build without
+        a start); holds [(made, inf)] (and vanish None) when the job's builds cannot be read.
+        events: the updates after changes to its test group (see gcs_column), all of them (one
+        before the build was made may start a chain of holds that reaches it). One HoldModel
+        serves every build of the job judged with the same days and events whose window it
+        holds (the builds outside a build's window change nothing for it)."""
+        made, span = created(build), days * 86400
+        key = (span, tuple(sorted(events)))
+        try:
+            lo, hi = self.window(made, events, span, started, build)
+            if made - lo >= self.most(span):  # (a window cut short: the builds of its own, whatever was judged before)
+                have = (lo, hi, HoldModel([self.runs(b) for b in self.builds(lo, hi)], span, events))
+            else:
+                with self._model_lock:
+                    have = self._models.get(key)
+                    if have is None or lo < have[0] or hi > have[1]:
+                        if have is not None:
+                            lo, hi = min(lo, have[0]), max(hi, have[1])
+                        have = self._models[key] = (lo, hi, HoldModel([self.runs(b) for b in self.builds(lo, hi)],
+                                                                      span, events))
+        except (urllib.error.HTTPError, *TRANSIENT):
+            return [(made, math.inf)], None
+        model = have[2]
+        return model.holds(build, started), None if started is None else model.vanish(build, started)
+
+    def prime(self, pool, made):
+        """Start reading, in the pool, the builds window() reads for builds made at `made`
+        without events (but those without a start among them); returns the reads' futures."""
+        try:
+            ids = self.builds(min(made) - OLDER, max(made) + PENDING)
+        except (urllib.error.HTTPError, *TRANSIENT):
+            return []  # (window() lists them again)
+        return [pool.submit(self.runs, b) for b in ids]
+
+
+class Timelines:
+    """One run's Timeline of each job and cell options (see gcs_column), made as they are
+    needed; the Timelines of a job share its listings and its builds' files."""
+
+    def __init__(self, now):
+        self.now, self._lock, self._of, self._shared = now, threading.Lock(), {}, {}
+
+    @staticmethod
+    def shared():
+        return {"listing": {"lo": math.inf, "hi": -math.inf, "ids": None}, "list_lock": threading.Lock(),
+                "files": {}, "lock": threading.Lock()}
+
+    def get(self, gcs, query, options=None):
+        options = options or tr.DEFAULT_OPTIONS
+        with self._lock:
+            if (gcs, query, options) not in self._of:
+                shared = self._shared.setdefault((gcs, query), self.shared())
+                self._of[(gcs, query, options)] = Timeline(gcs, query, self.now, options, shared)
+            return self._of[(gcs, query, options)]
+
+    def prime(self, pool, gcs, builds, deadline=math.inf, events=None, days=None):
+        """Read, in the pool, what judging these (query, build)s will need (waiting for it until
+        `deadline`, a time.monotonic()): the builds of each one's Timeline window (with its
+        events, {(query, build): events}, and days of results, {(query, build): days}), each
+        job's listed at once, then all their files read at once, then those of what the
+        builds without a start among them widen the windows by, until none does."""
+        events, days = events or {}, days or {}
+        want = {}  # query -> [[made, its events, days of results (s), builds without a start in its window]]
+        for query, build in builds:
+            want.setdefault(query, []).append([created(build), events.get((query, build), ()),
+                                               days.get((query, build), tr.DAYS_OF_RESULTS) * 86400, 0])
+
+        def left():
+            return None if deadline == math.inf else max(0, deadline - time.monotonic())
+        while want and left() != 0:
+            listed = {q: pool.submit(self.get(gcs, q).builds,
+                                     min(m - Timeline.back(m, ev, sp, n) for m, ev, sp, n in items),
+                                     max(m for m, _, _, _ in items) + PENDING)
+                      for q, items in sorted(want.items())}
+            cf.wait(listed.values(), timeout=left())
+            ids = {q: fut.result() for q, fut in listed.items() if fut.done() and fut.exception() is None}
+            reads = [pool.submit(self.get(gcs, q).runs, b) for q, bs in ids.items() for b in bs
+                     if self.get(gcs, q).read(b) is None]
+            cf.wait(reads, timeout=left())
+            wider = {}
+            for q, bs in ids.items():
+                timeline = self.get(gcs, q)
+                runs = [timeline.read(b) for b in bs]
+                if None in runs:
+                    continue  # (out of time, or a build that cannot be read: window() reads it again)
+                nostart = [created(r.build) for r in runs if r.nostart]
+                for item in want[q]:
+                    m, ev, sp, n = item
+                    count = sum(1 for t in nostart if m - Timeline.back(m, ev, sp, n) <= t <= m + PENDING)
+                    if Timeline.back(m, ev, sp, count) > Timeline.back(m, ev, sp, n):
+                        item[3] = count
+                        wider[q] = want[q]
+            want = wider
+
+
+def gcs_column(gcs, query, build, days=tr.DAYS_OF_RESULTS, now=None, timeline=None, events=(), options=None,
+               inputs=None):
     """TestGrid's column for a build, from GCS read as its updater reads it (see
     testgrid_rule): started.json, finished.json, podinfo.json and, unless reading
     those failed (that error is then the column), every junit file it would parse.
@@ -1565,99 +2179,205 @@ def gcs_column(gcs, query, build, days=tr.DAYS_OF_RESULTS, now=None):
     or read, the column is the one without them, with .partial saying why (see
     verdict).
 
-    The column is the one TestGrid read last, from what GCS held then (objects by when
-    GCS says they were written; one without a time counts as there): its read once
-    finished.json is in and the Pod row has stopped waiting (podinfo.json is in, or an
-    hour after finished.json's timestamp passed), or, for a build without finished.json
-    24 hours after it started, its read after that deadline: its Overall cell is FAIL
-    then and no cell of it runs, so TestGrid does not read it again, even when it
-    finishes later. TestGrid updates a job's builds at least every 2 hours, an update
-    taking up to 20 minutes, so what was written that long after such a moment may be
-    in its read instead: that column is in .alternatives. A build that started more
-    than `days` (the tab's days of results)
-    before the update that read it began counts as too old. Without finished.json's
-    time, the column is the one GCS holds now. .inputs: what GCS holds, as given to the rule."""
+    TestGrid reads a build's column again and again (see possible_reads): while it
+    runs, while the build started less than REPROCESS before an update, while the grid
+    holds an older running column of its job (see HoldModel: `timeline`, else one for
+    this build), and at the update after its test group's config changed, if it started
+    less than REPROCESS_DAYS before (or every build, for a new group; `events`: when
+    those updates may begin, as (from, to, "changed", "new", or "unknown": taken as new)), each time from what GCS
+    holds then (objects by when GCS says they were written; one without a time counts as
+    there), and makes the column up to UPDATE_SPAN later (see made_columns). A column
+    stays on its tabs until the next read of it (one that may vanish from the grid, see
+    HoldModel.vanishing, is read as if it never vanished too, and once listed again), so the
+    build was red on a tab if the column of any read is.
+    The column returned is the one of the last read up to now; .reads: each column read,
+    the last first, with when it may have been read and its tabs may have shown it
+    ([(column, [(from, to, read by)])]: from `from` until `to`, read by `read by` at the
+    latest); .alternatives the other columns read; .open says whether TestGrid may read
+    it again after now. A build counts as too old by the days of results (`days`) before
+    the update that read it began. options: the test group's cell options
+    (testgrid_rule.Options); inputs: a dict that keeps what GCS holds of the build for
+    calls with other options (see Columns). .inputs: what GCS holds, as given to the
+    rule."""
+    now = time.time() if now is None else now
+    job = query.rsplit("/", 1)[-1]
+    made, span = created(build), int(days * 86400)
+    if inputs is None or not inputs:
+        read = read_build(gcs, query, build, made - span, now)
+        if inputs is not None:
+            inputs.update(read)
+    else:
+        read = inputs
+    timeline = timeline or Timeline(gcs, query, now, options)
+    timeline.offer(build, tuple(read[k] for k in ("started", "finished", "finished_at", "podinfo", "podinfo_at")))
+    started, finished, finished_at, podinfo, podinfo_at, probe, s, junits, folder, partial, parsed = (read[k] for k in (
+        "started", "finished", "finished_at", "podinfo", "podinfo_at", "probe", "s", "junits", "folder", "partial",
+        "parsed"))
+    options = options or tr.DEFAULT_OPTIONS
+
+    def column(at, clock):
+        # (made at `clock` by an update that read the build at `at`: one that began UPDATE_SPAN before
+        # `clock` at the earliest, and so took its stop then)
+        held = lambda written: written is None or written <= at  # noqa: E731
+        col = tr.column(job, started, finished if held(finished_at) else None, podinfo if held(podinfo_at) else None,
+                        [(j[0], j[1], j[2], j[4]) for j in junits if held(j[3])], clock - UPDATE_SPAN - span, clock,
+                        folder=folder, parsed=parsed, options=options)
+        col.finished_seen = finished is not None and held(finished_at)
+        return col
+
+    def view(at):
+        return made_columns(column, at)
+
+    changes = relevant_events(made, s, events)
+    holds, vanish = timeline.grid(build, s, days, events)
+    marks = column_marks(probe, finished_at, podinfo_at, junits) + ([s + span + UPDATE_SPAN] if s else [])  # (too old)
+    # (after a change to its test group, an update that begins later than `recent` does not read it
+    # again; the first update of a new group reads every build it shows)
+    recent = (s or made) + REPROCESS_DAYS * 86400
+    seeds = [(lo, (hi if how != "changed" else min(hi, recent)) + UPDATE_SPAN) for lo, hi, how in changes]
+    if s:  # (an update that begins less than REPROCESS after it started reads it again, within its span)
+        seeds.append((made, s + REPROCESS + UPDATE_SPAN))
+    if vanish:  # (once it vanished, it is read again once listed again)
+        done, gone, pinned, back = vanish
+        marks += [done, gone, back, *(x for w in pinned for x in w)]
+    reads, reach, _ = possible_reads(view, made, marks, holds, now, seeds)
+    if vanish:  # (it vanishes from the grid if every read of it from `done` to `gone` finds it running)
+        late = [c for t, _, c, _ in reads if done <= t <= gone]
+        if late and all(runs(c) for c in late):
+            # (its reads as if it never vanished stay: the column that pins it out may never be appended,
+            # as an update appends the columns after its first only until its grace; HoldModel.vanishing)
+            again = listed_again(pinned, back, s + span, lambda t: any(runs(c) for c in view(t)))
+            if again:
+                reads, reach, _ = possible_reads(view, made, marks, holds, now, seeds + again)
+    if not reads:  # (an ID made after now)
+        reads = [(now, math.inf, c, now) for c in view(now)]
+    col = reads[-1][2]
+    shown = {}  # per column read: when it may have been read, and its tabs may have shown it (the last read first)
+    for lo, until, c, end in reversed(reads):
+        shown.setdefault(signature(c), (c, []))[1].append((lo, until, end))
+    for c, _ in shown.values():
+        c.has_finished, c.partial = finished is not None, partial
+    col.reads = list(shown.values())
+    col.alternatives = [c for c, _ in col.reads[1:]]
+    # (after the build is too old for TestGrid to show, a read of it cannot matter)
+    col.open, col.now = min(reach, s + span + UPDATE_SPAN if s else math.inf) > now, now
+    col.inputs = (started, finished, podinfo, [j[:3] for j in junits])
+    return col
+
+
+def read_build(gcs, query, build, stop, now):
+    """What gcs_column reads of a build from GCS (once for every cell options it is judged
+    by): its started.json, finished.json and podinfo.json with when they were written, the
+    column without junit files as of now (a stop of `stop`, for its start), and, for a
+    build with a start TestGrid takes, the junit files it reads, as (object it opens,
+    size, data, when written, name as listed), or why they cannot be read."""
     base = f"{gcs}/{query}/{build}"
     job = query.rsplit("/", 1)[-1]
     started = read_artifact(f"{base}/started.json", MAX_JSON_BYTES)
     finished, finished_at = read_artifact(f"{base}/finished.json", MAX_JSON_BYTES, when=True)
     podinfo, podinfo_at = read_artifact(f"{base}/podinfo.json", MAX_JSON_BYTES, when=True)
-    now = time.time() if now is None else now
-    made, span = created(build), int(days * 86400)
-    probe = tr.column(job, started, finished, podinfo, [], made - span, now)
-    s, f = probe.started, probe.finished
-    ended = finished is not None and f is not None and f > 0  # (TestGrid takes it as finished once it reads that)
-    if s and now > s + DEADLINE and not (ended and (finished_at is None or finished_at <= s + DEADLINE)):
-        last = s + DEADLINE + 1  # its deadline passed first
-    elif ended and finished_at is not None:
-        # (a podinfo.json without a pod leaves the Pod row waiting, as none does)
-        has_pod = not probe.errors and probe.notes.get(job + ".Pod") != tr.MISSING_POD_INFO
-        in_time = podinfo is not None and has_pod and (podinfo_at is None or podinfo_at <= f + POD_WAIT)
-        last = max(finished_at, podinfo_at or finished_at) if in_time else max(finished_at, f + POD_WAIT + 1)
-    else:
-        last = None
-    last = max(last, made) if last is not None else None  # (TestGrid reads a build only once it exists)
-    last = last if last is not None and last <= now else None  # (None: still read again; as of now)
-
-    def view(at, junits, folder=""):
-        """The column TestGrid read at `at` (None: from what GCS holds now)."""
-        if at is None:
-            return tr.column(job, started, finished, podinfo, [j[:3] for j in junits], made - span, now, folder=folder)
-        held = lambda written: written is None or written <= at  # noqa: E731
-        return tr.column(job, started, finished if held(finished_at) else None, podinfo if held(podinfo_at) else None,
-                         [j[:3] for j in junits if held(j[3])], at - UPDATE_SPAN - span, at, folder=folder)
-
-    partial, junits = None, []
-    if not probe.errors or not view(last, []).errors:  # (TestGrid lists the junit files of a build it could read)
+    probe = tr.column(job, started, finished, podinfo, [], stop, now)
+    s = probe.started if probe.started and not {"ancient", "started"} & set(probe.errors) else None
+    partial, junits, folder = None, [], ""
+    if s:  # (TestGrid lists the junit files of a build it can read: one with a start it takes)
         bucket, _, path = query.partition("/")
         folder = f"{path}/{build}/"
         try:
             listing = list_objects(gcs, bucket, folder)
-            for _, opened in tr.junit_reads(sorted(listing)):
+            for listed, opened in tr.junit_reads(sorted(listing)):
                 size, gzipped, written = listing.get(opened, (None, False, None))
                 if size is None:
-                    junits.append((opened, None, None, None))  # TestGrid cannot open it either
+                    junits.append((opened, None, None, None, listed))  # TestGrid cannot open it either
                     continue
                 size = -1 if gzipped else size  # read decompressed, of unknown length
                 data = b"" if size > tr.JUNIT_MAX_SIZE else read_artifact(
                     f"{gcs}/{bucket}/{urllib.parse.quote(opened, safe='/')}", MAX_JUNIT_BYTES)
-                junits.append((opened, size, data, written))
+                junits.append((opened, size, data, written, listed))
         except (urllib.error.HTTPError, *TRANSIENT) as e:  # TestGrid read them then; they cannot be read now
             partial = f"its junit files cannot be read: {type(e).__name__}: {e}"[:300]
             junits = []
-    else:
-        folder = ""
-    # (a later read, for each object written within the window: right after it, the update that
-    # made it begun at most UPDATE_SPAN before)
-    later = sorted({w for w in (finished_at, podinfo_at, *(j[3] for j in junits))
-                    if w is not None and last is not None and last < w <= min(last + DEADLINE_RACE, now)})
-    later = later if len(later) <= 4 else later[:3] + later[-1:]  # (the last read has them all)
-    cols = [view(at, junits, folder) for at in [last, *(min(w + 1, now) for w in later)]]
-    for c in cols:
-        c.has_finished, c.partial = finished is not None, partial
-    col = cols[0]
-    col.alternatives, col.inputs = cols[1:], (started, finished, podinfo, [j[:3] for j in junits])
-    return col
+    return {"started": started, "finished": finished, "finished_at": finished_at, "podinfo": podinfo,
+            "podinfo_at": podinfo_at, "probe": probe, "s": s, "junits": junits, "folder": folder, "partial": partial,
+            "parsed": {}}
+
+
+class Columns:
+    """A build's columns (see gcs_column), one per cell options its tabs' configs give,
+    made as they are asked for, from one read of the build: columns(options)."""
+
+    def __init__(self, gcs, query, build, days, now=None, timelines=None, events=()):
+        self.args, self.timelines, self.events = (gcs, query, build, days, now), timelines, events
+        self.inputs, self.made, self.lock = {}, {}, threading.Lock()
+
+    def __call__(self, options=None):
+        options = options or tr.DEFAULT_OPTIONS
+        with self.lock:  # (one at a time: they share the build's read)
+            if options not in self.made:
+                gcs, query, build, days, now = self.args
+                self.made[options] = gcs_column(
+                    gcs, query, build, days, now=now,
+                    timeline=self.timelines.get(gcs, query, options) if self.timelines else None,
+                    events=self.events, options=options, inputs=self.inputs)
+            return self.made[options]
+
+
+def signature(col):
+    """What tells two columns read of one build apart."""
+    return (tuple(col.errors), tuple(col.malformed), tuple(sorted(col.results)),
+            tuple(sorted((col.cells or {}).items())), tuple(sorted(col.notes.items())))
 
 
 def unreadable_junit(col):
     """Why the column cannot be judged though nothing else keeps it undecided: its junit
-    files could not be read, and no cell of it still runs. None otherwise."""
-    return col.partial if getattr(col, "partial", None) and "RUNNING" not in (col.cells or {}).values() else None
+    files could not be read, and TestGrid will not read it again. None otherwise."""
+    return col.partial if getattr(col, "partial", None) and not still_read(col) else None
 
 
-def verdict(col, job, rows=None, shows=None):
-    """What TestGrid's column for the build shows on a tab: ("red", red rows), or,
-    when it is not red there, ("undecided", []) while TestGrid would still read it
-    again (not started, or a cell still RUNNING: the build, or its Pod row waiting
-    for podinfo.json) or its junit files cannot be read, else ("not-red", []).
-    shows(row): whether the tab shows a row (its config's filters, see
-    testgrid_config.TabRule); without it, rows: {"overall": shown?, "pod": shown?},
-    as learned from the tab's table (shown when not known), and every other row is
-    shown. Of the columns readResult's racing reads can give, and of the columns
-    TestGrid may have ended with (col.alternatives, see gcs_column), the build
-    counts as red when any is."""
-    return combine([column_verdict(c, job, rows, shows) for c in (col, *getattr(col, "alternatives", ()))])
+def still_read(col):
+    """Whether TestGrid may read the column again (.open; a column gcs_column did not read:
+    whether it runs)."""
+    still = getattr(col, "open", None)
+    return runs(col) if still is None else still
+
+
+def verdict(col, job, rows=None, shows=None, during=None, read_in=None):
+    """What TestGrid's column for the build shows on a tab: ("red", red rows) when the
+    column of any read of it (col and col.alternatives, see gcs_column; and of the
+    columns readResult's racing reads can give) is red there: the red rows of the last
+    read (col) when it is red, as TestGrid shows them from then on, else those of the
+    others; else ("undecided", []) while TestGrid may still read it (see still_read) or
+    its junit files cannot be read, else ("not-red", []). shows(row): whether the tab
+    shows a row (its config's filters, see testgrid_config.TabRule); without it, rows:
+    {"overall": shown?, "pod": shown?}, as learned from the tab's table (shown when not
+    known), and every other row is shown. during: (from, to): only the reads the tab may
+    have shown then count (see gcs_column's .reads), and one TestGrid may make after now
+    only if `to` is later; read_in: (from, to): only the reads TestGrid may have made then
+    (with the cell options of then, which col's are)."""
+    reads = getattr(col, "reads", None)
+    if reads is None:  # (a column gcs_column did not read: all it read was shown at any time)
+        reads = [(c, [(-math.inf, math.inf, math.inf)]) for c in (col, *getattr(col, "alternatives", ()))]
+    chosen = [c for c, windows in reads
+              if any((during is None or (a <= during[1] and during[0] <= b)) and
+                     (read_in is None or (a <= read_in[1] and read_in[0] <= end)) for a, b, end in windows)]
+    verdicts = [column_verdict(c, job, rows, shows) for c in chosen]
+    if verdicts and chosen[0] is col and verdicts[0][0] == "red":
+        return verdicts[0]
+    state, cells = combine(verdicts)
+    if state == "red":
+        return state, cells
+    later = (during is None or during[1] > getattr(col, "now", -math.inf)) and \
+        (read_in is None or read_in[1] > getattr(col, "now", -math.inf))
+    return ("undecided" if still_read(col) and later or getattr(col, "partial", None) else "not-red"), []
+
+
+def shown_during(col, lo, hi):
+    """Whether a tab may have shown a read of the build's column at some time in [lo, hi]
+    (see gcs_column's .reads), or may show one TestGrid reads after now."""
+    reads = getattr(col, "reads", None)
+    if reads is None:
+        return True
+    return any(a <= hi and lo <= b for _, windows in reads for a, b, _ in windows) \
+        or (still_read(col) and hi > getattr(col, "now", -math.inf))
 
 
 def combine(verdicts):
@@ -1671,28 +2391,157 @@ def combine(verdicts):
     return ("undecided" if any(state == "undecided" for state, _ in verdicts) else "not-red"), []
 
 
-def tab_verdict(col, job, rule, made):
-    """verdict() on a tab by its rule (see run()): undecided for a tab whose columns
-    the port cannot paint as TestGrid does ("problem"); by its config's filters
-    ("shows"), or, where they cannot be applied, the rows its table showed ("rows");
-    and both, red when either is, for a build made before the tab's config last
+def view_end(made, days):
+    """The last time TestGrid may show a build made then on a tab of `days` days of results
+    (it started at most PENDING after it was made; an update may take UPDATE_SPAN)."""
+    return made + PENDING + days * 86400 + UPDATE_SPAN
+
+
+class Elsewhere:
+    """A tab's config whose test group read another job's builds than the one judged (see
+    tab_eras): .rule, its TabRule."""
+
+    def __init__(self, rule):
+        self.rule = rule
+
+
+def tab_eras(rule, made, query=None):
+    """The tab's configs while TestGrid may have shown a build made then (its rule's
+    "eras", see ConfigHistory.eras; each by its own days of results), as [(from, to,
+    config)]: a TabRule, UNKNOWN for a config the archive does not know, None while
+    TestGrid had no such tab, or (for a build of `query`) Elsewhere while its test group
+    read another job's builds (unless the tab's table disagreed with its config then: see
+    run()'s "unreliable_until"); None for a rule without them."""
+    eras = rule.get("eras")
+    if eras is None:
+        return None
+    days = rule.get("days", tr.DAYS_OF_RESULTS)
+    other = query is not None and made >= rule.get("unreliable_until", -math.inf)
+    return [(lo, hi, Elsewhere(r) if other and isinstance(r, tgc.TabRule) and r.prefix is not None
+             and r.prefix != query else r) for lo, hi, r in eras
+            if hi >= made and lo <= view_end(made, r.days if isinstance(r, tgc.TabRule) else days)]
+
+
+def build_days(rule, made):
+    """The days of results TestGrid read a build made then with on the tab: the most of
+    its configs while it may have shown it (see tab_eras), else the tab's."""
+    days = [r.days for _, _, r in tab_eras(rule, made) or () if isinstance(r, tgc.TabRule)]
+    return max(days) if days else rule.get("days", tr.DAYS_OF_RESULTS)
+
+
+def tab_events(tab_rules, keys):
+    """When updates may begin that read a build's column on these tabs again (their
+    test groups' config changed: see ConfigHistory.events)."""
+    return sorted({e for k in keys for e in (tab_rules.get(k) or {}).get("events", ())})
+
+
+def tab_verdict(cols, job, rule, made, query=None, since=None):
+    """verdict() on a tab by its rule (see run()): by each config TestGrid had for the
+    tab while it may have shown the build ("eras"; else the one known; one whose test
+    group read another job than the build's, `query` (by default the Columns'), as if
+    TestGrid had no such tab then), each on the reads the tab may have shown while that
+    config was in force (and from `since` on, if given); each read's column made with
+    the cell options of the config in force when TestGrid may have made it
+    (cols(options), see Columns; or one column, made with the tab's options), and
+    undecided where those are options the port does not follow; red when it is red by
+    one, undecided while one is not known (see config_verdict)."""
+    col_of = cols if isinstance(cols, Columns) else lambda options: cols
+    if query is None and isinstance(cols, Columns):
+        query = cols.args[1]
+    eras = tab_eras(rule, made, query)
+    if eras is None:
+        return config_verdict(col_of(rule.get("options")), job, rule, made,
+                              None if since is None else (since, math.inf))
+    # The reads TestGrid made under each config, by its cell options (from its run's start to
+    # an update after the next one's PICKUP, which may begin then and read for its span; none
+    # while TestGrid did not update the group, or while it read another job's builds, nor, once
+    # it reads this job again, of a build made before that it does not list again: one older
+    # than the REPROCESS_DAYS the update after the change reads again; while TestGrid had no
+    # such tab, its group's options are not known: by each).
+    made_with, away = [], None  # (away: when the group began reading another job, while it does)
+    for lo, hi, r in eras:
+        if isinstance(r, Elsewhere):
+            away = lo if away is None else away
+            continue
+        back, away = away is not None, None
+        if isinstance(r, tgc.TabRule) and not r.not_updated and \
+                not (back and made + PENDING < lo - REPROCESS_DAYS * 86400):
+            made_with.append((r.options, (lo, hi + UPDATE_SPAN), r.group_problem))
+    made_with += [(options, (lo, hi + UPDATE_SPAN), problem) for lo, hi, r in eras if r is None
+                  for options, problem in dict.fromkeys((o, p) for o, _, p in made_with)]
+    # (and while a config not known yet was in force, by options not known: undecided if shown)
+    made_with += [(rule.get("options"), (lo, hi + UPDATE_SPAN), "its options then are not known yet")
+                  for lo, hi, r in eras if r is UNKNOWN]
+    verdicts, away = [], None
+    for lo, hi, r in eras:
+        # (none: TestGrid had no such tab then; broken: its tabulator could not apply the tab's
+        # filters, and the tab showed the columns it had, by the config before (that era's); not
+        # updated: TestGrid read no build of the group then, but the tab showed the grid it had)
+        elsewhere = isinstance(r, Elsewhere)
+        away = (lo if away is None else away) if elsewhere else None
+        if elsewhere:
+            # (its group reads another job: it keeps the columns of this one, until they are too old,
+            # and reads none of them again; TestGrid does not read a changed group's columns again, no
+            # grid it stores holding the config reprocessColumn compares, updater.go:718-735, 765-767)
+            if made >= away:
+                continue
+            r, made_by = r.rule, away
+        else:
+            made_by = math.inf
+        if r is None or r is not UNKNOWN and r.broken:
+            continue
+        # (and then, while TestGrid's tabulator may not have written the tab again, the columns read
+        # before by its filters: TABULATE more, for reads made by then)
+        windows = [(lo, hi, -math.inf, made_by)] + \
+            ([(hi, hi + TABULATE, -math.inf, min(hi, made_by))] if math.isfinite(hi) else [])
+        if since is not None:  # (what it showed from then on: reads made before still count)
+            windows = [(max(a, since), b, c, d) for a, b, c, d in windows if b >= since]
+        for lo, hi, made_lo, made_hi in windows:
+            if r is UNKNOWN:  # (by the options known for the tab: what TestGrid read then is not known)
+                if shown_during(col_of(rule.get("options")), lo, hi):
+                    verdicts.append(("undecided", []))
+                continue
+            if not any(shown_during(col_of(options), lo, hi) for options, _, _ in made_with):
+                continue  # (a config the tab had only while it showed no read of the build)
+            tab = dict(rule, shows=None if r.filter_problem else r.shows)
+            for options, span, problem in made_with:
+                col = col_of(options)
+                span = (max(span[0], made_lo), min(span[1], made_hi))
+                if span[0] > span[1]:
+                    continue
+                if problem:  # (reads made under options the port does not follow, if the tab showed one then)
+                    if any(a <= hi and lo <= b and a <= span[1] and span[0] <= end
+                           for _, windows_ in getattr(col, "reads", [(col, [(-math.inf, math.inf, math.inf)])])
+                           for a, b, end in windows_):
+                        verdicts.append(("undecided", []))
+                    continue
+                verdicts.append(config_verdict(col, job, dict(tab, problem=None), made, (lo, hi), span))
+    return combine(verdicts) if verdicts else ("not-red", [])
+
+
+def config_verdict(col, job, rule, made, during=None, read_in=None):
+    """verdict() on a tab by one config of it (in force `during`, see verdict): undecided
+    for a tab whose columns the port cannot paint as TestGrid does ("problem"); by its
+    config's filters ("shows"), or, where they cannot be applied, the rows its table showed
+    ("rows"); and both, red when either is, for a build made before the tab's config last
     agreed with its table ("unreliable_until")."""
     if rule.get("problem"):
         return "undecided", []
     shows = rule.get("shows")
     if shows is None:
-        return verdict(col, job, rule.get("rows"))
+        return verdict(col, job, rule.get("rows"), during=during, read_in=read_in)
     try:
-        by_config = verdict(col, job, rule.get("rows"), shows)
+        by_config = verdict(col, job, rule.get("rows"), shows, during, read_in)
     except tgc.Unsupported:  # (its filters ran out of time: TabRule keeps that as its filter_problem)
-        return verdict(col, job, rule.get("rows"))
+        return verdict(col, job, rule.get("rows"), during=during, read_in=read_in)
     if made < rule.get("unreliable_until", -math.inf):
-        return combine([by_config, verdict(col, job, rule.get("rows"))])
+        return combine([by_config, verdict(col, job, rule.get("rows"), during=during, read_in=read_in)])
     return by_config
 
 
 def column_verdict(col, job, rows=None, shows=None):
-    """verdict() for one column."""
+    """Whether one column TestGrid read is red on a tab: ("red", its red rows there) or
+    ("not-red", []) (see verdict())."""
     if shows is None:
         rows = rows or {}
         hidden = {job + ".Overall"} if not rows.get("overall", True) else set()
@@ -1702,20 +2551,10 @@ def column_verdict(col, job, rows=None, shows=None):
         # (a column TestGrid could not read has one row, "Overall"; a tab that hides it shows no such column)
         if "TOOL_FAIL" in col.results and shows("Overall"):
             return "red", [{"test": "Overall", "status": "TOOL_FAIL", "message": "TestGrid could not read the build from GCS"}]
-        if "UNKNOWN" in col.results or col.has_finished or "RUNNING" not in col.results:
-            return "not-red", []  # too old, finished without ever starting, or a TOOL_FAIL the tab hides: never red
-        return "undecided", []
+        return "not-red", []  # still running, too old, or finished without ever starting: not red
     red = [row for row in col.red_rows() if shows(row)]
-    if not red:
-        # TestGrid reads a column again while any cell of it runs (truncateRunning), shown or not:
-        # the build, or its Pod row waiting for podinfo.json; what it reads then can still turn it
-        # red. And without its junit files a column is only as red as its job's rows: a failing
-        # test could still make it red.
-        running = "RUNNING" in col.cells.values()
-        return ("undecided" if running or getattr(col, "partial", None) else "not-red"), []
-    # Red now is red: what makes a cell red comes from objects GCS writes whole and once
-    # (finished.json, podinfo.json, junit files), so reading them again keeps it red.
-    return "red", [{"test": row, "status": col.cells[row], "message": col.notes.get(row) or None} for row in red]
+    return ("red", [{"test": row, "status": col.cells[row], "message": col.notes.get(row) or None} for row in red]) \
+        if red else ("not-red", [])
 
 
 def tab_rows(table, job, results=False):
@@ -1738,27 +2577,311 @@ def known_rows(rows):
     return None
 
 
+UNKNOWN = "unknown"  # (a tab's config when no run of the archive has read it yet)
+
+
+entry_id = tgc.entry_id
+
+
+class ConfigHistory:
+    """TestGrid's config over time, as the archive learned it (see testgrid_config):
+    TestGrid production takes the config each run of test-infra's upload job uploads,
+    within PICKUP of the run's end. .runs: those runs, oldest first, each {"build",
+    "commit", "started", "finished" (None while it runs), "tabs": {"dashboard#tab": entry}
+    (None while its config is not known), "group_changes": how it changed its tabs' test
+    groups ({name: "new" or "changed"}; None while not known, see events), "listed": when
+    the archive first listed it (None: before it kept that), "failed": why its config could
+    not be built the last time that was tried (None: it was not, or it is known), "recipe":
+    what names its config (testgrid_config.recipe_id; None: not kept), "built": what its config
+    was last built from ({"committed": test-infra's commit time, "image", "digest"}; None: not
+    known)}, back to the last that began CONFIG_KEEP_DAYS ago. In state.json (encode()): "config_uploads",
+    the runs, each with the tabs whose entry it changed (a tab gone: null), every tab's for
+    a "base" one (the first, and the first after one not known), and the digest of its
+    whole config of the tabs ("config_digest", checked when read back); "config_entries",
+    {id: entry}; and "config_relist_after" while a run dropped from state.json (malformed)
+    is to be listed again (testgrid_config.plan lists the runs made after it)."""
+
+    def __init__(self, uploads=None, entries=None, warnings=None, relist_after=None, now=None):
+        self.runs, relist = tgc.decode_uploads(uploads, entries, time.time() if now is None else now)
+        self.recipes = {}  # per run listed now, what names its config (testgrid_config.recipe_id)
+        self.relist_after = relist_after if tgc.is_moment(relist_after) else None
+        if relist is not None:
+            self.relist_after = relist if self.relist_after is None else min(relist, self.relist_after)
+            if warnings is not None:
+                warnings.append("state.json: dropped malformed runs of TestGrid's config uploads; the runs of the "
+                                f"upload job from {iso(relist) if relist else 'the first one kept'} on are listed "
+                                "again")
+
+    def merge(self, loaded, now=None):
+        """Take what testgrid_config.sh read now (testgrid_config.load): the upload job's runs
+        made after loaded["after"] (one that still ran before and is not listed now failed:
+        it uploaded nothing), the configs built, those that could not be, and how runs
+        changed their test groups. now: when they were listed (a run first listed then)."""
+        after, configs, changes = loaded["after"], loaded["configs"], loaded["group_changes"]
+        failed = loaded.get("failed") or {}
+        first = min((created(r["build"]) for r in self.runs), default=None)  # (of the runs kept before)
+        known = {r["build"]: r for r in self.runs}
+        listed = {r["build"] for r in loaded["runs"]}
+        for b, r in list(known.items()):
+            if r["finished"] is None and tgc.made(b) > after and b not in listed:  # (as plan() lists: by the millisecond)
+                del known[b]
+        for r in loaded["runs"]:
+            self.recipes[r["build"]] = r["recipe"]
+            had = known.get(r["build"])
+            if had is None:
+                known[r["build"]] = dict({k: r[k] for k in ("build", "commit", "started", "finished", "recipe")},
+                                         tabs=None, group_changes=None, listed=now, failed=None, built=None)
+            else:
+                had["recipe"] = r["recipe"]
+                if had["finished"] is None:
+                    had["finished"] = r["finished"]
+        for r in known.values():
+            recipe = self.recipes.get(r["build"])
+            built = {k: v for k, v in configs[recipe][1].items() if k != "test_infra"} if recipe in configs else None
+            if tgc.valid_built(built):  # (what its config was built from: test-infra's commit time, the image)
+                r["built"] = built
+            if r["tabs"] is None and recipe in configs:
+                r["tabs"] = configs[recipe][0]
+            if r["group_changes"] is None and r["tabs"] is not None and r["build"] in changes:
+                r["group_changes"] = changes[r["build"]]
+            if r["tabs"] is not None:
+                r["failed"] = None
+            elif recipe in failed:
+                r["failed"] = str(failed[recipe])[:300]
+        self.runs = sorted(known.values(), key=lambda r: int(r["build"]))
+        # (listed again from where it was asked; for 0, from the first run kept, or for good with none kept)
+        if self.relist_after is not None and (after <= self.relist_after or
+                                              self.relist_after == 0 and (first is None or after < first)):
+            self.relist_after = None
+
+    def prune(self, now):
+        """Forget the runs before the last that began CONFIG_KEEP_DAYS ago."""
+        old = [i for i, r in enumerate(self.runs) if r["started"] <= now - CONFIG_KEEP_DAYS * 86400]
+        if old:
+            self.runs = self.runs[old[-1]:]
+
+    def encode(self):
+        """(state.json's "config_uploads", its "config_entries")."""
+        uploads, entries, prev = [], {}, None
+        for r in self.runs:
+            u = {k: r[k] for k in ("build", "commit", "started", "finished")}
+            u.update((k, r[k]) for k in ("listed", "failed", "recipe", "built") if r.get(k) is not None)
+            if r["tabs"] is None:
+                u["tabs"], prev = None, None
+            else:
+                ids = {k: entry_id(e) for k, e in r["tabs"].items()}
+                entries.update((ids[k], e) for k, e in r["tabs"].items())
+                if prev is None:
+                    u["tabs"], u["base"] = ids, True
+                else:
+                    u["tabs"] = {k: ids.get(k) for k in sorted(set(ids) | set(prev)) if ids.get(k) != prev.get(k)}
+                u["config_digest"] = tgc.tabs_digest(ids)
+                prev = ids
+                if r.get("group_changes") is not None:
+                    u["group_changes"] = r["group_changes"]
+            uploads.append(u)
+        return uploads, entries
+
+    def current(self):
+        """(the tabs' entries, the run) of the latest run that ended whose config is known; (None, None)."""
+        return next(((r["tabs"], r) for r in reversed(self.runs) if r["tabs"] is not None and r["finished"]),
+                    (None, None))
+
+    def unknown(self):
+        """The runs whose config is not known yet."""
+        return [r for r in self.runs if r["tabs"] is None]
+
+    def ended(self, i):
+        """When the run at i ended, at the latest: its finish; for one without (still running,
+        or its finished.json never written), when the next run began, as the upload job runs
+        one at a time (unless its runs show otherwise: then inf), else inf."""
+        r = self.runs[i]
+        if r["finished"] is not None:
+            return r["finished"]
+        alone = all(a["finished"] is None or a["finished"] <= b["started"] for a, b in itertools.pairwise(self.runs))
+        return self.runs[i + 1]["started"] if i + 1 < len(self.runs) and alone else math.inf
+
+    def replaced(self, after):
+        """When the config in force at `after` was replaced at the latest: by the upload of a
+        run that began then or later, by its finish (and PICKUP)."""
+        return min((r["finished"] + PICKUP for r in self.runs if r["finished"] is not None and r["started"] >= after),
+                   default=math.inf)
+
+    def eras(self, key):
+        """The tab's entry over time, as [(from, to, entry)]: entry None while TestGrid had no
+        such tab, UNKNOWN while the archive does not know it; a run's entry from its start
+        until a run that began after it ended uploaded its config (and PICKUP: either may be
+        in force then; and the tabulator may show the columns read before by its filters
+        TABULATE longer, see tab_verdict)."""
+        if not self.runs:
+            return []
+        out = [(-math.inf, self.replaced(-math.inf), UNKNOWN)]
+        for i, r in enumerate(self.runs):
+            entry = UNKNOWN if r["tabs"] is None else r["tabs"].get(key)
+            end = self.replaced(self.ended(i))
+            if out[-1][2] == entry:
+                out[-1] = (out[-1][0], end, entry)
+            else:
+                out.append((r["started"], end, entry))
+        return out
+
+    @staticmethod
+    def group_change(prev, r, group, entry):
+        """How run r changed the test group named `group` (its entry in r's config: `entry`)
+        from the run before (prev): "new", "changed" or None, or "unknown" where the archive
+        cannot tell yet: by the group's digest in the run before's tabs where the run's own
+        comparison was not made. A changed group whose days of results were REPROCESS_DAYS or fewer
+        counts as new: TestGrid reads again every column newer than that (reprocessColumn),
+        and lists every build after the highest of the columns it keeps (hintStarted): such a
+        grid keeps none older, so it reads every build, as a new group's first update does."""
+        if r.get("group_changes") is not None:
+            how = r["group_changes"].get(group)
+        elif prev["tabs"] is None:
+            return "unknown"
+        else:  # (by the run before's tabs: a digest not known tells nothing)
+            digests = {e.get("group_digest") for e in prev["tabs"].values()
+                       if e.get("test_group") == group and e.get("group") is not None}
+            how = "unknown" if not digests or None in digests or entry.get("group_digest") is None else \
+                None if digests == {entry["group_digest"]} else "changed"
+        if how == "changed":  # (its days of results before not known: taken as "new")
+            before = [e["group"] for e in (prev["tabs"] or {}).values()
+                      if e.get("test_group") == group and e.get("group") is not None]
+            if not before or tgc.group_days(before[0]) <= REPROCESS_DAYS:
+                how = "new"
+        return how
+
+    def events(self, key, now, prefix=None):
+        """When an update may begin that reads again the columns of a test group the tab has
+        shown (one that reads builds from the GCS prefix `prefix`, if given), as a run of the
+        upload job changed the group: [(from, to, how)], how "changed" (any field of the
+        TestGroup: TestGrid reads again the columns of the builds that started in the 7 days
+        before the update, reprocessColumn), "new" (a group TestGrid did not have: its first
+        update reads every build it shows; see group_change), or "unknown": a run whose config,
+        or whose change to the group, is not known yet, taken as "new" (until it is known). A
+        group's changes count whatever tab showed it then: TestGrid's updater reads by test
+        group."""
+        def reads(e):
+            return e is not None and e.get("group") is not None and \
+                (prefix is None or tgc.group_source(e["group"])[0] == prefix)
+        groups = sorted({e["test_group"] for r in self.runs if r["tabs"] for e in [r["tabs"].get(key)] if reads(e)})
+        out = []
+        for i in range(1, len(self.runs)):
+            prev, r = self.runs[i - 1], self.runs[i]
+            if r["tabs"] is None:
+                how = "unknown"
+            else:
+                hows = set()
+                for g in groups:
+                    e = next((x for x in r["tabs"].values() if x.get("test_group") == g and reads(x)), None)
+                    if e is not None:  # (no tab of the run has the group: nothing is known of it then)
+                        hows.add(self.group_change(prev, r, g, e))
+                how = "new" if "new" in hows else "+".join(h for h in ("changed", "unknown") if h in hows) or None
+            if how:
+                end = self.ended(i)
+                end = now if end == math.inf else min(end, now)
+                # (a known change and an unknown one of another group: both, the unknown taken as new)
+                out += [(r["started"], end + PICKUP + READ_GAP - UPDATE_SPAN, h) for h in how.split("+")]
+        return out
+
+
+def config_changed(rule, since, newest=math.inf):
+    """Whether a tab's config (its rule's "eras" and "events", see history_rules) may have
+    changed what it shows of builds made up to `newest` after time `since`: a config of it
+    in force until after then, and then one with other filters (its other base options
+    only draw the tab), or none, or one whose test group reads another job; or an update
+    after a change to its test group that may begin then and read such a build again.
+    True, False, or None while that is not known (a config the archive does not know yet
+    was in force then)."""
+    def shows(r):
+        return None if r is None else (r.prefix, r.filters) if isinstance(r, tgc.TabRule) else r
+    unknown = False
+    for (_, hi, a), (_, _, b) in itertools.pairwise(rule.get("eras") or ()):
+        if hi + TABULATE > since:  # (the tabulator may show the old filters until then)
+            if a is UNKNOWN or b is UNKNOWN:
+                unknown = True
+            elif shows(a) != shows(b):
+                return True
+    for lo, hi, how in rule.get("events") or ():
+        if hi > since and (how != "changed" or lo < newest + PENDING + REPROCESS_DAYS * 86400):
+            if how != "unknown":
+                return True
+            unknown = True
+    return None if unknown else False
+
+
+def first_listed(run):
+    """When the archive first listed a run of the upload job (for one listed before it kept
+    that: when the run ended, or began)."""
+    return run.get("listed") if run.get("listed") is not None else run["finished"] or run["started"]
+
+
+def judged_since(state, now):
+    """From when a build the archive may still judge from GCS (as of state.json) could have been
+    shown, so the config TestGrid had then may decide it: one in a gap a run finds now (searched
+    GIVE_UP_DAYS back), one watched, one in a part of a gap not searched yet, and one a scan saw
+    before its tab's config changed. (A build the archive saw on its tab is judged by what the
+    tab showed, whatever config it had.)"""
+    times = [now - GIVE_UP_DAYS * 86400]
+    for t in state["tabs"].values():  # (as load_state checked them)
+        times += [t["unsearched"][0]] if "unsearched" in t else []
+        times += [p["since"] for p in t.get("changed_pending", ())]
+    times += [u["rec"]["created"] for u in state["watch"].values()]
+    return min(times)
+
+
+def history_rules(history, keys, now, lacking=(), queries=None, era_rule=None):
+    """Per tab ("dashboard#tab", of `keys`), what its config over time (a ConfigHistory) says
+    for tab_verdict: {"eras": its configs (see ConfigHistory.eras; era_rule(entry) makes each
+    entry's rule), "events": the updates that read its columns again (see
+    ConfigHistory.events: of the test groups it showed that read its job, queries[key])}.
+    A tab TestGrid shows now that the latest config known lacks (in `lacking`): its config
+    since its last entry is not known (UNKNOWN). Tabs without eras are left out."""
+    queries, era_rule = queries or {}, era_rule or (lambda entry: entry)
+    out = {}
+    for key in keys:
+        eras = [(lo, hi, era_rule(entry)) for lo, hi, entry in history.eras(key)]
+        if key in lacking:
+            last = max((i for i, (_, _, e) in enumerate(eras) if e is not None and e is not UNKNOWN), default=-1)
+            eras = [(lo, hi, UNKNOWN if e is None and i > last else e) for i, (lo, hi, e) in enumerate(eras)]
+        if eras:
+            out[key] = {"eras": eras, "events": history.events(key, now, queries.get(key))}
+    return out
+
+
+def config_about(source):
+    """Where a config came from, for messages (its source as testgrid_config.load and run() give it)."""
+    text = f"test-infra {str(source.get('test_infra'))[:12]}"
+    if plausible_time(source.get("committed"), time.time()):
+        text += f" of {iso(source['committed'])}"
+    if plausible_time(source.get("uploaded"), time.time()):
+        text += f", uploaded {iso(source['uploaded'])}"
+    return text
+
+
 def read_config(path, warnings):
-    """TestGrid's config for the tabs, as testgrid_config.sh wrote it to `path`:
-    ({"dashboard#tab": entry}, its source), or (None, None) with a warning."""
+    """The upload job's runs, the configs built and the rest testgrid_config.sh wrote to
+    `path` (testgrid_config.load), or None with a warning."""
     try:
         return tgc.load(path)
     except (OSError, ValueError) as e:
         warnings.append(f"TestGrid's config could not be read from {path} ({type(e).__name__}: {str(e)[:200]})")
-        return None, None
+        return None
 
 
 def config_mismatch(rule, table, query):
     """How a tab's table disagrees with its config (a testgrid_config.TabRule): builds
     read from another GCS prefix, or rows shown that its base options hide; "" when it
-    agrees, None when that is not known (its filters cannot be applied)."""
+    agrees, None when that is not known (its filters cannot be applied, or TestGrid does
+    not update its test group: what the table shows is none of the config's doing)."""
+    if rule.not_updated:
+        return None
     problems = []
     if rule.prefix != query:
         problems.append(f"its test group reads gs://{rule.prefix}, the tab shows gs://{query}")
     try:
         hidden = [t["name"] for t in table.get("tests", []) if isinstance(t, dict) and isinstance(t.get("name"), str)
                   and not rule.shows(t["name"])]
-    except tgc.Unsupported:  # (TabRule.filter_problem says why)
+    except (tgc.Unsupported, tgc.Broken):  # (TabRule.filter_problem or .broken says why)
         return "; ".join(problems) or None
     if hidden:
         problems.append(f"the tab shows {len(hidden)} rows its base options hide, such as {hidden[0][:200]!r}")
@@ -1878,10 +3001,11 @@ def recheck(old, rec, target, base, run_id, now, compress, max_bytes):
     return outcome, meta
 
 
-def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_bytes=95 << 20, tab_rules=None):
+def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_bytes=95 << 20, tab_rules=None,
+            timelines=None):
     """Archive one red build into `target` (its existing folder, or one in this run's folder).
     tab_rules: per tab ("dashboard#tab"), the rows it shows and its days of results, for a
-    build from a history gap that is judged here (see judge_in_tabs)."""
+    build from a history gap that is judged here (see judge_in_tabs, and its timelines)."""
     meta_path = os.path.join(target, "meta.json")
     base = f"{gcs}/{rec['query']}/{rec['build']}"
     existed = os.path.exists(meta_path)
@@ -1896,7 +3020,7 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
         return store(rec, target, existed, old, read_finished(base), base, run_id, now, max_job_hours, compress,
                      max_bytes)
     # from a history gap, not decided when last looked at
-    state, tabs, partial = judge_in_tabs(gcs, rec, tab_rules or {})
+    state, tabs, partial = judge_in_tabs(gcs, rec, tab_rules or {}, timelines)
     if state != "red":
         if state == "not-red":
             return "not-red", rec  # finished (or never started, or too old) and not red on any of its tabs
@@ -1916,17 +3040,28 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
         raise
 
 
-def judge_in_tabs(gcs, rec, tab_rules):
+def judged_with(rec, tab_rules):
+    """(days of results, events) a watched build is judged with on its tabs (see judge_in_tabs)."""
+    keys = [f"{t['dashboard']}#{t['tab']}" for t in rec["tabs"]]
+    return (max([build_days(tab_rules.get(k, {}), rec["created"]) for k in keys] or [tr.DAYS_OF_RESULTS]),
+            tab_events(tab_rules, keys))
+
+
+def judge_in_tabs(gcs, rec, tab_rules, timelines=None):
     """("red", its tabs with their red cells) when TestGrid's column for the build is
     red on one of the tabs in rec["tabs"], else ("not-red" | "undecided", []); and the
     column's .partial (why its junit files were not read, else None). A tab whose
-    config is not followed here (its rule's "problem") leaves the build undecided."""
+    config is not followed here (its rule's "problem") leaves the build undecided.
+    timelines: the run's Timelines (else the build's job is read for it alone)."""
     rules = [tab_rules.get(f"{t['dashboard']}#{t['tab']}", {}) for t in rec["tabs"]]
-    col = gcs_column(gcs, rec["query"], rec["build"], max([r.get("days", tr.DAYS_OF_RESULTS) for r in rules] or
-                                                          [tr.DAYS_OF_RESULTS]))
+    days, events = judged_with(rec, tab_rules)
+    cols = Columns(gcs, rec["query"], rec["build"], days, timelines=timelines or Timelines(time.time()), events=events)
+    col = cols()  # (read the build: a read that fails raises here)
     states, red = [], []
     for t, rule in zip(rec["tabs"], rules, strict=True):
-        state, cells = tab_verdict(col, rec["job"], rule, rec["created"])
+        # (a tab whose scan saw the build before its config changed: what it showed since)
+        since = t.get("since") if plausible_time(t.get("since"), time.time()) else None
+        state, cells = tab_verdict(cols, rec["job"], rule, rec["created"], since=since)
         states.append(state)
         if state == "red":
             red.append(dict(t, red_cells=cells, judged_from_gcs=True))
@@ -1936,10 +3071,22 @@ def judge_in_tabs(gcs, rec, tab_rules):
 
 
 def held_by(rec, tab_rules):
-    """Why the port cannot judge the build on one of its tabs (a test group option of
-    the tab's config it does not follow), or None."""
-    return next((tab_rules[k]["problem"] for k in (f"{t['dashboard']}#{t['tab']}" for t in rec["tabs"])
-                 if (tab_rules.get(k) or {}).get("problem")), None)
+    """Why the port cannot judge the build on one of its tabs (a test group option it
+    does not follow, in a config the tab had while TestGrid may have shown the build; or
+    such a config the archive does not know yet), or None."""
+    for key in (f"{t['dashboard']}#{t['tab']}" for t in rec["tabs"]):
+        rule = tab_rules.get(key) or {}
+        eras = tab_eras(rule, rec["created"], rec.get("query"))
+        # (for a time the archive does not know the config of: as the tab's config now says, and that
+        # it is not known)
+        problems = [rule.get("problem")] if eras is None else [
+            r.group_problem if isinstance(r, tgc.TabRule) else
+            rule.get("problem") or f"TestGrid's config of {key} then is not known yet" if r is UNKNOWN else None
+            for _, _, r in eras]  # (Elsewhere: its group reads none of the build's job)
+        found = next((p for p in problems if p), None)
+        if found:
+            return found
+    return None
 
 
 def backfill_note(tabs, partial=None):
@@ -2430,10 +3577,9 @@ def write_run_readme(root, rel, run, entries):
         read = run.get("testgrid_config")
         source = read.get("source") if isinstance(read, dict) else None
         if isinstance(source, dict) and isinstance(source.get("test_infra"), str) and \
-                plausible_time(source.get("committed"), time.time()) and plausible_time(read.get("read"), time.time()):
+                plausible_time(read.get("read"), time.time()):
             when = "by this run" if read["read"] == run.get("started") else f"by the run of {iso(read['read'])}"
-            lines.append(f"TestGrid's config: built from test-infra {md_cell(source['test_infra'][:12])} of "
-                         f"{iso(source['committed'])}, read {when}.")
+            lines.append(f"TestGrid's config: {md_cell(config_about(source))}, read {when}.")
     else:
         lines.append("This run was cut off before it wrote its report.")
     lines += ["", f"[run.json](run.json) has the details; [INDEX.md]({up}INDEX.md) lists every build. "
@@ -2486,7 +3632,8 @@ def holdings(entries, waiting, current_run):
             ("… of them with a damaged copy here, to be fetched again",
              sum(1 for e in waiting if e["on_disk"] and not e["status"].startswith("given up"))),
             ("Red builds given up on (after 14 days)", sum(1 for e in waiting if e["status"].startswith("given up"))),
-            ("Builds watched until TestGrid's rule can judge them (still running)", watched)]
+            ("Builds watched until TestGrid's rule can judge them (still running, unreadable, or shown under "
+             "a config not known or followed here)", watched)]
     return (["## What the archive holds", "", "| | Builds |", "|---|---:|"]
             + [f"| {md_cell(what)} | {n} |" for what, n in rows])
 
@@ -2623,6 +3770,16 @@ def load_state(root, warnings):
             for name in ("current_job_hours", "job_hours", "margin"):  # checked again where they are used
                 if name in v:
                     tabs[k][name] = v[name]
+            older = v.get("unsearched")  # (the part of a history gap not searched yet, see run())
+            if isinstance(older, list) and len(older) == 2 and all(plausible_time(t, now) for t in older) \
+                    and older[0] < older[1]:
+                tabs[k]["unsearched"] = older
+            # (builds a scan saw that the tab no longer shows, while a config not known yet was in force: see run())
+            waiting = [p for p in v.get("changed_pending") or () if isinstance(p, dict) and set(p) == {"since", "lo", "hi"}
+                       and all(plausible_time(p[x], now) for x in p) and p["lo"] < p["hi"]] \
+                if isinstance(v.get("changed_pending"), list) else []
+            if waiting:
+                tabs[k]["changed_pending"] = waiting[-60:]
         else:
             warnings.append(f"state.json: dropped a malformed tabs entry {str(k)[:80]!r}")
     # each tab's TestGrid config: {"config": entry, "read": when, "mismatch": record}, kept apart from
@@ -2646,7 +3803,8 @@ def load_state(root, warnings):
         m = v.get("mismatch")
         if m is not None:
             if isinstance(m, dict) and set(m) == {"detail", "since", "until"} and is_text(m["detail"], 4096) \
-                    and plausible_time(m["since"], now) and (m["until"] is None or plausible_time(m["until"], now)):
+                    and plausible_time(m["since"], now) \
+                    and (m["until"] is None or plausible_time(m["until"], now) and m["until"] >= m["since"]):
                 kept["mismatch"] = m
             else:
                 warnings.append(f"state.json: dropped a malformed config mismatch record of {str(k)[:80]!r}")
@@ -2656,12 +3814,16 @@ def load_state(root, warnings):
     if read is not None and not (isinstance(read, dict) and plausible_time(read.get("read"), now)
                                  and isinstance(read.get("source"), dict)
                                  and isinstance(read["source"].get("test_infra"), str)
-                                 and plausible_time(read["source"].get("committed"), now)):
+                                 and all(read["source"].get(k) is None or plausible_time(read["source"][k], now)
+                                         for k in ("committed", "uploaded"))):
         warnings.append("state.json: dropped a malformed testgrid_config record")
         read = None
     # Older archives also kept "no_log" here; the builds' own meta.json now says what to re-check.
+    # (ConfigHistory checks the config history.)
     return {"tabs": tabs, "unresolved": entries("unresolved"), "given_up": entries("given_up"),
-            "watch": entries("watch"), "tab_configs": configs, **({"testgrid_config": read} if read else {})}
+            "watch": entries("watch"), "tab_configs": configs, **({"testgrid_config": read} if read else {}),
+            "config_uploads": state.get("config_uploads"), "config_entries": state.get("config_entries"),
+            "config_relist_after": state.get("config_relist_after")}
 
 
 def valid_rec(rec, now):
@@ -2782,8 +3944,13 @@ def job_margin(entry, fresh, now, default):
     return max([default, *binding]), remember
 
 
-def backfill_gaps(gaps, gcs, pool, deadline, visible, skip, known=frozenset(), tab_rules=None, watched=None):
-    """For each tab with a history gap, the builds GCS has from that time whose
+def backfill_gaps(gaps, gcs, pool, deadline, visible, skip, known=frozenset(), tab_rules=None, watched=None,
+                  timelines=None):
+    """For each tab with a history gap (gaps: [(tab key, its report, the gap's start
+    up to the oldest build it shows now, or None; an older stretch (from, to) searched
+    with it, or None; and [(from, to, since)]: builds a scan, at `since`, saw that the
+    tab no longer shows, after its config changed: judged by what it may have shown
+    since)]), the builds GCS has from that time whose
     column TestGrid painted red on that tab but no longer shows: {tab key: [build
     records] or the Exception that stopped it}, plus "watch": builds there not
     decided yet (still running, or unreadable now), to judge once they are, and
@@ -2794,35 +3961,58 @@ def backfill_gaps(gaps, gcs, pool, deadline, visible, skip, known=frozenset(), t
     (in `watched`, {"job/build": its record}) is not read here: the tab is added to
     its record, and it is judged on all its tabs once it is decided (see archive())."""
     tab_rules, watched = tab_rules or {}, watched or {}
-    out, candidates = {}, []
-    listings = {key: pool.submit(list_build_ids, gcs, r["query"], floor - BACKFILL_SLACK_HOURS * 3600, r["oldest"])
-                for key, r, floor in gaps}
-    cf.wait(listings.values(), timeout=max(0, deadline - time.monotonic()))
-    for key, r, _ in gaps:
-        fut = listings[key]
-        if not fut.done():
+    out, candidates, since_of = {}, [], {}  # (since_of: per (tab, build) of a changed range only, its `since`)
+    ranges = {key: [(lo, hi, None) for lo, hi in ([(floor, r["oldest"])] if floor is not None else []) +
+                    ([older] if older else [])] + list(changed or ())
+              for key, r, floor, older, changed in gaps}
+    listings = {key: [pool.submit(list_build_ids, gcs, r["query"], lo - BACKFILL_SLACK_HOURS * 3600, hi)
+                      for lo, hi, _ in ranges[key]]
+                for key, r, _, _, _ in gaps}
+    cf.wait([f for futs in listings.values() for f in futs], timeout=max(0, deadline - time.monotonic()))
+    for key, r, _, _, _ in gaps:
+        futs = listings[key]
+        if not all(f.done() for f in futs):
             out[key] = TimeoutError("run timeout reached")
             continue
-        if fut.exception():
-            out[key] = fut.exception()
+        failed = next((f.exception() for f in futs if f.exception()), None)
+        if failed:
+            out[key] = failed
             continue
         out[key] = []
         job = r["query"].rsplit("/", 1)[-1]
-        for b in fut.result():
+        found = {}  # build -> the `since` it is judged from (None: any time)
+        for (_, _, since), f in zip(ranges[key], futs, strict=True):
+            for b in f.result():
+                found[b] = None if since is None or b in found and found[b] is None else \
+                    min(since, found.get(b) or since)
+        for b in sorted(found, key=int):
             name = f"{job}/{b}"
             if b in visible.get(r["query"], ()):
                 continue
+            if found[b] is not None:
+                since_of[(key, b)] = found[b]
             if name in watched:
                 tabs = watched[name]["tabs"]
-                if all((t["dashboard"], t["tab"]) != (r["dashboard"], r["tab"]) for t in tabs):
+                had = next((t for t in tabs if (t["dashboard"], t["tab"]) == (r["dashboard"], r["tab"])), None)
+                if had is None:
                     tabs.append({"dashboard": r["dashboard"], "tab": r["tab"], "tab_status": r.get("status"),
-                                 "red_cells": [], "judged_from_gcs": True})
+                                 "red_cells": [], "judged_from_gcs": True,
+                                 **({"since": found[b]} if found[b] is not None else {})})
+                elif found[b] is None:
+                    had.pop("since", None)
+                elif "since" in had:  # (judged from the earliest scan that saw it, by the configs since)
+                    had["since"] = min(had["since"], found[b]) if isinstance(had["since"], (int, float)) else found[b]
             elif name not in skip or name in known:
                 candidates.append((key, r, b))
-    days = {}
+    days, keys = {}, {}
     for key, r, b in candidates:
-        days[(r["query"], b)] = max(days.get((r["query"], b), 0), tab_rules.get(key, {}).get("days", tr.DAYS_OF_RESULTS))
-    looked_up = {qb: pool.submit(gcs_column, gcs, qb[0], qb[1], d) for qb, d in days.items()}
+        days[(r["query"], b)] = max(days.get((r["query"], b), 0), build_days(tab_rules.get(key, {}), created(b)))
+        keys.setdefault((r["query"], b), []).append(key)
+    timelines = timelines or Timelines(time.time())
+    timelines.prime(pool, gcs, days, deadline, events={qb: tab_events(tab_rules, keys[qb]) for qb in days}, days=days)
+    columns = {qb: Columns(gcs, qb[0], qb[1], d, None, timelines, tab_events(tab_rules, keys[qb]))
+               for qb, d in days.items()}
+    looked_up = {qb: pool.submit(cols) for qb, cols in columns.items()}  # (each read, by the default options)
     cf.wait(looked_up.values(), timeout=max(0, deadline - time.monotonic()))
     views = {}  # per build, how each tab whose gap holds it shows its column
     for key, r, b in candidates:
@@ -2834,7 +4024,8 @@ def backfill_gaps(gaps, gcs, pool, deadline, visible, skip, known=frozenset(), t
             continue
         job = r["query"].rsplit("/", 1)[-1]
         if fut.exception() is None:
-            state, cells = tab_verdict(fut.result(), job, tab_rules.get(key, {}), created(b))
+            state, cells = tab_verdict(columns[(r["query"], b)], job, tab_rules.get(key, {}), created(b),
+                                       since=since_of.get((key, b)))
             partial = fut.result().partial
         else:
             state, cells, partial = "undecided", [], "unreadable"
@@ -2847,9 +4038,11 @@ def backfill_gaps(gaps, gcs, pool, deadline, visible, skip, known=frozenset(), t
         query, b = seen[0][1]["query"], seen[0][2]
         job = query.rsplit("/", 1)[-1]
         tabs = [{"dashboard": r["dashboard"], "tab": r["tab"], "tab_status": r.get("status"),
-                 "red_cells": cells if state == "red" else [], "judged_from_gcs": True}
-                for _, r, _, state, cells, _ in seen]
-        red = [t for t, (*_, state, _, _) in zip(tabs, seen, strict=True) if state == "red"]
+                 "red_cells": cells if state == "red" else [], "judged_from_gcs": True,
+                 **({"since": since_of[(key, b)]} if (key, b) in since_of else {})}
+                for key, r, _, state, cells, _ in seen]
+        red = [{k: v for k, v in t.items() if k != "since"} for t, (*_, state, _, _) in zip(tabs, seen, strict=True)
+               if state == "red"]
         if name in known:
             if red:
                 sightings[name] = red
@@ -2911,13 +4104,16 @@ def main(argv=None):
             return 2
     deadline = time.monotonic() + args.run_timeout_minutes * 60
     ctx = RunContext(AdaptiveLimit(args.start_concurrency, args.max_concurrency), deadline)
+    caller = context()  # (bound again when the run returns: a run stopped part-way leaves its own abandoned)
     bind_context(ctx)
     # keep a kept-alive connection for every request that can be in flight (pools made from now on)
     HTTP.connection_pool_kw["maxsize"] = max(HTTP.connection_pool_kw["maxsize"], ctx.limit.ceiling)
     pool = cf.ThreadPoolExecutor(ctx.limit.ceiling, initializer=bind_context, initargs=(ctx,))  # (shared by the origins)
     # The GitHub runner ends a timed-out or cancelled step with SIGINT, then SIGTERM;
-    # handle both the same way.
+    # handle both the same way (SIGINT too where it was ignored when Python started, as in a
+    # shell's background job).
     previous_term = signal.signal(signal.SIGTERM, interrupt)
+    previous_int = signal.signal(signal.SIGINT, interrupt)
     try:
         return run(args, root, run_start, pool, deadline)
     except KeyboardInterrupt:  # outside the download wait (see run()): nothing to record yet
@@ -2926,6 +4122,8 @@ def main(argv=None):
         return 130
     finally:
         signal.signal(signal.SIGTERM, previous_term)
+        signal.signal(signal.SIGINT, previous_int)
+        bind_context(caller)
         # Workers still blocked past the deadline are abandoned: they cannot write
         # any more (see replace()), and the process exit (os._exit, below) does not
         # wait for them.
@@ -2940,6 +4138,7 @@ def interrupt(signum, frame):
 
 def run(args, root, run_start, pool, deadline):
     ctx = context()
+    timelines = Timelines(run_start)  # (each job's builds that TestGrid's reads of a judged build depend on)
     warnings = []
     if not args.list_only:
         sweep_parts(root)
@@ -2950,12 +4149,27 @@ def run(args, root, run_start, pool, deadline):
     folders = run_dirs(root)
     archive_start = folder_time(folders[0].rsplit("/", 1)[1]) if folders else None
     dashboards = args.dashboards or DASHBOARDS
-    # TestGrid's config for each tab (what it was built from test-infra into): the one read
-    # now, else the one an earlier run read (each tab's with when it was read)
-    config, config_source = read_config(args.testgrid_config, warnings) if args.testgrid_config else (None, None)
+    # TestGrid's config over time (see ConfigHistory): the upload job's runs and their configs
+    # read now, with those earlier runs read. Each tab's config now is that of the latest run
+    # whose config is known ("read" now when no later run's is unknown), else the one an
+    # earlier run of the archive read (each tab's with when it was read).
+    history = ConfigHistory(state.get("config_uploads"), state.get("config_entries"), warnings,
+                            state.get("config_relist_after"), run_start)
+    loaded = read_config(args.testgrid_config, warnings) if args.testgrid_config else None
+    if loaded:
+        history.merge(loaded, run_start)
+    history.prune(run_start)
+    current, current_run = history.current()
+    unknown_runs = history.unknown()
+    later_unknown = [r for r in unknown_runs if current_run is None or int(r["build"]) > int(current_run["build"])]
+    config = current if loaded and current is not None and not later_unknown else None  # (the config read now)
+    config_source = None
+    if config is not None:  # (built by this run or an earlier one)
+        config_source = dict(test_infra=current_run["commit"], **(current_run["built"] or {}),
+                             upload=current_run["build"], uploaded=current_run["finished"])
     tab_config = {k: c["config"] for k, c in state["tab_configs"].items() if "config" in c}
     config_read = {k: c.get("read") for k, c in state["tab_configs"].items() if "config" in c}
-    tab_config.update(config or {})
+    tab_config.update(current or {})
     config_read.update(dict.fromkeys(config or (), run_start))
     rules = {key: tgc.TabRule(entry) for key, entry in tab_config.items()}
 
@@ -2998,17 +4212,71 @@ def run(args, root, run_start, pool, deadline):
     # results; a tab whose test group the port does not follow is not judged
     for key, rule in rules.items():
         m = mismatch_of.get(key)
-        tab_rules[key] = dict(tab_rules.get(key, {}), days=rule.days, shows=None if rule.filter_problem else rule.shows,
-                              problem=rule.group_problem, unreliable_until=(m["until"] or math.inf) if m else -math.inf)
+        tab_rules[key] = dict(tab_rules.get(key, {}), days=rule.days,
+                              shows=None if rule.filter_problem or rule.broken or rule.not_updated else rule.shows,
+                              problem=rule.group_problem, unreliable_until=(m["until"] or math.inf) if m else -math.inf,
+                              options=rule.options)
+    # ... and each config the tab had over time ("eras", see tab_verdict), with the updates its
+    # test group's config changes made TestGrid read its columns again at ("events")
+    era_rules = {}
+
+    def era_rule(entry):
+        if entry is None or entry is UNKNOWN:
+            return entry
+        return era_rules.setdefault(entry_id(entry), tgc.TabRule(entry))
     listed_ok = sorted(f"{r['dashboard']}#{r['tab']}" for r in reports if r.get("tab") is not None and not r.get("error"))
+    # A tab TestGrid shows now that the latest config known lacks: that is not TestGrid's config
+    # (not taken yet, not built yet, or not built for the tab's dashboard), so the tab's config
+    # since its last entry is not known.
+    lacking = sorted(k for k in listed_ok if current is not None and k not in current)
+    queries = {k: t["query"] for k, t in state["tabs"].items() if isinstance(t.get("query"), str)}
+    queries.update((f"{r['dashboard']}#{r['tab']}", r["query"]) for r in reports
+                   if r.get("tab") is not None and not r.get("error") and r.get("query"))
+    for key, got in history_rules(history, sorted({k for r in history.runs if r["tabs"] for k in r["tabs"]} | set(tab_rules)),
+                                  run_start, lacking, queries, era_rule).items():
+        tab_rules[key] = dict(tab_rules.get(key, {}), **got)
     previous_read = state.get("testgrid_config") or {}
     source = config_source or previous_read.get("source") or {}
-    about = (f"test-infra {source['test_infra'][:12]} of {iso(source['committed'])}" if source else "source unknown")
-    if config is not None:
-        absent = [key for key in listed_ok if key not in config]
-        if absent:
-            warnings.append(f"TestGrid's config read now ({about}) has no tab {', '.join(absent[:3])}"
-                            f"{', ...' if len(absent) > 3 else ''}: for it, the config read before, if any, is used")
+    about = config_about(source) if source else "source unknown"
+    # (a run whose config is not known yet, listed less than CONFIG_STALE_DAYS ago: it may be the config
+    # of tabs TestGrid shows that the latest known one lacks)
+    awaited = [r for r in later_unknown if run_start - first_listed(r) <= CONFIG_STALE_DAYS * 86400]
+    if lacking:
+        fresh = current_run["finished"] is not None and run_start - current_run["finished"] <= PICKUP + 3600
+        warnings.append(f"TestGrid's config ({about}) has no tab {', '.join(lacking[:3])}"
+                        f"{', ...' if len(lacking) > 3 else ''}"
+                        + (", which TestGrid may not have taken yet" if fresh else
+                           ", which a later run of its upload job whose config is not known yet may have" if awaited else
+                           ": it lacks tabs TestGrid shows (is it built for their dashboard?)")
+                        + "; builds TestGrid may have shown there since the tab's last config are decided once a "
+                        "config with the tab is read")
+    if loaded and loaded["failed"]:
+        failed = sorted(loaded["failed"].items())
+        warnings.append(f"TestGrid's config of {len(failed)} runs of its upload job could not be built now: "
+                        + "; ".join(f"{rid}: {why[:300]}" for rid, why in failed[:3]) + ("; ..." if len(failed) > 3 else ""))
+    if unknown_runs:
+        oldest = unknown_runs[0]
+        # (configs are built newest first, as many as a run has time for: a backlog, such as the 18 days of
+        # runs a new archive lists, takes runs to build; it is late if one could not be built, or none was,
+        # and a build the archive may still judge from GCS could have been shown while it was in force)
+        progress = bool(loaded and loaded["configs"])
+        since = judged_since(state, run_start)
+        late = any(run_start - first_listed(r) > CONFIG_STALE_DAYS * 86400 and (r.get("failed") or not progress)
+                   and history.replaced(r["started"] + 1) > since for r in unknown_runs)
+        warnings.append(f"TestGrid's config of {len(unknown_runs)} runs of its upload job, from "
+                        f"{iso(oldest['started'])} to {iso(unknown_runs[-1]['started'])}, is "
+                        + (f"still not known {CONFIG_STALE_DAYS} days after the archive listed it" if late else
+                           "not known yet")
+                        + ": builds TestGrid may have shown then are decided once a run has read it")
+    if loaded and not loaded["runs"]:
+        # (the upload job runs several times a day: one that stopped, was renamed or moved lists no run
+        # after the last one the archive knows the config of; a run still waiting to be built is listed)
+        last = max((r["started"] for r in history.runs), default=None)
+        if last is None or run_start - last > CONFIG_STALE_DAYS * 86400:
+            warnings.append(f"TestGrid's config upload job ({tgc.UPLOAD_JOB}) has not run since "
+                            f"{iso(last) if last is not None else f'{tgc.HISTORY_DAYS} days ago or more'}, as GCS "
+                            "lists its runs: changes to TestGrid's config since then are not followed (was it "
+                            "renamed, or moved?)")
 
     def config_warnings(involved):
         """Warn about the config of tabs the run reads or judges builds of."""
@@ -3021,6 +4289,18 @@ def run(args, root, run_start, pool, deadline):
                 warnings.append(f"{key}: TestGrid's config for the tab ({about}): {rule.filter_problem}; the filters "
                                 "cannot be applied here, so builds the tab no longer shows are judged by the rows its "
                                 "table shows")
+            if rule.broken:
+                warnings.append(f"{key}: TestGrid's config for the tab ({about}): {rule.broken}; TestGrid cannot apply "
+                                "its filters either: its tabulator fails the tab, which shows no new column until they "
+                                "are fixed")
+            if rule.not_updated:
+                warnings.append(f"{key}: TestGrid's config for the tab ({about}): {rule.not_updated}: the tab shows "
+                                "no new column until this is fixed")
+            if rule.unknown_options:
+                warnings.append(f"{key}: TestGrid's config for the tab ({about}) sets base options not known here "
+                                f"({', '.join(rule.unknown_options)[:200]}): TestGrid's tabulator ignores them, and so "
+                                "does the archive; if its page hid rows by them, a build could count as red here that it "
+                                "does not show red")
             if m and m["until"] is None:
                 warnings.append(f"{key}: TestGrid's config ({about}) does not match the tab since {iso(m['since'])}: "
                                 f"{m['detail']}; builds it no longer shows are judged by the rows its table shows too")
@@ -3034,15 +4314,20 @@ def run(args, root, run_start, pool, deadline):
         never = [k for k in listed_ok if k not in tab_config] if args.testgrid_config else []
         if never:
             warnings.append(f"TestGrid's config was never read for {len(never)} tabs ({', '.join(never[:3])}"
-                            f"{', ...' if len(never) > 3 else ''}): rows their filters hide count as shown")
+                            f"{', ...' if len(never) > 3 else ''}): rows their filters hide count as shown"
+                            if not awaited else
+                            f"TestGrid's config of {len(never)} tabs ({', '.join(never[:3])}"
+                            f"{', ...' if len(never) > 3 else ''}) is not known yet: their builds are decided once a "
+                            "run has read it")
     read_ok, gaps = {}, []
     for r in reports:
         if r.get("tab") is None or r.get("error"):
             continue
         key = f"{r['dashboard']}#{r['tab']}"
         prev = state["tabs"].get(key)
-        horizon = run_start - GIVE_UP_DAYS * 86400  # a gap is searched this far back at most
+        horizon = run_start - GIVE_UP_DAYS * 86400  # a gap is searched this far back in one run
         first = prev is None and archive_start is not None
+        pending = (prev or {}).get("unsearched")  # (an older part of a gap, searched a chunk a run)
         if first:
             # never scanned while the archive ran (new, or failing until now): look
             # for red builds since the archive began, as far back as gaps are searched
@@ -3056,14 +4341,45 @@ def run(args, root, run_start, pool, deadline):
             margin = max(r["max_job_hours"], prev.get("margin") if isinstance(prev.get("margin"), (int, float))
                          and not isinstance(prev.get("margin"), bool) and 0 < prev["margin"] < 7 * 24 else 0)
             floor = max(prev["oldest"] or -math.inf, prev["scan"] - margin * 3600)
+            recent = None
             if r["oldest"] > floor:
-                if floor < horizon and not first:
-                    warnings.append(f"{key}: the gap in TestGrid's history reaches back to {iso(floor)}; red builds "
-                                    f"before {iso(horizon)} may be missing, as GCS is searched {GIVE_UP_DAYS} days back")
-                gaps.append((key, r, max(floor, horizon)))
+                recent = max(floor, horizon) if horizon < r["oldest"] else None
+                if floor < horizon and not first:  # (the rest: searched GIVE_UP_DAYS a run, newest first)
+                    top = min(horizon, r["oldest"])
+                    pending = [min(floor, pending[0]) if pending else floor, max(top, pending[1] if pending else top)]
+                    warnings.append(f"{key}: the gap in TestGrid's history reaches back to {iso(floor)}; GCS is "
+                                    f"searched {GIVE_UP_DAYS} days of it a run, from {iso(top)} back, over this and "
+                                    "the next runs")
+            older = None
+            if pending:
+                older = (max(pending[0], pending[1] - GIVE_UP_DAYS * 86400), pending[1])
+            # The builds that scan saw (not red then) that the tab no longer shows: if the tab's
+            # config changed since, it may have shown them red before they scrolled off (or before
+            # TestGrid dropped them to keep the group's grid under its size limit, as it does the
+            # oldest columns of its largest groups): judged by what it may have shown since. Where
+            # a config not known yet was in force since, that is decided once it is known (kept
+            # in the tab's state until then, GIVE_UP_DAYS at most).
+            changed, waiting = [], []
+            if not first and prev.get("oldest") is not None:
+                seen = list(prev.get("changed_pending") or ())
+                top = min(floor, r["oldest"])
+                if prev["oldest"] < top:
+                    seen.append({"since": prev["scan"], "lo": prev["oldest"], "hi": top})
+                for p in seen:
+                    status = config_changed(tab_rules.get(key, {}), p["since"], p["hi"])
+                    if status:
+                        changed.append((p["lo"], p["hi"], p["since"]))
+                    elif status is None and run_start - p["since"] <= GIVE_UP_DAYS * 86400:
+                        waiting.append(p)
+            if recent is not None or older or changed:
+                gaps.append((key, r, recent, older, changed))
         if r.get("oldest"):
             read_ok[key] = {"scan": run_start, "oldest": r["oldest"], "margin": r["max_job_hours"], "query": r["query"],
                             **job_hours.get(key, {}), **({"rows": r["rows"]} if known_rows(r.get("rows")) else {})}
+            if pending and pending[0] < (older or pending)[0]:  # (what is left once this run searched its chunk)
+                read_ok[key]["unsearched"] = [pending[0], older[0]]
+            if prev and r.get("oldest") and waiting:
+                read_ok[key]["changed_pending"] = waiting
     summaries_ok = {r["dashboard"] for r in reports if r.get("tab") is not None}
     listed = {f"{r['dashboard']}#{r['tab']}" for r in reports if r.get("tab") is not None}
     tab_scans = {}
@@ -3107,41 +4423,25 @@ def run(args, root, run_start, pool, deadline):
             running_on.setdefault(f"{t['dashboard']}#{t['tab']}", set()).add(build)
     watched = {k: u for k, u in state["watch"].items()
                if k not in chosen and k not in given_up and k not in state["unresolved"] and k not in known}
-    # A tab of a watched build that shows it now decides it there: red, it is chosen; running,
-    # it stays watched; else it is not red there. On its tabs that do not show it (not read
-    # now, or scrolled off) it is judged by the rule. It is decided, not red, once every tab
-    # of it shows it, unless a tab that may show it red could not be read now (one of its job,
-    # as last read, or any tab when a dashboard's summary, which lists them, could not be read).
-    unread = {(state["tabs"].get(f"{r['dashboard']}#{r['tab']}") or {}).get("query") if r.get("tab") is not None
-              else None for r in reports if r.get("error")}
-    query_of = {k: t.get("query") for k, t in state["tabs"].items()}
-    query_of.update({f"{r['dashboard']}#{r['tab']}": r["query"] for r in reports if r.get("query")})
-
-    def alike(a, b):
-        """Whether tabs a and b show a build's column alike (one renamed, or two of one test group
-        with the same base options), as far as their configs, or else their GCS folders, tell."""
-        ca, cb = tab_config.get(a), tab_config.get(b)
-        if ca and cb:
-            return ca["test_group"] == cb["test_group"] and ca.get("base_options", "") == cb.get("base_options", "")
-        return query_of.get(a) is not None and query_of.get(a) == query_of.get(b)
-
+    # A watched build a tab shows running now stays watched. Otherwise it is judged by the rule,
+    # from GCS, on its tabs: what a tab shows now is only its last read, by the tab's config
+    # now, and it may have shown another read of it red, or by another config (see
+    # tab_verdict). But a tab that shows it now and whose config the port does not follow
+    # (which would hold it) is decided by what it shows. (A tab that shows it red now has it
+    # chosen.)
     shown_settled, still_shown = [], []
     for k, u in sorted(watched.items()):
-        rec, build = u["rec"], u["rec"]["build"]
-        showing_tabs = {key for key, builds in shown_on.items() if build in builds}
-        showing = {key for key in (f"{t['dashboard']}#{t['tab']}" for t in rec["tabs"])
-                   if any(key == other or alike(key, other) for other in showing_tabs)}
-        rest = [t for t in rec["tabs"] if f"{t['dashboard']}#{t['tab']}" not in showing]
-        if not showing:
-            retry.append(rec)
-        elif any(build in running_on.get(other, ()) for other in showing_tabs):
+        rec = u["rec"]
+        showing = {key for key, builds in shown_on.items() if rec["build"] in builds}
+        if any(rec["build"] in running_on.get(key, ()) for key in showing):
             still_shown.append(rec)
-        elif rest:
+            continue
+        rest = [t for t in rec["tabs"] if not (f"{t['dashboard']}#{t['tab']}" in showing and
+                                                (tab_rules.get(f"{t['dashboard']}#{t['tab']}") or {}).get("problem"))]
+        if rest:
             retry.append(dict(rec, tabs=rest))
-        elif None not in unread and rec["query"] not in unread:
-            shown_settled.append(k)
         else:
-            still_shown.append(rec)
+            shown_settled.append(k)
     # Archived builds that are not final yet are compared with GCS again, even
     # after TestGrid drops them: their logs may still be replaced by Prow.
     queued = chosen | set(state["unresolved"]) | set(given_up) | set(state["watch"])
@@ -3178,7 +4478,8 @@ def run(args, root, run_start, pool, deadline):
         in_retry = {f"{x['job']}/{x['build']}": x for x in retry}
         backfill = backfill_gaps(gaps, args.gcs, pool, deadline, visible, set(known) | queued,
                                  known=(set(known) - queued) | (in_retry.keys() & set(state["unresolved"])),
-                                 tab_rules=tab_rules, watched={k: x for k, x in in_retry.items() if x.get("watch")})
+                                 tab_rules=tab_rules, watched={k: x for k, x in in_retry.items() if x.get("watch")},
+                                 timelines=timelines)
         new_watch = {f"{w['job']}/{w['build']}": w for w in backfill.pop("watch", [])}
         # an unreadable one is looked at again now; one still running is watched until it is not
         for w in new_watch.values():
@@ -3199,42 +4500,55 @@ def run(args, root, run_start, pool, deadline):
                 rechecks += 1
             had = {(t["dashboard"], t["tab"]) for t in rec["tabs"]}
             rec["tabs"] = rec["tabs"] + [t for t in tabs if (t["dashboard"], t["tab"]) not in had]
-        for key, r, floor in gaps:
+        for key, r, floor, older, changed in gaps:
             found = backfill.get(key)
+            what = []  # (what the gap's search covered: the recent part, an older one, those seen before a change)
+            if floor is not None:
+                what.append(f"TestGrid only shows builds since {iso(r['oldest'])}, but the last scan "
+                            f"({iso(last_scan(key))}) needed them from {iso(floor)}")
+            if older:
+                what.append(f"the older part of its history gap from {iso(older[0])} to {iso(older[1])} is searched "
+                            "now" + (f" (the rest, back to {iso(read_ok[key]['unsearched'][0])}, by the next runs)"
+                                     if "unsearched" in read_ok.get(key, {}) else ""))
+            for lo, hi, since in changed or ():
+                what.append(f"its config changed since a scan ({iso(since)}) saw the builds from {iso(lo)} to "
+                            f"{iso(hi)}, which it no longer shows")
             if isinstance(found, Exception):
                 backfill_errors.append({"build": None, "error": f"{key}: listing GCS for the history gap failed: "
                                                                f"{type(found).__name__}: {found}"})
-                # Keep the old scan time (none for a tab not scanned before), so the next run
-                # searches this gap again; it never searches more than GIVE_UP_DAYS back.
+                # Keep the old scan time (none for a tab not scanned before), and what was left of an
+                # older gap, so the next run searches them again.
                 if key in state["tabs"]:
                     old = state["tabs"][key]
                     tab_scans[key] = dict(job_hours.get(key, {}), scan=old["scan"], oldest=old["oldest"],
                                           query=r["query"], **({"margin": old["margin"]} if "margin" in old else {}),
-                                          **({"rows": r["rows"]} if known_rows(r.get("rows")) else {}))
+                                          **({"rows": r["rows"]} if known_rows(r.get("rows")) else {}),
+                                          **({"unsearched": old["unsearched"]} if "unsearched" in old else {}),
+                                          **({"changed_pending": old["changed_pending"]}
+                                             if "changed_pending" in old else {}))
                 else:
                     tab_scans.pop(key, None)
-                outcome = "looking them up in GCS failed; the next run tries again"
-            else:
-                searched.add(key)
-                new = [rec for rec in found if f"{rec['job']}/{rec['build']}" not in taken]  # also in another tab's gap
-                taken.update(f"{rec['job']}/{rec['build']}" for rec in new)
-                retry += new
-                backfilled += len(new)
-                undecided = sum(1 for w in new_watch.values()
-                                if any(f"{t['dashboard']}#{t['tab']}" == key for t in w["tabs"]))
-                warnings.append(f"{key}: TestGrid only shows builds since {iso(r['oldest'])}, but the last scan "
-                                f"({iso(last_scan(key))}) needed them from {iso(floor)}; GCS was "
-                                f"searched instead, and {len(found)} red builds from that time were taken from it"
-                                + (f" ({undecided} not decided yet: still running, or unreadable and looked at "
-                                   "again)" if undecided else ""))
+                warnings.append(f"{key}: {'; '.join(what)}; red builds in between may be missing; looking them up "
+                                "in GCS failed; the next run tries again")
                 continue
-            warnings.append(f"{key}: TestGrid only shows builds since {iso(r['oldest'])}, but the last scan "
-                            f"({iso(last_scan(key))}) needed them from {iso(floor)}; red builds in between "
-                            f"may be missing; {outcome}")
+            searched.add(key)
+            new = [rec for rec in found if f"{rec['job']}/{rec['build']}" not in taken]  # also in another tab's gap
+            taken.update(f"{rec['job']}/{rec['build']}" for rec in new)
+            retry += new
+            backfilled += len(new)
+            undecided = [w for w in new_watch.values() if any(f"{t['dashboard']}#{t['tab']}" == key for t in w["tabs"])]
+            held = sum(1 for w in undecided if held_by(w, tab_rules))
+            why = [f"{held} held until the config TestGrid had then is known and followed here"] * bool(held) + \
+                [f"{len(undecided) - held} still running, or unreadable"] * bool(len(undecided) - held)
+            warnings.append(f"{key}: {'; '.join(what)}; GCS was searched instead, and {len(found)} red builds from "
+                            "that time were taken from it"
+                            + (f" ({len(undecided)} not decided yet, looked at again: {'; '.join(why)})"
+                               if undecided else ""))
     elif gaps:
         warnings += [f"{key}: TestGrid only shows builds since {iso(r['oldest'])}, but the last scan "
-                     f"({iso(last_scan(key))}) needed them from {iso(floor)}; red builds in between "
-                     "may be missing" for key, r, floor in gaps]
+                     f"({iso(last_scan(key))}) needed them from "
+                     f"{iso(floor if floor is not None else older[0] if older else min(c[0] for c in changed))}"
+                     "; red builds in between may be missing" for key, r, floor, older, changed in gaps]
     tab_errors = [r for r in reports if r.get("error")]
     # tabs whose builds this run judges from GCS (a history gap, or watched builds) without their config
     judged = searched | {f"{t['dashboard']}#{t['tab']}" for x in retry + running_gap + list(stalled.values()) + still_shown
@@ -3308,8 +4622,11 @@ def run(args, root, run_start, pool, deadline):
                                    "last_error": "TimeoutError: run timeout reached before downloads started"}
                 errors.append({"build": key, "error": "TimeoutError: run timeout reached before downloads started"})
     else:
+        watched = {(b["query"], b["build"]): judged_with(b, tab_rules) for b in selected + retry if b.get("watch")}
+        timelines.prime(pool, args.gcs, watched, deadline, events={k: v[1] for k, v in watched.items()},
+                        days={k: v[0] for k, v in watched.items()})
         futures = {pool.submit(archive, b, target_of(b), args.gcs, run_id, run_start, hours(b), args.gzip,
-                               max_bytes, tab_rules): b
+                               max_bytes, tab_rules, timelines): b
                    for b in selected + retry}
     interrupted = False
     try:
@@ -3370,10 +4687,10 @@ def run(args, root, run_start, pool, deadline):
     for names in outcomes.values():
         names.sort()
     errors.sort(key=lambda e: e["build"] or "")
+    recs = {f"{b['job']}/{b['build']}": b for b in selected + retry + running_gap + list(stalled.values()) + still_shown}
     warnings += [f"{key}: still not decided {GIVE_UP_DAYS} days after it was made (not finished, or TestGrid still "
                  "shows it running, or it has no usable start time, so TestGrid never paints it red); no longer watched"
                  for key in outcomes.get("stopped-watching", [])]
-    recs = {f"{b['job']}/{b['build']}": b for b in selected + retry + running_gap + list(stalled.values()) + still_shown}
     warnings += [f"{key}: cannot be judged from GCS: {held_by(recs[key], tab_rules) or 'its tab config'}; no longer "
                  f"watched {HELD_DAYS} days after it was made, though TestGrid may have shown it red"
                  for key in outcomes.get("stopped-holding", []) if key in recs]
@@ -3399,16 +4716,19 @@ def run(args, root, run_start, pool, deadline):
     tab_configs = {}
     for key in sorted(referenced & (set(tab_config) | set(mismatch_of))):
         c = {}
-        if key in tab_config:
-            c["config"] = tab_config[key]
+        if key in tab_config:  # (its group's digest is the history's: the code before that takes no such field)
+            c["config"] = {k: v for k, v in tab_config[key].items() if k != "group_digest"}
             if plausible_time(config_read.get(key), run_start):
                 c["read"] = config_read[key]
         if key in mismatch_of:
             c["mismatch"] = mismatch_of[key]
         tab_configs[key] = c
+    uploads, entries = history.encode()
     write_json(os.path.join(root, "state.json"),
                {"tabs": tab_scans, "unresolved": unresolved, "given_up": given_up, "watch": watch,
-                "tab_configs": tab_configs, **({"testgrid_config": config_record} if config_record else {})})
+                "tab_configs": tab_configs, **({"testgrid_config": config_record} if config_record else {}),
+                **({"config_uploads": uploads, "config_entries": entries} if uploads else {}),
+                **({"config_relist_after": history.relist_after} if history.relist_after is not None else {})})
     write_json(run_json, dict(report_, errors=errors + [{"build": None, "error": "the run stopped before it finished"}]))
     # What failed or cut-off downloads left (a build folder without meta.json, stored files
     # a meta.json does not list, an empty job folder) goes now, so it is not committed;

@@ -12,14 +12,14 @@ k8s.io/apimachinery types in podinfo.json (testgrid_types.json). tool/oracle
 builds TestGrid's own code at that commit to check this port against;
 test_testgrid_rule.py replays what it answered.
 
-The column is the one TestGrid paints with its default cell options (rows of
-the same name merged, the Pod row shown, no custom evaluator rules, tests named
-as they are): every tab of the archive's dashboards has them, and the fetch
-does not judge a tab whose test group sets another (testgrid_config.py reads
-the config TestGrid builds from test-infra). Which of the column's rows a tab
-shows is the caller's (its base options, see testgrid_config.TabRule).
-What GCS cannot tell: when TestGrid last read the build, and errors it hit
-reading GCS itself.
+The column is the one TestGrid paints with its test group's cell options
+(Options: rows of the same name merged or split, the Pod row shown or not, the
+custom evaluator rules, the test name config; testgrid_config.py reads the
+config TestGrid builds from test-infra); by default the defaults, which every
+tab of the archive's dashboards has. Which of the column's rows a tab shows is
+the caller's (its base options, see testgrid_config.TabRule).
+What GCS cannot tell: when TestGrid read the build (fetch_red_logs.gcs_column
+works out when it may have), and errors it hit reading GCS itself.
 When readResult hits more than one error, whichever its goroutines report first
 decides the column; every outcome possible is kept, and a build counts as red
 when any of them is.
@@ -28,6 +28,8 @@ import json
 import math
 import os
 import re
+
+import gofmt
 
 # TestGrid's TestStatus names, and their severity (internal/result)
 SEVERITY = {"NO_RESULT": 0, "BUILD_PASSED": 1, "PASS": 2, "PASS_WITH_SKIPS": 3, "PASS_WITH_ERRORS": 4,
@@ -683,9 +685,9 @@ class _Decoder:
             p = cur if cur is not None else Ptr()
             p.v = self.value(node, T["elem"], p.v)
             return p
-        if kind == "interface":
+        if kind == "interface":  # (a string is kept: Metadata.Strings() reads them)
             self.any(node)
-            return True
+            return json_unquote(node[1]) if tag == "s" else True
         if tag == "o":
             if kind == "struct":
                 return self.struct(node, t, cur)
@@ -1271,8 +1273,14 @@ def _junit_element(kind, start, depth):
         value = {"name": "", "suites": [], "results": []}
         numbers = _SUITE_NUMBERS
     elif kind == "result":
-        value = {"name": "", "errored": False, "failure": False, "skipped": None}
+        value = {"name": "", "errored": False, "failure": False, "skipped": None, "properties": []}
         numbers = _RESULT_NUMBERS
+    elif kind == "property":  # (Property: its name and value attributes, the last of each)
+        value = {"name": "", "value": ""}
+        for (_, local), attr in start[2]:
+            if local in (b"name", b"value"):
+                value[local.decode()] = attr
+        return [kind, value, depth]
     else:
         value, numbers = [], {}
     for (_, local), attr in start[2] if kind in ("suite", "result") else ():
@@ -1287,7 +1295,7 @@ def _junit_element(kind, start, depth):
 _JUNIT_CHILDREN = {
     "suites": {b"testsuite": ("suite", 1)},
     "suite": {b"testsuite": ("suite", 1), b"properties": ("properties", 0), b"testcase": ("result", 1)},
-    "properties": {b"property": ("text", 1)},
+    "properties": {b"property": ("property", 1)},
     "result": {b"system-out": ("text", 0), b"system-err": ("text", 0), b"error": ("errored", 0),
                b"failure": ("failure", 0), b"skipped": ("skipped", 0), b"properties": ("properties", 0)},
 }
@@ -1318,6 +1326,10 @@ def _decode_junit_root(x, top):
                     parent[kind] = True
                 elif kind == "skipped":
                     parent["skipped"]["value"] = "".join(value)
+                elif kind == "property":
+                    parent.append((value["name"], value["value"]))
+                elif kind == "properties" and frames[-1][0] == "result":  # (each into the one Properties)
+                    parent["properties"].extend(value)
             continue
         if t[0] != "start":
             continue
@@ -1445,6 +1457,78 @@ def merge(statuses):
     return "FLAKY" if passing and failing else current
 
 
+MAX_DUPLICATES = 20  # SplitCells: rows of one name kept apart, then one "[overflow]" row
+
+
+def split(name, statuses):
+    """SplitCells: rows of the same name apart, as [(row, status)]: "name", "name [1]", ...,
+    then "name [overflow]", FAIL ("Too many duplicately named rows")."""
+    out = []
+    for i, status in enumerate(statuses):
+        if i == MAX_DUPLICATES:
+            out.append((name + " [overflow]", "FAIL"))
+            break
+        out.append((name if i == 0 else f"{name} [{i}]", status))
+    return out
+
+
+# the junit files TestGrid reads (util/gcs: re), as parseSuitesMeta takes their metadata
+_SUITES_META = re.compile(r".+/(?:junit((_[^_]+)?(_[0-9]+-[0-9]+)?(_[0-9]+)?|.+)?\.xml|test.xml)\Z")
+
+
+def suites_meta(name):
+    """parseSuitesMeta: a junit file's Context, Timestamp and Thread, from its name as listed."""
+    m = _SUITES_META.match(name)
+    if m is None:
+        return {}
+    c, ti, th = ((g or "")[1:] for g in m.group(2, 3, 4))
+    if not (c or ti or th):
+        c = m.group(1) or ""
+    return {"Context": c, "Timestamp": ti, "Thread": th}
+
+
+STATUS_OF = ["NO_RESULT", "PASS", "PASS_WITH_ERRORS", "PASS_WITH_SKIPS", "RUNNING", "CATEGORIZED_ABORT", "UNKNOWN",
+             "CANCEL", "BLOCKED", "TIMED_OUT", "CATEGORIZED_FAIL", "BUILD_FAIL", "FAIL", "FLAKY", "TOOL_FAIL",
+             "BUILD_PASSED"]  # (TestStatus by number, pb/test_status)
+
+
+class Options:
+    """A test group's cell options, as TestGrid's updater takes them (makeOptions,
+    makeNameConfig; production does not enable ignore_skip): .merge (rows of one name
+    merged, else split), .pod (the Pod row: prowjob analysis), .all_tests (the status a
+    custom evaluator rule without comparisons gives every test result, else None: a rule
+    with comparisons the configurator can write never matches, see from_group) and the
+    test name config (.names: (format, parts) or None)."""
+
+    def __init__(self, merge=True, pod=True, all_tests=None, names=None):
+        self.merge, self.pod, self.all_tests, self.names = merge, pod, all_tests, names
+        self.key = (merge, pod, all_tests, names)
+
+    def __eq__(self, other):
+        return isinstance(other, Options) and self.key == other.key
+
+    def __hash__(self):
+        return hash(self.key)
+
+    def render(self, job, test, *metadatas):
+        """nameConfig.render: fmt.Sprintf(format, the parts), each part the job's name, the
+        test's, or the first of the metadatas (the result's first properties, the file's,
+        finished.json's) that has it."""
+        fmt, parts = self.names
+        args = []
+        for p in parts:
+            if p == "Job name":
+                args.append(job)
+            elif p == "Tests name":
+                args.append(test)
+            else:
+                args.append(next((m[p] for m in metadatas if p in m), ""))
+        return gofmt.sprintf(fmt, args)
+
+
+DEFAULT_OPTIONS = Options()
+
+
 class Column:
     """One build's column: .errors (read errors, by part: "podinfo", "started",
     "nostart", "ancient", "finished"), .malformed, .results (the Overall results
@@ -1457,6 +1541,7 @@ class Column:
         self.errors, self.malformed, self.results, self.cells = errors, malformed, results, cells
         self.notes = notes or {}  # why the job's Overall and Pod cells are what they are
         self.started, self.finished = started, finished
+        self.either = {}  # (a row several split rows of one name fill: {row: their statuses})
 
     def red_rows(self):
         return sorted(row for row, status in (self.cells or {}).items() if status in RED)
@@ -1468,6 +1553,18 @@ _UNIX_TO_INTERNAL = 62135596800  # time's seconds from year 1 to 1970
 def _unix(sec):
     """time.Unix(sec, 0) as seconds since year 1: the sum wraps, as Go's does."""
     return _wrap(sec + _UNIX_TO_INTERNAL, 64)
+
+
+def _before(sec, t):
+    """time.Unix(sec, 0).Before(T) for the real time T = t (Unix seconds, a float or
+    an int): compared in whole seconds and then in the fraction t has, as Go compares
+    times (integers only: a float the size of Go's internal seconds would round to
+    2048-second steps)."""
+    if t != t or t in (math.inf, -math.inf):
+        return t == math.inf
+    whole = math.floor(t)
+    a, b = _unix(sec), _unix(whole)
+    return a < b or (a == b and t > whole)
 
 
 def _add(t, d):
@@ -1482,17 +1579,31 @@ def _deref(p, zero):
     return zero if p is None else zero if p.v is None else p.v
 
 
-def column(job, started, finished, podinfo, junits, stop, now, folder=""):
+def column(job, started, finished, podinfo, junits, stop, now, folder="", parsed=None, options=None):
     """TestGrid's column for one build. started, finished, podinfo: the objects'
     bytes (None: no such object). junits: what TestGrid read for each junit_reads()
-    entry, in listing order, as (object it opens, size, data): size is GCS's for a
-    plainly stored object and -1 for one stored gzipped (TestGrid reads that one
-    decompressed, of unknown length), data None when there is no such object.
-    stop: the start time before which TestGrid calls a build too old (its
-    days_of_results before it read the build); now: when it read the build;
-    folder: the build's folder (bucket-relative, with "/"), for the messages."""
+    entry, in listing order, as (object it opens, size, data[, name as listed]):
+    size is GCS's for a plainly stored object and -1 for one stored gzipped
+    (TestGrid reads that one decompressed, of unknown length), data None when there
+    is no such object (the listed name, the object's by default, gives the file's
+    Context, Timestamp and Thread). stop: the start time before which TestGrid
+    calls a build too old (its days_of_results before it read the build); now:
+    when it read the build; folder: the build's folder (bucket-relative, with "/"),
+    for the messages. parsed: a dict that keeps each file's decode and each junit
+    file's parse for later calls given the same data (the columns of one build read
+    at several times).
+    options: the test group's cell options (Options; the defaults when None)."""
     errors, malformed = [], []
-    kind, pi = read_json(podinfo, "podinfo")
+
+    def decoded(data, root):  # (each file decoded once for the calls given the same `parsed`)
+        key = ("json", root, id(data))  # (the caller keeps data alive while it keeps `parsed`)
+        got = parsed.get(key) if parsed is not None else None
+        if got is None:
+            got = read_json(data, root)
+            if parsed is not None:
+                parsed[key] = got
+        return got
+    kind, pi = decoded(podinfo, "podinfo")
     if kind == "eof":
         malformed.append("podinfo.json")
     elif kind == "error":
@@ -1500,20 +1611,20 @@ def column(job, started, finished, podinfo, junits, stop, now, folder=""):
     pod = _get(pi, "Pod") if kind == "ok" else None
 
     started_ts, started_seen = 0, None
-    kind, st = read_json(started, "started")
+    kind, st = decoded(started, "started")
     if kind == "eof":
         malformed.append("started.json")
     elif kind == "error":
         errors.append("started")
     else:
         ts = started_seen = _get(st, "Started", "Timestamp", default=0) if kind == "ok" else 0  # missing: pending
-        if _unix(ts) < _unix(stop):  # time.Unix(ts, 0).Before(stop)
+        if _before(ts, stop):
             errors.append("nostart" if ts == 0 else "ancient")
         else:
             started_ts = ts
 
     fin_ts, passed, result = None, None, ""
-    kind, fin = read_json(finished, "finished")
+    kind, fin = decoded(finished, "finished")
     if kind == "eof":
         malformed.append("finished.json")
     elif kind == "error":
@@ -1524,18 +1635,28 @@ def column(job, started, finished, podinfo, junits, stop, now, folder=""):
         passed = None if f.get("Passed") is None else _deref(f["Passed"], False)
         result = f.get("Result") or ""
 
-    suites = []
-    for opened, size, data in junits:
+    files = []  # (the suites of each junit file read, the metadata of its name)
+    for junit in junits:
+        opened, size, data = junit[:3]
         rel = opened[len(folder):] if folder and opened.startswith(folder) else opened
         if data is None:
             malformed.append(f"{rel}: open: storage: object doesn't exist")
         elif size is not None and size > JUNIT_MAX_SIZE:
             malformed.append(f"{rel}: too large")
         else:
-            try:
-                suites.append(parse_junit(data))
-            except Malformed as e:
-                malformed.append(f"{rel}: parse: {e}")
+            key = (opened, id(data))  # (the caller keeps data alive while it keeps `parsed`)
+            got = parsed.get(key) if parsed is not None else None
+            if got is None:
+                try:
+                    got = (True, parse_junit(data))
+                except Malformed as e:
+                    got = (False, str(e))
+                if parsed is not None:
+                    parsed[key] = got
+            if got[0]:
+                files.append((got[1], suites_meta(junit[3] if len(junit) > 3 else opened)))
+            else:
+                malformed.append(f"{rel}: parse: {got[1]}")
 
     if errors:
         results = {"RUNNING" if e == "nostart" else "UNKNOWN" if e == "ancient" else "TOOL_FAIL" for e in errors}
@@ -1558,25 +1679,50 @@ def column(job, started, finished, podinfo, junits, stop, now, folder=""):
     else:
         overall, why = "RUNNING", "still running"
 
+    opts = options or DEFAULT_OPTIONS
+    meta = {k: v for k, v in _get(fin, "Finished", "Metadata", default={}).items()
+            if isinstance(v, str)} if opts.names else {}  # (Metadata.Strings())
     cells = {}
-    for top in suites:
-        for r in _flatten(top):
+    for file_suites, file_meta in files:
+        for r in _flatten(file_suites):
             skipped = r["skipped"]
             if skipped is not None and skipped.get("value", "") == "" and skipped["message"] in ("skipped", ""):
                 continue
             status = "FAIL" if r["errored"] or r["failure"] else "PASS_WITH_SKIPS" if skipped is not None else "PASS"
-            cells.setdefault(r["name"], []).append(status)
+            if opts.all_tests is not None:  # (CustomStatus)
+                status = opts.all_tests
+            if status == "NO_RESULT":  # (ignoreStatus)
+                continue
+            name = r["name"]
+            if opts.names:
+                props = {}
+                for k, v in r["properties"]:
+                    props.setdefault(k, v)  # (first)
+                name = opts.render(job, name, props, file_meta, meta)
+            cells.setdefault(name, []).append(status)
     passed_pod, message = summarize(pod)
     if message == MISSING_POD_INFO:
         pod_status = "RUNNING" if before else "PASS_WITH_SKIPS"
     else:
         pod_status = "PASS" if passed_pod else "FAIL"
     injected = {job + ".Overall": overall}
-    if message != MISSING_POD_INFO or overall != "RUNNING":
+    if opts.pod and (message != MISSING_POD_INFO or overall != "RUNNING"):  # (analyzeProwJob)
         injected[job + ".Pod"] = pod_status
     for name, status in injected.items():
         cells[name] = [status] + cells.get(name, [])
-    merged = {name: merge(statuses) for name, statuses in cells.items()}
+    either = {}  # (rows two splits give one name: Go's map order picks which is shown)
+    if opts.merge:
+        merged = {name: merge(statuses) for name, statuses in cells.items()}
+    else:
+        merged = {}
+        for name, statuses in cells.items():
+            for row, status in split(name, statuses):
+                if row in merged:
+                    either.setdefault(row, {merged[row]}).add(status)
+                if row not in merged or status in RED:  # (either may be shown: a red one counts)
+                    merged[row] = status
     # (the messages of the rows TestGrid adds; a junit row of the same name is merged into them)
     notes = {name: why if name == job + ".Overall" else message for name in injected}
-    return Column([], sorted(malformed), {merged[job + ".Overall"]}, merged, notes, started=started_ts, finished=fin_ts)
+    col = Column([], sorted(malformed), {merged[job + ".Overall"]}, merged, notes, started=started_ts, finished=fin_ts)
+    col.either = either
+    return col

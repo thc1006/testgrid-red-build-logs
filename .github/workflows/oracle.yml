@@ -12,10 +12,10 @@ on:
   workflow_dispatch:
   push:
     paths: ["tool/testgrid_rule.py", "tool/testgrid_types.json", "tool/testgrid_config.py", "tool/fetch_red_logs.py",
-            "tool/oracle/**", ".github/workflows/oracle.yml"]
+            "tool/goregexp.py", "tool/gofmt.py", "tool/go_unicode.json.gz", "tool/oracle/**", ".github/workflows/oracle.yml"]
   pull_request:
     paths: ["tool/testgrid_rule.py", "tool/testgrid_types.json", "tool/testgrid_config.py", "tool/fetch_red_logs.py",
-            "tool/oracle/**", ".github/workflows/oracle.yml"]
+            "tool/goregexp.py", "tool/gofmt.py", "tool/go_unicode.json.gz", "tool/oracle/**", ".github/workflows/oracle.yml"]
 
 permissions:
   contents: read # check out the code, nothing else
@@ -67,12 +67,23 @@ jobs:
           "$RUNNER_TEMP/oracle/schemadump" | python3 -I oracle/gotypes.py > "$RUNNER_TEMP/types.json"
           cmp "$RUNNER_TEMP/types.json" testgrid_types.json
 
+      - name: Go's unicode tables are the ones go_unicode.json.gz holds
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: '"$RUNNER_TEMP/oracle/unidump" | python3 -I oracle/gounicode.py check go_unicode.json.gz'
+
       - name: Edge cases, then random builds
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           export TGORACLE="$RUNNER_TEMP/oracle/tgoracle"
           python3 -I oracle/fuzz/edge.py
           python3 -I oracle/fuzz/run.py "$GITHUB_RUN_ID" 5000
+
+      # A test group's test_name_config: Go's fmt.Sprintf against gofmt.py.
+      - name: Test names, random formats
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          export GOCHECK="$RUNNER_TEMP/oracle/gocheck"
+          python3 -I oracle/fuzz/fmtdiff.py "$GITHUB_RUN_ID" 20000
 
       # The rows a tab's base options keep: TestGrid's tabulator against testgrid_config.py.
       - name: Tab filters, edge cases then random
@@ -124,7 +135,8 @@ jobs:
       - id: pinned
         run: echo "go=$(python3 -c 'import json; print(json.load(open("oracle/pinned.json"))["go"])')" >> "$GITHUB_OUTPUT"
 
-      # (a newer Go that the new commit's go.mod asks for is fetched by the go command itself)
+      # (follow.sh builds the new commit with the Go its Bazel WORKSPACE registers, which
+      # production's images are built with: the go command fetches it, GOTOOLCHAIN set to it)
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: ${{ steps.pinned.outputs.go }}

@@ -3,9 +3,11 @@ name: Archive red TestGrid build logs
 on:
   schedule:
     # Twice a day is the aim, but GitHub starts scheduled runs late (5-6 hours
-    # late here in October 2026) and may drop one when it is busy. So the
-    # schedule fires every 3 hours (off the hour, when GitHub is less busy), and
-    # a scheduled run archives only once the last archive is 11 hours old.
+    # late here in October 2026) and drops most of them when it is busy (here it
+    # started two a day, about 12 hours apart). So the schedule fires every 3
+    # hours (off the hour, when GitHub is less busy), and a scheduled run
+    # archives once in each half of the UTC day, and whenever the last archive is
+    # 11 hours old (see the due job).
     - cron: "17 */3 * * *"
   workflow_dispatch:
 
@@ -34,8 +36,12 @@ jobs:
       age: ${{ steps.age.outputs.age }}
     steps:
       # Every archive run that gets to commit adds its folder under archive/runs/,
-      # so the last commit there is when the archive last ran. A run started by
-      # hand, or any re-run, always archives.
+      # so the last commit there is when the archive last ran. A scheduled run
+      # archives unless the archive changed in this half of the UTC day (00:00 to
+      # 12:00, 12:00 to 24:00) less than 11 hours ago. By its age alone, an archive
+      # made by hand between the two runs GitHub starts in a day would put the
+      # next archive off by a day (one by hand at 19:30 UTC: the run at 05:55 found
+      # it 10 hours old). A run started by hand, or any re-run, always archives.
       - id: age
         env:
           GH_TOKEN: ${{ github.token }}
@@ -55,13 +61,15 @@ jobs:
             echo "due=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          age=$(( $(date +%s) - changed ))
+          now=$(date +%s)
+          age=$(( now - changed ))
           echo "The archive last changed at $last, $((age / 3600)) hours ago."
           echo "age=$age" >> "$GITHUB_OUTPUT"
-          if [ "$EVENT" != schedule ] || [ "$GITHUB_RUN_ATTEMPT" -gt 1 ] || [ "$age" -ge $((11 * 3600)) ]; then
+          if [ "$EVENT" != schedule ] || [ "$GITHUB_RUN_ATTEMPT" -gt 1 ] || [ "$changed" -lt $((now / 43200 * 43200)) ] \
+              || [ "$age" -ge $((11 * 3600)) ]; then
             echo "due=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Not due yet: a scheduled run archives once the last archive is 11 hours old."
+            echo "Not due yet: the archive changed in this half of the UTC day, less than 11 hours ago."
           fi
 
   archive:
@@ -72,9 +80,9 @@ jobs:
       group: red-build-logs-archive-${{ github.ref }}
       cancel-in-progress: false
     runs-on: ubuntu-24.04
-    # More than the step timeouts below (5 + 2 + 10 + 50 + 20 + 10) plus checkout and
+    # More than the step timeouts below (5 + 2 + 34 + 50 + 20 + 10) plus checkout and
     # setup-uv, so the commit step always gets to run.
-    timeout-minutes: 110
+    timeout-minutes: 130
     permissions:
       contents: write # push the archive back to the branch
     steps:
@@ -107,17 +115,21 @@ jobs:
         timeout-minutes: 2
         run: tool/oracle/drift.sh
 
-      # TestGrid's config for the tabs, built from test-infra the way testgrid.k8s.io's
-      # is (tool/testgrid_config.sh: the configurator image test-infra's upload job
-      # runs, with no network): the rows each tab shows and the options its builds
-      # are read with, to judge builds TestGrid no longer shows. If this fails, the
-      # fetch uses the config the last run read, and says so.
-      - name: Read TestGrid's config from test-infra
+      # TestGrid's config for the tabs over time: that of each run of test-infra's
+      # upload job (TestGrid production takes what it uploads) the archive does not
+      # have yet, built the way testgrid.k8s.io's was (tool/testgrid_config.sh: the
+      # configurator image the job ran at that commit, with no network), newest first,
+      # for up to 30 minutes (a backlog, such as the 18 days of runs a first listing
+      # finds, takes a few runs); the rest are left to the next run. The rows each tab
+      # showed and the options its builds were read with, to judge builds TestGrid no
+      # longer shows. If this fails, the fetch uses what earlier runs read, and says so.
+      - name: Read TestGrid's config from its upload job's runs
         continue-on-error: true
-        timeout-minutes: 10
+        timeout-minutes: 34
         env:
           PYTHON: tool/.venv/bin/python
-        run: tool/testgrid_config.sh "$RUNNER_TEMP/testgrid-config.json"
+          CONFIG_SECONDS: "1800"
+        run: tool/testgrid_config.sh "$RUNNER_TEMP/testgrid-config.json" archive/state.json
 
       # On a timeout or cancel the runner signals only the step's own process:
       # SIGINT, then SIGTERM, then SIGKILL. exec makes that process Python itself,

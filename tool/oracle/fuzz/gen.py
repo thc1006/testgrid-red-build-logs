@@ -247,8 +247,18 @@ def xnum(rng):
                        "0x.8p1", "0xp1", "_", "1_"])
 
 
+PROPERTY_NAMES = ["n", "m", "Context", "Thread", "k", "x", "Tests name", ""]
+
+
+def properties(rng):
+    out = "".join(f"<property{xattr(rng, 'name', rng.choice(PROPERTY_NAMES)) if rng.random() < 0.9 else ''}"
+                  f"{xattr(rng, 'value', rng.choice(['1', 'x', '', 'é', 'v w'])) if rng.random() < 0.9 else ''}/>"
+                  for _ in range(rng.randint(0, 3)))
+    return f"<properties>{out}</properties>"
+
+
 def testcase(rng):
-    attrs = xattr(rng, "name", rng.choice(["a", "b", "c", "job.Overall", "job.Pod", ""]))
+    attrs = xattr(rng, "name", rng.choice(["a", "b", "c", "job.Overall", "job.Pod", "", "a [1]"]))
     if rng.random() < 0.3:
         attrs += xattr(rng, "time", xnum(rng))
     kids = []
@@ -259,7 +269,8 @@ def testcase(rng):
             a = "" if msg is None else xattr(rng, "message", msg)
             kids.append(f"<skipped{a}>{rng.choice(['', '', 'why', '<x/>'])}</skipped>")
         elif kind == "properties":
-            kids.append('<properties><property name="n" value="1"/><property name="m" value="x"></property></properties>')
+            kids.append(properties(rng) if rng.random() < 0.7 else
+                        '<properties><property name="n" value="1"/><property name="m" value="x"></property></properties>')
         else:
             kids.append(f"<{kind}{xattr(rng, 'message', 'm') if rng.random() < 0.5 else ''}>{xtext(rng)}</{kind}>")
     return f"<testcase{attrs}>{''.join(kids)}</testcase>" if kids or rng.random() < 0.5 else f"<testcase{attrs}/>"
@@ -270,6 +281,8 @@ def suite(rng, depth=0):
     for a in rng.sample(["time", "failures", "tests", "skipped", "errors", "disabled", "timestamp"], rng.randint(0, 2)):
         attrs += xattr(rng, a, xnum(rng))
     kids = [testcase(rng) for _ in range(rng.randint(0, 4))]
+    if rng.random() < 0.03:  # (more rows of one name than SplitCells keeps apart)
+        kids += ["<testcase name='a'><failure/></testcase>"] * rng.randint(18, 25)
     if depth < 2 and rng.random() < 0.3:
         kids.append(suite(rng, depth + 1))
     if rng.random() < 0.2:
@@ -309,8 +322,49 @@ JUNIT_NAMES = ["artifacts/junit_01.xml", "artifacts/junit.xml", "junit.xml", "ar
                "artifacts/../../other/junit.xml", "artifacts/.."]
 
 
+STATUSES = list(range(16)) + [None]
+NAME_FORMATS = ["%s [%s]", "%s", "%s.%s", "%s [%s] %s", "%v-%q", "", "%s %d", "%[2]s|%[1]s", "x"]
+NAME_PARTS = ["Tests name", "Job name", "Context", "Timestamp", "Thread", "n", "m", "k", "x", ""]
+
+
+def group(rng):
+    """A test group's cell options, as the configurator prints them (enums as numbers, a
+    oneof as its Go field, null)."""
+    g = {}
+    if rng.random() < 0.4:
+        g["disable_prowjob_analysis"] = True
+    if rng.random() < 0.4:
+        g["disable_merged_status"] = True
+    if rng.random() < 0.4:
+        g["test_name_config"] = {"name_format": rng.choice(NAME_FORMATS), "name_elements": [
+            rng.choice([{"target_config": rng.choice(NAME_PARTS)}, {"test_property": rng.choice(NAME_PARTS)},
+                        {"target_config": "", "test_property": rng.choice(NAME_PARTS)}, {}])
+            for _ in range(rng.randint(0, 3))]}
+    if rng.random() < 0.3:
+        rules = []
+        for _ in range(rng.randint(1, 3)):
+            rule = {}
+            status = rng.choice(STATUSES)
+            if status is not None:
+                rule["computed_status"] = status
+            if rng.random() < 0.5:
+                rule["test_result_comparisons"] = [
+                    rng.choice([{"TestResultInfo": None, "comparison": {"ComparisonValue": None, "op": rng.randint(0, 5)}},
+                                {"TestResultInfo": None}, {"TestResultInfo": None, "comparison": None}])
+                    for _ in range(rng.randint(1, 2))]
+            rules.append(rule)
+        g["custom_evaluator_rule_set"] = {"rules": rules}
+    return g
+
+
 def case(rng, i):
     c = {"id": str(i), "stop": NOW - 15 * 86400}
+    if rng.random() < 0.4:
+        c["group"] = group(rng)
+    if rng.random() < 0.2:  # (a stop with a fraction of a second, at times right by the start)
+        c["stop_ns"] = rng.randrange(512) * 1953125
+        if rng.random() < 0.5:
+            c["stop"] = NOW - rng.randint(60, 20 * 3600)
     if rng.random() < 0.92:
         c["started"] = json_bytes(rng, started_doc)
     if rng.random() < 0.8:

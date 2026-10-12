@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+import testgrid_config as tgc  # noqa: E402
 import testgrid_rule as tr  # noqa: E402
 
 ORACLE = os.environ.get("TGORACLE", "tgoracle")  # tool/oracle/build.sh builds it
@@ -21,7 +22,19 @@ def to_line(case):
                        "podinfo": b64(case.get("podinfo")),
                        "artifacts": [{"name": a["name"], "size": a.get("size"), "data": b64(a.get("data"))}
                                      for a in case.get("artifacts", [])],
-                       "stop": case["stop"]})
+                       "stop": case["stop"], "stop_ns": case.get("stop_ns", 0),
+                       "group": protojson_group(case.get("group"))})
+
+
+def protojson_group(group):
+    """A test group as the configurator prints it (a oneof as its Go field, null as it cannot
+    set one from YAML), as protojson takes it: without those."""
+    if isinstance(group, dict):
+        return {k: protojson_group(v) for k, v in group.items() if not (k in ("TestResultInfo", "ComparisonValue")
+                                                                       and v is None)}
+    if isinstance(group, list):
+        return [protojson_group(v) for v in group]
+    return group
 
 
 SLOW = []  # cases Go's own code takes too long on (huge quantity exponents)
@@ -52,11 +65,23 @@ def python_side(case, now):
         data = a.get("data") or b""
         objects[PREFIX + a["name"]] = (a.get("size") if a.get("size") is not None else len(data), data)
     junits = []
-    for _, opened in tr.junit_reads(sorted(n for n in objects if n.startswith(PREFIX))):
+    for listed, opened in tr.junit_reads(sorted(n for n in objects if n.startswith(PREFIX))):
         size, data = objects.get(opened, (None, None))
-        junits.append((opened, size, data))
+        junits.append((opened, size, data, listed))
+    options = tgc.cell_options(case["group"])[0] if case.get("group") is not None else None
     return tr.column("job", case.get("started"), case.get("finished"), case.get("podinfo"), junits,
-                     case["stop"], now, folder=PREFIX)
+                     stop_of(case), now, folder=PREFIX, options=options)
+
+
+def stop_of(case):
+    """The case's stop as the port takes it: Unix seconds, with the fraction "stop_ns" gives
+    (a multiple of STOP_STEP nanoseconds, so the float is exact)."""
+    ns = case.get("stop_ns", 0)
+    assert ns % STOP_STEP == 0, ns
+    return case["stop"] + ns // STOP_STEP / (10**9 // STOP_STEP)
+
+
+STOP_STEP = 1953125  # nanoseconds: 1/512 of a second
 
 
 def category(e):
@@ -75,7 +100,10 @@ def compare(case, got, col=None):
     jsons = lambda m: sorted(x for x in m if x.endswith(".json") and ":" not in x)  # noqa: E731
     if jsons(col.malformed) != jsons(got["malformed"]) or len(col.malformed) != len(got["malformed"]):
         problems.append(f"malformed {col.malformed} != {got['malformed']}")
-    if (col.cells or None) != (got.get("cells") or None) and not (col.cells == {} and not got.get("cells")):
+    either = getattr(col, "either", {})  # (rows of one name after a split: Go's map order picks one)
+    want_cells = {row: (col.cells or {}).get(row) if status in either.get(row, ()) else status
+                  for row, status in (got.get("cells") or {}).items()}
+    if (col.cells or None) != (want_cells or None) and not (col.cells == {} and not want_cells):
         problems.append(f"cells {col.cells} != {got.get('cells')}")
     # The Pod row's message, when TestGrid added the row (the port does not carry the
     # messages of junit rows, so not for a junit row named like it, nor once merged).

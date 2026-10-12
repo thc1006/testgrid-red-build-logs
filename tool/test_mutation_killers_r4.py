@@ -251,7 +251,7 @@ class GapRule(GapWorld):
         self.gcs_build(never, started=None, log=False)
         # passed, but its started.json cannot be read now: TestGrid paints a build whose started.json
         # it cannot read TOOL_FAIL, so it is not decided until it can be read
-        passed = self.gap_build(17, (200, {}, {"result": "SUCCESS", "timestamp": self.ago(2)}), started=(500, {}, b""))
+        passed = self.gap_build(17, (200, {}, {"result": "SUCCESS", "timestamp": self.ago(4)}), started=(500, {}, b""))
         self.listing(never, passed)
         self.assertEqual(self.fetch(), 1)  # a build whose files cannot be read is an error, and retried
         run = self.runs()[-1]
@@ -332,18 +332,25 @@ class Scans(r3.World):
         self.assertEqual(self.fetch(), 0)
         self.assertEqual(self.outcomes(), {"backfilled": [f"job/{after}"]})
 
-    def test_FS10_FS11_FS14_a_gap_past_the_horizon_is_searched_14_days_back_and_fails_the_run(self):
+    def test_FS10_FS11_FS14_a_gap_past_the_horizon_is_searched_14_days_a_run(self):
         visible = self.show_recent()
-        self.put_state(tabs={"dash#t": {"scan": self.now - 20 * DAY, "oldest": self.now - 21 * DAY}})
-        old, recent = snowflake(self.now - 17 * DAY), snowflake(self.now - 2 * DAY)
-        for b in (old, recent):
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * DAY, "oldest": self.now - 41 * DAY}})
+        old, older, recent = (snowflake(self.now - d * DAY) for d in (17, 33, 2))
+        for b in (old, older, recent):
             self.gcs_build(b, finished=self.failed())
-        self.srv.gcs_listing("bucket", [f"logs/job/{b}/finished.json" for b in (old, recent, visible)])
-        self.assertEqual(self.fetch(), 1)
+        self.srv.gcs_listing("bucket", [f"logs/job/{b}/finished.json" for b in (older, old, recent, visible)])
+        self.assertEqual(self.fetch(), 0)
         run = self.runs()[-1]
-        self.assertEqual(run["outcomes"], {"backfilled": [f"job/{recent}"]})
-        self.assertTrue(any("searched 14 days back" in w and "may be missing" in w for w in run["serious_warnings"]),
-                        run["warnings"])
+        # (this run: the last 14 days, and the 14 before; the rest, back to 40 days ago, the next run)
+        self.assertEqual(sorted(run["outcomes"]["backfilled"]), sorted([f"job/{recent}", f"job/{old}"]))
+        self.assertTrue(any("searched 14 days of it a run" in w for w in run["warnings"]), run["warnings"])
+        self.assertEqual(run["serious_warnings"], [])
+        rest = self.state()["tabs"]["dash#t"]["unsearched"]
+        self.assertLess(rest[0], self.now - 40 * DAY)
+        self.assertAlmostEqual(rest[1], self.now - 28 * DAY, delta=60)
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"].get("backfilled"), [f"job/{older}"])
+        self.assertNotIn("unsearched", self.state()["tabs"]["dash#t"])
 
     def test_LS07_a_gap_search_still_failing_after_14_days_is_tried_again(self):
         # never given up while it fails (each run fails instead); it never reaches back past 14 days

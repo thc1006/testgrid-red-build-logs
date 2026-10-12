@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 # Exits 1 when TestGrid production's updater or tabulator runs another commit than
 # the one testgrid_rule.py and testgrid_config.py follow (pinned.json), or when that
-# cannot be read. TestGrid's image tags end in -g<commit>: a newer updater may paint
-# cells by another rule, a newer tabulator filter a tab's rows another way.
+# cannot be read. TestGrid's image tags end in -g<commit>, or, for a release itself, in
+# -v<version>: a newer updater may paint cells by another rule, a newer tabulator filter
+# a tab's rows another way.
 # In GitHub Actions it also sets the outputs updater, tabulator (the commits
 # production runs) and moved (true when either is not the pinned one).
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 pinned=$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["testgrid_commit"])' "$here/pinned.json")
+pinned_version=$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["testgrid_module_version"])' \
+  "$here/pinned.json")
 status=0
 moved=false
 for component in updater tabulator; do
@@ -20,10 +23,18 @@ for component in updater tabulator; do
     status=1
     continue
   fi
-  running=${tag##*-g}
+  if [[ $tag =~ -g([0-9a-f]+)$ ]]; then
+    running=${BASH_REMATCH[1]}  # (vDATE-vX.Y.Z-N-gCOMMIT: a commit after a release)
+    same() { [ "${pinned#"$running"}" != "$pinned" ] || [ "${running#"$pinned"}" != "$running" ]; }
+  elif [[ $tag =~ -(v[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+    running=${BASH_REMATCH[1]}  # (vDATE-vX.Y.Z: the release itself)
+    same() { [ "$running" = "$pinned" ] || [ "$running" = "$pinned_version" ]; }
+  else
+    running=""
+  fi
   echo "production $component: $tag (commit $running), pinned: $pinned"
   echo "$component=$running" >> "${GITHUB_OUTPUT:-/dev/null}"
-  if [ -z "$running" ] || { [ "${pinned#"$running"}" = "$pinned" ] && [ "${running#"$pinned"}" = "$running" ]; }; then
+  if [ -z "$running" ] || ! same; then
     echo "::error::TestGrid production's $component now runs $tag, not the pinned commit $pinned: see tool/oracle/README.md (When TestGrid production moves to another commit)."
     moved=true
     status=1

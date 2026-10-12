@@ -88,9 +88,10 @@ class GapSearchRetryTest(World):
         self.assertEqual(self.fetch(), 1)
         self.assertEqual(self.state()["tabs"]["dash#t"]["scan"], scan)  # kept, so the gap is searched again
         self.gap_world()
-        self.assertEqual(self.fetch(), 1)  # what lies before the 14-day horizon may still be missing
+        self.assertEqual(self.fetch(), 0)  # (what lies before the last 14 days is searched with it: 6 days of it)
         self.assertEqual(sorted(self.runs()[-1]["outcomes"]["backfilled"]),
                          sorted([f"job/{self.red30h}", f"job/{self.red5d}"]))
+        self.assertNotIn("unsearched", self.state()["tabs"]["dash#t"])
         self.assertEqual(self.fetch(), 0)
 
 
@@ -320,7 +321,8 @@ class SharedGapBuildTest(World):
         self.failed_in_gcs(red, 30 * HOUR)
         self.srv.route(f"/bucket/logs/job/{bad}/finished.json", (403, {}, b""))
         tab = {"query": "bucket/logs/job", "dashboard": "dash", "oldest": self.now - HOUR, "status": "FAILING"}
-        gaps = [("dash#t", dict(tab, tab="t"), self.now - 50 * HOUR), ("dash#t2", dict(tab, tab="t2"), self.now - 32 * HOUR)]
+        gaps = [("dash#t", dict(tab, tab="t"), self.now - 50 * HOUR, None, None),
+                ("dash#t2", dict(tab, tab="t2"), self.now - 32 * HOUR, None, None)]
 
         def listing(gcs, query, lo, hi):  # GCS lists by name, which need not be by age
             return [b for b in (red, bad) if lo <= frl.created(b) <= hi]

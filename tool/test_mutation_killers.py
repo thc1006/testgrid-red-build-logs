@@ -540,8 +540,10 @@ class Gap(ArchiveWorld):
     def test_B03_an_aborted_build_testgrid_paints_red_is_backfilled_one_never_started_is_not(self):
         self.show([self.visible], {"job.Overall": ([1], [""])}, start=int(self.now - HOUR))
         aborted, never = snowflake(self.now - 30 * HOUR), snowflake(self.now - 29 * HOUR)
+        # (finished hours ago: TestGrid's reads of the builds after it, re-read while its Pod row
+        # waited for podinfo.json, are over)
         self.failed_build(aborted, finished=(200, {}, {"result": "ABORTED", "passed": False,
-                                                        "timestamp": int(self.now - HOUR)}))
+                                                        "timestamp": int(self.now - 5 * HOUR)}))
         self.failed_build(never, started=False)  # crier wrote finished.json for a pod that never ran
         self.listing(aborted, never)
         self.fetch()

@@ -31,7 +31,8 @@ for c, g in zip(cases, got, strict=True):
     assert g is not None and c["id"] == g["id"]
     problems = harness.compare(c, g)
     assert not problems, (c["id"], problems)
-    out.append({"id": c["id"], "now": g["now"], "stop": c["stop"], "started": b64(c.get("started")),
+    out.append({"id": c["id"], "now": g["now"], "stop": c["stop"], "stop_ns": c.get("stop_ns", 0), "group": c.get("group"),
+                "started": b64(c.get("started")),
                 "finished": b64(c.get("finished")), "podinfo": b64(c.get("podinfo")),
                 "artifacts": [{"name": a["name"], "size": a.get("size"), "data": b64(a.get("data"))} for a in c["artifacts"]],
                 "want": {"errors": [harness.category(e) for e in g["errors"]], "results": sorted(g["results"]),

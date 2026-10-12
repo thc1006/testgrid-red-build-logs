@@ -626,17 +626,25 @@ class EndToEndTest(unittest.TestCase):
             self.assertIn("given up", f.read())
 
     def test_run_timeout_keeps_partial_results_and_late_workers_write_nothing(self):
+        # (the log of 1004 is served only once the run stopped: its 6 seconds are for the rest, even
+        # on a busy machine)
+        served, done = threading.Event(), threading.Event()
+        self.addCleanup(served.set)
+
         def slow(h):
-            time.sleep(2)
+            served.wait(60)
             send(h, *gcs_object(b"log 1004\n"))
+            done.set()
 
         self.srv.route("/bucket/logs/job-a/1004/build-log.txt", slow)
-        self.assertEqual(self.run_tool("--run-timeout-minutes", "0.01"), 1)
+        self.assertEqual(self.run_tool("--run-timeout-minutes", "0.1"), 1)
         run = self.last_run()
         self.assertIn("run timeout", {e["build"]: e["error"] for e in run["errors"]}["job-a/1004"])
         self.assertIn("job-a/1004", self.state()["unresolved"])
         self.assertIn("job-a/1002", run["outcomes"]["archived"])
-        time.sleep(2.5)  # let the abandoned worker finish: it must not write
+        served.set()
+        self.assertTrue(done.wait(30))
+        time.sleep(1)  # let the abandoned worker finish: it must not write
         self.assertNotArchived("job-a", "1004")
 
     def test_truncated_json_is_retried(self):
@@ -994,7 +1002,8 @@ class EndToEndTest(unittest.TestCase):
         script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fetch_red_logs.py")
         p = subprocess.Popen([sys.executable, script, "--archive", self.root, "--dashboard", "dash",
                               "--testgrid", self.srv.url, "--gcs", self.srv.url],
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                             preexec_fn=lambda: signal.signal(signal.SIGINT, signal.SIG_IGN))  # (as in a background job)
         time.sleep(3)  # the scan is done and it is stuck in the slow download
         t0 = time.monotonic()
         p.send_signal(sig)

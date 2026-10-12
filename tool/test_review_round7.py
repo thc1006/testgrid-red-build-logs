@@ -495,6 +495,9 @@ class StateMachine(r4.World):
         self.fetch()
         self.assertIn(f"job/{b}", self.state()["watch"])
         self.show([b], {"job.Overall": ([1], [""])}, start=start)  # it passed after all, and TestGrid shows that
+        for name, body in (("started.json", {"timestamp": start}), ("podinfo.json", {"pod": {"status": {"phase": "Succeeded"}}}),
+                           ("finished.json", {"timestamp": start + 20 * HOUR, "passed": True, "result": "SUCCESS"})):
+            self.srv.route(f"/bucket/logs/job/{b}/{name}", (200, {}, body))  # (in time: GCS says so too)
         self.assertEqual(self.fetch(), 0)
         self.assertEqual(self.runs()[-1]["outcomes"], {"not-red": [f"job/{b}"]})
         self.assertEqual(self.state()["watch"], {})
@@ -990,23 +993,32 @@ class FourthWave(r4.World):
         b = snowflake(self.now - 10 * HOUR)
         self.show([b], {"job.Overall": ([1], [""])}, start=int(self.now - 10 * HOUR))  # settled, not red, on dash#t
         self.srv.gcs_listing("bucket", [])
+        self.in_gcs_passed(b, self.now - 10 * HOUR, self.now - 9 * HOUR)  # (and so it was all along)
         return b
 
-    def test_a_failed_summary_keeps_a_settled_watched_build_watched(self):
+    def in_gcs_passed(self, b, started, finished):
+        self.srv.route(f"/bucket/logs/job/{b}/started.json", (200, {}, {"timestamp": int(started)}))
+        self.srv.route(f"/bucket/logs/job/{b}/finished.json",
+                       (200, {}, {"timestamp": int(finished), "passed": True, "result": "SUCCESS"}))
+        self.srv.route(f"/bucket/logs/job/{b}/podinfo.json", (200, {}, {"pod": {"status": {"phase": "Succeeded"}}}))
+
+    def test_a_failed_summary_does_not_keep_a_watched_build_from_being_judged(self):
+        # (it is judged from GCS on its tabs, whichever tabs could be read now)
         b = self.watched_and_shown_settled()
         self.srv.route("/dash2/summary", (500, {}, b""))
         self.put_state(watch={f"job/{b}": {"rec": self.watched(b), "first_seen": self.now - HOUR}})
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             frl.main(["--archive", self.root, "--dashboard", "dash", "--dashboard", "dash2", "--testgrid",
                       self.srv.url, "--gcs", self.srv.url])
-        self.assertEqual(self.runs()[-1]["outcomes"].get("watching"), [f"job/{b}"])
+        self.assertEqual(self.runs()[-1]["outcomes"].get("not-red"), [f"job/{b}"])
 
-    def test_only_a_failed_tab_of_the_builds_job_keeps_it_watched(self):
+    def test_a_failed_tab_does_not_keep_it_watched_as_it_is_judged_from_gcs(self):
         b = self.watched_and_shown_settled()
         self.srv.summary("dash", {"t": "FAILING", "other": "FAILING"})
         self.srv.table("dash", "other", (500, {}, b""))
-        for other_query, want in (("bucket/logs/job2", {"not-red": [f"job/{b}"]}),  # another job's tab: settled
-                                  ("bucket/logs/job", {"watching": [f"job/{b}"]})):  # its own job's: watched
+        # (judged from GCS on its tabs, whatever tab could not be read now)
+        for other_query, want in (("bucket/logs/job2", {"not-red": [f"job/{b}"]}),
+                                  ("bucket/logs/job", {"not-red": [f"job/{b}"]})):
             with self.subTest(other_query):
                 self.put_state(tabs={"dash#other": {"scan": self.now - HOUR, "oldest": self.now - DAY,
                                                     "query": other_query}},

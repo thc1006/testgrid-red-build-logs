@@ -1,12 +1,14 @@
 // Command gocheck prints what Go makes of strings: strconv.ParseFloat, ParseInt,
-// time.Parse(time.RFC3339) and resource.ParseQuantity, and the rows a tab's base
-// options keep (TestGrid's tabulator, see pkg/tabulator/zz_oracle.go), one JSON
-// line per input.
+// time.Parse(time.RFC3339) and resource.ParseQuantity, the rows a tab's base
+// options keep (TestGrid's tabulator, see pkg/tabulator/zz_oracle.go), and
+// fmt.Sprintf of a format with string operands (a test name, as a test group's
+// test_name_config renders it), one JSON line per input.
 package main
 
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -41,6 +43,13 @@ func main() {
 			_, err = time.Parse(time.RFC3339, c.S)
 		case "quantity":
 			_, err = resource.ParseQuantity(strings.TrimSpace(c.S))
+		case "sprintf":
+			args := make([]any, len(c.Names))
+			for i, n := range c.Names {
+				args[i] = n
+			}
+			out.Encode(map[string]any{"kind": c.Kind, "s": c.S, "ok": true, "out": fmt.Sprintf(c.S, args...)})
+			continue
 		case "filter":
 			kept, err := tabulator.OracleFilter(c.S, c.Names)
 			if kept == nil {

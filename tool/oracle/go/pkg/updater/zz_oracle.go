@@ -3,7 +3,8 @@ package updater
 // For differential testing of a Python port only: what this package makes of
 // one build, with readResult's four reads run one after another and every
 // error kept (readResult returns whichever arrives first), and convertResult
-// run with a default test group.
+// run with the test group's options (a default group when none is given), as
+// production runs it (--enable-ignore-skip off).
 
 import (
 	"context"
@@ -35,7 +36,7 @@ type OracleResult struct {
 }
 
 // OracleColumn reads one build like readResult and converts it like readColumns.
-func OracleColumn(ctx context.Context, client gcs.Downloader, build gcs.Build, stop time.Time) OracleResult {
+func OracleColumn(ctx context.Context, client gcs.Downloader, build gcs.Build, stop time.Time, group *configpb.TestGroup) OracleResult {
 	result := gcsResult{job: build.Job(), build: build.Build()}
 	var errs []string
 
@@ -104,8 +105,13 @@ func OracleColumn(ctx context.Context, client gcs.Downloader, build gcs.Build, s
 		seen[r] = true
 	}
 	if len(errs) == 0 {
-		group := &configpb.TestGroup{GcsPrefix: build.Path.Bucket() + "/" + strings.TrimSuffix(build.Path.Object(), "/")}
-		col := convertResult(logrus.New(), makeNameConfig(group), build.Build(), nil, result, makeOptions(group))
+		if group == nil {
+			group = &configpb.TestGroup{}
+		}
+		group.GcsPrefix = build.Path.Bucket() + "/" + strings.TrimSuffix(build.Path.Object(), "/")
+		opts := makeOptions(group)
+		opts.ignoreSkip = false
+		col := convertResult(logrus.New(), makeNameConfig(group), build.Build(), nil, result, opts)
 		out.Cells, out.Messages = map[string]string{}, map[string]string{}
 		for name, c := range col.Cells {
 			out.Cells[name] = c.Result.String()

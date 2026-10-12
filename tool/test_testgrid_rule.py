@@ -1,5 +1,5 @@
 """testgrid_rule against TestGrid's own code: testdata/testgrid_rule_golden.jsonl.gz holds
-what TestGrid's updater (tool/oracle, built from the commit production runs) made of 551
+what TestGrid's updater (tool/oracle, built from the commit production runs) made of 590
 builds, edge cases and random ones; each is replayed here. Then the helpers, and
 gcs_column reading a build over HTTP as TestGrid's GCS client does."""
 import base64
@@ -12,6 +12,7 @@ import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_red_logs as frl  # noqa: E402
+import testgrid_config as tgc  # noqa: E402
 import testgrid_rule as tr  # noqa: E402
 from test_fetch_red_logs import FakeServer  # noqa: E402
 
@@ -34,11 +35,13 @@ def replay(case):
         data = b64(a["data"]) or b""
         objects[FOLDER + a["name"]] = (a["size"] if a["size"] is not None else len(data), data)
     junits = []
-    for _, opened in tr.junit_reads(sorted(objects)):
+    for listed, opened in tr.junit_reads(sorted(objects)):
         size, data = objects.get(opened, (None, None))
-        junits.append((opened, size, data))
+        junits.append((opened, size, data, listed))
+    stop = case["stop"] + case.get("stop_ns", 0) // 1953125 / 512  # (fractions of 1/512 s: exact)
+    options = tgc.cell_options(case["group"])[0] if case.get("group") is not None else None
     return tr.column("job", b64(case["started"]), b64(case["finished"]), b64(case["podinfo"]), junits,
-                     case["stop"], case["now"], folder=FOLDER)
+                     stop, case["now"], folder=FOLDER, options=options)
 
 
 class GoldenTest(unittest.TestCase):
@@ -55,7 +58,10 @@ class GoldenTest(unittest.TestCase):
                 self.assertEqual(len(col.malformed), want["malformed"])
                 self.assertEqual(sorted(m for m in col.malformed if m.endswith(".json") and ":" not in m),
                                  want["malformed_json"])
-                self.assertEqual(col.cells or None, want["cells"])
+                either = col.either  # (rows two splits name alike: Go's map order picks one)
+                cells = {row: col.cells.get(row) if status in either.get(row, ()) else status
+                         for row, status in (want["cells"] or {}).items()}
+                self.assertEqual(col.cells or None, cells or None)
 
     def test_the_golden_cases_reach_every_outcome(self):
         """So a port that always answers the same could not pass the replay."""

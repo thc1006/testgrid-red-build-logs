@@ -1,7 +1,10 @@
 // Command tgoracle judges builds exactly as TestGrid's updater does (see
 // pkg/updater/zz_oracle.go), to check a Python port against: one JSON object per
 // line in, {"id", "started", "finished", "podinfo" (base64, or null for no such
-// object), "artifacts": [{"name", "size", "data"}], "stop"}; one per line out.
+// object), "artifacts": [{"name", "size", "data"}], "stop", "stop_ns", "group"}:
+// the build is too old when it started before time.Unix(stop, stop_ns), and its
+// column is made with the test group's options ("group": a TestGroup as protojson,
+// else a default one); one per line out.
 package main
 
 import (
@@ -18,7 +21,9 @@ import (
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
+	"google.golang.org/protobuf/encoding/protojson"
 
+	configpb "github.com/GoogleCloudPlatform/testgrid/pb/config"
 	"github.com/GoogleCloudPlatform/testgrid/pkg/updater"
 	"github.com/GoogleCloudPlatform/testgrid/util/gcs"
 )
@@ -77,7 +82,9 @@ type input struct {
 	Finished  *string    `json:"finished"`
 	PodInfo   *string    `json:"podinfo"`
 	Artifacts []artifact `json:"artifacts"`
-	Stop      int64      `json:"stop"`
+	Stop      int64           `json:"stop"`
+	StopNs    int64           `json:"stop_ns"`
+	Group     json.RawMessage `json:"group"`
 }
 
 type output struct {
@@ -126,7 +133,14 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		res := updater.OracleColumn(context.Background(), b, gcs.Build{Path: *path}, time.Unix(c.Stop, 0))
+		var group *configpb.TestGroup
+		if len(c.Group) > 0 && string(c.Group) != "null" {
+			group = &configpb.TestGroup{}
+			if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(c.Group, group); err != nil {
+				panic(err)
+			}
+		}
+		res := updater.OracleColumn(context.Background(), b, gcs.Build{Path: *path}, time.Unix(c.Stop, c.StopNs), group)
 		if err := out.Encode(output{c.ID, res}); err != nil {
 			panic(err)
 		}

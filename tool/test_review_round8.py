@@ -16,9 +16,11 @@ import urllib3
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_red_logs as frl  # noqa: E402
+import goregexp  # noqa: E402
 import test_review_round7 as r7  # noqa: E402  (module imports: their tests are not collected again here)
 import test_testgrid_config as ttc  # noqa: E402
 import testgrid_config as tgc  # noqa: E402
+import testgrid_rule as tr  # noqa: E402
 from test_fetch_red_logs import DAY, FakeServer  # noqa: E402
 from test_fetch_red_logs import table as ttc_table  # noqa: E402
 from test_integrity import HOUR, snowflake  # noqa: E402
@@ -75,15 +77,18 @@ class RememberedMismatch(ttc.ConfigWorld):
         self.assertEqual(self.fetch_with(path), 0)
         until = self.state()["tab_configs"]["dash#t"]["mismatch"]["until"]
         self.assertGreater(until, record["since"])
-        y = snowflake(time.time() + 2)  # (made after the record closed: created() is in whole seconds)
-        self.failed_in_gcs(y, 0)
+        # (the record moved ten hours back, for a build made after it closed whose reads by
+        # TestGrid are over)
+        state = self.state()
+        state["tab_configs"]["dash#t"]["mismatch"].update(since=self.now - 20 * HOUR, until=self.now - 10 * HOUR)
+        y = snowflake(self.now - 8 * HOUR)
+        self.failed_in_gcs(y, 8 * HOUR)
         self.srv.route(f"/bucket/logs/job/{y}/artifacts/junit_01.xml", (200, {}, KUBETEST_FAILED))
         self.srv.route(f"/bucket/logs/job/{y}/finished.json",
-                       (200, {}, {"result": "SUCCESS", "passed": True, "timestamp": int(time.time())}))
+                       (200, {}, {"result": "SUCCESS", "passed": True, "timestamp": int(self.now - 7 * HOUR)}))
         self.srv.route(f"/bucket/logs/job/{y}/podinfo.json", (200, {}, {"pod": {"status": {"phase": "Succeeded"}}}))
         self.srv.gcs_listing("bucket", [f"logs/job/{x}/finished.json" for x in (self.visible, w, y)])
-        state = self.state()
-        state["watch"] = {f"job/{y}": {"rec": self.watched(y), "first_seen": time.time()}}
+        state["watch"] = {f"job/{y}": {"rec": self.watched(y), "first_seen": self.now - 7 * HOUR}}
         frl.write_json(os.path.join(self.root, "state.json"), state)
         self.assertEqual(self.fetch_with(path), 0)
         self.assertEqual(self.runs()[-1]["outcomes"], {"not-red": [f"job/{y}"]})
@@ -123,7 +128,7 @@ class HeldBuilds(ttc.ConfigWorld):
 
     def test_held_past_14_days_and_judged_once_the_config_is_followed(self):
         b = self.held(14 * DAY + HOUR)
-        self.assertEqual(self.fetch_with(self.config("", disable_prowjob_analysis=True)), 1)
+        self.assertEqual(self.fetch_with(self.config("", build_override_configuration_value="x")), 1)
         run = self.runs()[-1]
         self.assertEqual(run["outcomes"], {"held": [f"job/{b}"]})
         self.assertIn("cannot be judged from GCS", " ".join(run["serious_warnings"]))
@@ -133,11 +138,11 @@ class HeldBuilds(ttc.ConfigWorld):
 
     def test_dropped_after_60_days_with_a_serious_warning(self):
         b = self.held(61 * DAY)
-        self.assertEqual(self.fetch_with(self.config("", disable_prowjob_analysis=True)), 1)
+        self.assertEqual(self.fetch_with(self.config("", build_override_configuration_value="x")), 1)
         run = self.runs()[-1]
         self.assertEqual(run["outcomes"], {"stopped-holding": [f"job/{b}"]})
         warning = next(w for w in run["serious_warnings"] if b in w)
-        self.assertIn("disable_prowjob_analysis", warning)
+        self.assertIn("build_override_configuration_value", warning)
         self.assertIn("though TestGrid may have shown it red", warning)
         self.assertEqual(self.state()["watch"], {})
 
@@ -148,7 +153,7 @@ class HeldBuilds(ttc.ConfigWorld):
         self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 3 * HOUR},
                              "dash#gone": {"scan": self.now - 2 * DAY, "oldest": self.now - 9 * DAY,
                                            "missing_since": self.now - DAY}},
-                       tab_configs={"dash#gone": {"config": ttc.entry("", disable_prowjob_analysis=True),
+                       tab_configs={"dash#gone": {"config": ttc.entry("", build_override_configuration_value="x"),
                                                   "read": self.now - DAY}},
                        watch={f"job/{w}": {"rec": rec, "first_seen": self.now - 5 * DAY}})
         self.assertEqual(self.fetch_with(self.config("")), 1)
@@ -183,10 +188,7 @@ class Staleness(ttc.ConfigWorld):
         state = self.state()
         state["tab_configs"]["dash#t"]["read"] = self.now - 30 * DAY
         frl.write_json(os.path.join(self.root, "state.json"), state)
-        other = os.path.join(self.dir, "other.json")
-        frl.write_json(other, {"format": 1, "source": {"test_infra": "f" * 40, "committed": int(self.now - HOUR),
-                                                       "image": "img:v2"},
-                               "dashboards": {"elsewhere": {"x": ttc.entry("")}}})
+        other = self.config_of({"elsewhere": {"x": ttc.entry("")}})
         self.assertEqual(self.fetch_with(other), 1)
         run = self.runs()[-1]
         self.assertIn("has no tab dash#t", " ".join(run["warnings"]))
@@ -198,12 +200,10 @@ class MalformedEntries(ttc.ConfigWorld):
     """An entry valid_entry accepted (custom_evaluator_rule_set a list) crashed the fetch."""
 
     def test_a_field_of_the_wrong_type_is_refused_not_a_crash(self):
-        path = os.path.join(self.dir, "c.json")
-        frl.write_json(path, {"format": 1, "source": {"test_infra": "a" * 40, "committed": int(self.now - DAY),
-                                                      "image": "img"},
-                              "dashboards": {"dash": {"t": ttc.entry("", custom_evaluator_rule_set=["x"])}}})
+        path = self.config_of({"dash": {"t": ttc.entry("", custom_evaluator_rule_set=["x"])}})
         self.fetch_with(path)
-        self.assertIn("TestGrid's config could not be read", " ".join(self.runs()[-1]["warnings"]))
+        self.assertIn("its config as written: dash#t: an entry not as extract writes it",
+                      " ".join(self.runs()[-1]["warnings"]))
         for bad in (ttc.entry("", custom_evaluator_rule_set=["x"]), ttc.entry("", custom_evaluator_rule_set={"rules": 1}),
                     ttc.entry("", ignore_skip="yes"), ttc.entry("", name=5), ttc.entry("", test_name_config="x")):
             self.assertFalse(tgc.valid_entry(bad), bad)
@@ -268,7 +268,7 @@ class TestGridsLastRead(LastReadWorld):
         self.finished(30 * HOUR)
         self.assertEqual(self.judged(15)[1][0]["message"], "it did not finish within 24 hours")
         col = frl.gcs_column(self.srv.url, "bucket/logs/job", self.build, 15, self.now)
-        self.assertEqual(col.alternatives, [])  # (written too late to be in that read)
+        self.assertFalse(any(c.finished_seen for c in (col, *col.alternatives)))  # (written too late to be read)
 
     def test_what_was_written_after_the_deadline_read_is_not_in_it(self):
         self.finished(30 * HOUR, passed=False)
@@ -284,7 +284,7 @@ class TestGridsLastRead(LastReadWorld):
 
     def test_a_podinfo_written_after_the_pod_row_stopped_waiting_is_not_in_it(self):
         self.finished(2 * HOUR, passed=True)
-        self.podinfo(2 * HOUR + 4 * HOUR, failed=True)  # (an hour of waiting, and the read window, past)
+        self.podinfo(2 * HOUR + 5 * HOUR, failed=True)  # (an hour of waiting, and the read window, past)
         self.assertEqual(self.judged(15)[0], "not-red")
         self.podinfo(2 * HOUR + 30 * 60, failed=True)
         self.assertEqual(self.judged(15), ("red", [{"test": "job.Pod", "status": "FAIL", "message": ANY_TEXT}]))
@@ -292,7 +292,9 @@ class TestGridsLastRead(LastReadWorld):
     def test_finished_soon_after_the_deadline_is_red_if_either_read_is(self):
         self.finished(25 * HOUR)
         col = frl.gcs_column(self.srv.url, "bucket/logs/job", self.build, 15, self.now)
-        self.assertEqual(len(col.alternatives), 1)
+        reads = (col, *col.alternatives)
+        self.assertTrue(any(c.finished_seen for c in reads))  # (the first read after the deadline may come after it)
+        self.assertTrue(any(c.cells.get("job.Overall") == "FAIL" and not c.finished_seen for c in reads))
         self.assertEqual(frl.verdict(col, "job")[0], "red")
 
     def test_finished_in_time_is_judged_as_it_finished(self):
@@ -352,16 +354,18 @@ class FilterLimits(unittest.TestCase):
     """Filters Go rejects for their height or size were applied, nested repetitions grew the
     automaton exponentially, and nothing bounded the time a filter could take."""
 
-    def test_patterns_beyond_the_limits_are_not_followed(self):
-        with self.assertRaisesRegex(tgc.Unsupported, "longer than"):
-            tgc.go_regexp("a" * (tgc.MAX_PATTERN + 1))
-        with self.assertRaisesRegex(tgc.Unsupported, "nested too deeply"):
-            tgc.go_regexp("(" * (tgc.MAX_NESTING + 1) + ")" * (tgc.MAX_NESTING + 1))
-        tgc.go_regexp("(" * tgc.MAX_NESTING + ")" * tgc.MAX_NESTING)
+    def test_patterns_beyond_gos_limits_are_broken(self):
+        # (Go's maxHeight and maxSize, as its parser counts them)
+        tgc.go_regexp("(" * 999 + "a" + ")" * 999)
+        with self.assertRaisesRegex(tgc.Broken, "expression nests too deeply"):
+            tgc.go_regexp("(" * 1000 + "a" + ")" * 1000)
+        with self.assertRaisesRegex(tgc.Broken, "expression too large"):
+            tgc.go_regexp("(?:a{1000}b{1000}){1}" * 1700)
+        tgc.go_regexp("a" * 5000)
 
     def test_nested_repetitions_compile_to_one_copy_each(self):
         r = tgc.go_regexp("((((((a+)+)+)+)+)+)+b")
-        self.assertLess(len(r.states), 40)
+        self.assertLess(len(r.matcher.states), 40)
         self.assertTrue(r.search("xaaab"))
         self.assertFalse(r.search("a" * 3000))
         r = tgc.go_regexp("x{3,}y")
@@ -388,8 +392,8 @@ class FilterOutOfTime(ttc.ConfigWorld):
 
 class CacheBound(unittest.TestCase):
     def test_the_cache_is_emptied_by_size(self):
-        r = tgc.go_regexp("[a-z].{20}~")
-        with mock.patch.object(tgc, "CACHE_ELEMENTS", 500):
+        r = tgc.go_regexp("[a-z].{20}~").matcher
+        with mock.patch.object(goregexp, "CACHE_ELEMENTS", 500):
             for i in range(50):
                 r.search("abcdefghijklmnopqrstuvwxyz" * 3 + str(i))
                 self.assertLessEqual(r.cached, 500 + 2 * len(r.states) + 1)
@@ -424,12 +428,8 @@ class Wave2(ttc.ConfigWorld):
                                                {"job.Pod": ([1] * len(builds), [""] * len(builds)),
                                                 "kubetest.Up": ([1] * len(builds), [""] * len(builds))},
                                                start=int(self.now - HOUR) * 1000))
-        path = os.path.join(self.dir, "two.json")
-        frl.write_json(path, {"format": 1, "source": {"test_infra": "a" * 40, "committed": int(self.now - HOUR),
-                                                      "image": "img"},
-                              "dashboards": {"dash": {"t": ttc.entry("", disable_prowjob_analysis=True),
-                                                      "t2": ttc.entry(self.HIDE)}}})
-        return path
+        return self.config_of({"dash": {"t": ttc.entry("", build_override_configuration_value="x"),
+                                        "t2": ttc.entry(self.HIDE)}})
 
     def test_a_run_whose_filters_cannot_be_applied_leaves_the_record_open(self):
         self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 3 * HOUR}})
@@ -448,10 +448,7 @@ class Wave2(ttc.ConfigWorld):
 
     def test_a_listed_tab_missing_from_a_config_read_is_serious(self):
         self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 3 * HOUR}})
-        other = os.path.join(self.dir, "other.json")
-        frl.write_json(other, {"format": 1, "source": {"test_infra": "f" * 40, "committed": int(self.now - HOUR),
-                                                       "image": "img:v2"},
-                               "dashboards": {"elsewhere": {"x": ttc.entry("")}}})
+        other = self.config_of({"elsewhere": {"x": ttc.entry("")}})
         self.assertEqual(self.fetch_with(other), 1)
         self.assertIn("TestGrid's config was never read for 1 tabs (dash#t)", " ".join(self.runs()[-1]["serious_warnings"]))
 
@@ -475,10 +472,7 @@ class Wave2(ttc.ConfigWorld):
         self.srv.table("dash", "t2", ttc_table("bucket/logs/job", [self.visible, w],
                                                {"job.Pod": ([1, 1], ["", ""]), "kubetest.Up": ([1, 1], ["", ""])},
                                                start=int(self.now - HOUR) * 1000))
-        path = os.path.join(self.dir, "two.json")
-        frl.write_json(path, {"format": 1, "source": {"test_infra": "a" * 40, "committed": int(self.now - HOUR),
-                                                      "image": "img"},
-                              "dashboards": {"dash": {"t": ttc.entry(""), "t2": ttc.entry(self.HIDE)}}})
+        path = self.config_of({"dash": {"t": ttc.entry(""), "t2": ttc.entry(self.HIDE)}})
         rec = self.watched(w)
         rec["tabs"].append({"dashboard": "dash", "tab": "t2", "tab_status": "PASSING", "red_cells": []})
         self.put_state(tabs={"dash#t": {"scan": self.now - HOUR, "oldest": self.now - 3 * HOUR},
@@ -518,9 +512,12 @@ class Wave2(ttc.ConfigWorld):
                        tab_configs={"dash#gone": {"config": ttc.entry("", custom_evaluator_rule_set=rules),
                                                   "read": self.now - DAY}},
                        watch={f"job/{w}": {"rec": rec, "first_seen": self.now - 20 * DAY}})
-        for _ in range(2):
-            self.fetch_with(self.config(""))
-            self.assertEqual(self.runs()[-1]["outcomes"], {"held": [f"job/{w}"]})
+        # (TestGrid's config had the tab while it may have shown the build; it is gone from it now)
+        path = self.config_of({"dash": {"t": ttc.entry(""), "gone": ttc.entry("", custom_evaluator_rule_set=rules)}})
+        self.fetch_with(path)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"held": [f"job/{w}"]})
+        self.fetch_with(self.config_of({"dash": {"t": ttc.entry("")}}, uploaded=self.now - DAY))
+        self.assertEqual(self.runs()[-1]["outcomes"], {"held": [f"job/{w}"]})
         self.assertNotIn("dash#gone", self.state()["tabs"])
         self.assertIn("dash#gone", self.state()["tab_configs"])
 
@@ -530,7 +527,7 @@ class Wave2(ttc.ConfigWorld):
         self.listing_fails()  # its junit files cannot be listed: archive() raises
         self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 3 * HOUR}},
                        watch={f"job/{b}": {"rec": self.watched(b), "first_seen": self.now - 61 * DAY}})
-        self.fetch_with(self.config("", disable_prowjob_analysis=True))
+        self.fetch_with(self.config("", build_override_configuration_value="x"))
         error = next(e["error"] for e in self.runs()[-1]["errors"] if e["build"] == f"job/{b}")
         self.assertIn(f"no longer watched after {frl.HELD_DAYS} days", error)
 
@@ -562,7 +559,7 @@ class MutationGaps(ttc.ConfigWorld):
 
     def test_cross_check_follows_the_runs_group_problems_and_days(self):
         self.earlier_run(self.now - 3 * DAY)
-        self.assertEqual(self.fetch_with(self.config("", disable_prowjob_analysis=True)), 1)  # b held
+        self.assertEqual(self.fetch_with(self.config("", build_override_configuration_value="x")), 1)  # b held
         code, out = self.check()
         self.assertNotIn(f"MISSED red build job/{self.b}", out)
         self.assertIn(f"job/{self.b}: TestGrid no longer lists it and it is not decided yet", out)
@@ -652,12 +649,18 @@ class ConfigRoundTrip(unittest.TestCase):
         return tgc.TabRule(entry)
 
     def test_every_option_the_updater_paints_cells_by_survives_extract(self):
-        for option, value in (("ignore_skip", True), ("result_source", {"gcs_config": {"gcs_prefix": "x"}}),
-                              ("ignore_old_results", True), ("test_name_config", {"name_format": "%s"}),
-                              ("disable_prowjob_analysis", True), ("disable_merged_status", True),
-                              ("custom_evaluator_rule_set", {"rules": [{"name": "r"}]}),
-                              ("build_override_strftime", "%Y"), ("build_override_configuration_value", "x")):
+        for option, value in (("build_override_strftime", "%Y"), ("build_override_configuration_value", "x")):
             self.assertIn(option, self.rule(**{option: value}).group_problem or "", option)
+        # (kept, and followed: the cell options, the source of its builds; options TestGrid production
+        # does not apply)
+        rule = self.rule(test_name_config={"name_format": "%s", "name_elements": [{"target_config": "Tests name"}]},
+                         disable_prowjob_analysis=True, disable_merged_status=True,
+                         custom_evaluator_rule_set={"rules": [{"computed_status": 12}]})
+        self.assertEqual((rule.group_problem, rule.options),
+                         (None, tr.Options(merge=False, pod=False, all_tests="FAIL", names=("%s", ("Tests name",)))))
+        rule = self.rule(result_source={"gcs_config": {"gcs_prefix": "x/y"}}, ignore_skip=True, ignore_old_results=True)
+        self.assertEqual((rule.prefix, rule.not_updated, rule.group_problem), ("x/y", None, None))
+        self.assertTrue({"result_source", "ignore_skip", "ignore_old_results"} <= set(rule.entry["group"]))
         self.assertIsNone(self.rule(num_columns_recent=3, alert_stale_results_hours=4, short_text_metric="m",
                                     user_property="p").group_problem)  # (fields that set no result)
         rule = self.rule()
@@ -666,7 +669,9 @@ class ConfigRoundTrip(unittest.TestCase):
     def test_a_group_without_use_kubernetes_client_is_skipped_by_testgrid(self):
         group = {k: v for k, v in ttc.GROUP.items() if k != "use_kubernetes_client"}
         rule = tgc.TabRule({"test_group": "job", "base_options": "", "group": group})
-        self.assertIn("use_kubernetes_client", rule.group_problem)
+        self.assertIsNone(rule.group_problem)  # (what TestGrid shows is known: no new column)
+        self.assertIn("never updates the group", rule.not_updated)
+        self.assertIsNone(rule.prefix)
 
     def test_a_tab_without_its_test_group_is_a_valid_entry_with_a_problem(self):
         entry = {"test_group": "missing", "base_options": "", "group": None}
@@ -678,24 +683,36 @@ class ConfigRoundTrip(unittest.TestCase):
         d = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, d)
         path = os.path.join(d, "c.json")
-        scalars = [None, True, 0, -1, 1.5, "", "x", [], {}, [1], {"a": 1}]
+        scalars = [None, True, 0, -1, 1.5, "", "x", [], {}, [1], {"a": 1}, "a" * 12 + "-" + "b" * 12, "c" * 40, 1 << 41]
+        commit, recipe = "c" * 40, ttc.recipe_of("c" * 40)
+        run = {"build": "2109000000000000000", "commit": commit, "started": 1_790_000_000, "finished": 1_790_000_005,
+               "recipe": recipe}
+        good = {"format": tgc.FORMAT, "after": 1_789_000_000, "runs": [run], "group_changes": {run["build"]: {}},
+                "failed": {}, "configs": {recipe: {"commit": commit, "committed": 1_789_990_000, "image": "i",
+                                                   "dashboards": {"d": {"t": ttc.entry("")}}}}}
+
+        def mutate(value, depth=0):
+            if depth > 4 or not isinstance(value, (dict, list)) or rng.random() < 0.15:
+                return rng.choice(scalars) if rng.random() < 0.5 else value
+            if isinstance(value, list):
+                return [mutate(v, depth + 1) for v in value] + ([rng.choice(scalars)] if rng.random() < 0.1 else [])
+            out = {k: mutate(v, depth + 1) for k, v in value.items() if rng.random() > 0.05}
+            if rng.random() < 0.1:
+                out[rng.choice(["extra", "x", "group", "duplicate", "base_options"])] = rng.choice(scalars)
+            return out
+        accepted = 0
         for _ in range(3000):
-            doc = {"format": rng.choice([1, 1, 1, 2, "1"]),
-                   "source": rng.choice([{"test_infra": "a", "committed": 1_790_000_000, "image": "i"},
-                                         {"test_infra": rng.choice(scalars), "committed": rng.choice(scalars),
-                                          "image": rng.choice(scalars)}, rng.choice(scalars)]),
-                   "dashboards": rng.choice([{"d": {"t": dict(ttc.entry(""), **{rng.choice(["test_group", "base_options",
-                                                                                            "group", "duplicate"]):
-                                                                               rng.choice(scalars)})}},
-                                             {"d": rng.choice(scalars)}, rng.choice(scalars)])}
             with open(path, "w") as f:
-                json.dump(doc, f)
+                json.dump(mutate(good), f)
             try:
-                tabs, _ = tgc.load(path)
+                loaded = tgc.load(path)
             except ValueError:
                 continue
-            for entry in tabs.values():
-                tgc.TabRule(entry)  # (never raises for an entry load accepts)
+            accepted += 1
+            for tabs, _ in loaded["configs"].values():
+                for entry in tabs.values():
+                    tgc.TabRule(entry)  # (never raises for an entry load accepts)
+        self.assertGreater(accepted, 10)  # (some mutations keep it valid: the loop does reach TabRule)
 
 
 class UploadJobArguments(unittest.TestCase):
@@ -722,21 +739,18 @@ class Wave3(ttc.ConfigWorld):
         self.srv.table("dash", "t2", ttc_table("bucket/logs/job", [self.visible, w],
                                                {"job.Pod": ([1, 1], ["", ""]), "kubetest.Up": ([1, 1], ["", ""])},
                                                start=int(self.now - HOUR) * 1000))
-        path = os.path.join(self.dir, "renamed.json")
-        frl.write_json(path, {"format": 1, "source": {"test_infra": "a" * 40, "committed": int(self.now - HOUR),
-                                                      "image": "img"},
-                              "dashboards": {"dash": {"t2": ttc.entry(self.HIDE)}}})
-        self.put_state(tabs={"dash#t": {"scan": self.now - HOUR, "oldest": self.now - 5 * HOUR}},
-                       tab_configs={"dash#t": {"config": ttc.entry(self.HIDE), "read": self.now - HOUR}},
-                       watch={f"job/{w}": {"rec": self.watched(w), "first_seen": self.now - 2 * HOUR}})
-        self.fetch_with(path)
-        self.assertEqual(self.runs()[-1]["outcomes"].get("not-red"), [f"job/{w}"])
-        # with other base options, t2 says nothing about t: t judges it by the rule (red there)
-        self.put_state(tabs={"dash#t": {"scan": self.now - HOUR, "oldest": self.now - 5 * HOUR}},
-                       tab_configs={"dash#t": {"config": ttc.entry(""), "read": self.now - HOUR}},
-                       watch={f"job/{w}": {"rec": self.watched(w), "first_seen": self.now - 2 * HOUR}})
-        self.fetch_with(path)
-        self.assertIn(f"job/{w}", self.runs()[-1]["outcomes"].get("backfilled", []))
+        # (TestGrid's config had t while it may have shown the build, then t2 instead of it)
+        for t, outcome in ((ttc.entry(self.HIDE), "not-red"), (ttc.entry(""), "backfilled")):
+            # with other base options, t2 says nothing about t: t judges it by the rule (red there)
+            self.put_state(tabs={"dash#t": {"scan": self.now - HOUR, "oldest": self.now - 5 * HOUR}},
+                           tab_configs={"dash#t": {"config": t, "read": self.now - HOUR}})
+            self.fetch_with(self.config_of({"dash": {"t": t}}))
+            self.put_state(**{k: v for k, v in self.state().items() if k in ("config_uploads", "config_entries")},
+                           tabs={"dash#t": {"scan": self.now - HOUR, "oldest": self.now - 5 * HOUR}},
+                           tab_configs={"dash#t": {"config": t, "read": self.now - HOUR}},
+                           watch={f"job/{w}": {"rec": self.watched(w), "first_seen": self.now - 2 * HOUR}})
+            self.fetch_with(self.config_of({"dash": {"t2": ttc.entry(self.HIDE)}}, uploaded=self.now - HOUR))
+            self.assertIn(f"job/{w}", self.runs()[-1]["outcomes"].get(outcome, []), outcome)
 
     def test_a_listed_tab_without_scans_keeps_its_config_record(self):
         self.earlier_run(self.now - 3 * DAY)

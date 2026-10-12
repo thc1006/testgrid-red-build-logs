@@ -1,11 +1,12 @@
 """A tab's row filter, TestGrid's tabulator (gocheck) vs testgrid_config.py:
 filterdiff.py SEED CASES (GOCHECK: the gocheck binary tool/oracle/build.sh builds).
 
-Each case is base options and row names. Where TestGrid rejects the base options,
-the port must not apply them (Unsupported); where it keeps rows, the port must keep
-the same ones, or not apply the options at all. Patterns made only of the syntax
-the port claims to follow must be applied. The edge cases (the filters
-testgrid.k8s.io's tabs use among them) run first."""
+Each case is base options and row names. Where TestGrid rejects the base options
+(its tabulator then fails the tab), the port must say so (Broken); where it keeps
+rows, the port must keep the same ones (options other than the filters are ignored,
+as TestGrid's tabulator ignores them). The port may leave them unapplied only for an
+automaton too large to run here.
+The edge cases (the filters testgrid.k8s.io's tabs use among them) run first."""
 import json
 import os
 import random
@@ -53,34 +54,40 @@ EDGE_PATTERNS = [
 
 
 def plain_pattern(rng, depth=0):
-    """A pattern made only of the syntax the port follows (that Go also accepts)."""
+    """A pattern of Go's regexp syntax (mostly one Go accepts): flags, groups of every kind,
+    classes, escapes, Unicode classes, repetitions up to Go's limits."""
     def atom():
         r = rng.random()
-        if r < 0.35:
-            return rng.choice(["a", "b", "K", "s", "_", "0", "é", "日", " ", "x"])
-        if r < 0.45:
+        if r < 0.3:
+            return rng.choice(["a", "b", "K", "k", "s", "S", "_", "0", "é", "É", "日", " ", "x", chr(0x212A), "ſ", "Σ",
+                               "σ", "ς", "ǅ", "\n"])
+        if r < 0.4:
             return rng.choice([r"\.", r"\-", r"\[", r"\]", r"\(", r"\)", r"\|", r"\*", r"\+", r"\?", r"\{", r"\}",
-                               r"\^", r"\$", r"\\", r"\ ", r"\_", r"\#", r"\t", r"\n", r"\x41", r"\x{e9}"])
-        if r < 0.55:
+                               r"\^", r"\$", r"\\", r"\ ", r"\_", r"\#", r"\t", r"\n", r"\x41", r"\x{e9}", r"\0",
+                               r"\101", r"\012", r"\x{1F600}", r"\Q.*\E", r"\Q|"])
+        if r < 0.48:
             return "."
-        if r < 0.68:
-            return rng.choice([r"\d", r"\D", r"\s", r"\S", r"\w", r"\W"])
-        if r < 0.82:
+        if r < 0.58:
+            return rng.choice([r"\d", r"\D", r"\s", r"\S", r"\w", r"\W", r"\pL", r"\PL", r"\p{Greek}",
+                               r"\p{^Greek}", r"\P{Lu}", r"\p{Letter}", r"\p{lu}", r"\p{Any}", r"\p{ASCII}", r"\pN",
+                               r"\p{Han}", r"\p{Assigned}"])
+        if r < 0.75:
             items = "".join(rng.choice(["a", "b-z", "0-9", r"\d", r"\s", r"\w", r"\]", r"\-", "_", "é", "K", ".",
-                                        "$", "^x", " ", r"\t"]) for _ in range(rng.randint(1, 3)))
+                                        "$", "^x", " ", r"\t", "[:alpha:]", "[:^digit:]", r"\pL", r"\p{Greek}",
+                                        r"\D", "Σ-σ", "k-l"]) for _ in range(rng.randint(1, 3)))
             return "[" + rng.choice(["", "^"]) + items + "]"
         if depth < 3:
-            return rng.choice(["(", "(?:"]) + plain_pattern(rng, depth + 1) + ")"
+            return rng.choice(["(", "(?:", "(?i)", "(?i:", "(?-i:", "(?s:", "(?m:", "(?U:", "(?P<n>", "(?<x_1>",
+                               "(?im-s:"]).replace("(?i)", "(?i:") + plain_pattern(rng, depth + 1) + ")"
         return "a"
 
     def piece():
         if rng.random() < 0.12:
-            return rng.choice(["^", "$", r"\b", r"\B", r"\A", r"\z"])
+            return rng.choice(["^", "$", r"\b", r"\B", r"\A", r"\z", "(?i)", "(?m)", "(?s)", "(?-i)"])
         a = atom()
         if rng.random() < 0.3:
-            q = rng.choice(["*", "+", "?", "{2}", "{0,1}", "{1,}", "{3,5}", "{2,}", "{0,}"])
-            if q.startswith("{") and a.startswith("(") and "{" in a:
-                q = "*"  # (Go limits counted repetitions of counted repetitions)
+            q = rng.choice(["*", "+", "?", "{2}", "{0,1}", "{1,}", "{3,5}", "{2,}", "{0,}", "{10}", "{100}", "{1000}",
+                            "{0}", "{0,0}"])
             a += q + ("?" if rng.random() < 0.2 else "")
         return a
 
@@ -110,8 +117,6 @@ def base_options(rng, plain):
         key = rng.choice([INC, EXC, EXC, "width", "sort-by-name"] + ([] if plain else ["unknown-option", "", "x;y"]))
         if key in (INC, EXC):
             value = plain_pattern(rng) if plain else (wild_pattern(rng) if rng.random() < 0.6 else rng.choice(EDGE_PATTERNS))
-            while plain and len(value) > tc.MAX_PATTERN:  # (longer ones are not followed, by design)
-                value = plain_pattern(rng)
         else:
             value = rng.choice(["", "10", "a b"])
         parts.append(f"{key}={encode(rng, value)}" if plain or rng.random() < 0.9 else key)
@@ -138,10 +143,14 @@ def names(rng, options):
 
 
 def python_side(options, names_):
+    """(the names the port keeps, None) or (None, why not: "broken: ..." when it says TestGrid
+    cannot apply the options, "unsupported: ..." when it cannot)."""
     try:
         includes, excludes = tc.tab_filters(options)
+    except tc.Broken as e:
+        return None, f"broken: {e}"
     except tc.Unsupported as e:
-        return None, str(e)
+        return None, f"unsupported: {e}"
     return [n for n in names_ if all(r.search(n) for r in includes) and not any(r.search(n) for r in excludes)], None
 
 
@@ -154,16 +163,19 @@ def go_side(cases):
 def check(cases):
     """Mismatches, and how many cases the port did not apply although TestGrid did."""
     bad, unapplied = [], 0
-    for (options, names_, plain), got in zip(cases, go_side(cases), strict=True):
+    for (options, names_, _plain), got in zip(cases, go_side(cases), strict=True):
         kept, why = python_side(options, names_)
         if not got["ok"]:
-            if kept is not None:
-                bad.append((options, f"TestGrid rejects them, the port keeps {kept}"))
+            if not (why or "").startswith("broken: "):
+                bad.append((options, f"TestGrid rejects them, the port: {kept if kept is not None else why}"))
             continue
         if kept is None:
+            if why.startswith("broken: "):
+                bad.append((options, f"TestGrid applies them, the port says it cannot: {why}"))
+                continue
             unapplied += 1
-            if plain and "options not known here" not in why:
-                bad.append((options, f"syntax the port follows, but it raised: {why}"))
+            if "too large to apply here" not in why:
+                bad.append((options, f"the port did not apply them: {why}"))
             continue
         if kept != got["kept"]:
             bad.append((options, f"kept {[n for n in kept if n not in got['kept']]} that TestGrid drops, dropped "

@@ -559,33 +559,62 @@ def check(args, problems, notes):
                 and (job_of[q], b) not in archived and (job_of[q], b) not in shown
                 and created(b) >= archive_start and q not in unread and q in oldest_shown and created(b) < oldest_shown[q]]
 
+    # ... and over time, as the archive learned it (its state.json: frl.ConfigHistory), as the fetch judges by it
+    try:
+        state = frl.read_json(os.path.join(root, "state.json"))
+    except (OSError, ValueError):
+        state = {}
+    state = state if isinstance(state, dict) else {}
+    history, era_rules = frl.ConfigHistory(state.get("config_uploads"), state.get("config_entries")), {}
+
+    def era_rule(entry):
+        return entry if entry is None or entry is frl.UNKNOWN else \
+            era_rules.setdefault(frl.entry_id(entry), tgc.TabRule(entry))
+    rule_of = {}  # per "dashboard#tab", the tab's rule as the fetch takes it (frl.tab_verdict)
+    current, _ = history.current()
+    keys = [f"{t['dashboard']}#{t['tab']}" for t in tabs]
+    over_time = frl.history_rules(history, keys, t0, [k for k in keys if current is not None and k not in current],
+                                  {f"{t['dashboard']}#{t['tab']}": t["query"] for t in tabs}, era_rule)
+    for t in tabs:
+        key, rule = f"{t['dashboard']}#{t['tab']}", rules.get((t["dashboard"], t["tab"]))
+        rule_of[key] = {"rows": rows_of.get((t["dashboard"], t["tab"]))}
+        if rule is not None:
+            m = t.get("config_mismatch")
+            until = -math.inf
+            if isinstance(m, dict):  # (a build made before the tab agreed with its config again: its rows count too)
+                until = m["until"] if number(m.get("until")) else math.inf
+            rule_of[key].update(days=rule.days,
+                                shows=None if rule.filter_problem or rule.broken or rule.not_updated else rule.shows,
+                                problem=rule.group_problem, unreliable_until=until, options=rule.options)
+        rule_of[key].update(over_time.get(key, {}))
+
     def tab_verdict(col, t, made):
         """The build's verdict on tab t, by the tab's rule as the fetch takes it (frl.tab_verdict)."""
-        rows, rule = rows_of.get((t["dashboard"], t["tab"])), rules.get((t["dashboard"], t["tab"]))
-        if rule is None:
-            return frl.tab_verdict(col, job_of[t["query"]], {"rows": rows}, made)
-        m = t.get("config_mismatch")
-        until = -math.inf
-        if isinstance(m, dict):  # (a build made before the tab agreed with its config again: its table's rows count too)
-            until = m["until"] if number(m.get("until")) else math.inf
-        return frl.tab_verdict(col, job_of[t["query"]], {"rows": rows, "shows": None if rule.filter_problem else rule.shows,
-                                                        "problem": rule.group_problem, "unreliable_until": until}, made)
+        return frl.tab_verdict(col, job_of[t["query"]], rule_of[f"{t['dashboard']}#{t['tab']}"], made)
 
-    def days_of(query):  # (the longest of the job's tabs, as the fetch takes it)
-        known = [rules[(t["dashboard"], t["tab"])].days for t in tabs
-                 if t["query"] == query and (t["dashboard"], t["tab"]) in rules]
+    def keys_of(query):
+        return [f"{t['dashboard']}#{t['tab']}" for t in tabs if t["query"] == query]
+
+    def days_of(query, made):  # (the longest of the job's tabs, as the fetch takes it)
+        known = [frl.build_days(rule_of[k], made) for k in keys_of(query) if "days" in rule_of[k] or "eras" in rule_of[k]]
         return max(known) if known else frl.tab_days(oldest_shown[query], t0)
 
+    timelines = frl.Timelines(t0)
+    timelines.prime(pool, args.gcs, unlisted, events={qb: frl.tab_events(rule_of, keys_of(qb[0])) for qb in unlisted},
+                    days={qb: days_of(qb[0], created(qb[1])) for qb in unlisted})  # (as the builds are judged)
+
     def judge(qb):
+        cols = frl.Columns(args.gcs, qb[0], qb[1], days_of(qb[0], created(qb[1])), t0, timelines,
+                           frl.tab_events(rule_of, keys_of(qb[0])))
         try:
-            col = frl.gcs_column(args.gcs, qb[0], qb[1], days_of(qb[0]), now=t0)
+            col = cols()
+            # a finished column not red without its junit files, which cannot be read now, cannot be checked
+            if frl.unreadable_junit(col) and not any(tab_verdict(cols, t, created(qb[1]))[0] == "red"
+                                                     for t in tabs if t["query"] == qb[0]):
+                return Unreachable(ValueError(col.partial))
         except Exception as e:
             return Unreachable(e)
-        # a finished column not red without its junit files, which cannot be read now, cannot be checked
-        if frl.unreadable_junit(col) and not any(tab_verdict(col, t, created(qb[1]))[0] == "red"
-                                                 for t in tabs if t["query"] == qb[0]):
-            return Unreachable(ValueError(col.partial))
-        return col
+        return cols
     judged = dict(zip(unlisted, pool.map(judge, unlisted), strict=True))
     judged_as = {}
     for (q, b), col in judged.items():
