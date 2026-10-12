@@ -46,8 +46,8 @@ class VanishedBuildsTakenTogether(unittest.TestCase):
         model = frl.HoldModel(builds, DAY)
         c1 = builds[1]
         self.assertEqual(model.gone[x.build][3], c1.started + DAY)
-        self.assertEqual(model.vanishing(x.build, x.started), model.gone[x.build][:4])
-        self.assertEqual(model.vanish(x.build, x.started), model.gone[x.build][:4])
+        self.assertEqual(model.vanishing(x.build, x.started), model.gone[x.build])
+        self.assertEqual(model.vanish(x.build, x.started), model.gone[x.build])
 
     def test_whatever_order_the_builds_come_in(self):
         x, builds, _ = self.builds()

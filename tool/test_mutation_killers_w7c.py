@@ -163,8 +163,8 @@ class ListedAgainWhileItMayRun(k8.Reads):
         made = frl.created(b)
         events = [(made + 10 * HOUR, made + 11 * HOUR, "changed")]
         jobs = k9.Jobs(k9.buildruns(made + 0.5, started=29.5, running_until=made + HOUR), now=self.now)
-        _, gone, pinned, back = jobs.grid(b, made + 60, 15, events)[1]
-        self.assertEqual((back, len(pinned)), (made + 10 * HOUR, 2))
+        _, gone, pinned, back, ends = jobs.grid(b, made + 60, 15, events)[1]
+        self.assertEqual((back, len(pinned), ends[-1]), (made + 10 * HOUR, 2, made + 30 + 15 * DAY))
         self.assertEqual(self.judged(b, timeline=jobs, events=events), "red")
 
 

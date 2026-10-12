@@ -150,7 +150,7 @@ class ListedAgain(unittest.TestCase):
         self.assertEqual(k9.Jobs(x, c).grid(b, b_start, 1)[0], [(M + 6 * HOUR, until)])
         self.assertIn((M + 25 * HOUR, until, x.started, -1), frl.HoldModel([x, c], DAY).entries)
         model = frl.HoldModel([x, c], DAY)
-        self.assertEqual(model.gone[x.build][-1], [(M + 25 * HOUR, INF)])  # (when it is listed again: the last)
+        self.assertEqual(model.gone[x.build][-1], [M + 25 * HOUR])  # (when it may be listed again)
 
     def test_it_holds_newer_columns_until_it_is_gone(self):
         # MF0465, MF0468, MF0500, MF0501, MF0555, MF0565, MF0567, MF0572, NMF0026, NMF0031, NMF0041, NMF0042, NMF0046,
@@ -251,13 +251,17 @@ class Pinned(unittest.TestCase):
         c = runs(M + 0.5, started=30, running_until=M + 5 * HOUR, good_until=settled + 1)
         self.assertEqual(self.vanishing(c), (settled - GAP, settled, [(settled, c.started + 15 * DAY)]))
 
-    def test_a_column_that_vanished_itself_does_not_pin(self):  # MF0701-MF0703, MF0708, SF060, SF066
+    def test_a_column_that_vanished_itself_pins_only_where_it_never_did(self):  # MF0701-MF0703, MF0708, SF060, SF066
         # (C, between X and D by ID and by start, vanishes when D settles, as X does: D pins X until D
-        # is too old, when X and C are both listed again)
+        # is too old, when X and C are both listed again; but C may never vanish, review W8a, and then
+        # pins X until C is too old: X may be listed again at either)
+        x = runs(M, running_until=INF)
         c = runs(M + 1, started=49, running_until=M + 5 * HOUR)
         d = runs(M + 2, started=8, running_until=M + HOUR)
         settled = M + HOUR + GAP
-        self.assertEqual(self.vanishing(c, d), (settled - GAP, settled, [(settled, d.started + 15 * DAY)]))
+        self.assertEqual(frl.HoldModel([x, c, d], 15 * DAY).vanishing(x.build, x.started),
+                         (settled - GAP, settled, [(settled, c.started + 15 * DAY)], d.started + 15 * DAY,
+                          [d.started + 15 * DAY, c.started + 15 * DAY]))
 
     def test_a_change_cuts_the_pin_of_a_column_that_started_within_its_week(self):
         # MF0142, MF0144, MF0718-MF0723, MF0735, MF0779, MF0783, NMF0083, SF009, SF062, SF066, SF071

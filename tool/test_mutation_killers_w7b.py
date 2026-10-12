@@ -23,25 +23,15 @@ runs = w7.runs
 
 
 class ListedAgain(unittest.TestCase):
-    """listed_again(pinned, back, old, runs_at): the update after `back` lists the build again, and
-    reads it, within READ_GAP; if it runs then, back in the grid, it vanishes again while an older
-    column pins it, and is listed again after each such pin; never once it is too old (`old`)."""
+    """listed_again(ends, old): the update after each time a column may stop pinning the build out
+    lists it again, and reads it, within READ_GAP; never once it is too old (`old`)."""
 
-    PINNED = [(10, 20), (30, 40), (50, 60), (70, 80)]
-
-    def test_within_a_gap_after_back(self):  # NMF0010, NMF0012, NSF003, NSF008
-        self.assertEqual(frl.listed_again(self.PINNED, 20, 1000, lambda t: False), [(20, 20 + GAP)])
-
-    def test_after_each_later_pin_if_it_runs(self):  # NMF0007, NMF0010, NMF0013-NMF0022, NSF003, NSF005-NSF007, NSF009
-        got = frl.listed_again(self.PINNED, 40, 75, lambda t: t == 40)
-        self.assertEqual(got, [(40, 40 + GAP), (60, 60 + GAP)])  # (not the pin ending at back, nor after old)
-        self.assertEqual(frl.listed_again(self.PINNED, 40, 80, lambda t: True), [(40, 40 + GAP), (60, 60 + GAP)])
-        self.assertEqual(frl.listed_again(self.PINNED, 40, 81, lambda t: True), [(40, 40 + GAP), (60, 60 + GAP),
-                                                                               (80, 80 + GAP)])
+    def test_within_a_gap_after_each_end(self):  # NMF0010, NMF0012, NSF003, NSF008
+        self.assertEqual(frl.listed_again([20, 40, 60], 1000), [(20, 20 + GAP), (40, 40 + GAP), (60, 60 + GAP)])
 
     def test_never_once_too_old(self):
-        self.assertEqual(frl.listed_again(self.PINNED, 40, 40, lambda t: True), [])
-        self.assertEqual(frl.listed_again(self.PINNED, 40, 39, lambda t: True), [])
+        self.assertEqual(frl.listed_again([40, 80], 80), [(40, 40 + GAP)])
+        self.assertEqual(frl.listed_again([40], 40), [])
 
 
 class BackWhenNoHigherColumnPins(unittest.TestCase):
@@ -55,7 +45,7 @@ class BackWhenNoHigherColumnPins(unittest.TestCase):
         c2 = runs(M + HOUR, started=MINUTE, running_until=M + HOUR + 5 * MINUTE)
         gone = frl.HoldModel([x, c1, c2], 15 * DAY).gone[x.build]
         back = c2.started + 15 * DAY
-        self.assertEqual((gone[2], gone[3], gone[4]), ([(M + 5 * HOUR + GAP, c1.started + 15 * DAY)], back, [(back, INF)]))
+        self.assertEqual((gone[2], gone[3], gone[4]), ([(M + 5 * HOUR + GAP, c1.started + 15 * DAY)], back, [back]))
 
 
 class ListedAgainReadsAndHolds(unittest.TestCase):

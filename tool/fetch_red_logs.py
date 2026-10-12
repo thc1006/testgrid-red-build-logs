@@ -1744,16 +1744,12 @@ class BuildRuns:
         return (all if every else any)(runs(c) for c in made_columns(self._column, t))
 
 
-def listed_again(pinned, back, old, runs_at):
+def listed_again(ends, old):
     """When an update may list again, and read, a build whose column vanished (see
-    HoldModel.vanishing: pinned, back): within READ_GAP after `back`, and, if its column may
-    run then (runs_at(back)), back in the grid, after each time a column that sorts older
-    stops pinning it out; but by an update that begins then, not once the build is too old
-    for it (`old`: its start and its tab's days of results): [(from, to)]."""
-    if back >= old:
-        return []
-    return [(back, back + READ_GAP)] + ([(hi, hi + READ_GAP) for _, hi in pinned if back < hi < old]
-                                        if runs_at(back) else [])
+    HoldModel.vanishing: `ends`, each time a column may stop pinning it out): within READ_GAP
+    after each; but by an update that begins then, not once the build is too old for it
+    (`old`: its start and its tab's days of results): [(from, to)]."""
+    return [(e, e + READ_GAP) for e in ends if e < old]
 
 
 def order_key(started, build):
@@ -1815,8 +1811,7 @@ class HoldModel:
             for x in bad:
                 v = self.vanishing(x.build, x.started)
                 if v is not None and x.runs_at(v[1]):  # (it runs at every read until it vanishes)
-                    # (and is read again only once listed again, from `back` on while no column pins it out)
-                    gone[x.build] = (*v, spans_minus([(v[3], math.inf)], v[2]))
+                    gone[x.build] = v
             if gone == self.gone:
                 break
             self.gone = gone
@@ -1824,7 +1819,7 @@ class HoldModel:
 
     def vanish(self, build, started):
         """vanishing() of a build, as the model took it (for one that vanishes, what it found last)."""
-        return self.gone[build][:4] if build in self.gone else self.vanishing(build, started)
+        return self.gone[build] if build in self.gone else self.vanishing(build, started)
 
     def run_end(self, r):
         """The last time a read may find r's column running in the grid (one that vanishes may
@@ -1857,13 +1852,13 @@ class HoldModel:
                 spans += [(lo, (hi if how != "changed" else min(hi, recent)) + UPDATE_SPAN) for lo, hi, how in self.events
                           if hi >= made and (how != "changed" or lo < recent)]
                 if r.build in gone:  # (read as if it never vanished, and again once listed again)
-                    _, until, pinned, back, listed = gone[r.build]
+                    _, until, _, back, ends = gone[r.build]
                     spans = spans_within(spans, -math.inf, until) if r.build == self.out else \
-                        spans + listed_again(pinned, back, r.started + span, r.runs_at)
+                        spans + listed_again(ends, r.started + span)
                     # (listed again, running: it holds the newer columns until the next update, those of
                     # a lower ID too, as the update lists every build after the highest ID kept, now lower)
-                    self.entries += [(lo, max(lo, self.held_by(min(hi, r.running_until), r.started)), r.started, -1)
-                                     for lo, hi in listed if r.runs_at(lo, every=False)]
+                    if back < math.inf and r.runs_at(back, every=False):
+                        self.entries.append((back, max(back, self.held_by(r.running_until, r.started)), r.started, -1))
                 cap = min(r.good_until, r.started + span + UPDATE_SPAN)
                 self.reads[r.build] = spans_union(spans_within(spans, -math.inf, cap))
                 below.append(r)
@@ -1902,8 +1897,8 @@ class HoldModel:
                            [(max(lo, made), hi) for lo, hi, _, above in self.entries if above < bid and hi >= made])
 
     def vanishing(self, build, started):
-        """(done, gone, pinned, back) when the build's column vanishes from the grid if it runs at
-        every read from `done` to `gone` (else None). A column of a higher ID that sorts older than it
+        """(done, gone, pinned, back, ends) when the build's column vanishes from the grid if it runs
+        at every read from `done` to `gone` (else None). A column of a higher ID that sorts older than it
         (it started earlier, or at the same time) pins it out of the listing while it is settled
         in the grid: from when its update that reads it done (or first) is over; while it is
         good (read errored, it is put at the start of the good column read before it, not its
@@ -1915,14 +1910,18 @@ class HoldModel:
         column, and drops it: the update before reads it for the last time, by `gone`. Out of
         the grid, a column of a higher ID pins it out so whatever its start: `back` is when none
         does any more (inf: never), and the update after lists it again, and reads it; while it
-        then runs in the grid, only one that sorts older pins it out (see listed_again). Until
-        then the build holds no column, nor is one put at its start: the columns that sort newer
-        pin it out as they do in the grid without it from `gone` on (not as its own reads after
-        that, which come only once it is listed again, would hold them)."""
+        then runs in the grid, only one that sorts older pins it out. Until then the build holds
+        no column, nor is one put at its start: the columns that sort newer pin it out as they do
+        in the grid without it from `gone` on (not as its own reads after that, which come only
+        once it is listed again, would hold them). A column that vanishes itself may also never
+        vanish (an update appends the columns after its first only until its grace): `pinned`
+        and `gone` are of the world where each pins it out, `back` of the one where none does,
+        and `ends` every time it may be listed again: `back`, and the end of each column's pin
+        after it (see listed_again)."""
         bid, key = int(build), order_key(started, build)
 
-        def pins(model, c):  # (when c, of a higher ID, is settled in the grid, and kept by every update)
-            if c.build in model.gone or c.running_until == math.inf:
+        def pins(model, c, anyway=False):  # (when c, of a higher ID, is settled in the grid, and kept by every update)
+            if c.build in model.gone and not anyway or c.running_until == math.inf:
                 return []  # (it vanishes itself, or may run on: not settled in the grid, or not yet)
             made = created(c.build)
             settled = max(max(model.run_end(c), made) + READ_GAP, c.started + REPROCESS + UPDATE_SPAN)
@@ -1934,19 +1933,26 @@ class HoldModel:
                     if hi >= made and (how != "changed" or lo < recent)]
             return spans_minus([(settled, c.started + self.span)], cut)
         higher = [c for c in self.good if int(c.build) > bid]
-        pinned = spans_union([p for c in higher if order_key(c.started, c.build) < key for p in pins(self, c)])
+        older = [c for c in higher if order_key(c.started, c.build) < key]
+        newer = [c for c in higher if order_key(c.started, c.build) > key]
+        # (a column that vanishes itself pins it out in the world where it never vanishes, not in the other)
+        pinned = spans_union([p for c in older for p in pins(self, c, anyway=True)])
         if not pinned:
             return None
         gone = pinned[0][0]
-        newer = [c for c in higher if order_key(c.started, c.build) > key]
-        out = pinned
-        if newer:  # (the model with the build gone from `gone` on, never listed again)
-            without = copy.copy(self)
-            without.gone, without.out = {**self.gone, build: (gone - READ_GAP, gone, pinned, math.inf, [])}, build
+        without = copy.copy(self)  # (the model with the build gone from `gone` on, never listed again)
+        without.gone, without.out = {**self.gone, build: (gone - READ_GAP, gone, pinned, math.inf, [])}, build
+        if newer:
             without._pass()
-            out = spans_union(pinned + [p for c in newer for p in spans_within(pins(without, c), gone, math.inf)])
-        back = next(hi for lo, hi in out if lo <= gone <= hi)
-        return gone - READ_GAP, gone, pinned, back
+        later = [(pins(self, c, anyway=True), pins(self, c)) for c in older] + \
+            [(spans_within(pins(without, c, anyway=True), gone, math.inf), spans_within(pins(without, c), gone, math.inf))
+             for c in newer]
+        # (listed again at the earliest once no column but one that vanishes itself pins it out; and, as those
+        # may not vanish, at the end of any column's pin after that)
+        least = spans_union([p for _, some in later for p in some])
+        back = next((hi for lo, hi in least if lo <= gone <= hi), gone)
+        ends = sorted({back} | {hi for every, _ in later for _, hi in every if hi > back})
+        return gone - READ_GAP, gone, pinned, back, ends
 
 
 class Timeline:
@@ -2238,15 +2244,15 @@ def gcs_column(gcs, query, build, days=tr.DAYS_OF_RESULTS, now=None, timeline=No
     if s:  # (an update that begins less than REPROCESS after it started reads it again, within its span)
         seeds.append((made, s + REPROCESS + UPDATE_SPAN))
     if vanish:  # (once it vanished, it is read again once listed again)
-        done, gone, pinned, back = vanish
-        marks += [done, gone, back, *(x for w in pinned for x in w)]
+        done, gone, pinned, back, ends = vanish
+        marks += [done, gone, *ends, *(x for w in pinned for x in w)]
     reads, reach, _ = possible_reads(view, made, marks, holds, now, seeds)
     if vanish:  # (it vanishes from the grid if every read of it from `done` to `gone` finds it running)
         late = [c for t, _, c, _ in reads if done <= t <= gone]
         if late and all(runs(c) for c in late):
             # (its reads as if it never vanished stay: the column that pins it out may never be appended,
             # as an update appends the columns after its first only until its grace; HoldModel.vanishing)
-            again = listed_again(pinned, back, s + span, lambda t: any(runs(c) for c in view(t)))
+            again = listed_again(ends, s + span)
             if again:
                 reads, reach, _ = possible_reads(view, made, marks, holds, now, seeds + again)
     if not reads:  # (an ID made after now)
