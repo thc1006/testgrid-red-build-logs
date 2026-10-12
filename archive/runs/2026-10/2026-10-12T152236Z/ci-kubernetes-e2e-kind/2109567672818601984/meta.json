@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2109567672818601984",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1791795130,
+  "created": 1791795101,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test phase transition timestamp multiple updates",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-2zq8x\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 10/12/26 09:04:02.193\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791796729,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2109567672818601984",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2109567672818601984/build-log.txt",
+  "log": {
+    "bytes": 131818,
+    "md5": "e8c52920e8b7f071f1183d480138940c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21713,
+    "gcs": {
+      "generation": "1791796747638787",
+      "md5": "e8c52920e8b7f071f1183d480138940c",
+      "crc32c": "432fc9b7",
+      "bytes": 131818,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-12T152236Z",
+  "archived_at": 1791818556.0,
+  "settled": true,
+  "final": false
+}

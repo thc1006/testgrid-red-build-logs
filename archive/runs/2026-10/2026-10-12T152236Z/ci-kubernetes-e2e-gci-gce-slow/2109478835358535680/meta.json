@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2109478835358535680",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1791773921,
+  "created": 1791773921,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach UDP service through 34.173.196.27:80 after 2m...io/kubernetes/test/e2e/network/service.go:569 @ 10/12/26 03:13:09.918\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791777076,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109478835358535680",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109478835358535680/build-log.txt",
+  "log": {
+    "bytes": 144434,
+    "md5": "917c6e49efa78909a16335293db3484e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23798,
+    "gcs": {
+      "generation": "1791777083285904",
+      "md5": "917c6e49efa78909a16335293db3484e",
+      "crc32c": "98c63557",
+      "bytes": 144434,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-12T152236Z",
+  "archived_at": 1791818556.0,
+  "settled": true,
+  "final": false
+}

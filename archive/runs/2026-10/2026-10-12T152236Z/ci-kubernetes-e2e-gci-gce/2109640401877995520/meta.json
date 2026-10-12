@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2109640401877995520",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1791812442,
+  "created": 1791812441,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should implement NodePort and HealthCheckNodePort correctly when ExternalTrafficPolicy changes",
+          "status": "FAIL",
+          "message": "[FAILED] updating ExternalTrafficPolicy and HealthCheckNodePort: faile...o/kubernetes/test/e2e/network/service.go:4036 @ 10/12/26 14:01:10.444\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791815487,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109640401877995520",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109640401877995520/build-log.txt",
+  "log": {
+    "bytes": 156831,
+    "md5": "cc750035ff85e4c0aabee619ca4f3cda",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25236,
+    "gcs": {
+      "generation": "1791815505356828",
+      "md5": "cc750035ff85e4c0aabee619ca4f3cda",
+      "crc32c": "7db3b232",
+      "bytes": 156831,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-12T152236Z",
+  "archived_at": 1791818556.0,
+  "settled": false,
+  "final": false
+}

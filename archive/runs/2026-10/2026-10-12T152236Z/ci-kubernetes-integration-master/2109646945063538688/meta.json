@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2109646945063538688",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1791814031,
+  "created": 1791814001,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.podgroup",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCPGScheduling/TestCPGBasicWithGangChildren\n    st...2s)\n\n=== RUN   TestCPGScheduling\n--- FAIL: TestCPGScheduling (70.75s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791816217,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2109646945063538688",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2109646945063538688/build-log.txt",
+  "log": {
+    "bytes": 204518,
+    "md5": "506d4a81a52b7fe85683a315ef9bd97b",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19186,
+    "gcs": {
+      "generation": "1791816221368901",
+      "md5": "506d4a81a52b7fe85683a315ef9bd97b",
+      "crc32c": "a2ce0c67",
+      "bytes": 204518,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-12T152236Z",
+  "archived_at": 1791818556.0,
+  "settled": false,
+  "final": false
+}

@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2109576479556767744",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1791797202,
+  "created": 1791797201,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] AdmissionWebhook [Privileged:ClusterAdmin] listing mutating webhooks should work [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Waiting for configMap in namespace webhook-5446 to be mutated...bernetes/test/e2e/apimachinery/webhook.go:760 @ 10/12/26 09:50:16.266\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791799811,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109576479556767744",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2109576479556767744/build-log.txt",
+  "log": {
+    "bytes": 217739,
+    "md5": "a7970f1a53d53b4b22cb87f0ebe0fbec",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 31593,
+    "gcs": {
+      "generation": "1791799827881572",
+      "md5": "a7970f1a53d53b4b22cb87f0ebe0fbec",
+      "crc32c": "e1c22e6a",
+      "bytes": 217739,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-12T152236Z",
+  "archived_at": 1791818556.0,
+  "settled": true,
+  "final": false
+}

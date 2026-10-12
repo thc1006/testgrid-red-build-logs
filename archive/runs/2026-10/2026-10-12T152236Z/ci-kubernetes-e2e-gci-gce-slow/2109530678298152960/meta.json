@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2109530678298152960",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1791786282,
+  "created": 1791786281,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[SynchronizedBeforeSuite]",
+          "status": "FAIL",
+          "message": "0/30 runs passed: [FAILED] �[1m�[38;5;9mSynchronizedBeforeSuite fa...ite] at: k8s.io/kubernetes/test/e2e/e2e.go:69 @ 10/12/26 06:41:37.802\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791787752,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109530678298152960",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109530678298152960/build-log.txt",
+  "log": {
+    "bytes": 186371,
+    "md5": "842cd38014db6d25589adfd5835fa124",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24913,
+    "gcs": {
+      "generation": "1791787753593346",
+      "md5": "842cd38014db6d25589adfd5835fa124",
+      "crc32c": "27211198",
+      "bytes": 186371,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-12T152236Z",
+  "archived_at": 1791818556.0,
+  "settled": true,
+  "final": false
+}
