@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2109907665915219968",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1791876192,
+  "created": 1791876162,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/client-go/tools.remotecommand",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestFallbackClient_SPDYSecondaryNonZeroExitCode\n2026/...ode\n--- FAIL: TestFallbackClient_SPDYSecondaryNonZeroExitCode (0.01s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791877534,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109907665915219968",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2109907665915219968/build-log.txt",
+  "log": {
+    "bytes": 278815,
+    "md5": "afbdb9d17b40009d308841e59eb2c797",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 34072,
+    "gcs": {
+      "generation": "1791877534847322",
+      "md5": "afbdb9d17b40009d308841e59eb2c797",
+      "crc32c": "8b72f43f",
+      "bytes": 278815,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-13T191916Z",
+  "archived_at": 1791919156.0,
+  "settled": true,
+  "final": false
+}

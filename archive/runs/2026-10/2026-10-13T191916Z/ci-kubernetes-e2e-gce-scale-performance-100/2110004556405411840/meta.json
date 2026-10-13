@@ -1,0 +1,59 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-performance-100",
+  "build": "2110004556405411840",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100",
+  "started": 1791899295,
+  "created": 1791899262,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-master-scale-performance-100",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ClusterLoaderV2.load overall (/home/prow/go/src/k8s.io/perf-tests/clusterloader2/testing/load/config.yaml)",
+          "status": "FAIL",
+          "message": ":0\n[measurement call APIAvailability - APIAvailability error: API availability: SLO not fulfilled (expected >= 99.50, got: 98.80)]\n:0"
+        },
+        {
+          "test": "ClusterLoaderV2.load: [step: 30] gathering measurements [10] - APIAvailability",
+          "status": "FAIL",
+          "message": ":0\n[measurement call APIAvailability - APIAvailability error: API availability: SLO not fulfilled (expected >= 99.50, got: 98.80)]\n:0"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-scale-performance-100.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791901529,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2110004556405411840",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2110004556405411840/build-log.txt",
+  "log": {
+    "bytes": 1585754,
+    "md5": "c07a53215bebb97d0b227f77ffd59224",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 142582,
+    "gcs": {
+      "generation": "1791901544590619",
+      "md5": "c07a53215bebb97d0b227f77ffd59224",
+      "crc32c": "6f802f57",
+      "bytes": 1585754,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-13T191916Z",
+  "archived_at": 1791919156.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37",
+  "build": "2109926791849185280",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37",
+  "started": 1791880755,
+  "created": 1791880722,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kubeadm-kinder-latest-on-1-37",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a replication controller. [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected:\n    <*v1.ResourceQuota | ...s/test/e2e/apimachinery/resource_quota.go:433 @ 10/13/26 08:56:07.678\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "task-07-e2e",
+          "status": "FAIL",
+          "message": "exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791881853,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37/2109926791849185280",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37/2109926791849185280/build-log.txt",
+  "log": {
+    "bytes": 332887,
+    "md5": "87f11b8362c5fb9263d3909f4e2b1ed6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 50017,
+    "gcs": {
+      "generation": "1791881857362863",
+      "md5": "87f11b8362c5fb9263d3909f4e2b1ed6",
+      "crc32c": "367bd123",
+      "bytes": 332887,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-13T191916Z",
+  "archived_at": 1791919156.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,59 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2109823863138291712",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1791856182,
+  "created": 1791856182,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach UDP service through 34.61.10.232:80 after 2m0...io/kubernetes/test/e2e/network/service.go:569 @ 10/13/26 02:05:47.654\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] HostPathType Character Device Should be able to mount character device 'achardev' successfully when HostPathType is HostPathCharDev [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] command: \"mknod /mnt/test/achardev c 89 1\", stdout: \nstderr: ...rnetes/test/e2e/storage/host_path_type.go:273 @ 10/13/26 02:15:59.384\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791859792,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109823863138291712",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2109823863138291712/build-log.txt",
+  "log": {
+    "bytes": 205502,
+    "md5": "55e82e2dbab6373e72ebd212abbf497d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 30705,
+    "gcs": {
+      "generation": "1791859799740813",
+      "md5": "55e82e2dbab6373e72ebd212abbf497d",
+      "crc32c": "0b425ae9",
+      "bytes": 205502,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-13T191916Z",
+  "archived_at": 1791919156.0,
+  "settled": true,
+  "final": false
+}

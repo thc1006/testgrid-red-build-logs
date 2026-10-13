@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2109858843587514368",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1791864555,
+  "created": 1791864522,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Probing container should *not* be restarted by liveness probe because startup probe delays it [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] pod container-probe-2364/startup-37029cb6-3b2c-44e3-b671-ea90.../test/e2e/common/node/container_probe.go:2137 @ 10/13/26 04:25:41.199\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791866167,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2109858843587514368",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2109858843587514368/build-log.txt",
+  "log": {
+    "bytes": 154773,
+    "md5": "545d0b4d24bba4a62b1cc71ea82f9ef5",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22187,
+    "gcs": {
+      "generation": "1791866183459438",
+      "md5": "545d0b4d24bba4a62b1cc71ea82f9ef5",
+      "crc32c": "b0391603",
+      "bytes": 154773,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-13T191916Z",
+  "archived_at": 1791919156.0,
+  "settled": true,
+  "final": false
+}
