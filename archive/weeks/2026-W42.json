@@ -1,5 +1,90 @@
 [
   {
+    "time": 1791847706,
+    "job": "ci-kubernetes-cmd-master",
+    "build": "2109788126321840128",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#cmd-master"
+    ],
+    "red_tests": [
+      "test-cmd.run_kubectl_config_set_cluster_tests",
+      "ci-kubernetes-cmd-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-cmd-master/2109788126321840128",
+    "run": "2026-10-13T004423Z",
+    "files": [
+      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-cmd-master/2109788126321840128/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 1115080,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-cmd-master/2109788126321840128"
+  },
+  {
+    "time": 1791845650,
+    "job": "ci-kubernetes-e2e-kind",
+    "build": "2109779570453385216",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] Volume metrics PVC should create prometheus metrics for volume provisioning and attach/detach",
+      "ci-kubernetes-e2e-kind.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-kind/2109779570453385216",
+    "run": "2026-10-13T004423Z",
+    "files": [
+      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-kind/2109779570453385216/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 154077,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2109779570453385216"
+  },
+  {
+    "time": 1791836953,
+    "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+    "build": "2109743079454937088",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-alphafeatures-master"
+    ],
+    "red_tests": [
+      "kubetest.Timeout",
+      "kubetest.listResources After",
+      "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109743079454937088",
+    "run": "2026-10-13T004423Z",
+    "files": [
+      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109743079454937088/build-log.txt.gz"
+    ],
+    "remote": [],
+    "bytes": 53950,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109743079454937088"
+  },
+  {
     "time": 1791835992,
     "job": "ci-kubernetes-e2e-gce-cos-slow-master",
     "build": "2109739053791318016",
@@ -19,7 +104,7 @@
     ],
     "remote": [],
     "bytes": 34847,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -47,7 +132,7 @@
     ],
     "remote": [],
     "bytes": 34821,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -76,7 +161,7 @@
     ],
     "remote": [],
     "bytes": 313819,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -105,7 +190,7 @@
     ],
     "remote": [],
     "bytes": 142891,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -133,7 +218,7 @@
     ],
     "remote": [],
     "bytes": 296200,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,

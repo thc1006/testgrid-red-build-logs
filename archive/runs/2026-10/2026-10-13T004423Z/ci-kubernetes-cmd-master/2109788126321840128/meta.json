@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-cmd-master",
+  "build": "2109788126321840128",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-cmd-master",
+  "started": 1791847706,
+  "created": 1791847661,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "cmd-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-cmd-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "test-cmd.run_kubectl_config_set_cluster_tests",
+          "status": "FAIL",
+          "message": "\nError from server (AlreadyExists): namespaces \"namespace-1791847837-2...!!! [1012 23:30:37]  6: hack/make-rules/test-cmd.sh:184 runTests(...)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791848232,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-cmd-master/2109788126321840128",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-cmd-master/2109788126321840128/build-log.txt",
+  "log": {
+    "bytes": 1115080,
+    "md5": "4916e4e10e5ccb44eb1c7e93f79a71ff",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 127334,
+    "gcs": {
+      "generation": "1791848233118519",
+      "md5": "4916e4e10e5ccb44eb1c7e93f79a71ff",
+      "crc32c": "4f3744b4",
+      "bytes": 1115080,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-13T004423Z",
+  "archived_at": 1791852263.0,
+  "settled": false,
+  "final": false
+}

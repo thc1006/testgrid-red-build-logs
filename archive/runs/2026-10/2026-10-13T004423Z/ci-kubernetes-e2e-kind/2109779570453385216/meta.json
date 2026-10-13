@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2109779570453385216",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1791845650,
+  "created": 1791845622,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics PVC should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 10/12/26 23:45:14.615\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791848797,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2109779570453385216",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2109779570453385216/build-log.txt",
+  "log": {
+    "bytes": 154077,
+    "md5": "e719d4f550587bb5d70111b2cab546b2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21540,
+    "gcs": {
+      "generation": "1791848814008839",
+      "md5": "e719d4f550587bb5d70111b2cab546b2",
+      "crc32c": "339a9aa7",
+      "bytes": 154077,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-13T004423Z",
+  "archived_at": 1791852263.0,
+  "settled": false,
+  "final": false
+}
