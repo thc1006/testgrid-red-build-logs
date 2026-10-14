@@ -1,0 +1,59 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-performance-100",
+  "build": "2110096663317057536",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100",
+  "started": 1791921256,
+  "created": 1791921222,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-master-scale-performance-100",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ClusterLoaderV2.access-tokens overall (/home/prow/go/src/k8s.io/perf-tests/clusterloader2/testing/access-tokens/config.yaml)",
+          "status": "FAIL",
+          "message": ":0\n[measurement call APIResponsivenessPrometheus - APIResponsivenessPr...perc99: 1.074095s Count:4432 SlowCount:10}; expected perc99 <= 1s]]\n:0"
+        },
+        {
+          "test": "ClusterLoaderV2.access-tokens: [step: 10] Collecting measurements [00] - APIResponsivenessPrometheus",
+          "status": "FAIL",
+          "message": ":0\n[measurement call APIResponsivenessPrometheus - APIResponsivenessPr...perc99: 1.074095s Count:4432 SlowCount:10}; expected perc99 <= 1s]]\n:0"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-scale-performance-100.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791923778,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2110096663317057536",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2110096663317057536/build-log.txt",
+  "log": {
+    "bytes": 1546921,
+    "md5": "6a672e3511fe0f1754fedabd1c400404",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 138758,
+    "gcs": {
+      "generation": "1791923793316433",
+      "md5": "6a672e3511fe0f1754fedabd1c400404",
+      "crc32c": "29a70560",
+      "bytes": 1546921,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-14T001832Z",
+  "archived_at": 1791937112.0,
+  "settled": true,
+  "final": false
+}

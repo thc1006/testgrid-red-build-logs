@@ -1,0 +1,20 @@
+# Run 2026-10-14 00:18:32 UTC
+
+46 tabs read (0 failed), 450 red builds on TestGrid. This run archived 7 new builds.
+TestGrid's config: test-infra 528e0fbf0b38 of 2026-10-13T22:20:52Z, uploaded 2026-10-13T22:21:09Z, read by this run.
+
+[run.json](run.json) has the details; [INDEX.md](../../../INDEX.md) lists every build. A file marked provisional was taken before Prow finished uploading and is re-checked against GCS on every run until it settles.
+
+## Builds archived by this run (7)
+
+### 2026-10-13
+
+| Time | Tab | Build | Red tests | Files |
+|---|---|---|---|---|
+| 22:17 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2110132649858174976](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2110132649858174976) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers \[Feature:LoadBalancer\] should be abl (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-cos-slow-master/2110132649858174976/build-log.txt.gz) (provisional) |
+| 21:22 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2110119061407928320](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110119061407928320) | Kubernetes e2e suite.\[It\] \[sig-network\] Networking Granular Checks: Services should update (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110119061407928320/build-log.txt.gz) |
+| 21:22 | blocking#integration-arm64-master | [ci-kubernetes-integration-arm64-master 2110118808931799040](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2110118808931799040) | \[sig-apps\] k8s.io/kubernetes/test/integration.job (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-14T001832Z/ci-kubernetes-integration-arm64-master/2110118808931799040/build-log.txt.gz) |
+| 20:15 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2110102199139831808](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110102199139831808) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110102199139831808/build-log.txt.gz) |
+| 19:54 | blocking#gce-master-scale-performance-100 | [ci-kubernetes-e2e-gce-scale-performance-100 2110096663317057536](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2110096663317057536) | ClusterLoaderV2.access-tokens overall (/home/prow/go/src/k8s.io/perf-tests/clusterloader2/ (+3) | [build-log.txt.gz](../../../runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-scale-performance-100/2110096663317057536/build-log.txt.gz) |
+| 19:31 | blocking#gce-device-plugin-gpu-master | [ci-kubernetes-e2e-gce-device-plugin-gpu 2110090875689242624](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2110090875689242624) | Kubernetes e2e suite.\[It\] \[sig-node\] \[Feature:GPUDevicePlugin\] Test using a Pod \[Provider: (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110090875689242624/build-log.txt.gz) |
+| 19:25 | informing#gce-cos-master-serial | [ci-kubernetes-e2e-gci-gce-serial 2110089616043282432](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2110089616043282432) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gci-gce-serial/2110089616043282432/build-log.txt.gz) |

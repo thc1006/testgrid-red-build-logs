@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2110090875689242624",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1791919876,
+  "created": 1791919843,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] [Feature:GPUDevicePlugin] Test using a Pod [Provider:aws,gce] should run gpu based matrix multiplication [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 1800.001s.\nexpected pod to be started or comp...t: k8s.io/kubernetes/test/e2e/node/gpu.go:158 @ 10/13/26 20:15:41.464\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791923115,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2110090875689242624",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2110090875689242624/build-log.txt",
+  "log": {
+    "bytes": 153686,
+    "md5": "8f2b1a4e5208bb97347692a1079e2dae",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20070,
+    "gcs": {
+      "generation": "1791923117503456",
+      "md5": "8f2b1a4e5208bb97347692a1079e2dae",
+      "crc32c": "6ecc8375",
+      "bytes": 153686,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-14T001832Z",
+  "archived_at": 1791937112.0,
+  "settled": true,
+  "final": false
+}
