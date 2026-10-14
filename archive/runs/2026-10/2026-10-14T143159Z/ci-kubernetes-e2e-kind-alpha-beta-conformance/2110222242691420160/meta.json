@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-conformance",
+  "build": "2110222242691420160",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-conformance",
+  "started": 1791951193,
+  "created": 1791951163,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Probing container with readiness probe should not be ready before initial delay and never restart [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Pod became ready before it's 15s initial delay\nIn [It] at: k8...es/test/e2e/common/node/container_probe.go:96 @ 10/14/26 04:21:07.237\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791951954,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-conformance/2110222242691420160",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-conformance/2110222242691420160/build-log.txt",
+  "log": {
+    "bytes": 123279,
+    "md5": "bad5926728e2882925f6cb9925a7e8e1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19000,
+    "gcs": {
+      "generation": "1791951956592924",
+      "md5": "bad5926728e2882925f6cb9925a7e8e1",
+      "crc32c": "ec9168e7",
+      "bytes": 123279,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-14T143159Z",
+  "archived_at": 1791988319.0,
+  "settled": true,
+  "final": false
+}

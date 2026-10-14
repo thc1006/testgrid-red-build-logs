@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-gce-conformance-latest",
+  "build": "2110180213873709056",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-gce-conformance-latest",
+  "started": 1791941171,
+  "created": 1791941142,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "Conformance - GCE - master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should verify ResourceQuota with terminating scopes. [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected:\n    <*v1.ResourceQuota | ...s/test/e2e/apimachinery/resource_quota.go:833 @ 10/14/26 03:04:54.742\n"
+        },
+        {
+          "test": "ci-kubernetes-gce-conformance-latest.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791949658,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-gce-conformance-latest/2110180213873709056",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-gce-conformance-latest/2110180213873709056/build-log.txt",
+  "log": {
+    "bytes": 159095,
+    "md5": "650f8fcda032e4e83519cae7daa28f82",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19971,
+    "gcs": {
+      "generation": "1791949665220448",
+      "md5": "650f8fcda032e4e83519cae7daa28f82",
+      "crc32c": "d40e02d3",
+      "bytes": 159095,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-14T143159Z",
+  "archived_at": 1791988319.0,
+  "settled": true,
+  "final": false
+}

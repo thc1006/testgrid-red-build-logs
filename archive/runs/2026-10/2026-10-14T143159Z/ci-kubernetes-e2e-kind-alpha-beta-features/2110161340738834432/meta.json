@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2110161340738834432",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1791936684,
+  "created": 1791936643,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Inline-volume (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-inlinevolume-n9p7\" success: Ti...s/test/e2e/framework/pod/output/output.go:263 @ 10/14/26 00:35:50.734\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791938323,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2110161340738834432",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2110161340738834432/build-log.txt",
+  "log": {
+    "bytes": 151123,
+    "md5": "d77651ae47148cea0c182a33ad362338",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23281,
+    "gcs": {
+      "generation": "1791938340267480",
+      "md5": "d77651ae47148cea0c182a33ad362338",
+      "crc32c": "8fedaea0",
+      "bytes": 151123,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-14T143159Z",
+  "archived_at": 1791988319.0,
+  "settled": true,
+  "final": false
+}

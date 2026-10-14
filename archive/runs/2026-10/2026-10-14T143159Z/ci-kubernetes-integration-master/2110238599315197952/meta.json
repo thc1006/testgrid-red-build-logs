@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2110238599315197952",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1791955110,
+  "created": 1791955063,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/apiextensions-apiserver/test.integration",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestStoragedVersionInNamespacedCRDStatus\n    testserv... exceeded\n--- FAIL: TestStoragedVersionInNamespacedCRDStatus (32.82s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791957281,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2110238599315197952",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2110238599315197952/build-log.txt",
+  "log": {
+    "bytes": 158384,
+    "md5": "ff66bdae789cb2afc589673f495c80a1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 12971,
+    "gcs": {
+      "generation": "1791957284869785",
+      "md5": "ff66bdae789cb2afc589673f495c80a1",
+      "crc32c": "71870871",
+      "bytes": 158384,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-14T143159Z",
+  "archived_at": 1791988319.0,
+  "settled": true,
+  "final": false
+}
