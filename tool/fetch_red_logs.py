@@ -4534,8 +4534,10 @@ def run(args, root, run_start, pool, deadline):
             elif run_start - prev["missing_since"] > UNLISTED_DAYS * 86400:
                 warnings.append(f"{key}: unlisted for {UNLISTED_DAYS} days; forgetting it")
                 continue
+        elif key in listed and prev.get("missing_since"):  # (listed again, whether its table could be read or not)
+            prev = {k: v for k, v in prev.items() if k != "missing_since"}
         tab_scans[key] = prev
-    tab_scans.update(read_ok)  # a tab listed again loses its missing_since
+    tab_scans.update(read_ok)
 
     # A given-up build whose files are back on disk (restored, or archived late) is done;
     # one given up on long ago is no longer listed (its runs' reports still name it).

@@ -1489,5 +1489,25 @@ class NeverRead(ttc.ConfigWorld):
                       self.runs()[-1]["serious_warnings"])
 
 
+# ------------------------------------------------------------------ a tab listed again whose table cannot be read
+
+class ListedAgain(ttc.ConfigWorld):
+    """A tab listed on its dashboard again, at a run that cannot read its table, kept the
+    missing_since it had while unlisted (only a tab read dropped it). Unlisted again later, it was
+    forgotten once 30 days had passed since it was first unlisted, here at once, without the
+    serious "no longer listed"; and a run that could not read its dashboard's summary did not take
+    it as shown (see HeldWhileItsTabCannotBeRead)."""
+
+    def test_it_is_no_longer_taken_as_unlisted(self):
+        self.put_state(tabs={"dash#t": {"scan": self.now - 41 * DAY, "oldest": self.now - 42 * DAY,
+                                        "missing_since": self.now - 40 * DAY}})  # (unlisted 40 days ago)
+        self.srv.table("dash", "t", (500, {}, b""))  # (listed again)
+        self.fetch()
+        self.assertNotIn("missing_since", self.state()["tabs"]["dash#t"])  # fails: kept
+        self.srv.summary("dash", {"u": "PASSING"})  # (unlisted again)
+        self.fetch()
+        self.assertIn("dash#t: no longer listed on its dashboard", self.runs()[-1]["serious_warnings"])
+
+
 if __name__ == "__main__":
     unittest.main()
