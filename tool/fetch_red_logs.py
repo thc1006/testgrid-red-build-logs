@@ -4357,10 +4357,18 @@ def run(args, root, run_start, pool, deadline):
             return entry
         return era_rules.setdefault(entry_id(entry), tgc.TabRule(entry))
     listed_ok = sorted(f"{r['dashboard']}#{r['tab']}" for r in reports if r.get("tab") is not None and not r.get("error"))
+    # the tabs the dashboards' summaries list now (a tab whose table could not be read too), and the
+    # dashboards whose summary this run read
+    listed = {f"{r['dashboard']}#{r['tab']}" for r in reports if r.get("tab") is not None}
+    summaries_ok = {r["dashboard"] for r in reports if r.get("tab") is not None}
     # A tab TestGrid shows now that the latest config known lacks: that is not TestGrid's config
     # (not taken yet, not built yet, or not built for the tab's dashboard), so the tab's config
-    # since its last entry is not known.
-    lacking = sorted(k for k in listed_ok if current is not None and k not in current)
+    # since its last entry is not known. Shown now: listed; on a dashboard this run reads but
+    # whose summary it could not read, or that listed only names it cannot use, listed when
+    # last read.
+    unread = {r["dashboard"] for r in reports} - summaries_ok
+    shown = listed | {k for k, t in state["tabs"].items() if k.split("#", 1)[0] in unread and not t.get("missing_since")}
+    lacking = sorted(k for k in shown if current is not None and k not in current)
     queries = {k: t["query"] for k, t in state["tabs"].items() if isinstance(t.get("query"), str)}
     queries.update((f"{r['dashboard']}#{r['tab']}", r["query"]) for r in reports
                    if r.get("tab") is not None and not r.get("error") and r.get("query"))
@@ -4512,8 +4520,6 @@ def run(args, root, run_start, pool, deadline):
                 read_ok[key]["unsearched"] = [pending[0], older[0]]
             if prev and r.get("oldest") and waiting:
                 read_ok[key]["changed_pending"] = waiting
-    summaries_ok = {r["dashboard"] for r in reports if r.get("tab") is not None}
-    listed = {f"{r['dashboard']}#{r['tab']}" for r in reports if r.get("tab") is not None}
     tab_scans = {}
     for key, prev in sorted(state["tabs"].items()):
         if key.split("#", 1)[0] in summaries_ok and key not in listed:
