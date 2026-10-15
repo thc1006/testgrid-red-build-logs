@@ -1384,6 +1384,7 @@ class CrossCheckTest(unittest.TestCase):
         code, out = self.check()
         self.assertEqual(code, 1)
         self.assertIn("no run report", out)
+        self.assertEqual(out.splitlines()[-1], "1 problem(s)")  # (counted with the others)
 
     def test_missing_local_log_is_a_problem_not_a_crash(self):
         start = NOW_MS - 20 * 3600 * 1000

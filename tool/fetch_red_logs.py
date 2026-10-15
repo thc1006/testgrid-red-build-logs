@@ -34,6 +34,7 @@ under --archive:
   runs/<YYYY-MM>/<run>/             one run, named by its UTC start time
     run.json                        what the run scanned, archived and failed
     README.md                       the builds it archived, with links
+    verification.json               its verification: what was checked, and the outcome (cross_check.py)
     <job>/<build>/build-log.txt     raw log, length and md5 checked against GCS
                                     (build-log.txt.gz with --gzip; meta.json keeps the raw md5)
     <job>/<build>/podinfo.json      only when the build has no log (pod never ran)
@@ -101,7 +102,7 @@ QUERY_RE = re.compile(r"[a-z0-9][a-z0-9._-]*(?:/(?!\.\.?(?:/|$))[A-Za-z0-9._-]+)
 LOG_FILES = {"build-log.txt", "build-log.txt.gz", "podinfo.json"}
 # a stored file too large for one file in git is kept as numbered parts: <file>.000, <file>.001, ...
 PART_RE = re.compile(r"(build-log\.txt(?:\.gz)?|podinfo\.json)\.([0-9]{3})")
-RUN_FILES = {"run.json", "README.md"}  # in a run folder, next to its job folders
+RUN_FILES = {"run.json", "README.md", "verification.json"}  # in a run folder, next to its job folders
 RUN_RE = re.compile(r"([0-9]{4}-[0-9]{2})-[0-9]{2}T[0-9]{6}Z(?:-([1-9][0-9]*))?")
 RETRIES = 4
 BACKOFF = 2.0  # seconds before the first retry, doubled after each attempt, with jitter
@@ -1298,8 +1299,27 @@ def download(url, path, compress=False, max_bytes=None):
             os.remove(part)
 
 
+def json_text(data):
+    return json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + "\n"
+
+
 def write_json(path, data):
-    write_file(path, json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
+    write_file(path, json_text(data))
+
+
+def write_new_json(path, data):
+    """write_json, but only where no file (nor link) is yet, else FileExistsError: the file is
+    never there empty, nor half written."""
+    tmp = temp_path(path)
+    try:
+        with open(tmp, "w", encoding="utf-8", errors="backslashreplace") as f:
+            f.write(json_text(data))
+        with context().write_lock:
+            refuse_if_abandoned(path)
+            os.link(tmp, path)  # (refused for any name there, a link to nothing too)
+    finally:
+        with contextlib.suppress(FileNotFoundError):  # (a fetch sweeping temp files may have taken it)
+            os.remove(tmp)
 
 
 def write_file(path, text):

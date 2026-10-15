@@ -4,6 +4,8 @@ test_control_* passes there and shows the scenario works otherwise.
 
 Run: cd tool && uv run --frozen python -m unittest test_review_round24 -v
 """
+import contextlib
+import io
 import json
 import os
 import re
@@ -12,6 +14,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from unittest import mock
@@ -20,6 +23,7 @@ import yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 from test_fetch_red_logs import DAY  # noqa: E402
 from test_integrity import ArchiveWorld, obj  # noqa: E402
@@ -681,6 +685,339 @@ class ToolVersion(unittest.TestCase):
         with open(os.path.join(os.fsencode(self.tmp), b"tool", b"\xff.txt"), "w") as f:
             f.write("not committed\n")
         self.assertEqual(self.version(), {"commit": self.git("rev-parse", "HEAD"), "modified": True})
+
+
+# ------------------------------------------------------------------ verification.json: each run's verification, kept
+
+class VerificationRecord(ArchiveWorld):
+    """cross_check.py --record, on a run that archived one red build. cab048a kept no record of a
+    verification: its outcome was only in the run's log on GitHub Actions (and in whether the run
+    failed), and cross_check.py had no --record, so each test but the control fails there."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        with mock.patch.dict(os.environ, GITHUB):
+            self.assertEqual(self.fetch(), 0)
+        self.path = os.path.join(self.root, frl.run_dirs(self.root)[-1], "verification.json")
+
+    def verify(self, *extra):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), mock.patch.dict(os.environ, GITHUB):
+            code = cc.main(["--archive", self.root, "--testgrid", self.srv.url, "--gcs", self.srv.url, "--hours", "200",
+                            *extra])
+        return code, out.getvalue()
+
+    def recorded(self):
+        return frl.read_json(self.path)
+
+    def test_a_verification_is_recorded_in_the_runs_folder(self):
+        code, out = self.verify("--record")
+        self.assertEqual(code, 0, out)
+        v = self.recorded()
+        self.assertEqual(v["tool"], frl.tool_version())  # (see ToolVersion)
+        self.assertEqual(v["github"], {"repository": "owner/repo", "run_id": "18500000000", "run_attempt": "2"})
+        run = self.runs()[-1]
+        self.assertEqual((v["run"], v["outcome"], v["problem_count"], v["problems"], v["note_count"], v["notes"]),
+                         (run["run"], "ok", 0, [], 0, []))
+        self.assertLessEqual(run["finished"], v["started"])
+        self.assertLessEqual(v["started"], v["finished"])
+        self.assertEqual([n for n in os.listdir(os.path.dirname(self.path)) if n.endswith(".part")], [])
+        t0 = run["started"]
+        self.assertEqual(v["scope"], {"window": {"from": t0 - 200 * 3600, "to": t0}, "tabs": 1, "builds": 1,
+                                      "compared_with_gcs": 1, "sevenths": [int(t0 // 86400) % 7], "differ": 0,
+                                      "not_settled": 0, "red_on_testgrid": 1, "red_not_settled": 0, "gcs_builds": 0,
+                                      "judged_by_rule": 0})
+
+    def test_it_says_incomplete_until_the_checks_end(self):
+        # (so a verification killed part-way, which writes nothing more, never reads as passed; it
+        # shows the scope learned so far)
+        seen, inventory = [], cc.inventory
+
+        def looking(*args):
+            seen.append(self.recorded())
+            return inventory(*args)
+        with mock.patch.object(cc, "inventory", looking):
+            code, out = self.verify("--record")
+        self.assertEqual((code, seen[0]["outcome"], self.recorded()["outcome"]), (0, "incomplete", "ok"), out)
+        self.assertEqual(seen[0]["scope"]["builds"], 1)
+
+    def test_problems_are_recorded(self):
+        os.remove(os.path.join(self.bdir(), "build-log.txt"))
+        code, out = self.verify("--record")
+        v = self.recorded()
+        self.assertEqual((code, v["outcome"], v["problem_count"]), (1, "problems", 1), out)
+        self.assertIn("build-log.txt: cannot verify: FileNotFoundError", v["problems"][0])
+
+    def test_notes_are_recorded(self):
+        # (a copy not settled yet that GCS no longer holds: noted, as the next fetch compares it again)
+        meta = os.path.join(self.bdir(), "meta.json")
+        frl.write_json(meta, dict(frl.read_json(meta), settled=False, final=False))
+        self.srv.route(self.base + "/build-log.txt", obj(b"a later upload\n", "2"))
+        code, out = self.verify("--record")
+        v = self.recorded()
+        self.assertEqual((code, v["outcome"], v["note_count"]), (0, "ok", 1), out)
+        self.assertIn("(not settled yet: the next fetch compares it again)", v["notes"][0])
+
+    def test_problems_past_the_first_hundred_are_counted(self):
+        run_json = os.path.join(os.path.dirname(self.path), "run.json")
+        frl.write_json(run_json, dict(frl.read_json(run_json),
+                                      errors=[{"build": f"job/{i}", "error": "boom"} for i in range(150)]))
+        code, out = self.verify("--record")
+        v = self.recorded()
+        self.assertEqual((code, v["outcome"], v["problem_count"], len(v["problems"])), (1, "problems", 150, 100))
+        self.assertEqual(v["problems"][-1], "the run reported an error for job/99: boom")
+
+    def test_a_timeout_is_recorded(self):
+        inventory = cc.inventory
+        with mock.patch("os._exit") as exit_:
+            def slow(*args):  # (until the watchdog has timed the verification out)
+                give_up = time.monotonic() + 60
+                while not exit_.called and time.monotonic() < give_up:
+                    time.sleep(0.01)
+                return inventory(*args)
+            with mock.patch.object(cc, "inventory", slow):
+                code, out = self.verify("--record", "--timeout-minutes", "0.01")  # (0.6 seconds)
+        exit_.assert_called_once_with(1)
+        v = self.recorded()
+        self.assertEqual((code, v["outcome"], v["problem_count"], v["problems"]),
+                         (1, "timed out", 1, ["verification did not finish within 0.01 minutes"]), out)
+
+    def test_an_interrupt_is_recorded(self):
+        def interrupt(*args):
+            raise KeyboardInterrupt
+
+        def exit_(code):
+            raise SystemExit(code)
+        with mock.patch.object(cc, "inventory", interrupt), mock.patch("os._exit", exit_), \
+                self.assertRaises(SystemExit) as stopped:
+            self.verify("--record")
+        self.assertEqual(stopped.exception.code, 130)
+        v = self.recorded()
+        self.assertEqual((v["outcome"], v["problem_count"], v["problems"]), ("interrupted", 1, ["interrupted"]))
+
+    def test_an_error_that_stops_the_verification_is_recorded(self):
+        with mock.patch.object(cc, "inventory", side_effect=RuntimeError("boom")):
+            code, out = self.verify("--record")
+        v = self.recorded()
+        self.assertEqual((code, v["outcome"], v["problems"]), (1, "stopped", ["verification stopped: RuntimeError: boom"]))
+
+    def test_a_write_that_fails_is_made_up_for_by_a_later_one(self):
+        # (only the last write counts: the file then says what happened; here the first write of
+        # the scope fails)
+        write_json, outcomes = frl.write_json, []
+
+        def flaky(path, data):
+            if path == self.path:
+                outcomes.append(data["outcome"])
+                if len(outcomes) == 1:
+                    raise PermissionError("not now")
+            return write_json(path, data)
+        with mock.patch.object(frl, "write_json", flaky):
+            code, out = self.verify("--record")
+        self.assertIn(f"note: cannot write {self.path}: PermissionError: not now", out)
+        self.assertNotIn("PROBLEM", out)
+        self.assertEqual((code, self.recorded()["outcome"], outcomes[-1]), (0, "ok", "ok"), out)
+
+    def test_a_record_that_cannot_be_ended_fails_the_verification(self):
+        write_json = frl.write_json
+
+        def read_only_at_the_end(path, data):
+            if path == self.path and data["outcome"] != "incomplete":
+                raise PermissionError("read-only")
+            return write_json(path, data)
+        with mock.patch.object(frl, "write_json", read_only_at_the_end):
+            code, out = self.verify("--record")
+        self.assertIn(f"PROBLEM: this verification is not recorded in {self.path}: PermissionError: read-only\n", out)
+        self.assertEqual((code, self.recorded()["outcome"], out.splitlines()[-1]), (1, "incomplete", "1 problem(s)"), out)
+
+    def test_a_record_that_cannot_be_made_fails_the_verification(self):
+        # (and leaves nothing: not an empty file, nor a temp file)
+        with mock.patch("os.link", side_effect=PermissionError("no links here")):
+            code, out = self.verify("--record")
+        self.assertIn(f"PROBLEM: this verification is not recorded in {self.path}: PermissionError: no links here\n", out)
+        self.assertEqual((code, out.splitlines()[-1]), (1, "1 problem(s)"), out)
+        self.assertEqual([n for n in os.listdir(os.path.dirname(self.path)) if "verification" in n], [])
+
+    def test_a_record_made_meanwhile_by_another_is_kept(self):
+        # (one that cannot make its own writes nothing more, so another verification's stays)
+        def another_first(src, dst):
+            with open(dst, "w") as f:
+                f.write('{"outcome": "ok", "by": "another verification"}\n')
+            raise PermissionError("no links here")
+        with mock.patch("os.link", another_first):
+            code, out = self.verify("--record")
+        self.assertEqual((code, self.recorded()), (1, {"outcome": "ok", "by": "another verification"}), out)
+
+    def test_an_interrupt_exits_even_when_recording_it_fails(self):
+        def interrupt(*args):
+            raise KeyboardInterrupt
+
+        def exit_(code):
+            raise SystemExit(code)
+        with mock.patch.object(cc, "inventory", interrupt), mock.patch.object(cc.Record, "end", side_effect=OSError("stuck")), \
+                mock.patch("os._exit", exit_), self.assertRaises(SystemExit) as stopped:
+            self.verify("--record")
+        self.assertEqual(stopped.exception.code, 130)
+
+    def test_a_record_interrupted_as_it_is_made_says_incomplete(self):
+        write_new_json = frl.write_new_json
+
+        def then_interrupted(path, data):
+            write_new_json(path, data)
+            raise KeyboardInterrupt
+
+        def exit_(code):
+            raise SystemExit(code)
+        with mock.patch.object(frl, "write_new_json", then_interrupted), mock.patch("os._exit", exit_), \
+                self.assertRaises(SystemExit) as stopped:
+            self.verify("--record")
+        self.assertEqual(stopped.exception.code, 130)
+        self.assertEqual(self.recorded()["outcome"], "incomplete")
+
+    def test_a_record_already_there_is_kept(self):
+        with open(self.path, "w") as f:
+            f.write('{"outcome": "ok", "by": "an earlier verification"}\n')
+        code, out = self.verify("--record")
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.recorded(), {"outcome": "ok", "by": "an earlier verification"})
+        self.assertIn("is there already, and is kept: this verification is not recorded", out)
+
+    def test_a_link_there_is_kept_too(self):
+        os.symlink("nowhere", self.path)
+        code, out = self.verify("--record")
+        self.assertEqual(code, 0, out)
+        self.assertEqual(os.readlink(self.path), "nowhere")
+        self.assertIn("is there already, and is kept: this verification is not recorded", out)
+
+    def test_a_report_outside_a_run_folder_is_not_recorded(self):
+        # (one of the old layout, say: a verification.json next to it would read as another)
+        flat = os.path.join(self.root, "runs", "20261001T120000.000000Z.json")
+        shutil.copy(os.path.join(os.path.dirname(self.path), "run.json"), flat)
+        code, out = self.verify("--record", "--run", flat)
+        self.assertEqual(os.listdir(os.path.join(self.root, "runs")).count("verification.json"), 0)
+        self.assertIn("is not the run.json of a run folder: this verification is not recorded", out)
+
+    def test_only_a_run_folders_own_run_json_is_recorded(self):
+        folder = os.path.dirname(self.path)
+        shutil.copy(os.path.join(folder, "run.json"), os.path.join(folder, "other.json"))
+        like = folder + "-extra"  # (named like a run folder, but not one)
+        shutil.copytree(folder, like)
+        for run in (os.path.join(folder, "other.json"), os.path.join(like, "run.json")):
+            with self.subTest(run=run):
+                code, out = self.verify("--record", "--run", run)
+                self.assertFalse(os.path.lexists(os.path.join(os.path.dirname(run), "verification.json")))
+                self.assertIn("is not the run.json of a run folder: this verification is not recorded", out)
+        self.addCleanup(os.chdir, os.getcwd())
+        os.chdir(folder)
+        code, out = self.verify("--record", "--run", "run.json")  # (the run's own, from its folder)
+        self.assertEqual((code, self.recorded()["outcome"]), (0, "ok"), out)
+
+    def test_control_without_record_nothing_is_written(self):
+        code, out = self.verify()
+        self.assertEqual(code, 0, out)
+        self.assertFalse(os.path.lexists(self.path))
+
+
+class RecordedVerification(unittest.TestCase):
+    """--record's parts on their own: the workflow's verify step, and the watchdog's thread. Each test
+    fails on cab048a, which had neither --record nor cc.Record, for the reason its docstring gives."""
+
+    def test_the_workflow_records_each_verification(self):
+        """(cab048a's verify step had no --record)"""
+        flow = workflow("red-build-logs.yml")
+        self.assertIn("--record", step_of(flow, "archive", lambda s: s.get("id") == "verify")["run"].split())  # fails
+
+    def test_a_timeout_after_the_verification_ended_changes_nothing(self):
+        """(the watchdog's thread can fire between the end of the checks and its cancel: it must
+        neither exit then nor later, when the timer that waits on its recording would fire, nor print;
+        cab048a: no cc.Record)"""
+        with tempfile.TemporaryDirectory() as root:
+            rel = frl.new_run_dir(root, time.time())[1]
+            record = cc.Record(True)  # fails: no cc.Record
+            record.start(os.path.join(root, rel, "run.json"), "x", [], [])
+            self.assertTrue(record.end("ok"))
+            out = io.StringIO()
+            with mock.patch("os._exit") as exit_, mock.patch.object(cc, "STUCK_SECONDS", 0.05), \
+                    contextlib.redirect_stdout(out):
+                cc.timed_out(1, record)
+                time.sleep(0.3)
+            exit_.assert_not_called()
+            self.assertEqual(out.getvalue(), "")
+            self.assertEqual(frl.read_json(os.path.join(root, rel, "verification.json"))["outcome"], "ok")
+
+    def test_the_watchdog_exits_even_when_recording_fails(self):
+        """(cab048a: no cc.Record)"""
+        record, out = cc.Record(True), io.StringIO()
+        before = set(threading.enumerate())
+        with mock.patch.object(record, "end", side_effect=RuntimeError("no record")), contextlib.redirect_stdout(out), \
+                mock.patch("os._exit", side_effect=SystemExit) as exit_, self.assertRaises(SystemExit):
+            cc.timed_out(1, record)
+        armed = [t for t in set(threading.enumerate()) - before if isinstance(t, threading.Timer) and not t.finished.is_set()]
+        for t in armed:  # (so that none fires later, into another test)
+            t.cancel()
+        self.assertEqual(armed, [])  # (the timer that waits on the recording is cancelled too)
+        exit_.assert_called_once_with(1)
+        self.assertEqual(out.getvalue(), "  PROBLEM: verification did not finish within 1 minutes\n")
+
+    def test_the_watchdog_exits_even_when_recording_hangs(self):
+        """(and says why first, flushed: os._exit drops what a pipe was not given yet, as it would drop
+        what was printed before; cab048a: no cc.Record)"""
+        class Flushed(io.StringIO):  # (what a pipe holds when os._exit comes: what was flushed)
+            flushed = ""
+
+            def flush(self):
+                self.flushed = self.getvalue()
+        record, stuck, out, left = cc.Record(True), threading.Event(), Flushed(), []
+        with mock.patch.object(record, "end", side_effect=lambda *args: stuck.wait(60) and False), \
+                mock.patch.object(cc, "STUCK_SECONDS", 0.05), \
+                mock.patch("os._exit", side_effect=lambda code: left.append(out.flushed)) as exit_, \
+                contextlib.redirect_stdout(out):
+            watchdog = threading.Thread(target=cc.timed_out, args=(1, record), daemon=True)
+            watchdog.start()
+            give_up = time.monotonic() + 30
+            while not left and time.monotonic() < give_up:  # (not exit_.called: mock sets it before the side effect)
+                time.sleep(0.01)
+            stuck.set()  # (then the recording ends, as if the main thread had ended it first)
+            watchdog.join(30)
+        exit_.assert_called_once_with(1)
+        line = "  PROBLEM: verification did not finish within 1 minutes (and recording it did not end within 0.05 seconds)\n"
+        self.assertEqual((left, out.getvalue()), ([line], line))  # (and nothing more once the recording ends)
+
+    def test_the_watchdog_exits_even_when_it_cannot_print(self):
+        """(a stdout that cannot be written to: the exit comes all the same, from timed_out() and from
+        exit_stuck(); cab048a: timed_out() printed first, and had no exit_stuck())"""
+        closed = io.StringIO()
+        closed.close()
+        for name, call in (("timed_out", lambda exit_: cc.timed_out(1)), ("exit_stuck", lambda exit_: cc.exit_stuck("x", exit_))):
+            with self.subTest(name), contextlib.redirect_stdout(closed), mock.patch("os._exit") as exit_, \
+                    self.assertRaises(ValueError):
+                call(exit_)
+            exit_.assert_called_once_with(1)
+
+    def test_notes_past_the_first_hundred_are_counted(self):
+        """(cab048a: no cc.Record)"""
+        with tempfile.TemporaryDirectory() as root:
+            rel = frl.new_run_dir(root, time.time())[1]
+            record = cc.Record(True)
+            record.start(os.path.join(root, rel, "run.json"), "x", [], [f"note {i}" for i in range(150)])
+            self.assertTrue(record.end("ok"))
+            v = frl.read_json(os.path.join(root, rel, "verification.json"))
+        self.assertEqual((v["note_count"], len(v["notes"]), v["notes"][-1]), (150, 100, "note 99"))
+
+    def test_a_write_json_cannot_hold_fails_too(self):
+        """(a value json refuses, as NaN: the file keeps what was last written; cab048a: no cc.Record)"""
+        out = io.StringIO()
+        with tempfile.TemporaryDirectory() as root, contextlib.redirect_stdout(out):
+            rel = frl.new_run_dir(root, time.time())[1]
+            record = cc.Record(True)
+            record.start(os.path.join(root, rel, "run.json"), "x", [], [])
+            record.scope(tabs=float("nan"))
+            self.assertTrue(record.end("ok"))
+            v = frl.read_json(os.path.join(root, rel, "verification.json"))
+        self.assertEqual((record.failed, v["outcome"], v["scope"]), (True, "incomplete", {}))
+        self.assertIn("note: cannot write", out.getvalue())
 
 
 if __name__ == "__main__":

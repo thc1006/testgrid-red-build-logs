@@ -152,7 +152,7 @@ jobs:
         id: verify
         continue-on-error: true
         timeout-minutes: 20
-        run: exec tool/.venv/bin/python tool/cross_check.py --archive archive --hours 48
+        run: exec tool/.venv/bin/python tool/cross_check.py --archive archive --hours 48 --record
 
       # Commit whatever was archived even when a step failed or timed out (a step
       # timeout is a failure, not a cancellation). The run's report in its folder
