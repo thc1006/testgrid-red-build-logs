@@ -1,6 +1,6 @@
-"""Review of 2026-10-15: an outside audit of c8e43a4, its tests adapted. Each test fails on
-cab048a for the reason its docstring gives; a test named test_control_* passes there and shows
-the scenario works otherwise.
+"""Review of 2026-10-15: an outside audit of c8e43a4 (its tests, adapted), and what checking it
+found. Each test fails on cab048a for the reason its docstring gives; a test named
+test_control_* passes there and shows the scenario works otherwise.
 
 Run: cd tool && uv run --frozen python -m unittest test_review_round24 -v
 """
@@ -11,6 +11,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+
+import yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -146,6 +148,104 @@ class ConfigsToBuild(unittest.TestCase):
         done, written, steps = self.run_case("merge fails")
         self.assertNotEqual(done.returncode, 0)
         self.assertEqual((written, steps), (EARLIER, SETUP + ["merge"]))
+
+
+# ------------------------------------------------------------------ the workflows' shells
+
+WORKFLOWS = os.path.join(HERE, "..", ".github", "workflows")
+
+
+def workflow(name):
+    with open(os.path.join(WORKFLOWS, name)) as f:
+        return yaml.safe_load(f)
+
+
+def github_shell(flow, job, step):
+    """The command GitHub runs a step's script with on Linux (workflow syntax, jobs.<job_id>.steps[*].shell):
+    bash -e when no shell is given, bash --noprofile --norc -eo pipefail for shell: bash. The shell
+    is the step's, else that of its job's defaults.run, else the workflow's: a job's defaults.run
+    replaces the workflow's whole, not key by key (actions/runner, src/Runner.Worker/JobExtension.cs)."""
+    run = (job.get("defaults") or {}).get("run")
+    if run is None:
+        run = (flow.get("defaults") or {}).get("run") or {}
+    shell = step.get("shell") or run.get("shell")
+    return {None: ["bash", "-e"], "bash": ["bash", "--noprofile", "--norc", "-eo", "pipefail"]}[shell]
+
+
+def run_step(flow, job, step, cwd, env):
+    """Run a step's script as GitHub does: written to a file, run by its shell, in `cwd`."""
+    with tempfile.NamedTemporaryFile("w", suffix=".sh", delete=False) as f:
+        f.write(step["run"])
+    try:
+        return subprocess.run([*github_shell(flow, job, step), f.name], cwd=cwd, env=dict(os.environ, **env),
+                              capture_output=True, text=True, timeout=120)
+    finally:
+        os.remove(f.name)
+
+
+def step_of(flow, job, test):
+    return next(s for s in flow["jobs"][job]["steps"] if test(s))
+
+
+# (an oracle checker stood in: it passes what it reads on, as for a dump that wrote all it had)
+PASS_ON = "import shutil, sys\nshutil.copyfileobj(sys.stdin, sys.stdout)\n"
+
+
+class Shells(unittest.TestCase):
+    def test_every_run_step_runs_under_pipefail(self):
+        """Without `shell: bash`, GitHub runs a step's script with bash -e, without -o pipefail
+        (with it: bash --noprofile --norc -eo pipefail), and no workflow set one: in each of
+        their 25 run steps, a pipeline failed only when its last command did."""
+        steps = 0
+        for name in sorted(n for n in os.listdir(WORKFLOWS) if n.endswith((".yml", ".yaml"))):
+            flow = workflow(name)
+            for job_id, job in flow["jobs"].items():
+                for step in job.get("steps", []):
+                    if "run" in step:
+                        steps += 1
+                        label = step.get("name") or step.get("id") or step["run"].split("\n")[0]
+                        with self.subTest(workflow=name, job=job_id, step=label):
+                            self.assertIn("pipefail", github_shell(flow, job, step))  # fails: bash -e
+        self.assertGreater(steps, 0)
+
+    def dump_step(self, title, dump):
+        """The oracle job's step `title`, with the Go dumps it reads (schemadump, unidump) stood in
+        by `dump` (a shell script), and the checkers they are piped to by PASS_ON."""
+        flow = workflow("oracle.yml")
+        step = step_of(flow, "oracle", lambda s: s.get("name") == title)
+        with tempfile.TemporaryDirectory() as tmp:
+            tool = os.path.join(tmp, "tool")
+            os.makedirs(os.path.join(tool, "oracle"))
+            os.makedirs(os.path.join(tmp, "oracle"))
+            for checker in ("gotypes.py", "gounicode.py"):
+                with open(os.path.join(tool, "oracle", checker), "w") as f:
+                    f.write(PASS_ON)
+            with open(os.path.join(tool, "testgrid_types.json"), "w") as f:
+                f.write("{}\n")
+            for name in ("schemadump", "unidump"):
+                with open(os.path.join(tmp, "oracle", name), "w") as f:
+                    f.write(dump)
+                os.chmod(os.path.join(tmp, "oracle", name), 0o755)
+            return run_step(flow, flow["jobs"]["oracle"], step, tool, {"RUNNER_TEMP": tmp})
+
+    def test_the_go_types_step_fails_when_schemadump_fails(self):
+        """oracle.yml:67: `schemadump | python3 -I oracle/gotypes.py > types.json`, then cmp: under
+        bash -e only the pipeline's last command counted, so a schemadump that failed after writing
+        its types (a panic as it exits, say) passed the step."""
+        done = self.dump_step("The Go types are the ones testgrid_types.json holds", "#!/bin/sh\necho '{}'\nexit 2\n")
+        self.assertNotEqual(done.returncode, 0, done.stdout + done.stderr)  # fails: 0
+
+    def test_the_unicode_step_fails_when_unidump_fails(self):
+        """oracle.yml:72: `unidump | python3 -I oracle/gounicode.py check ...`: the same."""
+        done = self.dump_step("Go's unicode tables are the ones go_unicode.json.gz holds", "#!/bin/sh\necho '{}'\nexit 2\n")
+        self.assertNotEqual(done.returncode, 0, done.stdout + done.stderr)  # fails: 0
+
+    def test_control_the_dump_steps_pass_when_the_dumps_do(self):
+        for title in ("The Go types are the ones testgrid_types.json holds",
+                      "Go's unicode tables are the ones go_unicode.json.gz holds"):
+            with self.subTest(step=title):
+                done = self.dump_step(title, "#!/bin/sh\necho '{}'\n")
+                self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
 
 
 if __name__ == "__main__":

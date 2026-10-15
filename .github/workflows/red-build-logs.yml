@@ -22,6 +22,13 @@ concurrency:
   group: red-build-logs-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: false
 
+# Run steps run under bash -eo pipefail, not GitHub's default bash -e: a pipeline
+# fails when any of its commands does, not only its last. (A job that sets its own
+# defaults.run replaces this one whole, so it must set shell: bash too.)
+defaults:
+  run:
+    shell: bash
+
 jobs:
   due:
     name: Decide whether to archive now

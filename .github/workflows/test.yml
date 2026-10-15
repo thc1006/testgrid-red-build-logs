@@ -22,6 +22,7 @@ jobs:
     timeout-minutes: 25
     defaults:
       run:
+        shell: bash # bash -eo pipefail, not GitHub's default bash -e: a pipeline fails when any of its commands does
         working-directory: tool
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
