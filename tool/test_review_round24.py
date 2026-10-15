@@ -6,6 +6,7 @@ Run: cd tool && uv run --frozen python -m unittest test_review_round24 -v
 """
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -150,7 +151,7 @@ class ConfigsToBuild(unittest.TestCase):
         self.assertEqual((written, steps), (EARLIER, SETUP + ["merge"]))
 
 
-# ------------------------------------------------------------------ the workflows' shells
+# ------------------------------------------------------------------ the workflows' shells, and follow.sh's checks
 
 WORKFLOWS = os.path.join(HERE, "..", ".github", "workflows")
 
@@ -280,6 +281,55 @@ class Shells(unittest.TestCase):
                 done, written = self.pinned_step(job_id, '{"go": "1.26.5"}\n')
                 self.assertEqual(done.returncode, 0, done.stderr)
                 self.assertEqual(written, "go=1.26.5\n")
+
+
+class FollowChecks(unittest.TestCase):
+    """follow.sh's checks of the Go types and of Go's unicode tables (types, unicode), run by its
+    own check() under its own shell options, with the dumps stood in and the checkers by PASS_ON."""
+
+    def check(self, name, dump):
+        """(what check() reports failed after running the check `name`: [] or [name])"""
+        with open(os.path.join(HERE, "oracle", "follow.sh")) as f:
+            script = f.read()
+        options = "\n".join(re.findall(r"^set .*$", script.split('\ncheck "')[0], re.M))  # (those before the checks)
+        functions = [re.search(rf"^{f}\(\) \{{.*?\}}$", script, re.M | re.S).group(0) for f in ("check", name)]
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "oracle"))
+            for checker in ("gotypes.py", "gounicode.py"):
+                with open(os.path.join(tmp, "oracle", checker), "w") as f:
+                    f.write(PASS_ON)
+            with open(os.path.join(tmp, "testgrid_types.json"), "w") as f:
+                f.write('{"about": "pinned", "types": 1}\n')
+            fake = os.path.join(tmp, "dump")
+            with open(fake, "w") as f:
+                f.write(dump)
+            os.chmod(fake, 0o755)
+            done = subprocess.run(["bash", "-c", "\n".join([
+                options, f"work={shlex.quote(tmp)}", f"SCHEMADUMP={shlex.quote(fake)}",
+                f"UNIDUMP={shlex.quote(fake)}", "failed=()", *functions, f"check {name} {name}",
+                'echo "failed: ${failed[*]}"'])], cwd=tmp, capture_output=True, text=True, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        return done.stdout.split("\n")[-2].split()[1:]
+
+    def test_the_types_check_fails_when_schemadump_fails(self):
+        """follow.sh:51-56: types() ran the dump, then the comparison, and check() runs it as an if's
+        condition, where set -e does not apply: a schemadump that failed after writing the types
+        went on to the comparison, whose status was the function's, so the check passed and the
+        summary did not list it as failed. When nothing else stopped follow.sh, it went on to
+        propose the commit and dumped the types again outside a condition (:107): only a dump
+        that failed there too stopped it."""
+        self.assertEqual(self.check("types", "#!/bin/sh\necho '{\"about\": \"new\", \"types\": 1}'\nexit 2\n"),
+                         ["types"])  # fails: []
+
+    def test_control_the_types_check_passes_on_the_same_types(self):
+        self.assertEqual(self.check("types", "#!/bin/sh\necho '{\"about\": \"new\", \"types\": 1}'\n"), [])
+
+    def test_control_the_types_check_fails_on_other_types(self):
+        self.assertEqual(self.check("types", "#!/bin/sh\necho '{\"about\": \"new\", \"types\": 2}'\n"), ["types"])
+
+    def test_control_the_unicode_check_fails_when_unidump_fails(self):
+        # (one pipeline: under pipefail, its status is the function's, condition or not)
+        self.assertEqual(self.check("unicode", "#!/bin/sh\necho '{}'\nexit 2\n"), ["unicode"])
 
 
 if __name__ == "__main__":

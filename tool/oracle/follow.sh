@@ -41,6 +41,8 @@ oracle/build.sh "$work/oracle" "$version"
 export TGORACLE="$work/oracle/tgoracle" GOCHECK="$work/oracle/gocheck" SCHEMADUMP="$work/oracle/schemadump" \
   UNIDUMP="$work/oracle/unidump"
 failed=()
+# (check() runs its command as an if's condition, where set -e does not apply: a check of several
+# commands joins them with &&, else a failure before the last command would go unseen)
 check() {
   local name=$1
   shift
@@ -49,8 +51,8 @@ check() {
 }
 # (testgrid_types.json names the pinned commit in "about"; the types themselves must not change)
 types() {
-  "$SCHEMADUMP" | python3 -I oracle/gotypes.py > "$work/types.json"
-  python3 -I -c 'import json, sys
+  "$SCHEMADUMP" | python3 -I oracle/gotypes.py > "$work/types.json" &&
+    python3 -I -c 'import json, sys
 a, b = (json.load(open(p)) for p in sys.argv[1:])
 sys.exit(a.pop("about") is None or b.pop("about") is None or a != b)' "$work/types.json" testgrid_types.json
 }
