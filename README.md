@@ -24,9 +24,15 @@ archive can miss, and when a build taken from GCS may never have shown red.
 ## Finding a log
 
 [archive/INDEX.md](archive/INDEX.md) lists the runs and red builds of the last
-14 days, and links a page for each week. Each run that archives has a folder
-under [archive/runs/](archive/runs/), named by its start time in UTC. A build
-stays in the folder of the run that first saved it:
+14 days, and links a page for each week. To find the builds where a test or job
+was red,
+[search the `meta.json` files](https://github.com/search?q=repo%3Athc1006%2Ftestgrid-red-build-logs+path%3Ameta.json&type=code)
+for its name in quotes. GitHub shows at most 100 results; for more, search a
+clone of this repository.
+
+Each run that archives has a folder under [archive/runs/](archive/runs/), named
+by its start time in UTC. A build stays in the folder of the run that first
+saved it:
 
 ```
 archive/runs/<YYYY-MM>/<run>/<job>/<build>/
