@@ -26,6 +26,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
+import report  # noqa: E402
 from test_fetch_red_logs import DAY  # noqa: E402
 from test_integrity import ArchiveWorld, obj  # noqa: E402
 
@@ -603,6 +604,21 @@ class RunsTable(unittest.TestCase):
         self.assertEqual(line.count("|"), header.count("|"))  # (GFM shows no table when they differ)
         self.assertEqual(row.count("|"), header.count("|"))
         self.assertIn(" | 0 | 0 | ok |", runs)
+
+
+class OneProblem(unittest.TestCase):
+    def test_a_run_with_one_problem_says_so(self):
+        """INDEX.md's runs table said "1 problems" (run_rows)."""
+        now = time.time()
+        with tempfile.TemporaryDirectory() as root:
+            for i, errors in enumerate((1, 2)):
+                rel = frl.new_run_dir(root, now - (3 - i) * 3600)[1]
+                frl.write_json(os.path.join(root, rel, "run.json"),
+                               {"run": "x", "started": now, "outcomes": {},
+                                "errors": [{"build": None, "error": "boom"}] * errors})
+            rows = frl.run_rows(root, report.day_of(now - 86400))
+        cells = [[c.strip() for c in row.strip("|").split("|")] for row in rows]
+        self.assertEqual([c[3] for c in cells], ["2 problems", "1 problem"])  # fails: 1 problems
 
 
 # ------------------------------------------------------------------ run.json: the code, and the GitHub Actions run

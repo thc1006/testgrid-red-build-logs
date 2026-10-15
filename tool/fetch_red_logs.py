@@ -3590,6 +3590,11 @@ def run_counts(run):
     return n("archived", "archived-without-log", "backfilled"), n("repaired", "refreshed", "log-recovered"), problems
 
 
+def problems_text(n):
+    """"1 problem", "2 problems"."""
+    return f"{n} problem" + ("" if n == 1 else "s")
+
+
 def run_rows(root, first_day, current=None):
     """Markdown rows for the run folders started on or after first_day, newest first."""
     rows = []
@@ -3608,7 +3613,7 @@ def run_rows(root, first_day, current=None):
             rows.append(f"| [{run_title(name)}]({rel}/) | | | no run report: the run was cut off |")
             continue
         new, updated, problems = run_counts(run)
-        result = "interrupted" if run.get("interrupted") is True else f"{problems} problems" if problems else "ok"
+        result = "interrupted" if run.get("interrupted") is True else problems_text(problems) if problems else "ok"
         rows.append(f"| [{run_title(name)}]({rel}/) | {new} | {updated} | {result} |")
     return rows
 
