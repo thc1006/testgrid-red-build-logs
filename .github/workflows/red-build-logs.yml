@@ -176,30 +176,43 @@ jobs:
           for d in archive/runs/*/*/*/*/; do
             [ -e "${d}meta.json" ] || rm -rf -- "$d"
           done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add archive
           # GitHub blocks files over 100 MiB, so the archive commits none over 95 MiB:
           # the fetch stores a larger log in parts, and the other files are small.
           # INDEX.md, index.json, a week's page or a chart that large (every run writes
           # them anew) is left out, and the version last committed stays, if any. Any
           # other file that large stops the commit, and nothing of this run is
           # committed: a build's file put back or left out would not be the one its
-          # meta.json describes.
-          {
-            for pages in archive/weeks archive/charts; do
-              [ -d "$pages" ] && find "$pages" -mindepth 1 -maxdepth 1 -type f -size +95M -print
-            done
-            find archive -maxdepth 1 \( -name INDEX.md -o -name index.json \) -type f -size +95M -print
-          } | while IFS= read -r large; do
-            echo "::warning::Not committing $large: larger than 95 MiB"
-            git --literal-pathspecs checkout -q HEAD -- "$large" 2>/dev/null || rm -f -- "$large"
-          done
-          big=$(find archive -type f -size +95M -print -quit)
-          if [ -n "$big" ]; then
-            echo "::error::$big is larger than 95 MiB, the most the archive commits in one file (GitHub blocks files over 100 MiB). Nothing of this run is committed."
+          # meta.json describes. (Only the files this commit adds or changes count: a
+          # temp file of a download cut off part-way can be that large, but git
+          # ignores it.)
+          git diff --cached --name-only --no-renames --diff-filter=d -z > "$RUNNER_TEMP/staged"
+          refuse=
+          while IFS= read -r -d '' f; do
+            size=$(stat -c %s -- "$f")
+            [ "$size" -gt $((95 << 20)) ] || continue
+            case $f in
+              archive/INDEX.md | archive/index.json | archive/weeks/* | archive/charts/*)
+                echo "::warning::Not committing $f ($size bytes): larger than 95 MiB. The version last committed stays, if any."
+                if git cat-file -e "HEAD:$f" 2> /dev/null; then
+                  git --literal-pathspecs checkout -q HEAD -- "$f"
+                else
+                  git --literal-pathspecs rm -q --cached -- "$f"
+                  rm -f -- "$f"
+                fi
+                ;;
+              *)
+                echo "::error::$f ($size bytes) is larger than 95 MiB, the most the archive commits in one file (GitHub blocks files over 100 MiB)."
+                refuse=1
+                ;;
+            esac
+          done < "$RUNNER_TEMP/staged"
+          if [ -n "$refuse" ]; then
+            echo "::error::Nothing of this run is committed."
             exit 1
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add archive
           if git diff --cached --quiet; then
             echo "Nothing new to commit."
             exit 0
