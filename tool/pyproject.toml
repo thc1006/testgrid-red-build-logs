@@ -3,7 +3,7 @@ name = "red-build-logs"
 version = "0.1.0"
 description = "Archive the Prow build-log.txt behind every red cell on the sig-release TestGrid dashboards"
 requires-python = ">=3.12"
-license = "Apache-2.0"
+license = "Apache-2.0 AND BSD-3-Clause AND Unicode-DFS-2016"
 dependencies = [
     "pyyaml>=6.0.3",
     "urllib3>=2.8,<3",  # (2.8: make_headers(proxy_basic_auth_encoding=...))

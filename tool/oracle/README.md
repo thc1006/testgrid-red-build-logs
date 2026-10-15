@@ -89,6 +89,8 @@ port follows changed. When something did:
 3. Update `pinned.json`.
 4. Rebuild, regenerate `testgrid_types.json`, and run the checks above.
 5. Regenerate the golden vectors, and make sure no other test changed.
+6. Update `THIRD_PARTY_NOTICES.md` at the root, and the headers of the ported
+   files, to the new versions and files.
 
 ## The config the port judges by
 

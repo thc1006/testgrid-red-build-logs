@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Parts of this file follow TestGrid's pkg/updater (f15bfa4808a4; Copyright The Kubernetes Authors and
+# The TestGrid Authors), Apache License 2.0 (LICENSE). THIRD_PARTY_NOTICES.md lists what was ported.
 """Archive the raw Prow build-log.txt behind every red cell on TestGrid dashboards.
 
 A cell counts as red exactly when TestGrid's own UI paints it red (#a00):

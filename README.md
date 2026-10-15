@@ -359,3 +359,7 @@ The tools honour the proxy environment variables (`http_proxy`, `https_proxy`,
 [Apache License 2.0](LICENSE), the same license as Kubernetes. The archived
 logs are copies of Kubernetes CI output that is already public in the
 `kubernetes-ci-logs` bucket.
+
+Parts of `tool/` are ports of Go, TestGrid and Kubernetes code, under their own
+licenses: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) lists each one and what
+changed.

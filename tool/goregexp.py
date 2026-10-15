@@ -1,3 +1,5 @@
+# Ported in part from Go's regexp/syntax and unicode (Go 1.26.5). Copyright The Go Authors; BSD 3-Clause
+# license in third_party/go/LICENSE. THIRD_PARTY_NOTICES.md lists what was ported and what changed.
 """Go's regexp, as TestGrid's tabulator compiles a tab's filters (regexp.Compile:
 regexp/syntax.Parse with its Perl flags) and matches them (MatchString).
 
