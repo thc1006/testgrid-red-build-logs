@@ -1427,5 +1427,33 @@ class HeldWhileItsTabCannotBeRead(ttc.ConfigWorld):
         self.assertNotIn("has no tab", " ".join(self.runs()[-1]["warnings"]))
 
 
+# ------------------------------------------------------------------ the warning that no TestGrid config is known for a tab
+
+class NoConfigKnown(ttc.ConfigWorld):
+    """The warning that no TestGrid config is known for a tab whose builds a run judges from GCS
+    ("rows their base options may hide count as shown"). Where the archive knows the tab's
+    configs over time, those judge its builds instead (tab_verdict), holding one where the tab's
+    config then is not known; cab048a warned for every tab the configs read lacked."""
+
+    history, judged = tch.ConfigOverTime.history, tch.ConfigOverTime.judged
+
+    def test_not_for_a_tab_with_configs_over_time(self):
+        run = self.judged((self.now - 30 * DAY, {"dash": {"t": ttc.entry(""), "u": ttc.entry("")}}),
+                          (self.now - 40 * HOUR, {"dash": {"u": ttc.entry("")}}))  # (TestGrid still shows t)
+        self.assertEqual(run["outcomes"], {"held": [f"job/{self.b}"]})
+        self.assertNotIn("no TestGrid config known", " ".join(run["warnings"]))  # fails: for 1 tabs (dash#t)
+
+    def test_control_for_a_tab_without_any(self):
+        self.assertEqual(self.fetch(), 0)  # (no config read, nor any over time)
+        self.assertIn("no TestGrid config known for 1 tabs (dash#t)", " ".join(self.runs()[-1]["warnings"]))
+
+    def test_control_not_for_a_tab_whose_config_an_earlier_run_read(self):
+        # (kept in state.json, as before the archive kept configs over time: none here)
+        self.put_state(tabs=self.state()["tabs"], tab_configs={"dash#t": {"config": ttc.entry(self.HIDE),
+                                                                          "read": self.now - HOUR}})
+        self.assertEqual(self.fetch(), 0)
+        self.assertNotIn("no TestGrid config known", " ".join(self.runs()[-1]["warnings"]))
+
+
 if __name__ == "__main__":
     unittest.main()
