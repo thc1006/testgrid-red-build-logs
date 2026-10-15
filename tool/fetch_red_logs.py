@@ -54,6 +54,7 @@ import copy
 import datetime as dt
 import email.utils
 import fcntl
+import functools
 import gzip
 import hashlib
 import http.client
@@ -66,6 +67,7 @@ import os
 import random
 import re
 import signal
+import subprocess
 import sys
 import tempfile
 import threading
@@ -170,6 +172,30 @@ def cpu_count():
         return len(os.sched_getaffinity(0))
     except AttributeError:
         return os.cpu_count() or 1
+
+
+@functools.cache
+def tool_version():
+    """The code that runs: {"commit": the commit checked out (git rev-parse HEAD), "modified":
+    whether tool/ differs from it (git status)}, each None when git cannot tell."""
+    def git(*args):  # (its output as bytes: a file name need not be UTF-8)
+        try:
+            done = subprocess.run(["git", "-C", os.path.dirname(os.path.abspath(__file__)), *args],
+                                  capture_output=True, timeout=60)
+        except (OSError, subprocess.SubprocessError):
+            return None
+        return done.stdout if done.returncode == 0 else None
+    commit, status = git("rev-parse", "HEAD"), git("--no-optional-locks", "status", "--porcelain", "--untracked-files=normal",
+                                                    "--", ".")
+    return {"commit": (commit or b"").decode("ascii", "replace").strip() or None,
+            "modified": None if status is None else bool(status.strip())}
+
+
+def github_run():
+    """The GitHub Actions run this runs in ({"repository", "run_id", "run_attempt"}), None outside one."""
+    if not os.environ.get("GITHUB_RUN_ID"):
+        return None
+    return {k: os.environ.get(f"GITHUB_{k.upper()}") for k in ("repository", "run_id", "run_attempt")}
 
 
 class AdaptiveLimit:
@@ -4109,6 +4135,7 @@ def main(argv=None):
     args = p.parse_args(argv)
 
     run_start = time.time()
+    tool_version()  # (asked once, now: the run's report gives it)
     root = args.archive
     lock = None
     if not args.list_only:
@@ -4715,9 +4742,9 @@ def run(args, root, run_start, pool, deadline):
     # retry list means builds may be missing without an error naming them.
     serious = [w for w in warnings if any(k in w for k in SERIOUS)]
     config_record = {"source": config_source, "read": run_start} if config_source else previous_read or None
-    report_ = {"run": run_id, "dir": run_rel, "started": run_start, "since_hours": args.since_hours,
-               "max_job_hours": args.max_job_hours, "testgrid_config": config_record, "tabs": reports,
-               "red_builds_seen": len(builds),
+    report_ = {"run": run_id, "dir": run_rel, "started": run_start, "tool": tool_version(), "github": github_run(),
+               "since_hours": args.since_hours, "max_job_hours": args.max_job_hours, "testgrid_config": config_record,
+               "tabs": reports, "red_builds_seen": len(builds),
                "retried_from_state": len(retry) - rechecks - backfilled - (len(new_watch) - len(running_gap)),
                "rechecked": rechecks, "watched": len(watch),
                "backfilled_from_gcs": len(outcomes.get("backfilled", [])), "outcomes": outcomes,
