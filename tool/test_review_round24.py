@@ -11,6 +11,7 @@ import os
 import re
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -797,6 +798,36 @@ class VerificationRecord(ArchiveWorld):
         v = self.recorded()
         self.assertEqual((v["outcome"], v["problem_count"], v["problems"]), ("interrupted", 1, ["interrupted"]))
 
+    def interrupted_by(self, signum, before):
+        """(how the verification ends when `signum` comes during the checks, its handler set to
+        `before` beforehand: the exit code, and the handlers of SIGTERM and SIGINT after)"""
+        for s in (signal.SIGTERM, signal.SIGINT):
+            self.addCleanup(signal.signal, s, signal.signal(s, before))
+
+        def signalled(*args):  # (the handler called as the signal calls it)
+            signal.getsignal(signum)(signum, None)
+
+        def exit_(code):
+            raise SystemExit(code)
+        with mock.patch.object(cc, "inventory", signalled), mock.patch("os._exit", exit_), \
+                self.assertRaises(SystemExit) as stopped:
+            self.verify("--record")
+        return stopped.exception.code, {signal.getsignal(s) for s in (signal.SIGTERM, signal.SIGINT)}
+
+    def test_sigterm_interrupts_it_too(self):
+        # (the runner ends a step with SIGINT, then SIGTERM)
+        def elsewhere(*args):
+            pass
+        code, handlers = self.interrupted_by(signal.SIGTERM, elsewhere)
+        self.assertEqual(code, 130)
+        self.assertEqual((self.recorded()["outcome"], handlers), ("interrupted", {elsewhere}))  # (put back)
+
+    def test_sigint_interrupts_it_where_it_was_ignored(self):
+        # (as in a shell's background job, where Python starts with SIGINT ignored)
+        code, handlers = self.interrupted_by(signal.SIGINT, signal.SIG_IGN)
+        self.assertEqual(code, 130)
+        self.assertEqual((self.recorded()["outcome"], handlers), ("interrupted", {signal.SIG_IGN}))
+
     def test_an_error_that_stops_the_verification_is_recorded(self):
         with mock.patch.object(cc, "inventory", side_effect=RuntimeError("boom")):
             code, out = self.verify("--record")
@@ -995,6 +1026,27 @@ class RecordedVerification(unittest.TestCase):
                     self.assertRaises(ValueError):
                 call(exit_)
             exit_.assert_called_once_with(1)
+
+    def test_no_watchdog_is_left_when_cross_check_cannot_start(self):
+        """main() sets its signal handlers before it starts its watchdog, so where they cannot be set
+        (a thread other than the main one) it stops with no watchdog left to end the process later.
+        (cab048a set none, and ran to its end there: no ValueError.)"""
+        before, failed = set(threading.enumerate()), []
+
+        def elsewhere():
+            try:
+                cc.main(["--archive", "nowhere", "--timeout-minutes", "10"])
+            except ValueError as e:
+                failed.append(e)
+        with mock.patch.object(cc, "timed_out"):  # (a watchdog left would end nothing)
+            thread = threading.Thread(target=elsewhere)
+            thread.start()
+            thread.join(30)
+            left = [t for t in set(threading.enumerate()) - before if isinstance(t, threading.Timer)]
+            for t in left:
+                t.cancel()
+        self.assertEqual(len(failed), 1)  # fails: 0
+        self.assertEqual(left, [])
 
     def test_notes_past_the_first_hundred_are_counted(self):
         """(cab048a: no cc.Record)"""

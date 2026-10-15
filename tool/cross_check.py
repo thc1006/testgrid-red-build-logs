@@ -34,6 +34,7 @@ import hashlib
 import math
 import operator
 import os
+import signal
 import sys
 import threading
 import time
@@ -215,6 +216,10 @@ def main(argv=None):
                         "it is made with a hard link, so that folder's file system must support hard links)")
     args = p.parse_args(argv)
     record = Record(args.record)
+    # The GitHub runner ends a timed-out or cancelled step with SIGINT, then SIGTERM: either
+    # interrupts the verification (SIGINT too where it was ignored when Python started).
+    previous_term = signal.signal(signal.SIGTERM, frl.interrupt)
+    previous_int = signal.signal(signal.SIGINT, frl.interrupt)
     # cross_check only reads (but for verification.json, which is written whole), so a hard
     # exit on timeout cannot leave anything half-written.
     watchdog = threading.Timer(args.timeout_minutes * 60, timed_out, args=(args.timeout_minutes, record))
@@ -230,6 +235,8 @@ def main(argv=None):
             os._exit(130)  # read-only, so stop now instead of waiting for worker threads
     finally:
         watchdog.cancel()
+        signal.signal(signal.SIGTERM, previous_term)
+        signal.signal(signal.SIGINT, previous_int)
 
 
 STUCK_SECONDS = 60  # (how long the watchdog waits on recording the timeout before it exits anyway)
