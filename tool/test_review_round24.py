@@ -28,8 +28,10 @@ sys.path.insert(0, HERE)
 import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 import report  # noqa: E402
+import test_config_history as tch  # noqa: E402  (module imports: their tests are not collected here)
+import test_testgrid_config as ttc  # noqa: E402
 from test_fetch_red_logs import DAY  # noqa: E402
-from test_integrity import ArchiveWorld, obj  # noqa: E402
+from test_integrity import HOUR, ArchiveWorld, obj  # noqa: E402
 
 
 # ------------------------------------------------------------------ testgrid_config.sh: the configs to build
@@ -1367,6 +1369,62 @@ class FinalBuildsOtherwise(ArchiveWorld):
         self.srv.route(self.base + "/build-log.txt", obj(b"log, longer\n", "2"))
         self.assertEqual(self.fetch_in(set()), 0)
         self.assertEqual(self.runs()[-1]["outcomes"], {"refreshed": [self.key]})
+
+
+# ------------------------------------------------------------------ a held build whose tab a run cannot read
+
+class HeldWhileItsTabCannotBeRead(ttc.ConfigWorld):
+    """A build held because TestGrid shows its tab, which the latest config known lacks (its
+    config since then is not known), at a run that cannot read the tab's table, or its
+    dashboard's summary. cab048a took only the tabs it read as shown: the tab's config since
+    then was none (TestGrid had no such tab), so the build was judged not red and no longer
+    watched."""
+
+    history, judged = tch.ConfigOverTime.history, tch.ConfigOverTime.judged
+
+    def held(self):
+        self.configs = [(self.now - 30 * DAY, {"dash": {"t": ttc.entry(""), "u": ttc.entry("")}}),
+                        (self.now - 40 * HOUR, {"dash": {"u": ttc.entry("")}})]  # (TestGrid still shows t)
+        self.assertEqual(self.judged(*self.configs)["outcomes"], {"held": [f"job/{self.b}"]})
+
+    def test_it_stays_held_while_its_table_cannot_be_read(self):
+        self.held()
+        # (u's table read: the summary was read, and t is shown as listed there, not as one of the tabs
+        # a dashboard whose summary cannot be read listed when last read)
+        self.srv.summary("dash", {"t": "FAILING", "u": "PASSING"})
+        self.srv.table("dash", "u", self.srv.httpd.routes[frl.table_url("", "dash", "t")])
+        self.srv.table("dash", "t", (500, {}, b""))
+        self.fetch_with(self.history(*self.configs))
+        self.assertEqual(self.runs()[-1]["outcomes"], {"held": [f"job/{self.b}"]})  # fails: not-red
+        self.assertIn(f"job/{self.b}", self.state()["watch"])
+
+    def test_it_stays_held_while_its_dashboards_summary_cannot_be_read(self):
+        self.held()
+        self.srv.route("/dash/summary", (500, {}, b""))
+        self.fetch_with(self.history(*self.configs))
+        run = self.runs()[-1]
+        self.assertEqual(run["outcomes"], {"held": [f"job/{self.b}"]})  # fails: not-red
+        self.assertIn("has no tab dash#t", " ".join(run["warnings"]))  # (the tabs it listed when last read)
+
+    def test_control_a_tab_unlisted_when_last_read_is_not_taken_as_shown(self):
+        # (a summary read, listing u and a name the run cannot use; then one that cannot be read)
+        self.held()
+        self.srv.summary("dash", {"u": "FAILING", "a\tb": "FAILING"})
+        self.fetch_with(self.history(*self.configs))
+        self.assertTrue(self.state()["tabs"]["dash#t"]["missing_since"])
+        self.assertNotIn("has no tab dash#t", " ".join(self.runs()[-1]["warnings"]))
+        self.srv.route("/dash/summary", (500, {}, b""))
+        self.fetch_with(self.history(*self.configs))
+        self.assertNotIn("has no tab dash#t", " ".join(self.runs()[-1]["warnings"]))
+
+    def test_control_a_tab_of_a_dashboard_the_run_does_not_read_is_not_taken_as_shown(self):
+        # (other#x, as a tab of a dashboard no longer read: the configs built since lack it, and
+        # state.json keeps it; taken as shown, every run would warn, and fail)
+        state = self.state()
+        state["tabs"]["other#x"] = dict(state["tabs"]["dash#t"])
+        frl.write_json(os.path.join(self.root, "state.json"), state)
+        self.assertEqual(self.fetch_with(self.config("")), 0)
+        self.assertNotIn("has no tab", " ".join(self.runs()[-1]["warnings"]))
 
 
 if __name__ == "__main__":

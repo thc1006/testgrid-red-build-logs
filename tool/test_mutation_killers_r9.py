@@ -866,12 +866,13 @@ class RunOverConfigs(ConfigRuns):
         run_ = self.dropped_t(2 * HOUR)
         self.assertIn("lacks tabs TestGrid shows", self.warning(run_, "has no tab dash#t"))
 
-    def test_a_tab_whose_table_cannot_be_read_is_not_said_to_lack_its_config(self):  # MF359, MF487, MF489
+    def test_a_tab_whose_table_cannot_be_read_is_not_said_to_be_never_read(self):  # MF359, MF487, MF489
+        # (its config is said to be lacking: TestGrid lists the tab, see test_review_round24.HeldWhileItsTabCannotBeRead)
         self.no_gap()
         self.srv.summary("dash", {"t": "FAILING", "u": "PASSING"})
         self.srv.table("dash", "u", (500, {}, b""))
         run_ = self.fetched(self.config(""))
-        self.assertIsNone(self.warning(run_, "has no tab"))
+        self.assertIn("lacks tabs TestGrid shows", self.warning(run_, "has no tab dash#u"))
         self.assertIsNone(self.warning(run_, "was never read"))
 
     def test_a_config_testgrid_applies_as_the_port_does_warns_of_nothing(self):  # MF232, MF234, MF236
