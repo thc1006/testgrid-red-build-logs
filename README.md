@@ -33,9 +33,9 @@ archive/runs/<YYYY-MM>/<run>/<job>/<build>/build-log.txt.gz
 Read it with `gzip -dc build-log.txt.gz | less`. A log over 95 MiB after gzip is
 split into `build-log.txt.gz.000`, `.001` and so on, because GitHub blocks files
 over 100 MiB; read those with `cat build-log.txt.gz.* | gzip -dc | less`. A build
-whose pod never ran has only its `podinfo.json`, and a build GCS had no file for
-has only its `meta.json`. The `meta.json` in each build folder records the tabs,
-the red tests, TestGrid's messages and the log's md5.
+whose pod never ran has its `podinfo.json` in place of the log, and a build GCS
+had no file for has only its `meta.json`. The `meta.json` in each build folder
+records the tabs, the red tests, TestGrid's messages and the log's md5.
 
 ## What counts as red
 
