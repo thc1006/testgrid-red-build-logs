@@ -4,7 +4,7 @@
 regexp/syntax.Parse with its Perl flags) and matches them (MatchString).
 
 The parser is Go's regexp/syntax/parse.go (Go 1.26.5, tool/oracle/pinned.json), ported
-line for line: the same parse tree, built the same way (literals merged as it goes,
+function by function: the same parse tree, built the same way (literals merged as it goes,
 alternations factored, nodes reused from a free list), so a pattern is accepted or
 rejected exactly as Go does, its size and height limits included (they count nodes
 and memoize sizes by node, stale entries and all). Unicode classes (\\p{...}) and case
@@ -44,6 +44,8 @@ ERR_INVALID_NAMED_CAPTURE = "invalid named capture"
 ERR_INVALID_PERL_OP = "invalid or unsupported Perl syntax"
 ERR_INVALID_REPEAT_OP = "invalid nested repetition operator"
 ERR_INVALID_REPEAT_SIZE = "invalid repeat count"
+# (never raised here: the one caller, testgrid_config.tab_filters, decodes each pattern from UTF-8
+# strictly and refuses one that is not)
 ERR_INVALID_UTF8 = "invalid UTF-8"
 ERR_MISSING_BRACKET = "missing closing ]"
 ERR_MISSING_PAREN = "missing closing )"
@@ -1064,13 +1066,12 @@ class Parser:
                         nhex += 1
                 else:
                     x = _unhex(c)
+                    y = -1  # (at the end of s, nextRune gives RuneError and no error: no hex digit)
                     if t:
                         c, t = t[0], t[1:]
                         y = _unhex(c)
-                        if x >= 0 and y >= 0:
-                            return x * 16 + y, t, None
-                    else:  # (nextRune("") is an invalid UTF-8 error in Go)
-                        return 0, "", Error(ERR_INVALID_UTF8, "")
+                    if x >= 0 and y >= 0:
+                        return x * 16 + y, t, None
         elif c in "afnrtv":
             return {"a": 7, "f": 12, "n": 10, "r": 13, "t": 9, "v": 11}[c], t, None
         elif ord(c) < 0x80 and not _isalnum(c):
@@ -1117,11 +1118,10 @@ class Parser:
             return None, s, None
         sign = -1 if s[1] == "P" else 1
         t = s[2:]
-        if not t:
-            return None, s, None  # (nextRune(""): an error Go drops here, so no class)
-        c, t = t[0], t[1:]
+        c, t = (t[0], t[1:]) if t else (None, "")  # (at the end of s, nextRune gives RuneError and no error)
         if c != "{":
-            seq, name = s[:len(s) - len(t)], c
+            seq = s[:len(s) - len(t)]
+            name = seq[2:]  # (at the end of s: "", which names no table)
         else:
             end = s.find("}")
             if end < 0:
