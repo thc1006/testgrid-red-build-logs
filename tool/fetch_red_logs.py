@@ -3633,6 +3633,16 @@ def run_counts(run):
     return n("archived", "archived-without-log", "backfilled"), n("repaired", "refreshed", "log-recovered"), problems
 
 
+def tabs_read_text(reports):
+    """"N tabs read (M failed)" for a run's tab reports, then ", K dashboard summary problems" for
+    those without a tab (a dashboard's summary that could not be read, or a tab name in it that
+    cannot be used), if any."""
+    tabs = [r for r in reports if isinstance(r, dict) and r.get("tab") is not None]
+    other = sum(1 for r in reports if isinstance(r, dict) and r.get("tab") is None and r.get("error"))
+    text = f"{len(tabs)} tabs read ({sum(1 for r in tabs if r.get('error'))} failed)"
+    return text + (f", {other} dashboard summary " + ("problem" if other == 1 else "problems") if other else "")
+
+
 def problems_text(n):
     """"1 problem", "2 problems"."""
     return f"{n} problem" + ("" if n == 1 else "s")
@@ -3689,10 +3699,9 @@ def write_run_readme(root, rel, run, entries):
     lines = [f"# Run {run_title(name)} UTC", ""]
     if isinstance(run, dict):
         tabs = run.get("tabs") if isinstance(run.get("tabs"), list) else []
-        failed = sum(1 for t in tabs if isinstance(t, dict) and t.get("error"))
         new, updated, problems = run_counts(run)
         seen = run.get("red_builds_seen") if is_int(run.get("red_builds_seen")) else "?"
-        lines.append(f"{len(tabs)} tabs read ({failed} failed), {seen} red builds on "
+        lines.append(f"{tabs_read_text(tabs)}, {seen} red builds on "
                      f"TestGrid. This run archived {new} new builds" + (f" and updated {updated} archived earlier"
                                                                        if updated else "") + ".")
         if run.get("interrupted") is True:
@@ -3824,10 +3833,10 @@ def write_index(root, now, current_run=None, missing=(), known=None):
         lines += build_rows(waiting, files=False) + [""]
     lines += [f"## Runs in the last {report.HEAT_DAYS} days", "",
               "Collection result is how the run's fetch went: ok, interrupted, its number of problems (errors, "
-              "serious warnings and tabs it could not read, listed in the README of the run's folder and in its "
-              "run.json), no run report if the run was cut off before writing one, or unreadable run report if its "
-              "run.json cannot be read. It does not include the "
-              "verification that follows the fetch ([cross_check.py](../tool/cross_check.py)).", "",
+              "serious warnings, and the tabs and dashboard summaries it could not read, listed in the README of "
+              "the run's folder and in its run.json), no run report if the run was cut off before writing one, or "
+              "unreadable run report if its run.json cannot be read. It does not include the verification that "
+              "follows the fetch ([cross_check.py](../tool/cross_check.py)).", "",
               "Verification is the outcome that verification recorded in the run's verification.json: ok, its "
               "number of problems, timed out, interrupted, stopped (by an error), or incomplete (it ended "
               "without recording one). It is pending for the run that wrote this page (it is verified after); not "
@@ -4733,7 +4742,7 @@ def run(args, root, run_start, pool, deadline):
         config_warnings(involved)
         for b in sorted(selected + retry, key=lambda b: b["started"] or b["created"]):
             print(iso(b["started"] or b["created"]), b["job"], b["build"], json.dumps([t["tab"] for t in b["tabs"]]))
-        print(f"{len(reports)} tabs read ({len(tab_errors)} failed), {len(selected)} red builds, "
+        print(f"{tabs_read_text(reports)}, {len(selected)} red builds, "
               f"{len(retry) - rechecks} to retry, {rechecks} archived builds to compare with GCS again")
         for r in tab_errors:
             print(*tab_error_words(r), r["error"], file=sys.stderr)
@@ -4928,7 +4937,7 @@ def run(args, root, run_start, pool, deadline):
         write_run_readme(root, run_rel, final, entries)
 
     counts = [f"{k}={len(v)}" for k, v in sorted(outcomes.items())] + [f"errors={len(errors)}"]
-    print(f"run {run_id}: {len(reports)} tabs read ({len(tab_errors)} failed), {len(builds)} red builds on TestGrid, "
+    print(f"run {run_id}: {tabs_read_text(reports)}, {len(builds)} red builds on TestGrid, "
           f"{len(selected)} selected, {len(retry) - rechecks - backfilled - (len(new_watch) - len(running_gap))} retried, "
           f"{rechecks} re-compared with GCS, "
           f"{len(outcomes.get('backfilled', []))} taken from GCS by TestGrid's rule: "

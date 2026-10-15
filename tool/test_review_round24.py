@@ -609,6 +609,14 @@ class RunsTable(unittest.TestCase):
         self.assertEqual(row.count("|"), header.count("|"))
         self.assertIn(" | 0 | 0 | ok |", runs)
 
+    def test_the_note_counts_the_dashboard_summaries_the_run_could_not_read(self):
+        """INDEX.md had no note on its runs table (cab048a: the table follows the heading); the one
+        added since said a run's problems were its errors, serious warnings and the tabs it could not
+        read, but run_counts counts the dashboard summaries it could not read too."""
+        note = self.runs_section().split("\n\n")[1]
+        self.assertIn("(errors, serious warnings, and the tabs and dashboard summaries it could not read, ",
+                      note)  # fails: no note, the table: | Run (UTC) | New builds | Updated | Result |
+
     def test_each_runs_verification_is_shown(self):
         """INDEX.md showed no run's verification (cab048a kept none: see VerificationRecord)."""
         now = time.time()
@@ -1595,6 +1603,23 @@ class RunReadme(unittest.TestCase):
                          ["no run report: the run was cut off", "unreadable run report",
                           "unreadable run report"])  # fails: no run report: the run was cut off
 
+    def test_a_dashboard_summary_is_not_counted_as_a_tab(self):
+        """The README's first line counted a dashboard whose summary could not be read as a tab read
+        and failed ("3 tabs read (2 failed)" for two tabs and that summary), as did the fetch's log."""
+        readme = self.readme({"run": "x", "outcomes": {}, "tabs": [{"dashboard": "d", "tab": "t"},
+                                                                   {"dashboard": "d", "tab": "u", "error": "no table"},
+                                                                   {"dashboard": "other", "tab": None, "error": "boom"}]})
+        self.assertIn("2 tabs read (1 failed), 1 dashboard summary problem, ", readme)  # fails: 3 tabs read (2 failed)
+        self.assertNotIn("dashboard summary", self.readme({"run": "x", "outcomes": {}, "tabs": [{"dashboard": "d",
+                                                                                                "tab": "t"}]}))
+        # (and an entry of the list that is no report, as in a run.json edited by hand: no tab)
+        readme = self.readme({"run": "x", "outcomes": {}, "tabs": [5, None, {"dashboard": "d", "tab": "t"},
+                                                                   {"dashboard": "other", "tab": None, "error": "boom"}]})
+        self.assertIn("1 tabs read (0 failed), 1 dashboard summary problem, ", readme)  # fails: 4 tabs read (1 failed)
+        readme = self.readme({"run": "x", "outcomes": {}, "tabs": [{"dashboard": "d", "tab": None, "error": "boom"},
+                                                                   {"dashboard": "e", "tab": None, "error": "boom"}]})
+        self.assertIn("0 tabs read (0 failed), 2 dashboard summary problems, ", readme)
+
     def test_control_a_run_with_its_report_links_it(self):
         self.assertIn("[run.json](run.json) has the details;", self.readme({"run": "x", "outcomes": {}}))
 
@@ -1630,8 +1655,8 @@ class NamedAsItself(ArchiveWorld):
         self.srv.summary("dash", {"t": "FAILING", "u": "FAILING"})
         self.srv.table("dash", "u", (500, {}, b""))
         self.srv.route("/other/summary", (500, {}, b""))
-        err = io.StringIO()
-        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+        err, self.out = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(self.out), contextlib.redirect_stderr(err):
             frl.main(["--archive", self.root, "--dashboard", "dash", "--dashboard", "other", "--testgrid", self.srv.url,
                       "--gcs", self.srv.url, *extra])
         return [ln for ln in err.getvalue().splitlines() if ln.startswith("ERROR")]
@@ -1650,6 +1675,16 @@ class NamedAsItself(ArchiveWorld):
         with mock.patch.object(frl, "BACKOFF", 0):
             lines = self.errors_logged()
         self.assertTrue(any(ln.startswith(f"ERROR build {self.key} ") for ln in lines), lines)
+
+    def test_the_fetchs_count_of_tabs_leaves_the_summary_out(self):
+        """The fetch's log, with --list-only too, counted a dashboard whose summary it could not read
+        as a tab read and failed: "3 tabs read (2 failed)" for dash's two tabs (one unread) and
+        other's summary."""
+        for extra in ((), ("--list-only",)):
+            with self.subTest(extra=extra):
+                self.errors_logged(*extra)
+                self.assertIn("2 tabs read (1 failed), 1 dashboard summary problem, ",
+                              self.out.getvalue())  # fails: 3 tabs read (2 failed),
 
     def test_an_error_of_the_whole_run_gets_one_space(self):
         # (two copies of one build, in two run folders, is one)
