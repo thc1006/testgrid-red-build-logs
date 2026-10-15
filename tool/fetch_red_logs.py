@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 # Parts of this file follow TestGrid's pkg/updater (f15bfa4808a4; Copyright The Kubernetes Authors and
 # The TestGrid Authors), Apache License 2.0 (LICENSE). THIRD_PARTY_NOTICES.md lists what was ported.
-"""Archive the raw Prow build-log.txt behind every red cell on TestGrid dashboards.
+"""Archive the raw Prow build-log.txt behind the red cells on TestGrid dashboards.
 
 A cell counts as red exactly when TestGrid's own UI paints it red (#a00):
 FAIL, TIMED_OUT, CATEGORIZED_FAIL and TOOL_FAIL. Tables are read the way the
 dashboard page loads them (tab base options applied, no extra row filter), so
 the red cells are the ones you see when you open the tab. Each column is one
 Prow build: the archive keeps one copy per build and skips builds it already
-holds, so every run picks up whatever turned red since the previous run and
-the first run backfills everything TestGrid still shows. Builds that could not
-be archived yet are remembered in state.json and retried straight from GCS,
-even after they scroll off TestGrid.
+holds, so each run takes the red builds TestGrid shows that the archive does
+not hold yet (a cell red only between two runs, on a build still shown, is not
+seen), and the first run backfills everything TestGrid still shows. Builds that
+could not be archived yet are remembered in state.json and retried straight
+from GCS, even after they scroll off TestGrid.
 
 When a tab's history no longer reaches back to the previous scan (a missed run,
 or a tab that keeps little history), its builds from that time are listed in
 GCS and judged by TestGrid's own rule (testgrid_rule.py, a port of its updater
-checked against TestGrid's code): those it painted red on the tab are archived,
-and those it would still read again (not finished) are watched until they can
-be judged.
+checked against TestGrid's code): those it painted red on the tab, or may have
+where a read is in doubt, are archived; those it would still read again (not
+finished), or that the tab may have shown under a config the archive does not
+know yet or does not follow, are watched until they can be judged, at most 14
+days after they were made, or 60 under such a config.
 
 A matching md5 only proves the copy equals what GCS held at that moment, and
 Prow can upload a log again (its sidecar uploads once when told to stop and

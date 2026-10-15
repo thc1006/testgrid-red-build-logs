@@ -1,10 +1,13 @@
 # Red TestGrid build logs
 
-This repository keeps the raw Prow `build-log.txt` of every build that TestGrid
-shows red on
+This repository keeps the raw Prow `build-log.txt` of builds that TestGrid shows
+red on
 [sig-release-master-blocking](https://testgrid.k8s.io/sig-release-master-blocking)
 and [sig-release-master-informing](https://testgrid.k8s.io/sig-release-master-informing).
-A GitHub Actions workflow saves them about twice a day, one copy per build.
+A GitHub Actions workflow reads both dashboards about twice a day and saves one
+copy per build. A build that scrolled off a tab between two runs is found in GCS
+instead and judged by TestGrid's own rule. [Limits](#limits) says what the
+archive can miss, and when a build taken from GCS may never have shown red.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="archive/charts/trend-dark.svg">
@@ -94,16 +97,37 @@ with `gh workflow enable red-build-logs.yml`.
 
 ## Limits
 
-- TestGrid does not publish when it read a build. The workflow infers the time
-  from TestGrid's code and from GCS timestamps. When that leaves a doubt, the
-  build counts as red, so a build taken from GCS may never have shown red on
-  TestGrid.
+- TestGrid does not publish when it read a build, and some of its reads can end
+  in more than one way. The workflow works these out from TestGrid's code and
+  from GCS timestamps. When that leaves a doubt, the build counts as red, so a
+  build taken from GCS may never have shown red on TestGrid.
+- The same goes for a build judged before the archive has read any TestGrid
+  config, or on a tab it knows only from a build it still watches (the rows the
+  tab's filters hide then count as shown), and for a build on a tab with a base
+  option the archive does not know: TestGrid's tabulator ignores the option, and
+  so does the archive, but the tab's page may hide rows by it.
+- TestGrid does not publish which of its updates failed either, or which left
+  columns for more than the next update to read. The workflow takes no update
+  to have done so, and misses a build judged from GCS that only such a later
+  read showed red, such as the retry of a failed update.
+- A build its tab may have shown under a config the archive does not know yet,
+  or under one whose test group sets an option `testgrid_rule.py` does not
+  support, waits until it can be judged, up to 60 days after it was made. Past
+  that it is not archived, and the run fails with a warning that TestGrid may
+  have shown it red. One held because TestGrid showed its tab while the latest
+  config the archive knows lacked it is judged once TestGrid stops listing the
+  tab instead, as if TestGrid had had no such tab since the last config with it:
+  not red, though TestGrid may have shown it red meanwhile.
+- A build a scan saw, not red, that has since scrolled off is judged from GCS
+  if its tab's config changed after that scan. If a config the archive does not
+  know yet was in force after that scan, the build waits for it, at most 14
+  days after the scan, and is then dropped without a warning of its own.
 - A cell that was red only between two runs, on a build the tab still shows,
   is not seen.
 - A gap in TestGrid's history is searched in GCS newest first: up to 28 days
   back in the run that finds it, then 14 days more in each later run.
-- If a tab's test group sets an option `testgrid_rule.py` does not support, the
-  run fails rather than guess.
+- If a tab's test group now sets an option `testgrid_rule.py` does not
+  support, the run fails rather than guess.
 
 ## Running it locally
 
