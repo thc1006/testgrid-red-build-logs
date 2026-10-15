@@ -595,7 +595,8 @@ class RunsTable(unittest.TestCase):
         self.assertIn("| Run (UTC) | New builds | Updated | Collection result |", runs)  # fails: Result
         self.assertIn("Collection result is how the run's fetch went:", runs)
         note = runs.split("\n\n")[1]
-        for value in ("ok", "interrupted", "problems", "no run report"):  # (each the cell can show)
+        for value in ("ok", "interrupted", "problems", "no run report",
+                      "unreadable run report"):  # (each the cell can show; the note lacked the last before)
             self.assertRegex(note, rf"\b{value}\b")
         self.assertIn("It does not include the verification that follows the fetch "
                       "([cross_check.py](../tool/cross_check.py))", note)
@@ -1540,11 +1541,16 @@ class IndexOpening(unittest.TestCase):
 # ------------------------------------------------------------------ a run folder's README
 
 class RunReadme(unittest.TestCase):
-    def readme(self, run):
-        """(a run folder's README.md for the report `run`)"""
+    def readme(self, run, run_json="the report"):
+        """(a run folder's README.md for the report `run`, read from its run.json: run_json is what
+        that holds, "the report" for `run` as JSON, None for no run.json, else text as it is)"""
         with tempfile.TemporaryDirectory() as root:
             rel = frl.new_run_dir(root, time.time())[1]
-            frl.write_json(os.path.join(root, rel, "run.json"), run)
+            if run_json == "the report":
+                frl.write_json(os.path.join(root, rel, "run.json"), run)
+            elif run_json is not None:
+                with open(os.path.join(root, rel, "run.json"), "w") as f:
+                    f.write(run_json)
             frl.write_run_readme(root, rel, run, [])
             with open(os.path.join(root, rel, "README.md")) as f:
                 return f.read()
@@ -1559,6 +1565,38 @@ class RunReadme(unittest.TestCase):
         problems = readme.split("## Problems\n\n")[1].split("\n\n")[0].splitlines()
         self.assertEqual(problems, ["- d\\_x: no summary", "- d\\_x#t\\|u: \\# no table",  # fails: d\_x#None: no summary
                                     "- 1\\. stopped", "- job\\_a/1: boom"])  # fails: None: 1\. stopped
+
+    def test_a_run_cut_off_before_its_report_gets_no_link_to_it(self):
+        """The README of a run cut off before it wrote run.json still said "[run.json](run.json) has
+        the details": a link to a file that is not there."""
+        readme = self.readme(None, run_json=None)
+        self.assertIn("This run was cut off before it wrote its report.", readme)
+        self.assertNotIn("(run.json)", readme)  # fails: [run.json](run.json) has the details
+        self.assertIn("lists the archived builds of the last 14 days, and links a page per week for older ones.", readme)
+
+    def test_a_report_that_cannot_be_read_is_called_that(self):
+        """A run whose run.json is there but cannot be read was called cut off before it wrote its
+        report, in its README (which linked run.json all the same) and in INDEX.md."""
+        readme = self.readme(None, run_json="{broken")
+        self.assertIn("Its report, [run.json](run.json), cannot be read.", readme)  # fails: cut off
+        self.assertNotIn("cut off", readme)
+        self.assertNotIn("has the details", readme)
+        now = time.time()
+        with tempfile.TemporaryDirectory() as root:
+            rels = [frl.new_run_dir(root, now - (4 - i) * 3600)[1] for i in range(3)]
+            with open(os.path.join(root, rels[0], "run.json"), "w") as f:
+                f.write("{broken")
+            os.symlink("nowhere", os.path.join(root, rels[1], "run.json"))
+            rows = frl.run_rows(root, report.day_of(now - 86400))
+            frl.write_run_readme(root, rels[1], None, [])  # (a link to nothing is there, but cannot be read)
+            with open(os.path.join(root, rels[1], "README.md")) as f:
+                self.assertIn("Its report, [run.json](run.json), cannot be read.", f.read())
+        self.assertEqual([[c.strip() for c in row.strip("|").split("|")][3] for row in rows],
+                         ["no run report: the run was cut off", "unreadable run report",
+                          "unreadable run report"])  # fails: no run report: the run was cut off
+
+    def test_control_a_run_with_its_report_links_it(self):
+        self.assertIn("[run.json](run.json) has the details;", self.readme({"run": "x", "outcomes": {}}))
 
 
 # ------------------------------------------------------------------ a dashboard, or the whole run, named as itself

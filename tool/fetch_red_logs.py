@@ -3654,7 +3654,9 @@ def run_rows(root, first_day, current=None):
                 run = None
         verified = "pending" if current and current.get("dir") == rel else verification_of(root, rel)
         if not isinstance(run, dict):
-            rows.append(f"| [{run_title(name)}]({rel}/) | | | no run report: the run was cut off | {verified} |")
+            result = "unreadable run report" if os.path.lexists(os.path.join(root, rel, "run.json")) else \
+                "no run report: the run was cut off"
+            rows.append(f"| [{run_title(name)}]({rel}/) | | | {result} | {verified} |")
             continue
         new, updated, problems = run_counts(run)
         result = "interrupted" if run.get("interrupted") is True else problems_text(problems) if problems else "ok"
@@ -3701,10 +3703,13 @@ def write_run_readme(root, rel, run, entries):
                 plausible_time(read.get("read"), time.time()):
             when = "by this run" if read["read"] == run.get("started") else f"by the run of {iso(read['read'])}"
             lines.append(f"TestGrid's config: {md_cell(config_about(source))}, read {when}.")
+    elif os.path.lexists(os.path.join(root, rel, "run.json")):
+        lines.append("Its report, [run.json](run.json), cannot be read.")
     else:
         lines.append("This run was cut off before it wrote its report.")
-    lines += ["", f"[run.json](run.json) has the details; [INDEX.md]({up}INDEX.md) lists the archived builds of the "
-              f"last {report.HEAT_DAYS} days, and links a page per week for older ones. "
+    details = "[run.json](run.json) has the details; " if isinstance(run, dict) else ""
+    lines += ["", f"{details}[INDEX.md]({up}INDEX.md) lists the archived builds of the last {report.HEAT_DAYS} days, "
+              "and links a page per week for older ones. "
               "A file marked provisional was taken before Prow finished uploading and is re-checked against "
               "GCS on every run until it settles.", ""]
     lines.append(f"## Builds archived by this run ({len(mine)})")
@@ -3820,7 +3825,8 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     lines += [f"## Runs in the last {report.HEAT_DAYS} days", "",
               "Collection result is how the run's fetch went: ok, interrupted, its number of problems (errors, "
               "serious warnings and tabs it could not read, listed in the README of the run's folder and in its "
-              "run.json), or no run report if the run was cut off before writing one. It does not include the "
+              "run.json), no run report if the run was cut off before writing one, or unreadable run report if its "
+              "run.json cannot be read. It does not include the "
               "verification that follows the fetch ([cross_check.py](../tool/cross_check.py)).", "",
               "Verification is the outcome that verification recorded in the run's verification.json: ok, its "
               "number of problems, timed out, interrupted, stopped (by an error), or incomplete (it ended "
