@@ -247,6 +247,40 @@ class Shells(unittest.TestCase):
                 done = self.dump_step(title, "#!/bin/sh\necho '{}'\n")
                 self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
 
+    def pinned_step(self, job_id, pinned):
+        """(the job's step `pinned`, run on the pinned.json `pinned`: its exit status, and what it
+        wrote to $GITHUB_OUTPUT, None if nothing)"""
+        flow = workflow("oracle.yml")
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "oracle"))
+            with open(os.path.join(tmp, "oracle", "pinned.json"), "w") as f:
+                f.write(pinned)
+            out = os.path.join(tmp, "outputs")
+            done = run_step(flow, flow["jobs"][job_id], step_of(flow, job_id, lambda s: s.get("id") == "pinned"), tmp,
+                            {"GITHUB_OUTPUT": out})
+            if not os.path.exists(out):
+                return done, None
+            with open(out) as f:
+                return done, f.read()
+
+    def test_the_go_version_steps_fail_without_one(self):
+        """oracle.yml:45 and :136 wrote `echo "go=$(python3 ...)" >> "$GITHUB_OUTPUT"`: the step's
+        status was echo's, so a pinned.json without "go" (or with an empty one) wrote go= and
+        passed, and setup-go, given no version, used the Go the runner has."""
+        for job_id in ("oracle", "follow"):
+            for pinned in ('{"testgrid_commit": "f15bfa4808a4"}\n', '{"go": ""}\n'):
+                with self.subTest(job=job_id, pinned=pinned):
+                    done, written = self.pinned_step(job_id, pinned)
+                    self.assertNotEqual(done.returncode, 0, done.stdout + done.stderr)  # fails: 0
+                    self.assertIsNone(written)  # fails: "go=\n"
+
+    def test_control_the_go_version_steps_write_the_pinned_go(self):
+        for job_id in ("oracle", "follow"):
+            with self.subTest(job=job_id):
+                done, written = self.pinned_step(job_id, '{"go": "1.26.5"}\n')
+                self.assertEqual(done.returncode, 0, done.stderr)
+                self.assertEqual(written, "go=1.26.5\n")
+
 
 if __name__ == "__main__":
     unittest.main()

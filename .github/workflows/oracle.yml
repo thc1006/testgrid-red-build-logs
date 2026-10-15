@@ -42,8 +42,12 @@ jobs:
         with:
           persist-credentials: false
 
+      # (assigned first, as the status of echo "go=$(...)" is echo's: a pinned.json without "go"
+      # would pass, and setup-go would use the Go the runner has; ${go:?} stops an empty one too)
       - id: pinned
-        run: echo "go=$(python3 -c 'import json; print(json.load(open("oracle/pinned.json"))["go"])')" >> "$GITHUB_OUTPUT"
+        run: |
+          go=$(python3 -c 'import json; print(json.load(open("oracle/pinned.json"))["go"])')
+          echo "go=${go:?pinned.json gives no Go version}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
@@ -135,7 +139,9 @@ jobs:
           persist-credentials: false
 
       - id: pinned
-        run: echo "go=$(python3 -c 'import json; print(json.load(open("oracle/pinned.json"))["go"])')" >> "$GITHUB_OUTPUT"
+        run: |
+          go=$(python3 -c 'import json; print(json.load(open("oracle/pinned.json"))["go"])')
+          echo "go=${go:?pinned.json gives no Go version}" >> "$GITHUB_OUTPUT"
 
       # (follow.sh builds the new commit with the Go its Bazel WORKSPACE registers, which
       # production's images are built with: the go command fetches it, GOTOOLCHAIN set to it)
