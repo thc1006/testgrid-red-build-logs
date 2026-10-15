@@ -427,6 +427,33 @@ class CommitStep(unittest.TestCase):
         self.assertIn(f"::error::{NEW}/build-log.txt.gz is larger than 95 MiB", done.stdout)
         self.assertEqual(os.path.getsize(os.path.join(self.repo, NEW, "build-log.txt.gz")), LIMIT + 1)
 
+    def test_a_page_too_large_puts_back_only_itself(self):
+        """red-build-logs.yml:180 gave `git checkout -q HEAD --` the page's name as a pathspec, so a page
+        named like a glob (the fetch names none so) put back the pages it matched too, and this
+        run's copy of one was lost."""
+        self.write("archive/weeks/2026-W4?.md", b"as last committed\n")
+        self.git(self.repo, "add", "-A")
+        self.git(self.repo, "commit", "-q", "-m", "a page named like a glob")
+        self.git(self.repo, "push", "-q")
+        self.write("archive/weeks/2026-W4?.md", size=LIMIT + 1)
+        self.write("archive/weeks/2026-W42.md", b"this run's\n")
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        files = self.pushed()
+        self.assertEqual(files["archive/weeks/2026-W4?.md"], len(b"as last committed\n"))
+        self.assertEqual(files["archive/weeks/2026-W42.md"], len(b"this run's\n"))  # fails: 18, put back too
+
+    def test_a_new_page_too_large_leaves_out_only_itself(self):
+        """The same for a page this run made: `git checkout -q HEAD --` put back the page it matched,
+        and kept the new one, too large, so the commit stopped."""
+        self.write("archive/weeks/2026-W4?.json", size=LIMIT + 1)
+        self.write("archive/weeks/2026-W42.json", b"this run's\n")
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)  # fails: 1
+        files = self.pushed()
+        self.assertNotIn("archive/weeks/2026-W4?.json", files)
+        self.assertEqual(files.get("archive/weeks/2026-W42.json"), len(b"this run's\n"))
+
     def test_control_a_page_too_large_keeps_the_version_last_committed(self):
         # (INDEX.md, index.json, a week's page and a chart: every run writes them anew; one this run made is left out)
         for page in ("INDEX.md", "index.json", "weeks/2026-W43.json", "charts/trend-light.svg"):

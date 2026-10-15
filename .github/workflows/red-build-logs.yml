@@ -190,7 +190,7 @@ jobs:
             find archive -maxdepth 1 \( -name INDEX.md -o -name index.json \) -type f -size +95M -print
           } | while IFS= read -r large; do
             echo "::warning::Not committing $large: larger than 95 MiB"
-            git checkout -q HEAD -- "$large" 2>/dev/null || rm -f -- "$large"
+            git --literal-pathspecs checkout -q HEAD -- "$large" 2>/dev/null || rm -f -- "$large"
           done
           big=$(find archive -type f -size +95M -print -quit)
           if [ -n "$big" ]; then
