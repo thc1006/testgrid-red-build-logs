@@ -30,7 +30,7 @@ import fetch_red_logs as frl  # noqa: E402
 import report  # noqa: E402
 import test_config_history as tch  # noqa: E402  (module imports: their tests are not collected here)
 import test_testgrid_config as ttc  # noqa: E402
-from test_fetch_red_logs import DAY  # noqa: E402
+from test_fetch_red_logs import DAY, table as fetch_table  # noqa: E402
 from test_integrity import HOUR, ArchiveWorld, obj  # noqa: E402
 
 
@@ -1453,6 +1453,40 @@ class NoConfigKnown(ttc.ConfigWorld):
                                                                           "read": self.now - HOUR}})
         self.assertEqual(self.fetch(), 0)
         self.assertNotIn("no TestGrid config known", " ".join(self.runs()[-1]["warnings"]))
+
+
+# ------------------------------------------------------------------ the warning that TestGrid's config was never read for a tab
+
+class NeverRead(ttc.ConfigWorld):
+    """"TestGrid's config was never read for N tabs (...): rows their filters hide count as
+    shown". For a tab with configs over time, those judge its builds (tab_verdict: held here, the
+    latest config lacking the tab), and its rows do not count as shown; cab048a said so of every
+    tab listed without a config read, as it did in the warning that no config is known (see
+    NoConfigKnown)."""
+
+    history, judged = tch.ConfigOverTime.history, tch.ConfigOverTime.judged
+
+    def test_not_said_of_a_tab_with_configs_over_time(self):
+        run = self.judged((self.now - 30 * DAY, {"dash": {"t": ttc.entry(""), "u": ttc.entry("")}}),
+                          (self.now - 40 * HOUR, {"dash": {"u": ttc.entry("")}}))  # (TestGrid still shows t)
+        self.assertEqual(run["outcomes"], {"held": [f"job/{self.b}"]})
+        never = next(w for w in run["serious_warnings"] if "TestGrid's config was never read for 1 tabs (dash#t)" in w)
+        self.assertNotIn("rows their filters hide count as shown", never)  # fails: said
+        self.assertIn("(dash#t): their builds are decided once a config with them is read", never)
+
+    def test_control_said_of_them_all_when_one_has_none(self):
+        # (v: listed and read, with no column yet, and in no config over time)
+        self.srv.summary("dash", {"t": "FAILING", "v": "PASSING"})
+        self.srv.table("dash", "v", fetch_table("bucket/logs/job", [], {}))
+        run = self.judged((self.now - 30 * DAY, {"dash": {"t": ttc.entry(""), "u": ttc.entry("")}}),
+                          (self.now - 40 * HOUR, {"dash": {"u": ttc.entry("")}}))
+        self.assertIn("TestGrid's config was never read for 2 tabs (dash#t, dash#v): rows their filters hide count as "
+                      "shown", run["serious_warnings"])
+
+    def test_control_said_of_a_tab_without_any(self):
+        self.assertEqual(self.fetch_with(os.path.join(self.dir, "missing.json")), 1)  # (none read, nor any over time)
+        self.assertIn("TestGrid's config was never read for 1 tabs (dash#t): rows their filters hide count as shown",
+                      self.runs()[-1]["serious_warnings"])
 
 
 if __name__ == "__main__":
