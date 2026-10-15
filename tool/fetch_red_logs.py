@@ -4689,16 +4689,17 @@ def run(args, root, run_start, pool, deadline):
                      f"{iso(floor if floor is not None else older[0] if older else min(c[0] for c in changed))}"
                      "; red builds in between may be missing" for key, r, floor, older, changed in gaps]
     tab_errors = [r for r in reports if r.get("error")]
-    # tabs whose builds this run judges from GCS (a history gap, or watched builds) without their config
+    # tabs whose builds this run judges from GCS (a history gap, or watched builds) without any config
+    # of theirs: neither one read nor their configs over time (by which tab_verdict judges them otherwise)
     judged = searched | {f"{t['dashboard']}#{t['tab']}" for x in retry + running_gap + list(stalled.values()) + still_shown
                          if x.get("watch") for t in x["tabs"]}
     involved = set(listed_ok) | judged
-    without = sorted(judged - set(rules))
+    without = sorted(k for k in judged - set(rules) if "eras" not in tab_rules.get(k, {}))
     if without:
         warnings.append(f"no TestGrid config known for {len(without)} tabs ({', '.join(without[:3])}"
                         f"{', ...' if len(without) > 3 else ''}): for the builds they no longer show, judged from GCS "
                         "now, rows their base options may hide count as shown, and their days of results are taken "
-                        "from their history")
+                        "from their history, or are TestGrid's default for a tab the archive no longer keeps")
 
     if args.list_only:
         config_warnings(involved)
