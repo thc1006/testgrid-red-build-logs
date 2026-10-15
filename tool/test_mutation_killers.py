@@ -135,7 +135,7 @@ class Unit(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             rel = frl.new_run_dir(root, time.time())[1]
             frl.write_json(os.path.join(root, rel, "run.json"), {"run": "x", "interrupted": "no", "outcomes": {}})
-            self.assertTrue(frl.run_rows(root, report.day_of(time.time() - DAY))[0].endswith("| ok |"))
+            self.assertTrue(frl.run_rows(root, report.day_of(time.time() - DAY))[0].endswith("| ok | not recorded |"))
 
     def test_P09_svg_text_drops_noncharacters(self):
         self.assertNotIn("￾", report.xml_text("a￾b"))

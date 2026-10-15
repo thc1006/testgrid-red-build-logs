@@ -103,6 +103,8 @@ LOG_FILES = {"build-log.txt", "build-log.txt.gz", "podinfo.json"}
 # a stored file too large for one file in git is kept as numbered parts: <file>.000, <file>.001, ...
 PART_RE = re.compile(r"(build-log\.txt(?:\.gz)?|podinfo\.json)\.([0-9]{3})")
 RUN_FILES = {"run.json", "README.md", "verification.json"}  # in a run folder, next to its job folders
+# verification.json's outcomes (cross_check.py --record): "incomplete" until the verification ends
+VERIFICATION_OUTCOMES = ("incomplete", "ok", "problems", "timed out", "interrupted", "stopped")
 RUN_RE = re.compile(r"([0-9]{4}-[0-9]{2})-[0-9]{2}T[0-9]{6}Z(?:-([1-9][0-9]*))?")
 RETRIES = 4
 BACKOFF = 2.0  # seconds before the first retry, doubled after each attempt, with jitter
@@ -3609,13 +3611,31 @@ def run_rows(root, first_day, current=None):
                 run = read_json(os.path.join(root, rel, "run.json"))
             except (ValueError, OSError):
                 run = None
+        verified = "pending" if current and current.get("dir") == rel else verification_of(root, rel)
         if not isinstance(run, dict):
-            rows.append(f"| [{run_title(name)}]({rel}/) | | | no run report: the run was cut off |")
+            rows.append(f"| [{run_title(name)}]({rel}/) | | | no run report: the run was cut off | {verified} |")
             continue
         new, updated, problems = run_counts(run)
         result = "interrupted" if run.get("interrupted") is True else problems_text(problems) if problems else "ok"
-        rows.append(f"| [{run_title(name)}]({rel}/) | {new} | {updated} | {result} |")
+        rows.append(f"| [{run_title(name)}]({rel}/) | {new} | {updated} | {result} | {verified} |")
     return rows
+
+
+def verification_of(root, rel):
+    """A run's Verification cell in INDEX.md: the outcome its verification.json records, linked."""
+    path = os.path.join(root, rel, "verification.json")
+    if not os.path.lexists(path):
+        return "not recorded"
+    try:
+        v = None if os.path.islink(path) else read_json(path)  # (a link in the archive is never followed)
+    except (ValueError, OSError):
+        v = None
+    outcome = v.get("outcome") if isinstance(v, dict) else None
+    if outcome not in VERIFICATION_OUTCOMES:
+        return "unreadable"
+    if outcome == "problems" and is_int(n := v.get("problem_count")) and n > 0:
+        outcome = problems_text(n)
+    return f"[{outcome}]({rel}/verification.json)"
 
 
 def write_run_readme(root, rel, run, entries):
@@ -3749,15 +3769,19 @@ def write_index(root, now, current_run=None, missing=(), known=None):
              "compared with GCS on every run and fetched again if GCS changes.", ""]
     lines += report.write_charts(root, counted, now, current_run)
     if waiting:
-        lines += ["## Not archived yet", "", f"{len(waiting)} red builds without a verified local copy yet."]
+        lines += ["## Not archived yet", "", f"{len(waiting)} red builds without an intact local copy yet."]
         lines += build_rows(waiting, files=False) + [""]
     lines += [f"## Runs in the last {report.HEAT_DAYS} days", "",
               "Collection result is how the run's fetch went: ok, interrupted, its number of problems (errors, "
               "serious warnings and tabs it could not read, listed in the README of the run's folder and in its "
               "run.json), or no run report if the run was cut off before writing one. It does not include the "
-              "verification that follows the fetch ([cross_check.py](../tool/cross_check.py)), whose result is in "
-              "the run's log on GitHub Actions.", "",
-              "| Run (UTC) | New builds | Updated | Collection result |", "|---|---:|---:|---|"]
+              "verification that follows the fetch ([cross_check.py](../tool/cross_check.py)).", "",
+              "Verification is the outcome that verification recorded in the run's verification.json: ok, its "
+              "number of problems, timed out, interrupted, stopped (by an error), or incomplete (it ended "
+              "without recording one). It is pending for the run that wrote this page (it is verified after); not "
+              "recorded when the run has no verification.json (it ran before verifications were recorded, was not "
+              "verified, or none could be written); and unreadable when the file is damaged.", "",
+              "| Run (UTC) | New builds | Updated | Collection result | Verification |", "|---|---:|---:|---|---|"]
     lines += run_rows(root, first_day, current_run) + [""]
     lines += [f"## Builds from the last {report.HEAT_DAYS} days", "",
               f"{len(recent)} archived builds that started since {first_day.isoformat()} (UTC), newest first."]
