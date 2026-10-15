@@ -33,7 +33,10 @@ left() {
 
 # (listing the upload job's runs reads GCS: bounded too, so the script ends well within its step)
 timeout -k 10 "$(left)" "$python" -I "$here/testgrid_config.py" uploads ${state:+--state "$state"} > "$work/uploads.json"
-mapfile -t recipes < <("$python" -I "$here/testgrid_config.py" recipes "$work/uploads.json")
+# (the configs to build go through a file: set -e does not see a command in a process
+# substitution fail, and a list cut short would pass for the whole)
+"$python" -I "$here/testgrid_config.py" recipes "$work/uploads.json" > "$work/recipes"
+mapfile -t recipes < "$work/recipes"
 
 git init -q "$work/test-infra"
 git -C "$work/test-infra" remote add origin https://github.com/kubernetes/test-infra
