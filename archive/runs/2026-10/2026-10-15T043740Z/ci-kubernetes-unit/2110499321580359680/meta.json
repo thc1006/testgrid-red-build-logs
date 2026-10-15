@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2110499321580359680",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1792017253,
+  "created": 1792017224,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/apiserver/pkg/util.proxy",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestStreamTranslator_TTYResizeChannel\n    streamtrans...} 1\n         \n--- FAIL: TestStreamTranslator_TTYResizeChannel (0.33s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792018626,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2110499321580359680",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2110499321580359680/build-log.txt",
+  "log": {
+    "bytes": 284831,
+    "md5": "af83762504a2ac35e7f7049200e09337",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 35303,
+    "gcs": {
+      "generation": "1792018627353670",
+      "md5": "af83762504a2ac35e7f7049200e09337",
+      "crc32c": "2843c534",
+      "bytes": 284831,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-15T043740Z",
+  "archived_at": 1792039060.0,
+  "settled": true,
+  "final": false
+}

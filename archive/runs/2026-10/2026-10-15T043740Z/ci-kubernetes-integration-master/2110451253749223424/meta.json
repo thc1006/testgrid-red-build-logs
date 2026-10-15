@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2110451253749223424",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1792005794,
+  "created": 1792005763,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.storage",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCorrectness/cacher_with_watch-delaying_etcd\n    c...15.31s)\n\n=== RUN   TestCorrectness\n--- FAIL: TestCorrectness (71.49s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792008012,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2110451253749223424",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2110451253749223424/build-log.txt",
+  "log": {
+    "bytes": 157912,
+    "md5": "3d8af8f0729c4ad48038190c11027829",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 12462,
+    "gcs": {
+      "generation": "1792008016665506",
+      "md5": "3d8af8f0729c4ad48038190c11027829",
+      "crc32c": "ced8a1c3",
+      "bytes": 157912,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-15T043740Z",
+  "archived_at": 1792039060.0,
+  "settled": true,
+  "final": false
+}

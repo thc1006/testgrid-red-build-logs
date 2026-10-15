@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2110472140603002880",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1792010744,
+  "created": 1792010743,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.diffResources",
+          "status": "FAIL",
+          "message": "Error: 3 leaked resources\n+NAME                                 MACHIN...de-template  e2-standard-2               2026-10-14T13:48:57.380-07:00"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792014188,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2110472140603002880",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2110472140603002880/build-log.txt",
+  "log": {
+    "bytes": 64326,
+    "md5": "5d68d214b8a03d027b421ffc83ab0090",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 13149,
+    "gcs": {
+      "generation": "1792014197734550",
+      "md5": "5d68d214b8a03d027b421ffc83ab0090",
+      "crc32c": "ed279cce",
+      "bytes": 64326,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-15T043740Z",
+  "archived_at": 1792039060.0,
+  "settled": true,
+  "final": false
+}

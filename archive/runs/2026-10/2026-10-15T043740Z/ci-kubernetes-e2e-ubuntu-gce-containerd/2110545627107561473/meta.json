@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2110545627107561473",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1792028265,
+  "created": 1792028264,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Connectivity Pod Lifecycle should be able to connect to other Pod from a terminating Pod",
+          "status": "FAIL",
+          "message": "[FAILED] error running /workspace/kubernetes/platforms/linux/amd64/kub...8s.io/kubernetes/test/e2e/network/util.go:182 @ 10/15/26 02:04:13.996\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792030449,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110545627107561473",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110545627107561473/build-log.txt",
+  "log": {
+    "bytes": 171963,
+    "md5": "283597e31a84b69989dc17cb2f4d9d0d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23370,
+    "gcs": {
+      "generation": "1792030465088664",
+      "md5": "283597e31a84b69989dc17cb2f4d9d0d",
+      "crc32c": "8cb4300e",
+      "bytes": 171963,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-15T043740Z",
+  "archived_at": 1792039060.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2110558713260544000",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1792031418,
+  "created": 1792031384,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.storage",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCorrectness/cacher_with_bookmark-dropping_etcd\n  ...t StatusReasonTimeout error events\n--- FAIL: TestCorrectness (58.04s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792033675,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2110558713260544000",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2110558713260544000/build-log.txt",
+  "log": {
+    "bytes": 158285,
+    "md5": "eb24e433b2017b8b7650bb48e4d430e5",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 12532,
+    "gcs": {
+      "generation": "1792033678642574",
+      "md5": "eb24e433b2017b8b7650bb48e4d430e5",
+      "crc32c": "92e3d8fd",
+      "bytes": 158285,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-15T043740Z",
+  "archived_at": 1792039060.0,
+  "settled": false,
+  "final": false
+}

@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2110378021654368256",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1791988335,
+  "created": 1791988303,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-storage] k8s.io/kubernetes/pkg/controller/volume.persistentvolume",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestControllerSync\n    pv_controller_test.go:388: Fai...ion_protection_finalizer_removed_as_CSI_migration_is_disabled (0.01s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1791989690,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2110378021654368256",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2110378021654368256/build-log.txt",
+  "log": {
+    "bytes": 328330,
+    "md5": "c7a2400612bbad0103da6062b624e29d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 39593,
+    "gcs": {
+      "generation": "1791989691063088",
+      "md5": "c7a2400612bbad0103da6062b624e29d",
+      "crc32c": "657e0f4a",
+      "bytes": 328330,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-15T043740Z",
+  "archived_at": 1792039060.0,
+  "settled": true,
+  "final": false
+}

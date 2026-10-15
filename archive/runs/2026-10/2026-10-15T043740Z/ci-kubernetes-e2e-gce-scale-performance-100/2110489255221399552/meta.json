@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-performance-100",
+  "build": "2110489255221399552",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100",
+  "started": 1792014855,
+  "created": 1792014824,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-master-scale-performance-100",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-scale-performance-100.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792016373,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2110489255221399552",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2110489255221399552/build-log.txt",
+  "log": {
+    "bytes": 325564,
+    "md5": "af870ad8287c00b8cf5c5d4f6fb970dd",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 40080,
+    "gcs": {
+      "generation": "1792016387752410",
+      "md5": "af870ad8287c00b8cf5c5d4f6fb970dd",
+      "crc32c": "d5293389",
+      "bytes": 325564,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-15T043740Z",
+  "archived_at": 1792039060.0,
+  "settled": true,
+  "final": false
+}

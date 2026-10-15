@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2110529771002662912",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1792024484,
+  "created": 1792024483,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics Ephemeral should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 10/15/26 01:28:42.821\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792028205,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110529771002662912",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110529771002662912/build-log.txt",
+  "log": {
+    "bytes": 188284,
+    "md5": "7cc6163f18a0f68f38c11ed79900a7e2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25923,
+    "gcs": {
+      "generation": "1792028220900164",
+      "md5": "7cc6163f18a0f68f38c11ed79900a7e2",
+      "crc32c": "acb392d3",
+      "bytes": 188284,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-15T043740Z",
+  "archived_at": 1792039060.0,
+  "settled": true,
+  "final": false
+}
