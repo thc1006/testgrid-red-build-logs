@@ -4268,6 +4268,13 @@ def main(argv=None):
             lock.close()
 
 
+def tab_error_words(r):
+    """How the log names a tab's report with an error: "ERROR tab <dashboard> <tab>", or, without
+    a tab (a dashboard's summary that could not be read, or a tab name in it that cannot be used),
+    "ERROR dashboard <dashboard>"."""
+    return ("ERROR dashboard", r["dashboard"]) if r["tab"] is None else ("ERROR tab", r["dashboard"], r["tab"])
+
+
 def interrupt(signum, frame):
     raise KeyboardInterrupt
 
@@ -4723,7 +4730,7 @@ def run(args, root, run_start, pool, deadline):
         print(f"{len(reports)} tabs read ({len(tab_errors)} failed), {len(selected)} red builds, "
               f"{len(retry) - rechecks} to retry, {rechecks} archived builds to compare with GCS again")
         for r in tab_errors:
-            print("ERROR", r["dashboard"], r["tab"], r["error"], file=sys.stderr)
+            print(*tab_error_words(r), r["error"], file=sys.stderr)
         for w in warnings:
             print("WARNING", w, file=sys.stderr)
         return 1 if tab_errors else 0
@@ -4928,9 +4935,9 @@ def run(args, root, run_start, pool, deadline):
               f"of max {concurrency['ceiling']}, {c['pushbacks']} pushbacks")
     print(f"  folder: {os.path.join(root, run_rel)}")
     for r in tab_errors:
-        print("ERROR tab", r["dashboard"], r["tab"], r["error"], file=sys.stderr)
-    for e in errors:
-        print("ERROR build" if e["build"] else "ERROR", e["build"] or "", e["error"], file=sys.stderr)
+        print(*tab_error_words(r), r["error"], file=sys.stderr)
+    for e in errors:  # (one of the whole run names no build)
+        print(*(("ERROR build", e["build"]) if e["build"] else ("ERROR",)), e["error"], file=sys.stderr)
     for w in warnings:
         print("WARNING", w, file=sys.stderr)
     if interrupted:

@@ -1561,5 +1561,67 @@ class RunReadme(unittest.TestCase):
                                     "- 1\\. stopped", "- job\\_a/1: boom"])  # fails: None: 1\. stopped
 
 
+# ------------------------------------------------------------------ a dashboard, or the whole run, named as itself
+
+class NamedAsItself(ArchiveWorld):
+    """A dashboard whose summary cannot be read (its report has no tab) and an error of the whole
+    run (no build), next to a tab and a build that have names. cab048a named the missing tab and
+    build anyway, as None, in cross_check.py's problems (which verification.json, added since,
+    keeps) and in the fetch's log, where an error of the whole run also got two spaces."""
+
+    def test_cross_check_names_neither(self):
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.fetch()
+        run_json = os.path.join(self.root, frl.run_dirs(self.root)[-1], "run.json")
+        run = frl.read_json(run_json)
+        frl.write_json(run_json, dict(run, tabs=run["tabs"] + [{"dashboard": "other", "tab": None, "error": "summary: boom"},
+                                                               {"dashboard": "dash", "tab": "u", "error": "no table"}],
+                                      errors=[{"build": None, "error": "the run stopped before it finished"},
+                                              {"build": "job/1", "error": "boom"}]))
+        code, out = self.check()
+        self.assertEqual(code, 1, out)
+        self.assertIn("PROBLEM: dashboard other: summary: boom\n", out)  # fails: tab not scanned by the run: other#None
+        self.assertIn("PROBLEM: tab not scanned by the run: dash#u: no table\n", out)
+        self.assertIn("PROBLEM: the run reported an error: the run stopped before it finished\n", out)  # fails: for None
+        self.assertIn("PROBLEM: the run reported an error for job/1: boom\n", out)
+        self.assertNotIn("None", out)
+
+    def errors_logged(self, *extra):
+        """(the ERROR lines of a fetch of dash, whose tab u cannot be read, and other, whose summary cannot)"""
+        self.srv.summary("dash", {"t": "FAILING", "u": "FAILING"})
+        self.srv.table("dash", "u", (500, {}, b""))
+        self.srv.route("/other/summary", (500, {}, b""))
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            frl.main(["--archive", self.root, "--dashboard", "dash", "--dashboard", "other", "--testgrid", self.srv.url,
+                      "--gcs", self.srv.url, *extra])
+        return [ln for ln in err.getvalue().splitlines() if ln.startswith("ERROR")]
+
+    def test_the_fetchs_log_names_no_tab(self):
+        for extra in ((), ("--list-only",)):
+            with self.subTest(extra=extra):
+                lines = self.errors_logged(*extra)
+                self.assertTrue(any(ln.startswith("ERROR dashboard other summary: ") for ln in lines), lines)  # fails
+                self.assertTrue(any(ln.startswith("ERROR tab dash u ") for ln in lines), lines)
+                self.assertFalse([ln for ln in lines if "None" in ln], lines)
+
+    def test_control_an_error_of_a_build_names_it(self):
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
+        with mock.patch.object(frl, "BACKOFF", 0):
+            lines = self.errors_logged()
+        self.assertTrue(any(ln.startswith(f"ERROR build {self.key} ") for ln in lines), lines)
+
+    def test_an_error_of_the_whole_run_gets_one_space(self):
+        # (two copies of one build, in two run folders, is one)
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.fetch()
+        shutil.copytree(self.bdir(), os.path.join(self.root, "runs", "2026-01", "2026-01-01T000000Z", "job", self.build))
+        lines = self.errors_logged()
+        self.assertTrue(any(ln.startswith("ERROR duplicate copies: ") for ln in lines), lines)  # fails: ERROR  duplicate
+
+
 if __name__ == "__main__":
     unittest.main()
