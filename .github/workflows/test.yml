@@ -1,10 +1,11 @@
 name: Test
 
+# (and .gitignore: tests read it)
 on:
   push:
-    paths: ["tool/**", ".github/workflows/**"]
+    paths: ["tool/**", ".github/workflows/**", ".gitignore"]
   pull_request:
-    paths: ["tool/**", ".github/workflows/**"]
+    paths: ["tool/**", ".github/workflows/**", ".gitignore"]
 
 permissions:
   contents: read # check out the code, nothing else
