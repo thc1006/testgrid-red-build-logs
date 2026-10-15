@@ -90,7 +90,8 @@ class RememberedMismatch(ttc.ConfigWorld):
         self.srv.gcs_listing("bucket", [f"logs/job/{x}/finished.json" for x in (self.visible, w, y)])
         state["watch"] = {f"job/{y}": {"rec": self.watched(y), "first_seen": self.now - 7 * HOUR}}
         frl.write_json(os.path.join(self.root, "state.json"), state)
-        self.assertEqual(self.fetch_with(path), 0)
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set()):  # (w, final, not in this run's sevenths)
+            self.assertEqual(self.fetch_with(path), 0)
         self.assertEqual(self.runs()[-1]["outcomes"], {"not-red": [f"job/{y}"]})
 
     def test_cross_check_judges_by_the_runs_mismatch_record(self):

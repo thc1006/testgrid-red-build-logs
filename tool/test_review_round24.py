@@ -18,6 +18,7 @@ import tempfile
 import threading
 import time
 import unittest
+import zlib
 from unittest import mock
 
 import yaml
@@ -1162,6 +1163,210 @@ class Sevenths(unittest.TestCase):
         # (the fetch and cross_check.py sample apart, in two processes: crc32 of "job/build", not hash())
         for key, seventh in (("ci-kind-dra/2104314601444216832", 5), ("job/1", 3), ("job/2", 6)):
             self.assertEqual([s for s in range(7) if frl.sampled(key, {s})], [seventh], key)  # fails: no frl.sampled
+
+
+# ------------------------------------------------------------------ final builds, compared with GCS once a week
+
+class FinalBuilds(ArchiveWorld):
+    """A build final since its first fetch (it finished 3 days before), whose log GCS has replaced
+    since. The next fetch's sevenths of the archive (frl.gcs_sevenths, which cross_check.py
+    compares too) hold it or not. cab048a never compared a final build again; only cross_check.py
+    did, once a week, and failed the run each time ("GCS changed since it was archived"), while no
+    run fetched it again."""
+
+    def setUp(self):
+        super().setUp()
+        self.calls = []
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"first upload\n", "1", self.calls))
+        self.assertEqual(self.fetch(), 0)
+        self.assertTrue(self.meta()["final"])
+        self.srv.route(self.base + "/build-log.txt", obj(b"a later upload\n", "2", self.calls))
+
+    def fetch_in(self, sevenths):
+        with mock.patch.object(frl, "gcs_sevenths", return_value=sevenths, create=True):  # (cab048a has none)
+            return self.fetch()
+
+    def test_a_final_build_in_the_runs_sevenths_is_fetched_again(self):
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        run = self.runs()[-1]
+        self.assertEqual(run["outcomes"], {"refreshed": [self.key]})  # fails: already-archived
+        self.assertEqual(self.read("build-log.txt"), b"a later upload\n")
+        m = self.meta()
+        self.assertEqual((m["refreshed"], m["refreshed_by_run"], m["final"]), (["build-log.txt"], run["run"], True))
+        self.assertEqual(self.check()[0], 0)  # (cross_check.py compares it too: the same now)
+
+    def test_a_final_build_is_compared_in_its_own_seventh_only(self):
+        own = zlib.crc32(self.key.encode()) % 7  # (as cross_check.py samples it: by "job/build")
+        self.assertEqual(self.fetch_in(set(range(7)) - {own}), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
+        self.assertEqual(self.fetch_in({own}), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"refreshed": [self.key]})  # fails: already-archived
+
+    def test_the_fetch_samples_a_build_by_its_job_and_build(self):
+        # (as cross_check.py does; whichever seventh its folder or number would fall in)
+        asked, sampled = [], frl.sampled  # fails: no frl.sampled
+
+        def spy(key, sevenths):
+            asked.append(key)
+            return sampled(key, sevenths)
+        with mock.patch.object(frl, "sampled", spy):
+            self.assertEqual(self.fetch_in({0}), 0)  # (one seventh: the build may be in it or not)
+        self.assertEqual(asked, [self.key])
+
+    def test_one_no_longer_on_testgrid_too(self):
+        # (it scrolled off: found among the archived builds, not among those TestGrid shows red)
+        self.show([str(int(self.build) + (1 << 22))], {"job.Overall": ([1], [""])})
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        run = self.runs()[-1]
+        self.assertEqual((run["outcomes"], run["rechecked"]), ({"refreshed": [self.key]}, 1))  # fails: ({}, 0)
+        self.assertEqual(self.read("build-log.txt"), b"a later upload\n")
+
+    def test_a_damaged_final_build_no_longer_on_testgrid_is_repaired_in_its_seventh(self):
+        # (cross_check.py reports the damage on every run; before, only a build TestGrid still showed was
+        # fetched again)
+        self.show([str(int(self.build) + (1 << 22))], {"job.Overall": ([1], [""])})
+        with open(os.path.join(self.bdir(), "build-log.txt"), "ab") as f:
+            f.write(b"damage")
+        self.assertEqual(self.fetch_in(set()), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {})  # (outside its seventh: not looked at)
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"repaired": [self.key]})  # fails: {}
+        self.assertEqual(self.read("build-log.txt"), b"a later upload\n")
+        self.assertEqual(self.check()[0], 0)
+
+    def test_the_fetch_and_cross_check_compare_the_same_sevenths(self):
+        # (each for the run it makes or verifies, with the run before three days back: several sevenths)
+        seen, sevenths = [], frl.gcs_sevenths  # fails: no frl.gcs_sevenths
+
+        def spy(root, t0):
+            seen.append((t0, sevenths(root, t0)))
+            return seen[-1][1]
+        run_json = os.path.join(self.root, frl.run_dirs(self.root)[-1], "run.json")
+        frl.write_json(run_json, dict(frl.read_json(run_json), started=time.time() - 3 * DAY))
+        with mock.patch.object(frl, "gcs_sevenths", spy):
+            self.fetch()
+            self.check()
+        started = self.runs()[-1]["started"]
+        self.assertEqual([t0 for t0, _ in seen], [started, started])
+        self.assertEqual(seen[0][1], seen[1][1])
+        self.assertGreater(len(seen[0][1]), 1)
+
+    def test_a_final_build_that_cannot_be_compared_is_an_error_of_the_run(self):
+        # (archived 20 days before: a build not final would stop being compared after 14 days of errors)
+        meta = os.path.join(self.bdir(), "meta.json")
+        frl.write_json(meta, dict(self.meta(), archived_at=time.time() - 20 * DAY))
+        self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
+        before = self.meta()
+        self.assertEqual(self.fetch_in(set(range(7))), 1)  # fails: 0, not compared
+        run = self.runs()[-1]
+        self.assertIn("comparing the archived copy with GCS failed", run["errors"][0]["error"])
+        self.assertNotIn("stopped-comparing", run["outcomes"])
+        self.assertEqual(self.meta(), before)  # (compared again by the next run that compares its seventh)
+        self.assertNotIn(self.key, frl.read_json(os.path.join(self.root, "state.json"))["unresolved"])
+        self.assertEqual(self.read("build-log.txt"), b"first upload\n")
+
+    def test_a_note_that_it_was_not_compared_goes_once_it_is(self):
+        frl.write_json(os.path.join(self.bdir(), "meta.json"),
+                       dict(self.meta(), archived_at=time.time() - 20 * DAY,
+                            note="not compared with GCS after 14 days of errors: HTTPError: 500"))
+        self.srv.route(self.base + "/build-log.txt", obj(b"first upload\n", "1", self.calls))
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        self.assertNotIn("note", self.meta())  # fails: kept
+
+    def test_control_another_note_stays(self):
+        note = "GCS had neither finished.json nor build-log.txt 96h after the build started"
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), note=note))
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        self.assertEqual(self.meta()["note"], note)
+
+    def test_control_a_note_that_is_not_text_stays(self):
+        # (a meta.json edited by hand, "note": null: compared, it is neither dropped nor an error)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), note=None))
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        self.assertIsNone(self.meta()["note"])
+
+    def test_control_the_flag_is_never_stored(self):
+        # (it goes to archive() for one call: not into a build's record, meta.json or state.json)
+        new = str(int(self.build) + (1 << 22))
+        self.show([new, self.build], {"job.Overall": ([12, 12], ["", ""])})
+        self.srv.route(f"/bucket/logs/job/{new}/build-log.txt", obj(b"new\n"))
+        self.srv.route(f"/bucket/logs/job/{new}/finished.json", (200, {}, {"result": "FAILURE", "timestamp": int(time.time())}))
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        for path in [os.path.join(self.bdir(b), "meta.json") for b in (self.build, new)] + [
+                os.path.join(self.root, "state.json")]:
+            with open(path) as f:
+                self.assertNotIn("compare_final", f.read(), path)
+
+    def test_control_a_final_build_outside_them_is_not_compared(self):
+        hits = self.srv.hits(self.base + "/finished.json")
+        self.assertEqual(self.fetch_in(set()), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
+        self.assertEqual((self.calls, self.srv.hits(self.base + "/finished.json")), (["GET"], hits))
+        self.assertEqual(self.read("build-log.txt"), b"first upload\n")
+
+    def test_control_a_final_build_gcs_no_longer_has_stays_as_it_is(self):
+        for name in ("build-log.txt", "finished.json"):
+            self.srv.route(f"{self.base}/{name}", (404, {}, b""))
+        before = self.meta()
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
+        self.assertEqual((self.meta(), self.read("build-log.txt")), (before, b"first upload\n"))
+
+
+class FinalBuildsOtherwise(ArchiveWorld):
+    """Final builds of other kinds, compared in the run's sevenths (cab048a compared none again, so
+    each test but the control fails there)."""
+
+    def fetch_in(self, sevenths):
+        with mock.patch.object(frl, "gcs_sevenths", return_value=sevenths, create=True):  # (cab048a has none)
+            return self.fetch()
+
+    def test_one_archived_without_a_log_gets_a_late_one(self):
+        # (cross_check.py found the log in GCS, once a week, and failed the run: "GCS now has a
+        # build-log.txt that is not archived")
+        self.finished(ago=3 * DAY)
+        self.assertEqual(self.fetch(), 0)
+        self.assertIsNone(self.meta()["log"])
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+        self.assertEqual(self.fetch_in(set()), 0)
+        self.assertTrue(self.meta()["final"])
+        self.srv.route(self.base + "/build-log.txt", obj(b"late log\n"))
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"log-recovered": [self.key]})  # fails: already-archived
+        self.assertEqual(self.read("build-log.txt"), b"late log\n")
+        self.assertEqual(self.check()[0], 0)
+
+    def test_one_never_settled_settles_once_compared(self):
+        # (final without a finished.json, 14 days after it was archived: compared, it takes the one now there)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n", "1"))
+        self.assertEqual(self.fetch(), 0)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+        self.assertEqual(self.fetch_in(set()), 0)
+        self.assertEqual((self.meta()["settled"], self.meta()["final"]), (False, True))
+        self.finished(ago=3 * DAY)
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        self.assertEqual((self.meta()["settled"], self.meta()["final"]), (True, True))  # fails: (False, True)
+
+    def test_control_one_not_final_still_gives_up_in_the_runs_sevenths(self):
+        # (in the sevenths but not final: after 14 days of errors it stops being compared, as before)
+        self.finished(ago=3 * 3600)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+        self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
+        self.assertEqual(self.fetch_in(set(range(7))), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"stopped-comparing": [self.key]})
+
+    def test_control_one_not_final_is_compared_outside_the_runs_sevenths_too(self):
+        # (off TestGrid and not final: compared on every run, whichever sevenths the run compares)
+        self.finished(ago=3 * 3600)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n", "1"))
+        self.assertEqual(self.fetch(), 0)
+        self.show([str(int(self.build) + (1 << 22))], {"job.Overall": ([1], [""])})
+        self.srv.route(self.base + "/build-log.txt", obj(b"log, longer\n", "2"))
+        self.assertEqual(self.fetch_in(set()), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"refreshed": [self.key]})
 
 
 if __name__ == "__main__":

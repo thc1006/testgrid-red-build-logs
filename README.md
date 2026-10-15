@@ -57,7 +57,11 @@ the config the tab had at the time, and marks it as taken from GCS.
    and checksum against GCS. In the same pass, compare recent builds with GCS
    again, since Prow can upload a log twice. A build is compared until 48 hours
    after it finished; one without a log or without `finished.json`, until 14
-   days after it was archived.
+   days after it was archived. After that, it is compared at least once a week:
+   the archive's builds are split into seven by a hash of their job and build,
+   and each run compares the seventh for its UTC day, and those of any days
+   since the run before, as `cross_check.py` does. A run cut off before it got
+   to a build leaves it to the next run that compares its seventh.
 5. Rewrite the index and the charts, then run
    [`cross_check.py`](tool/cross_check.py). It checks the archive again on its
    own, and fails the run if a red build is missing or a stored file changed.

@@ -439,12 +439,13 @@ class Archive(ArchiveWorld):
         self.fetch()
         self.assertEqual(self.runs()[-1]["outcomes"], {"repaired": [self.key]})
 
-    def test_RN03_a_final_build_is_not_queued_again(self):
+    def test_RN03_a_final_build_outside_the_runs_sevenths_is_not_queued_again(self):
         self.finished(ago=3 * DAY)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.fetch()
         self.off_testgrid()
-        self.fetch()
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set()):  # (not in this run's sevenths)
+            self.fetch()
         self.assertEqual(self.runs()[-1]["rechecked"], 0)
 
     def test_L11_L12_a_cleaned_run_folder_goes_away(self):

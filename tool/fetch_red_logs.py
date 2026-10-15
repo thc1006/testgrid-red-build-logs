@@ -24,9 +24,13 @@ A matching md5 only proves the copy equals what GCS held at that moment, and
 Prow can upload a log again (its sidecar uploads once when told to stop and
 again when the test exits). So every archived build is compared with GCS on
 every run until RECHECK_HOURS after it finished (GIVE_UP_DAYS after it was
-archived, for one without a log), and fetched again whenever GCS holds
-different content. A copy taken less than SETTLE_HOURS after the
-build finished, or before it finished at all, is marked as not settled.
+archived, for one without a log or finished.json), and fetched again whenever
+GCS holds different content. After that (it is final), it is compared at least
+once a week: each run compares the seventh of the archive for its UTC day, and
+those of the days since the run before (see gcs_sevenths), as cross_check.py
+does. One a run cut off did not get to waits for the next run that compares its
+seventh. A copy taken less than SETTLE_HOURS after the build finished, or before
+it finished at all, is marked as not settled.
 
 Each run gets its own folder; a build is stored in the folder of the run that
 first archived it, and later repairs or refreshes happen in place. Layout
@@ -1519,7 +1523,8 @@ def stray_files(target, meta):
 
 
 class RecheckError(Exception):
-    """Comparing an intact archived build with GCS failed; its copy stays and is checked again next run."""
+    """Comparing an intact archived build with GCS failed; its copy stays and is compared again by a
+    later run (a final one, by the next run that compares its seventh: see gcs_sevenths)."""
 
 
 def read_finished(base):
@@ -2975,9 +2980,10 @@ def settle_flags(meta, checked, now):
 
     settled: the copy was taken or confirmed SETTLE_HOURS after the build
     finished, when Prow had stopped uploading. final: it was confirmed
-    RECHECK_HOURS after that, so later runs stop comparing it. A build without
-    finished.json, or without a log, keeps being checked for a late one until
-    GIVE_UP_DAYS after it was first archived.
+    RECHECK_HOURS after that, so later runs compare it only in its seventh of
+    the archive (see gcs_sevenths). A build without finished.json, or without a
+    log, keeps being checked for a late one on every run until GIVE_UP_DAYS after
+    it was first archived.
     """
     fin = meta.get("finished")
     if not plausible_time(fin, now) or fin < meta["created"] - 86400:
@@ -2989,9 +2995,10 @@ def settle_flags(meta, checked, now):
     return settled, checked >= fin + RECHECK_HOURS * 3600
 
 
-def recheck(old, rec, target, base, run_id, now, compress, max_bytes):
-    """An intact archived build: add new tab sightings and, until it is final,
-    compare its files with GCS and fetch again whatever GCS now holds instead."""
+def recheck(old, rec, target, base, run_id, now, compress, max_bytes, compare_final=False):
+    """An intact archived build: add new tab sightings and, until it is final (or when
+    compare_final: a final build in this run's sevenths, see gcs_sevenths), compare its
+    files with GCS and fetch again whatever GCS now holds instead."""
     tabs, _ = merge_tabs(old["tabs"], rec["tabs"])
     meta = copy.deepcopy(dict(old, tabs=tabs))  # the file records may gain a GCS identity below
     if meta.get("started") is None and rec.get("started") is not None:
@@ -3000,7 +3007,7 @@ def recheck(old, rec, target, base, run_id, now, compress, max_bytes):
         write_json(os.path.join(target, "meta.json"), meta)
         old = copy.deepcopy(meta)
     outcome = "already-archived"
-    if not old.get("final"):
+    if not old.get("final") or compare_final:
         try:
             finished = read_finished(base)
             changed = []
@@ -3037,7 +3044,8 @@ def recheck(old, rec, target, base, run_id, now, compress, max_bytes):
             raise
         except Exception as e:
             first = meta.get("archived_at") if plausible_time(meta.get("archived_at"), now) else meta["created"]
-            if now - first <= GIVE_UP_DAYS * 86400:
+            # (a final one is compared again by the next run that compares its seventh)
+            if old.get("final") or now - first <= GIVE_UP_DAYS * 86400:
                 raise RecheckError(f"comparing the archived copy with GCS failed: {type(e).__name__}: {e}") from None
             meta.update(final=True, note=f"not compared with GCS after {GIVE_UP_DAYS} days of errors: "
                                          f"{type(e).__name__}: {e}"[:300])
@@ -3047,6 +3055,8 @@ def recheck(old, rec, target, base, run_id, now, compress, max_bytes):
             meta.update(refreshed_by_run=run_id, refreshed=changed)
             if outcome == "already-archived":
                 outcome = "refreshed"
+        if str(meta.get("note", "")).startswith("not compared with GCS after "):
+            del meta["note"]  # (compared now, after all)
         if finished is not None:  # a field this read could not tell keeps what was recorded
             if finished["result"] is not None:
                 meta["result"] = finished["result"]
@@ -3059,10 +3069,11 @@ def recheck(old, rec, target, base, run_id, now, compress, max_bytes):
 
 
 def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_bytes=95 << 20, tab_rules=None,
-            timelines=None):
+            timelines=None, compare_final=False):
     """Archive one red build into `target` (its existing folder, or one in this run's folder).
     tab_rules: per tab ("dashboard#tab"), the rows it shows and its days of results, for a
-    build from a history gap that is judged here (see judge_in_tabs, and its timelines)."""
+    build from a history gap that is judged here (see judge_in_tabs, and its timelines).
+    compare_final: compare it with GCS even if it is final (see recheck)."""
     meta_path = os.path.join(target, "meta.json")
     base = f"{gcs}/{rec['query']}/{rec['build']}"
     existed = os.path.exists(meta_path)
@@ -3072,7 +3083,7 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
         old = None  # corrupt meta.json: archive the build again
     old = old if valid_meta(old) and old.get("job") == rec["job"] and old.get("build") == rec["build"] else None
     if old and intact(target, old, deep=True):
-        return recheck(old, rec, target, base, run_id, now, compress, max_bytes)
+        return recheck(old, rec, target, base, run_id, now, compress, max_bytes, compare_final)
     if not rec.get("watch"):
         return store(rec, target, existed, old, read_finished(base), base, run_id, now, max_job_hours, compress,
                      max_bytes)
@@ -3252,10 +3263,11 @@ def run_started(path):
 
 
 def gcs_sevenths(root, t0):
-    """The sevenths of the archived builds (see sampled()) that cross_check.py compares with GCS
-    again when it verifies the run started at t0: one for each UTC day from the day after the
-    run before it to the day of this one, at least this day's, so all seven after a week
-    without a run. Each build is compared at least once a week, even when a day has no run."""
+    """The sevenths of the archived builds (see sampled()) that the run started at t0 compares
+    with GCS again, final or not: one for each UTC day from the day after the run before it
+    to the day of this one, at least this day's, so all seven after a week without a run.
+    Each build is compared at least once a week, even when a day has no run. cross_check.py
+    compares the same ones when it verifies that run."""
     day = int(t0 // 86400)
     previous = next((s for s in (run_started(os.path.join(root, rel, "run.json")) for rel in reversed(run_dirs(root)))
                      if s is not None and s < t0), None)
@@ -4262,6 +4274,10 @@ def run(args, root, run_start, pool, deadline):
         clean_partial_builds(root, warnings)
     state = load_state(root, warnings)
     known, duplicates = archived_builds(root)
+    # the archived builds in this run's sevenths: compared with GCS even if final (cross_check.py
+    # compares them too), see gcs_sevenths
+    sevenths = gcs_sevenths(root, run_start)
+    resampled = {key for key in known if sampled(key, sevenths)}
     folders = run_dirs(root)
     archive_start = folder_time(folders[0].rsplit("/", 1)[1]) if folders else None
     dashboards = args.dashboards or DASHBOARDS
@@ -4559,7 +4575,8 @@ def run(args, root, run_start, pool, deadline):
         else:
             shown_settled.append(k)
     # Archived builds that are not final yet are compared with GCS again, even
-    # after TestGrid drops them: their logs may still be replaced by Prow.
+    # after TestGrid drops them: their logs may still be replaced by Prow. So are
+    # the final ones in this run's sevenths (see gcs_sevenths).
     queued = chosen | set(state["unresolved"]) | set(given_up) | set(state["watch"])
     # A column TestGrid still shows as running long after its job should have ended
     # may never finish: TestGrid paints it red 24 hours after it started, and it can
@@ -4579,7 +4596,7 @@ def run(args, root, run_start, pool, deadline):
             meta = read_json(os.path.join(root, rel, "meta.json"))
         except (ValueError, OSError):
             continue  # reported as unreadable by the index
-        if valid_meta(meta) and not meta.get("final") and (rec := recheck_rec(meta, run_start, key)):
+        if valid_meta(meta) and (not meta.get("final") or key in resampled) and (rec := recheck_rec(meta, run_start, key)):
             retry.append(rec)
             rechecks += 1
     # A gap in a tab's history: list the job's builds from that time in GCS and
@@ -4742,7 +4759,7 @@ def run(args, root, run_start, pool, deadline):
         timelines.prime(pool, args.gcs, watched, deadline, events={k: v[1] for k, v in watched.items()},
                         days={k: v[0] for k, v in watched.items()})
         futures = {pool.submit(archive, b, target_of(b), args.gcs, run_id, run_start, hours(b), args.gzip,
-                               max_bytes, tab_rules, timelines): b
+                               max_bytes, tab_rules, timelines, compare_final=f"{b['job']}/{b['build']}" in resampled): b
                    for b in selected + retry}
     interrupted = False
     try:
@@ -4762,7 +4779,8 @@ def run(args, root, run_start, pool, deadline):
             if fut in not_done:
                 if archived_intact(target_of(b), deep=True):
                     # Finished just as the run gave up, or already on disk; one
-                    # that is not final yet is compared with GCS next run.
+                    # that is not final yet is compared with GCS next run, and a final
+                    # one by the next run that compares its seventh.
                     outcomes.setdefault(add_sightings(target_of(b), b, run_id), []).append(key)
                     continue
                 cause = "interrupted" if interrupted else "run timeout reached"
@@ -4778,7 +4796,8 @@ def run(args, root, run_start, pool, deadline):
             elif outcome in ("watching", "held"):
                 watch[key] = {"rec": b, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
         except RecheckError as e:
-            # The archived copy stays as it is; it is not final, so the next run compares it again.
+            # The archived copy stays as it is, and a later run compares it again (a final one, the next
+            # run that compares its seventh).
             errors.append({"build": key, "error": str(e)})
         except Exception as e:
             message = f"{type(e).__name__}: {e}"

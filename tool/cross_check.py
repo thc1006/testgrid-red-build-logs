@@ -7,9 +7,10 @@ For one run (default: the latest):
              no other stored file sits next to it; and GCS still holds the
              content it was taken from, checked for the builds of the last
              --hours and a seventh of the older ones for each day since the
-             run before (so each at least once a week); a build archived
-             without a log still has none in GCS. Then what the archive
-             holds, by kind.
+             run before (so each at least once a week; the run's fetch
+             compares the same ones, see fetch_red_logs.gcs_sevenths); a
+             build archived without a log still has none in GCS. Then what
+             the archive holds, by kind.
   testgrid   every column TestGrid paints red now, whose build finished well
              before the run, is archived (red cells recomputed here)
   gcs        every build of the dashboards' jobs from the last --hours that
@@ -433,7 +434,7 @@ def inventory(archived, root):
         if m.get("settled") is False:
             count("provisional" if m.get("final") is not True else "never settled")
         if m.get("final") is not True:
-            count("still compared with GCS by the fetch")
+            count("still compared with GCS on every run")
         if m.get("backfilled"):
             count("taken from GCS, judged by TestGrid's rule")
     try:
@@ -535,7 +536,8 @@ def check(args, problems, notes, record):
     # 1. integrity: every archived file on disk, whatever its age; and what GCS holds
     # now for the builds of the window, and for a seventh of the older ones per day
     # since the run before this one (a different seventh each day, so each is
-    # compared again at least once a week, even when a day has no run)
+    # compared again at least once a week, even when a day has no run; the run's
+    # fetch compared the same ones, final or not)
     sevenths = frl.gcs_sevenths(root, t0)
 
     def compare_with_gcs(m):

@@ -19,6 +19,7 @@ import time
 import unittest
 import urllib.parse
 import zlib
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_red_logs as frl  # noqa: E402
@@ -370,7 +371,8 @@ class EndToEndTest(unittest.TestCase):
         self.run_tool()
         self.heal()
         before = self.srv.hits("/bucket/logs/job-a/1004/build-log.txt")
-        self.assertEqual(self.run_tool(), 0)
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set()):  # (not in this run's sevenths)
+            self.assertEqual(self.run_tool(), 0)
         run = self.last_run()
         self.assertEqual(run["outcomes"], {"already-archived": ["job-a/1001", "job-a/1002", "job-a/1004"],
                                            "archived": ["job-b/2001", "job-c/3000", "job-c/3001"]})
