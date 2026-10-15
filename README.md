@@ -1,3 +1,4 @@
+<!-- The wording here is settled: change a sentence only when the code changes what it says, or adds something a reader needs to know (AGENTS.md). -->
 # Red TestGrid build logs
 
 This repository keeps the raw Prow `build-log.txt` of Kubernetes CI builds that
