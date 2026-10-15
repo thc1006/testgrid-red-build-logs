@@ -8,10 +8,12 @@ import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 import yaml
 
@@ -330,6 +332,186 @@ class FollowChecks(unittest.TestCase):
     def test_control_the_unicode_check_fails_when_unidump_fails(self):
         # (one pipeline: under pipefail, its status is the function's, condition or not)
         self.assertEqual(self.check("unicode", "#!/bin/sh\necho '{}'\nexit 2\n"), ["unicode"])
+
+
+# ------------------------------------------------------------------ the commit step: files GitHub would refuse
+
+LIMIT = 95 << 20  # (the commit step's limit; GitHub blocks files over 100 MiB)
+OLD = "archive/runs/2026-10/2026-10-14T000000Z/job/2110000000000000000"  # (archived by an earlier run)
+NEW = "archive/runs/2026-10/2026-10-15T000000Z/job/2110558713260544000"  # (archived by this run)
+
+
+class CommitStep(unittest.TestCase):
+    """The archive job's commit step, run as GitHub runs it, in a local repository whose origin
+    is a bare one, with the repository's .gitignore: git, the files, the push and the bundle
+    are real."""
+
+    def setUp(self):
+        self.enterContext(mock.patch.dict(os.environ))
+        for name in [n for n in os.environ if n.startswith("GIT_")]:
+            del os.environ[name]  # (a GIT_DIR, say, would send these git commands elsewhere)
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        with open(os.path.join(self.tmp, "gitconfig"), "w") as f:
+            f.write("[user]\n\tname = test\n\temail = test@example.com\n")
+        self.env = {"GIT_CONFIG_GLOBAL": os.path.join(self.tmp, "gitconfig"), "GIT_CONFIG_NOSYSTEM": "1",
+                    "XDG_CONFIG_HOME": self.tmp}  # (and not the user's git/ignore or git/attributes)
+        self.origin, self.repo = os.path.join(self.tmp, "origin.git"), os.path.join(self.tmp, "repo")
+        self.git(self.tmp, "init", "-q", "--bare", "-b", "main", self.origin)
+        self.git(self.tmp, "init", "-q", "-b", "main", self.repo)
+        shutil.copy(os.path.join(HERE, "..", ".gitignore"), self.repo)
+        self.write(f"{OLD}/build-log.txt.gz", b"the log as archived")
+        self.write(f"{OLD}/meta.json", b'{"log": "as archived"}\n')
+        for page in ("INDEX.md", "index.json", "weeks/2026-W42.md", "weeks/2026-W42.json", "charts/trend-light.svg",
+                     "state.json"):
+            self.write(f"archive/{page}", b"as last committed\n")
+        self.git(self.repo, "add", "-A")
+        self.git(self.repo, "commit", "-q", "-m", "base")
+        self.git(self.repo, "remote", "add", "origin", self.origin)
+        self.git(self.repo, "push", "-q", "-u", "origin", "main")
+        self.base = self.git(self.origin, "rev-parse", "main")
+
+    def git(self, cwd, *args):
+        return subprocess.run(["git", *args], cwd=cwd, env=dict(os.environ, **self.env), check=True, capture_output=True,
+                              text=True).stdout.strip()
+
+    def write(self, rel, data=b"", size=None):
+        path = os.path.join(self.repo, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as f:
+            f.write(data)
+            if size is not None:
+                f.truncate(size)  # (sparse: no disk written)
+
+    def read(self, rel):
+        with open(os.path.join(self.repo, rel), "rb") as f:
+            return f.read()
+
+    def commit(self):
+        flow = workflow("red-build-logs.yml")
+        return run_step(flow, flow["jobs"]["archive"], step_of(flow, "archive", lambda s: s.get("id") == "commit"),
+                        self.repo, dict(self.env, GITHUB_TOKEN="not-a-token", RUNNER_TEMP=self.tmp,
+                                        GITHUB_REF_NAME="main", GITHUB_OUTPUT=os.path.join(self.tmp, "outputs")))
+
+    def pushed(self):
+        """{path: size} of the files on origin's main."""
+        listing = self.git(self.origin, "ls-tree", "-r", "-l", "main")
+        return {line.split("\t")[1]: int(line.split()[3]) for line in listing.splitlines()}
+
+    def check_refused(self, done):
+        self.assertNotEqual(done.returncode, 0, done.stdout + done.stderr)  # fails: 0
+        self.assertEqual(self.git(self.origin, "rev-parse", "main"), self.base)  # fails: a commit pushed
+
+    def test_an_archived_log_grown_too_large_stops_the_commit(self):
+        """red-build-logs.yml:171-181: a stored log over 95 MiB was put back as last committed
+        (git checkout HEAD), while its meta.json, which describes the new copy, was committed:
+        that left the archive with a log its meta.json does not describe (cross_check: "local
+        md5 ... != meta ..."). Nothing is committed now, and both files stay as the fetch wrote
+        them."""
+        self.write(f"{OLD}/build-log.txt.gz", size=LIMIT + 1)
+        self.write(f"{OLD}/meta.json", b'{"log": "fetched again"}\n')
+        done = self.commit()
+        self.check_refused(done)
+        self.assertIn(f"::error::{OLD}/build-log.txt.gz is larger than 95 MiB", done.stdout)
+        self.assertEqual(os.path.getsize(os.path.join(self.repo, OLD, "build-log.txt.gz")), LIMIT + 1)
+        self.assertEqual(self.read(f"{OLD}/meta.json"), b'{"log": "fetched again"}\n')
+
+    def test_a_new_log_too_large_stops_the_commit(self):
+        """The same for a build this run archived: its log was deleted and its meta.json committed,
+        so the archive held a build whose meta.json lists a log that is not there (cross_check:
+        "cannot verify: FileNotFoundError")."""
+        self.write(f"{NEW}/build-log.txt.gz", size=LIMIT + 1)
+        self.write(f"{NEW}/meta.json", b'{"log": "new"}\n')
+        done = self.commit()
+        self.check_refused(done)
+        self.assertIn(f"::error::{NEW}/build-log.txt.gz is larger than 95 MiB", done.stdout)
+        self.assertEqual(os.path.getsize(os.path.join(self.repo, NEW, "build-log.txt.gz")), LIMIT + 1)
+
+    def test_control_a_page_too_large_keeps_the_version_last_committed(self):
+        # (INDEX.md, index.json, a week's page and a chart: every run writes them anew; one this run made is left out)
+        for page in ("INDEX.md", "index.json", "weeks/2026-W43.json", "charts/trend-light.svg"):
+            self.write(f"archive/{page}", size=LIMIT + 1)
+        self.write(f"{NEW}/build-log.txt.gz", b"a new log")
+        self.write(f"{NEW}/meta.json", b'{"log": "new"}\n')
+        self.write("archive/state.json", b"this run's\n")
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertEqual(done.stdout.count("::warning::"), 4, done.stdout)
+        files = self.pushed()
+        last = len(b"as last committed\n")
+        self.assertEqual((files["archive/INDEX.md"], files["archive/index.json"], files["archive/charts/trend-light.svg"]),
+                         (last, last, last))
+        self.assertNotIn("archive/weeks/2026-W43.json", files)
+        self.assertEqual(files["archive/state.json"], len(b"this run's\n"))
+        self.assertIn(f"{NEW}/build-log.txt.gz", files)
+        self.assertEqual(self.read("archive/INDEX.md"), b"as last committed\n")
+        self.assertFalse(os.path.exists(os.path.join(self.repo, "archive/weeks/2026-W43.json")))
+
+    def test_control_the_state_too_large_stops_the_commit(self):
+        self.write("archive/state.json", size=LIMIT + 1)
+        self.check_refused(self.commit())
+
+    def test_control_a_new_build_is_pushed(self):
+        self.write(f"{NEW}/build-log.txt.gz", b"a new log")
+        self.write(f"{NEW}/meta.json", b'{"log": "new"}\n')
+        self.write("archive/INDEX.md", b"this run's\n")
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertNotIn("::warning::", done.stdout)
+        files = self.pushed()
+        self.assertEqual((files[f"{NEW}/build-log.txt.gz"], files[f"{NEW}/meta.json"], files["archive/INDEX.md"]),
+                         (len(b"a new log"), len(b'{"log": "new"}\n'), len(b"this run's\n")))
+        self.assertEqual(self.git(self.repo, "status", "--porcelain"), "")
+
+    def test_control_files_removed_are_committed_removed(self):
+        # (a log now stored in parts, and a week no longer listed: a file removed has no size to check)
+        os.remove(os.path.join(self.repo, OLD, "build-log.txt.gz"))
+        self.write(f"{OLD}/build-log.txt.gz.000", b"the log, in parts")
+        self.write(f"{OLD}/meta.json", b'{"log": "in parts"}\n')
+        os.remove(os.path.join(self.repo, "archive/weeks/2026-W42.md"))
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        files = self.pushed()
+        self.assertIn(f"{OLD}/build-log.txt.gz.000", files)
+        self.assertNotIn(f"{OLD}/build-log.txt.gz", files)
+        self.assertNotIn("archive/weeks/2026-W42.md", files)
+
+    def test_control_a_log_of_95_mib_is_committed(self):
+        self.write(f"{NEW}/build-log.txt.gz", size=LIMIT)
+        self.write(f"{NEW}/meta.json", b'{"log": "new"}\n')
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertEqual(self.pushed()[f"{NEW}/build-log.txt.gz"], LIMIT)
+
+    def test_control_a_build_folder_without_meta_json_is_left_out(self):
+        # (a download cut off part-way: removed first, so its size stops nothing)
+        cut = NEW[:-1] + "1"
+        self.write(f"{cut}/build-log.txt.gz", size=LIMIT + 1)
+        self.write(f"{NEW}/build-log.txt.gz", b"a new log")
+        self.write(f"{NEW}/meta.json", b'{"log": "new"}\n')
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertFalse(os.path.exists(os.path.join(self.repo, cut)))
+        self.assertIn(f"{NEW}/meta.json", self.pushed())
+
+    def test_control_a_push_refused_leaves_a_bundle(self):
+        hook = os.path.join(self.origin, "hooks", "pre-receive")
+        with open(hook, "w") as f:
+            f.write("#!/bin/sh\nexit 1\n")
+        os.chmod(hook, 0o755)
+        self.write(f"{NEW}/build-log.txt.gz", b"a new log")
+        self.write(f"{NEW}/meta.json", b'{"log": "new"}\n')
+        self.check_refused(self.commit())
+        bundle = os.path.join(self.tmp, "unpushed-archive.bundle")
+        self.git(self.repo, "bundle", "verify", bundle)
+        with open(os.path.join(self.tmp, "outputs")) as f:
+            self.assertEqual(f.read(), f"bundle={bundle}\n")
+
+    def test_control_nothing_new_is_not_committed(self):
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertIn("Nothing new to commit.", done.stdout)
+        self.assertEqual(self.git(self.origin, "rev-parse", "main"), self.base)
 
 
 if __name__ == "__main__":

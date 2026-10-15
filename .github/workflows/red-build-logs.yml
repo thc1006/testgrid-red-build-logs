@@ -170,14 +170,20 @@ jobs:
             echo "No archive/ to commit."
             exit 0
           fi
-          # GitHub rejects a push holding a file over 100 MB. The fetch stores a larger
-          # log in parts, so there should be none. A stored log (a copy cut off part-way,
-          # fetched again by a later run) or a page every run writes anew that is that
-          # large is not committed: the version last committed stays, if any. Any other
-          # file that large stops the commit here.
+          # A build folder without meta.json is a download that was cut off: leave
+          # it out; the build is retried by a later run.
+          shopt -s nullglob
+          for d in archive/runs/*/*/*/*/; do
+            [ -e "${d}meta.json" ] || rm -rf -- "$d"
+          done
+          # GitHub blocks files over 100 MiB, so the archive commits none over 95 MiB:
+          # the fetch stores a larger log in parts, and the other files are small.
+          # INDEX.md, index.json, a week's page or a chart that large (every run writes
+          # them anew) is left out, and the version last committed stays, if any. Any
+          # other file that large stops the commit, and nothing of this run is
+          # committed: a build's file put back or left out would not be the one its
+          # meta.json describes.
           {
-            [ -d archive/runs ] && find archive/runs -mindepth 5 -maxdepth 5 -type f -size +95M \
-              \( -name 'build-log.txt*' -o -name 'podinfo.json*' \) -print
             for pages in archive/weeks archive/charts; do
               [ -d "$pages" ] && find "$pages" -mindepth 1 -maxdepth 1 -type f -size +95M -print
             done
@@ -188,15 +194,9 @@ jobs:
           done
           big=$(find archive -type f -size +95M -print -quit)
           if [ -n "$big" ]; then
-            echo "::error::$big is larger than 95 MiB: GitHub would reject the push."
+            echo "::error::$big is larger than 95 MiB, the most the archive commits in one file (GitHub blocks files over 100 MiB). Nothing of this run is committed."
             exit 1
           fi
-          # A build folder without meta.json is a download that was cut off: leave
-          # it out; the build is retried by a later run.
-          shopt -s nullglob
-          for d in archive/runs/*/*/*/*/; do
-            [ -e "${d}meta.json" ] || rm -rf -- "$d"
-          done
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add archive
