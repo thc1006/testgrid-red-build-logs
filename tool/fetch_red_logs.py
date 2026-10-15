@@ -4453,8 +4453,13 @@ def run(args, root, run_start, pool, deadline):
                             "their filters or test groups since then are not followed")
         never = [k for k in listed_ok if k not in tab_config] if args.testgrid_config else []
         if never:
+            # (the builds of a tab with configs over time are judged by them, see tab_verdict: those of
+            # one the latest config lacks are held until a config with it is read)
+            by_rows = any("eras" not in tab_rules.get(k, {}) for k in never)
             warnings.append(f"TestGrid's config was never read for {len(never)} tabs ({', '.join(never[:3])}"
-                            f"{', ...' if len(never) > 3 else ''}): rows their filters hide count as shown"
+                            f"{', ...' if len(never) > 3 else ''}): "
+                            + ("rows their filters hide count as shown" if by_rows else
+                               "their builds are decided once a config with them is read")
                             if not awaited else
                             f"TestGrid's config of {len(never)} tabs ({', '.join(never[:3])}"
                             f"{', ...' if len(never) > 3 else ''}) is not known yet: their builds are decided once a "
