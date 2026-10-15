@@ -21,6 +21,8 @@ import yaml
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import fetch_red_logs as frl  # noqa: E402
+from test_fetch_red_logs import DAY  # noqa: E402
+from test_integrity import ArchiveWorld, obj  # noqa: E402
 
 
 # ------------------------------------------------------------------ testgrid_config.sh: the configs to build
@@ -596,6 +598,89 @@ class RunsTable(unittest.TestCase):
         self.assertEqual(line.count("|"), header.count("|"))  # (GFM shows no table when they differ)
         self.assertEqual(row.count("|"), header.count("|"))
         self.assertIn(" | 0 | 0 | ok |", runs)
+
+
+# ------------------------------------------------------------------ run.json: the code, and the GitHub Actions run
+
+GITHUB = {"GITHUB_REPOSITORY": "owner/repo", "GITHUB_RUN_ID": "18500000000", "GITHUB_RUN_ATTEMPT": "2"}
+
+
+class RunReportCode(ArchiveWorld):
+    """A fetch's run.json, made on GitHub Actions. cab048a's named neither the commit that ran nor
+    the GitHub Actions run, so each test fails there."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        with mock.patch.dict(os.environ, GITHUB):
+            self.assertEqual(self.fetch(), 0)
+
+    def test_the_run_report_names_the_code_and_the_github_run(self):
+        run = self.runs()[-1]
+        self.assertEqual(run.get("tool"), frl.tool_version())  # fails: no tool_version (and run.json has no "tool")
+        self.assertEqual(run.get("github"), {"repository": "owner/repo", "run_id": "18500000000", "run_attempt": "2"})
+
+    def test_outside_github_actions_no_run_is_named(self):
+        with mock.patch.dict(os.environ):
+            os.environ.pop("GITHUB_RUN_ID", None)
+            self.assertIsNone(frl.github_run())  # fails: no github_run
+
+
+class ToolVersion(unittest.TestCase):
+    """frl.tool_version(), for a fetch_red_logs.py in a checkout made here (its git, with no
+    config but the repository's)."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.addCleanup(frl.tool_version.cache_clear)  # fails: no tool_version
+        os.makedirs(os.path.join(self.tmp, "tool"))
+        self.env = {"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1",
+                    "GIT_CEILING_DIRECTORIES": os.path.dirname(self.tmp)}
+
+    def write(self, rel, text):
+        with open(os.path.join(self.tmp, rel), "w") as f:
+            f.write(text)
+
+    def git(self, *args):
+        return subprocess.run(["git", "-C", self.tmp, "-c", "user.name=test", "-c", "user.email=test@example.com", *args],
+                              env=dict(os.environ, **self.env), check=True, capture_output=True, text=True).stdout.strip()
+
+    def version(self):
+        frl.tool_version.cache_clear()
+        with mock.patch.object(frl, "__file__", os.path.join(self.tmp, "tool", "fetch_red_logs.py")), \
+                mock.patch.dict(os.environ, self.env):
+            return frl.tool_version()
+
+    def test_the_commit_checked_out_and_whether_tool_differs_from_it(self):
+        self.write("tool/fetch_red_logs.py", "as committed\n")
+        self.write("README.md", "as committed\n")
+        self.assertEqual(self.version(), {"commit": None, "modified": None})  # (not a checkout)
+        self.git("init", "-q")
+        self.git("add", "-A")
+        self.git("commit", "-q", "-m", "x")
+        self.assertEqual(self.version(), {"commit": self.git("rev-parse", "HEAD"), "modified": False})
+        self.write("README.md", "changed, outside tool/\n")
+        self.assertEqual(self.version()["modified"], False)
+        self.write("tool/new.py", "not committed\n")
+        self.assertEqual(self.version()["modified"], True)
+        os.remove(os.path.join(self.tmp, "tool", "new.py"))
+        self.write("tool/fetch_red_logs.py", "changed\n")
+        self.assertEqual(self.version()["modified"], True)
+        self.git("checkout", "-q", "--", "tool")
+        self.assertEqual(self.version()["modified"], False)
+
+    def test_a_file_name_that_is_not_utf8(self):
+        # (git status prints it as it is with core.quotePath false)
+        self.git("init", "-q")
+        self.git("config", "core.quotePath", "false")
+        self.write("tool/fetch_red_logs.py", "as committed\n")
+        self.git("add", "-A")
+        self.git("commit", "-q", "-m", "x")
+        with open(os.path.join(os.fsencode(self.tmp), b"tool", b"\xff.txt"), "w") as f:
+            f.write("not committed\n")
+        self.assertEqual(self.version(), {"commit": self.git("rev-parse", "HEAD"), "modified": True})
 
 
 if __name__ == "__main__":
