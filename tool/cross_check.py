@@ -39,7 +39,6 @@ import sys
 import threading
 import time
 import urllib.parse
-import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_red_logs as frl  # noqa: E402
@@ -338,21 +337,12 @@ class Record:
             print(f"  note: cannot write {self.path}: {self.error}", flush=True)
 
 
-def run_start(path):
-    """A run report's start time, None if it is unreadable or not a time it could have started at."""
-    try:
-        started = frl.read_json(path).get("started")
-    except (OSError, ValueError, AttributeError):
-        return None
-    return started if frl.plausible_time(started, time.time()) else None
-
-
 def latest_run(root):
     """Path of the run.json in the newest run folder that has a usable one, or None.
     Folders are named by when their run started, so a damaged report cannot pose as newer."""
     for rel in reversed(frl.run_dirs(root)):
         path = os.path.join(root, rel, "run.json")
-        if run_start(path) is not None:
+        if frl.run_started(path) is not None:
             return path
     return None
 
@@ -546,14 +536,10 @@ def check(args, problems, notes, record):
     # now for the builds of the window, and for a seventh of the older ones per day
     # since the run before this one (a different seventh each day, so each is
     # compared again at least once a week, even when a day has no run)
-    day = int(t0 // 86400)
-    previous = next((s for s in (run_start(os.path.join(root, rel, "run.json")) for rel in reversed(frl.run_dirs(root)))
-                     if s is not None and s < t0), None)
-    first = max(min(int(previous // 86400) + 1, day), day - 6) if previous is not None else day
-    sevenths = {d % 7 for d in range(first, day + 1)}
+    sevenths = frl.gcs_sevenths(root, t0)
 
     def compare_with_gcs(m):
-        return (m["started"] or m["created"]) >= since or zlib.crc32(f"{m['job']}/{m['build']}".encode()) % 7 in sevenths
+        return (m["started"] or m["created"]) >= since or frl.sampled(f"{m['job']}/{m['build']}", sevenths)
 
     def integrity(item):
         rel, m = item

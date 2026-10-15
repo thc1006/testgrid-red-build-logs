@@ -1139,5 +1139,30 @@ class RecordedVerification(unittest.TestCase):
         self.assertIn("note: cannot write", out.getvalue())
 
 
+# ------------------------------------------------------------------ the sevenths of the archive compared with GCS each day
+
+class Sevenths(unittest.TestCase):
+    def test_the_sevenths_compared_since_the_run_before(self):
+        """(cab048a computed them inside cross_check.check: it has no frl.gcs_sevenths)"""
+        with tempfile.TemporaryDirectory() as root:
+            day = 20_000 * 86400
+            for started in (day - 10 * 86400, day - 3 * 86400 + 5, day + 7200):
+                rel = frl.new_run_dir(root, started)[1]
+                frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": started})
+            rel = frl.new_run_dir(root, day - 86400)[1]  # (a report with a start no run can have: passed over)
+            frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": 0})
+            with mock.patch("time.time", return_value=day + 86400):
+                self.assertEqual(frl.gcs_sevenths(root, day + 3600), {(20_000 - d) % 7 for d in range(3)})  # fails
+                self.assertEqual(frl.gcs_sevenths(root, day + 7200), {(20_000 - d) % 7 for d in range(3)})  # (not itself)
+                self.assertEqual(frl.gcs_sevenths(root, day + 9000), {20_000 % 7})  # (a run earlier that day)
+                self.assertEqual(frl.gcs_sevenths(root, day - 10 * 86400 - 60), {(20_000 - 11) % 7})  # (no run before)
+                self.assertEqual(frl.gcs_sevenths(root, day + 30 * 86400), set(range(7)))  # (a week or more after)
+
+    def test_a_build_is_sampled_by_a_hash_every_process_agrees_on(self):
+        # (the fetch and cross_check.py sample apart, in two processes: crc32 of "job/build", not hash())
+        for key, seventh in (("ci-kind-dra/2104314601444216832", 5), ("job/1", 3), ("job/2", 6)):
+            self.assertEqual([s for s in range(7) if frl.sampled(key, {s})], [seventh], key)  # fails: no frl.sampled
+
+
 if __name__ == "__main__":
     unittest.main()
