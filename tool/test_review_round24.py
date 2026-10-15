@@ -1537,5 +1537,29 @@ class IndexOpening(unittest.TestCase):
                               "week for older ones.", f.read())  # fails: every build.
 
 
+# ------------------------------------------------------------------ a run folder's README
+
+class RunReadme(unittest.TestCase):
+    def readme(self, run):
+        """(a run folder's README.md for the report `run`)"""
+        with tempfile.TemporaryDirectory() as root:
+            rel = frl.new_run_dir(root, time.time())[1]
+            frl.write_json(os.path.join(root, rel, "run.json"), run)
+            frl.write_run_readme(root, rel, run, [])
+            with open(os.path.join(root, rel, "README.md")) as f:
+                return f.read()
+
+    def test_problems_without_a_tab_or_a_build_show_neither(self):
+        """The README's Problems listed a dashboard whose summary could not be read as "dash#None: ..."
+        and an error of the whole run as "None: ...": it named a tab and a build that are not there.
+        (Each part is still written as plain text: every name, and one error of each kind, holds Markdown.)"""
+        readme = self.readme({"run": "x", "outcomes": {}, "tabs": [{"dashboard": "d_x", "tab": None, "error": "no summary"},
+                                                                   {"dashboard": "d_x", "tab": "t|u", "error": "# no table"}],
+                              "errors": [{"build": None, "error": "1. stopped"}, {"build": "job_a/1", "error": "boom"}]})
+        problems = readme.split("## Problems\n\n")[1].split("\n\n")[0].splitlines()
+        self.assertEqual(problems, ["- d\\_x: no summary", "- d\\_x#t\\|u: \\# no table",  # fails: d\_x#None: no summary
+                                    "- 1\\. stopped", "- job\\_a/1: boom"])  # fails: None: 1\. stopped
+
+
 if __name__ == "__main__":
     unittest.main()
