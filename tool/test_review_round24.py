@@ -412,20 +412,40 @@ class CommitStep(unittest.TestCase):
         self.write(f"{OLD}/meta.json", b'{"log": "fetched again"}\n')
         done = self.commit()
         self.check_refused(done)
-        self.assertIn(f"::error::{OLD}/build-log.txt.gz is larger than 95 MiB", done.stdout)
+        self.assertIn(f"::error::{OLD}/build-log.txt.gz ({LIMIT + 1} bytes) is larger than 95 MiB", done.stdout)
         self.assertEqual(os.path.getsize(os.path.join(self.repo, OLD, "build-log.txt.gz")), LIMIT + 1)
         self.assertEqual(self.read(f"{OLD}/meta.json"), b'{"log": "fetched again"}\n')
 
-    def test_a_new_log_too_large_stops_the_commit(self):
-        """The same for a build this run archived: its log was deleted and its meta.json committed,
-        so the archive held a build whose meta.json lists a log that is not there (cross_check:
-        "cannot verify: FileNotFoundError")."""
-        self.write(f"{NEW}/build-log.txt.gz", size=LIMIT + 1)
-        self.write(f"{NEW}/meta.json", b'{"log": "new"}\n')
+    def test_new_logs_too_large_stop_the_commit(self):
+        """The same for the builds this run archived: their logs were deleted and their meta.json
+        committed, so the archive held builds whose meta.json lists a log that is not there
+        (cross_check: "cannot verify: FileNotFoundError"). Each file too large is named."""
+        other = NEW[:-1] + "1"
+        for build in (NEW, other):
+            self.write(f"{build}/build-log.txt.gz", size=LIMIT + 1)
+            self.write(f"{build}/meta.json", b'{"log": "new"}\n')
         done = self.commit()
         self.check_refused(done)
-        self.assertIn(f"::error::{NEW}/build-log.txt.gz is larger than 95 MiB", done.stdout)
-        self.assertEqual(os.path.getsize(os.path.join(self.repo, NEW, "build-log.txt.gz")), LIMIT + 1)
+        for build in (NEW, other):
+            self.assertIn(f"::error::{build}/build-log.txt.gz ({LIMIT + 1} bytes) is larger than 95 MiB", done.stdout)
+            self.assertEqual(os.path.getsize(os.path.join(self.repo, build, "build-log.txt.gz")), LIMIT + 1)
+
+    def test_a_temporary_file_git_ignores_does_not_stop_the_commit(self):
+        """red-build-logs.yml:182: `find archive -type f -size +95M` also found the temporary files
+        of a fetch cut off part-way (.<name>.<random>.part, which .gitignore leaves out: a
+        download is written whole, gzipped, before it is split into parts), so a fetch that
+        timed out during a large download stopped the commit of everything else it archived."""
+        self.write(f"{OLD}/.build-log.txt.gz.k2j4h5.part", size=LIMIT + 1)
+        self.write("archive/weeks/.2026-W42.json.p9q8r7.part", size=LIMIT + 1)
+        self.write(f"{NEW}/build-log.txt.gz", b"a new log")
+        self.write(f"{NEW}/meta.json", b'{"log": "new"}\n')
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)  # fails: 1, larger than 95 MiB
+        self.assertNotIn("::warning::", done.stdout)
+        files = self.pushed()
+        self.assertIn(f"{NEW}/build-log.txt.gz", files)
+        self.assertFalse([name for name in files if name.endswith(".part")])
+        self.assertTrue(os.path.exists(os.path.join(self.repo, OLD, ".build-log.txt.gz.k2j4h5.part")))  # (the next fetch's)
 
     def test_a_page_too_large_puts_back_only_itself(self):
         """red-build-logs.yml:180 gave `git checkout -q HEAD --` the page's name as a pathspec, so a page
