@@ -3718,10 +3718,13 @@ def write_run_readme(root, rel, run, entries):
             lines += ["", "## Archived earlier, updated by this run", ""]
             lines += [f"- {k}: [{md_cell(key)}]({up}{where[key]}/)" if where.get(key) else f"- {k}: {md_cell(key)}"
                       for k, key in elsewhere]
-        problems = [f"{md_cell(t.get('dashboard'))}#{md_cell(t.get('tab'))}: {md_cell(t['error'])}"
+        # (a dashboard's summary that could not be read, or a tab name in it that cannot be used, has
+        # no tab; an error of the whole run has no build)
+        problems = [f"{md_cell(t.get('dashboard'))}{'' if t.get('tab') is None else '#' + md_cell(t['tab'])}: "
+                    f"{md_cell(t['error'])}"
                     for t in (run.get("tabs") if isinstance(run.get("tabs"), list) else [])
                     if isinstance(t, dict) and t.get("error")]
-        problems += [f"{md_cell(e.get('build'))}: {md_cell(e.get('error'))}"
+        problems += [("" if e.get("build") is None else f"{md_cell(e['build'])}: ") + md_cell(e.get("error"))
                      for e in (run.get("errors") if isinstance(run.get("errors"), list) else []) if isinstance(e, dict)]
         problems += [md_cell(w) for w in (run.get("serious_warnings") if isinstance(run.get("serious_warnings"), list)
                                           else [])]
