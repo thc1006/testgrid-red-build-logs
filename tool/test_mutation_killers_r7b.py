@@ -186,7 +186,7 @@ class Inventory(unittest.TestCase):
                     ("job", "2"): ("r/2", {"log": log, "finished": 5, "settled": False, "final": True}),
                     ("job", "3"): ("r/3", {"log": log, "finished": 5, "settled": True, "final": True})}
         self.assertEqual(cc.inventory(archived, root),
-                         "3 builds: 3 with a log, 1 log without a finish time, 1 still compared with GCS by the fetch, "
+                         "3 builds: 3 with a log, 1 log without a finish time, 1 still compared with GCS on every run, "
                          "1 never settled, 1 watched")
 
 

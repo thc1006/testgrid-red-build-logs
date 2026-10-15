@@ -410,14 +410,15 @@ class ContentOverTimeTest(ArchiveWorld):
         self.assertEqual(calls, ["GET", "HEAD"])
         self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
 
-    def test_a_final_build_is_not_compared_again(self):
+    def test_a_final_build_outside_the_runs_sevenths_is_not_compared_again(self):
         calls = []
         self.finished(ago=3 * DAY)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n", "1", calls))
         self.fetch()
         self.assertTrue(self.meta()["final"])
         hits = self.srv.hits(self.base + "/finished.json")
-        self.fetch()
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set()):  # (not in this run's sevenths)
+            self.fetch()
         self.assertEqual(calls, ["GET"])
         self.assertEqual(self.srv.hits(self.base + "/finished.json"), hits)
 
