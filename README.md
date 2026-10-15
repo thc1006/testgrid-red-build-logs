@@ -37,8 +37,9 @@ archive/runs/<YYYY-MM>/<run>/<job>/<build>/
   because GitHub blocks files over 100 MiB. Read it with
   `cat build-log.txt.gz.* | gzip -dc | less`.
 - `podinfo.json`: kept when GCS had no log, as for a build whose pod never ran.
-- `meta.json`: the tabs, the red tests, TestGrid's messages and the log's md5.
-  A build GCS had no file for has only this.
+- `meta.json`: the tabs, the red tests (it says when some are left out),
+  TestGrid's messages and the log's md5. A build GCS had no file for has only
+  this.
 
 ## What counts as red
 
