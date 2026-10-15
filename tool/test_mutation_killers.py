@@ -567,7 +567,7 @@ class Reports(ArchiveWorld):
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.fetch()
         row = [ln for ln in lines(os.path.join(self.root, "INDEX.md")) if ln.startswith("| [")][0]
-        self.assertIn("| 1 problems |", row)
+        self.assertIn("| 1 problem |", row)
 
     def test_MD08_an_earlier_run_readme_shows_the_settled_copy(self):
         self.finished(ago=60)
