@@ -3701,7 +3701,12 @@ def write_index(root, now, current_run=None, missing=(), known=None):
         lines += ["## Not archived yet", "", f"{len(waiting)} red builds without a verified local copy yet."]
         lines += build_rows(waiting, files=False) + [""]
     lines += [f"## Runs in the last {report.HEAT_DAYS} days", "",
-              "| Run (UTC) | New builds | Updated | Result |", "|---|---:|---:|---|"]
+              "Collection result is how the run's fetch went: ok, interrupted, its number of problems (errors, "
+              "serious warnings and tabs it could not read, listed in the README of the run's folder and in its "
+              "run.json), or no run report if the run was cut off before writing one. It does not include the "
+              "verification that follows the fetch ([cross_check.py](../tool/cross_check.py)), whose result is in "
+              "the run's log on GitHub Actions.", "",
+              "| Run (UTC) | New builds | Updated | Collection result |", "|---|---:|---:|---|"]
     lines += run_rows(root, first_day, current_run) + [""]
     lines += [f"## Builds from the last {report.HEAT_DAYS} days", "",
               f"{len(recent)} archived builds that started since {first_day.isoformat()} (UTC), newest first."]

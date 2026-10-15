@@ -12,12 +12,15 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
 import yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import fetch_red_logs as frl  # noqa: E402
 
 
 # ------------------------------------------------------------------ testgrid_config.sh: the configs to build
@@ -559,6 +562,40 @@ class CommitStep(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
         self.assertIn("Nothing new to commit.", done.stdout)
         self.assertEqual(self.git(self.origin, "rev-parse", "main"), self.base)
+
+
+# ------------------------------------------------------------------ INDEX.md: the runs table
+
+class RunsTable(unittest.TestCase):
+    def runs_section(self):
+        """INDEX.md's section on the recent runs, for an archive of one run."""
+        with tempfile.TemporaryDirectory() as root:
+            rel = frl.new_run_dir(root, time.time())[1]
+            frl.write_json(os.path.join(root, rel, "run.json"), {"run": "x", "started": time.time(), "outcomes": {}})
+            frl.write_index(root, time.time())
+            with open(os.path.join(root, "INDEX.md")) as f:
+                return f.read().split("## Runs in the last")[1].split("\n## ")[0]
+
+    def test_the_fetchs_result_is_called_the_collection_result(self):
+        """INDEX.md's runs table headed the fetch's own result "Result", which reads as the run's
+        verdict on the archive; the verification that follows the fetch (cross_check.py) is not
+        in it."""
+        runs = self.runs_section()
+        self.assertIn("| Run (UTC) | New builds | Updated | Collection result |", runs)  # fails: Result
+        self.assertIn("Collection result is how the run's fetch went:", runs)
+        note = runs.split("\n\n")[1]
+        for value in ("ok", "interrupted", "problems", "no run report"):  # (each the cell can show)
+            self.assertRegex(note, rf"\b{value}\b")
+        self.assertIn("It does not include the verification that follows the fetch "
+                      "([cross_check.py](../tool/cross_check.py))", note)
+        # (the note, a blank line, then the table: its header, which may gain columns, the line under it, a row)
+        table = re.search(r"\.\n\n(\| Run \(UTC\) \| New builds \| Updated \| Collection result \|.*)"
+                          r"\n(\|---\|.*)\n(\| \[.*)", runs)
+        self.assertIsNotNone(table, runs)
+        header, line, row = table.groups()
+        self.assertEqual(line.count("|"), header.count("|"))  # (GFM shows no table when they differ)
+        self.assertEqual(row.count("|"), header.count("|"))
+        self.assertIn(" | 0 | 0 | ok |", runs)
 
 
 if __name__ == "__main__":
