@@ -43,7 +43,7 @@ from fetch_red_logs import GCS, PROW_EPOCH_MS, TESTGRID, NotFound, get_json, iso
 PAINTED_RED = {9, 10, 12, 14}
 GITHUB_MAX_BYTES = 100 << 20  # GitHub rejects a push holding a larger file
 NAMES = {0: "NO_RESULT", 1: "PASS", 2: "PASS_WITH_ERRORS", 3: "PASS_WITH_SKIPS", 4: "RUNNING",
-         5: "ABORTED", 6: "UNKNOWN", 7: "CANCEL", 8: "BLOCKED", 9: "TIMED_OUT", 10: "CATEGORIZED_FAIL",
+         5: "CATEGORIZED_ABORT", 6: "UNKNOWN", 7: "CANCEL", 8: "BLOCKED", 9: "TIMED_OUT", 10: "CATEGORIZED_FAIL",
          11: "BUILD_FAIL", 12: "FAIL", 13: "FLAKY", 14: "TOOL_FAIL", 15: "BUILD_PASSED"}
 
 
