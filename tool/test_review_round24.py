@@ -1509,5 +1509,33 @@ class ListedAgain(ttc.ConfigWorld):
         self.assertIn("dash#t: no longer listed on its dashboard", self.runs()[-1]["serious_warnings"])
 
 
+# ------------------------------------------------------------------ INDEX.md: what it holds
+
+class IndexOpening(unittest.TestCase):
+    def test_it_does_not_claim_every_red_build(self):
+        """INDEX.md opened with "Every build with a red cell on" the dashboards: a cell red only
+        between two runs is not seen, and a build taken from GCS may never have shown red
+        (README.md, Limits)."""
+        with tempfile.TemporaryDirectory() as root:
+            frl.write_index(root, time.time())
+            with open(os.path.join(root, "INDEX.md")) as f:
+                opening = f.read().split("\n\n")[1]
+        self.assertNotIn("Every build", opening)  # fails: Every build with a red cell on
+        self.assertIn("[what that can miss or add](../README.md#limits)", opening)
+        with open(os.path.join(HERE, "..", "README.md")) as f:
+            self.assertIn("\n## Limits\n", f.read())  # (where the link goes)
+
+    def test_nor_does_a_run_folders_readme(self):
+        """A run folder's README.md said INDEX.md "lists every build": it lists those of the last 14
+        days, and links a page per week for older ones."""
+        with tempfile.TemporaryDirectory() as root:
+            rel = "runs/2026-10/2026-10-15T000000Z"
+            os.makedirs(os.path.join(root, rel))
+            frl.write_run_readme(root, rel, {"tabs": [], "red_builds_seen": 1}, [])
+            with open(os.path.join(root, rel, "README.md")) as f:
+                self.assertIn("(../../../INDEX.md) lists the archived builds of the last 14 days, and links a page per "
+                              "week for older ones.", f.read())  # fails: every build.
+
+
 if __name__ == "__main__":
     unittest.main()
