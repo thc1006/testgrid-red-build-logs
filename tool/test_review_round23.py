@@ -1,12 +1,12 @@
-"""Review of 2026-10-15, on cab048a: Go's regexp errors at the end of a pattern. Go's
-nextRune("") returns utf8.RuneError and no error (regexp/syntax/parse.go, Go 1.26.5). So a
-pattern that ends right after \\x and one more character other than { is an invalid escape
-sequence (no second hex digit), and one that ends right after \\p or \\P an invalid character
-class range (no class named ""). cab048a took nextRune("") for an error: it reported invalid
-UTF-8 for the first, and an invalid escape sequence for the second. Each test fails on cab048a
-for the reason its docstring gives, but those named test_control_*, which pass there. Every
-expected error is the one Go 1.26.5's regexp.Compile gives. Both versions reject the same
-patterns, so only the error a run reports changed.
+"""Review of 2026-10-15, on cab048a: Go's regexp errors at the end of a pattern, and a
+TestStatus name. Go's nextRune("") returns utf8.RuneError and no error (regexp/syntax/parse.go,
+Go 1.26.5). So a pattern that ends right after \\x and one more character other than { is an
+invalid escape sequence (no second hex digit), and one that ends right after \\p or \\P an
+invalid character class range (no class named ""). cab048a took nextRune("") for an error: it
+reported invalid UTF-8 for the first, and an invalid escape sequence for the second. Each test
+fails on cab048a for the reason its docstring gives, but those named test_control_*, which pass
+there. Every expected error is the one Go 1.26.5's regexp.Compile gives. Both versions reject
+the same patterns, so only the error a run reports changed.
 
 Run: cd tool && python -m unittest test_review_round23 -v
 """
@@ -15,7 +15,9 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cross_check  # noqa: E402
 import goregexp  # noqa: E402
+import testgrid_rule as tr  # noqa: E402
 
 AT_THE_END = {  # pattern: regexp.Compile's error, from Go 1.26.5
     r"\p": r"invalid character class range: `\p`",
@@ -74,6 +76,13 @@ class GoErrorsAtTheEnd(unittest.TestCase):
         for pattern in (r"\pL", r"\PL", r"\p{Greek}", r"[\pL]", r"\x41", r"\x{41}", r"[\x41-\x5A]"):
             with self.subTest(pattern=pattern):
                 goregexp.compile(pattern)
+
+
+class TestStatusNames(unittest.TestCase):
+    def test_cross_check_names_them_as_testgrid_does(self):
+        """cross_check called value 5 ABORTED; TestGrid's pb/test_status calls it CATEGORIZED_ABORT."""
+        self.assertEqual(cross_check.NAMES, dict(enumerate(tr.STATUS_OF)))
+        self.assertEqual(cross_check.NAMES[5], "CATEGORIZED_ABORT")
 
 
 if __name__ == "__main__":
