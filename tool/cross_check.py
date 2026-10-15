@@ -20,6 +20,13 @@ For one run (default: the latest):
 A difference in GCS for a build whose copy is not settled yet (taken before
 Prow finished uploading) is only noted: the next fetch compares it again.
 Exits 1 when a check finds a problem.
+
+With --record (as the workflow verifies each run), what was checked and the
+outcome go to verification.json in the run's folder. It says "incomplete" from
+when the checks start until they end with an outcome: ok, problems (all
+counted, the first 100 listed), timed out, interrupted, or stopped (by an
+error). So a verification cut off without one never reads as passed. A run
+that already has one keeps it.
 """
 import argparse
 import concurrent.futures as cf
@@ -203,23 +210,125 @@ def main(argv=None):
                    help="give up (and fail) if verification takes longer than this")
     p.add_argument("--testgrid", default=TESTGRID)
     p.add_argument("--gcs", default=GCS)
+    p.add_argument("--record", action="store_true",
+                   help="write what was checked and the outcome to verification.json in the run's folder (see above; "
+                        "it is made with a hard link, so that folder's file system must support hard links)")
     args = p.parse_args(argv)
-    # cross_check only reads, so a hard exit on timeout cannot leave anything half-written.
-    watchdog = threading.Timer(args.timeout_minutes * 60, timed_out, args=(args.timeout_minutes,))
+    record = Record(args.record)
+    # cross_check only reads (but for verification.json, which is written whole), so a hard
+    # exit on timeout cannot leave anything half-written.
+    watchdog = threading.Timer(args.timeout_minutes * 60, timed_out, args=(args.timeout_minutes, record))
     watchdog.daemon = True
     watchdog.start()
     try:
-        return verify(args)
+        return verify(args, record)
     except KeyboardInterrupt:
-        print("  PROBLEM: interrupted", flush=True)
-        os._exit(130)  # read-only, so stop now instead of waiting for worker threads
+        try:
+            print("  PROBLEM: interrupted", flush=True)
+            record.end("interrupted", "interrupted")
+        finally:
+            os._exit(130)  # read-only, so stop now instead of waiting for worker threads
     finally:
         watchdog.cancel()
 
 
-def timed_out(minutes):
-    print(f"  PROBLEM: verification did not finish within {minutes:g} minutes", flush=True)
-    os._exit(1)
+STUCK_SECONDS = 60  # (how long the watchdog waits on recording the timeout before it exits anyway)
+
+
+def exit_stuck(problem, exit_):
+    """The watchdog's way out when recording the timeout hangs (exit_: os._exit as it was when armed)."""
+    try:
+        print(f"  PROBLEM: {problem} (and recording it did not end within {STUCK_SECONDS:g} seconds)", flush=True)
+    finally:
+        exit_(1)
+
+
+def timed_out(minutes, record=None):
+    problem = f"verification did not finish within {minutes:g} minutes"
+    stuck = threading.Timer(STUCK_SECONDS, exit_stuck, (problem, os._exit))  # (should recording hang)
+    stuck.daemon = True
+    stuck.start()
+    ended = True
+    try:
+        ended = record is None or record.end("timed out", problem)
+    finally:  # (whatever recording does, the process exits; unless the verification ended just before)
+        stuck.cancel()  # (recording is over, however it went)
+        if ended:
+            try:
+                print(f"  PROBLEM: {problem}", flush=True)
+            finally:
+                os._exit(1)
+
+
+class Record:
+    """verification.json, with --record (see the docstring); without it, nothing is written. It
+    is written again each time the verification learns more of its scope, so one cut off shows
+    how far it got. The watchdog's thread and the main one may both end the verification: the
+    first outcome stays. failed: the last write failed (error says how), so the file does not
+    say what happened."""
+
+    LISTED = 100  # problems and notes the file lists (it counts them all)
+
+    def __init__(self, enabled):
+        self.enabled, self.lock = enabled, threading.Lock()
+        self.path = self.data = self.error = None
+        self.problems, self.notes, self.ended, self.failed = [], [], False, False
+
+    def start(self, run_path, run, problems, notes):
+        """Write "incomplete" to verification.json next to run_path, a run folder's run.json,
+        unless one is there already (made only if absent, whole, so a verification run at the
+        same time keeps it too)."""
+        if not self.enabled:
+            return
+        folder = os.path.dirname(run_path)
+        if os.path.basename(run_path) != "run.json" or not frl.RUN_RE.fullmatch(os.path.basename(os.path.abspath(folder))):
+            notes.append(f"{run_path} is not the run.json of a run folder: this verification is not recorded")
+            return
+        path = os.path.join(folder, "verification.json")
+        data = {"run": run, "outcome": "incomplete", "started": time.time(), "finished": None,
+                "tool": frl.tool_version(), "github": frl.github_run(), "scope": {}}
+        with self.lock:
+            if self.ended:
+                return
+            try:
+                frl.write_new_json(path, data)
+            except FileExistsError:
+                notes.append(f"{path} is there already, and is kept: this verification is not recorded")
+                return
+            except (OSError, ValueError, TypeError) as e:  # (nothing is recorded, and the verification fails)
+                self.path, self.failed, self.error = path, True, f"{type(e).__name__}: {e}"
+                print(f"  note: cannot write {path}: {self.error}", flush=True)
+                return
+            self.path, self.data, self.problems, self.notes = path, data, problems, notes
+
+    def scope(self, **found):
+        """What the verification covers, as it learns it (written at once)."""
+        with self.lock:
+            if self.data is not None and not self.ended:
+                self.data["scope"].update(found)
+                self.write()
+
+    def end(self, outcome, problem=None):
+        """Record the outcome (with one problem more, if given), unless the verification ended
+        already: whether this call ended it."""
+        with self.lock:
+            if self.ended:
+                return False
+            self.ended = True
+            if self.data is not None:
+                problems, notes = list(self.problems) + [problem] * bool(problem), list(self.notes)
+                self.data.update(outcome=outcome, finished=time.time(), problem_count=len(problems),
+                                 problems=problems[:self.LISTED], note_count=len(notes), notes=notes[:self.LISTED])
+                self.write()
+            return True
+
+    def write(self):
+        try:
+            frl.write_json(self.path, self.data)
+            self.failed = False
+        except (OSError, ValueError, TypeError) as e:  # (a later write may make up for it)
+            self.failed, self.error = True, f"{type(e).__name__}: {e}"
+            print(f"  note: cannot write {self.path}: {self.error}", flush=True)
 
 
 def run_start(path):
@@ -341,30 +450,41 @@ def inventory(archived, root):
     return f"{len(archived)} builds: " + ", ".join(f"{n} {what}" for what, n in counts.items())
 
 
-def verify(args):
+def verify(args, record=None):
+    record = record or Record(False)
     problems, notes = [], []
     try:
-        return check(args, problems, notes)
+        code = check(args, problems, notes, record)
+        outcome = "ok" if code == 0 else "problems"
     except Exception as e:  # keep what was already found
         problems.append(f"verification stopped: {type(e).__name__}: {e}")
         for n in notes:
             print("  note:", n)
         for pr in problems:
             print("  PROBLEM:", pr)
-        print(f"{len(problems)} problem(s)")
-        return 1
+        code, outcome = 1, "stopped"
+    if not record.end(outcome):
+        return 1  # (the watchdog ended the verification first; it exits 1)
+    if record.failed:
+        problems.append(f"this verification is not recorded in {record.path}: {record.error}")
+        print("  PROBLEM:", problems[-1])
+        code = 1
+    print("OK" if code == 0 else f"{len(problems)} problem(s)", flush=True)
+    return code
 
 
-def check(args, problems, notes):
+def check(args, problems, notes, record):
     root = args.archive
     if args.run:
         run_path = args.run if args.run.endswith(".json") else os.path.join(args.run, "run.json")
     else:
         run_path = latest_run(root)
     if run_path is None:
-        print(f"  PROBLEM: no run report in {os.path.join(root, 'runs')}; the fetch never finished a run")
+        problems.append(f"no run report in {os.path.join(root, 'runs')}; the fetch never finished a run")
+        print("  PROBLEM:", problems[-1])
         return 1
     run = frl.read_json(run_path)
+    record.start(run_path, run.get("run"), problems, notes)
     t0 = run["started"]
     since = t0 - args.hours * 3600
     if run.get("since_hours") is not None:
@@ -409,6 +529,7 @@ def check(args, problems, notes):
             problems.append(f"unreadable {path}: {type(e).__name__}: {e}")
     job_of = {t["query"]: t["query"].rsplit("/", 1)[-1] for t in tabs}
     print(f"verifying run {run['run']}: window {iso(since)} .. {iso(t0)}, {len(tabs)} tabs, {len(archived)} builds archived")
+    record.scope(window={"from": since, "to": t0}, tabs=len(tabs), builds=len(archived))
 
     ctx = frl.RunContext(frl.AdaptiveLimit(4 * frl.cpu_count(), args.max_concurrency))
     frl.bind_context(ctx)
@@ -470,6 +591,7 @@ def check(args, problems, notes):
           f"from the window, and {len(sevenths)}/7 of the rest, one seventh per day since the run before): {bad} differ, "
           f"{len(unsettled)} not settled yet")
     print("  inventory: " + inventory(archived, root))
+    record.scope(compared_with_gcs=compared, sevenths=sorted(sevenths), differ=bad, not_settled=len(unsettled))
 
     # 2. every column TestGrid paints red now
     def load(t):
@@ -533,6 +655,7 @@ def check(args, problems, notes):
     print(f"  testgrid: {len(red_now)} red builds in window, {len(red_now) - len(unarchived)} archived, "
           f"{late} not settled at run time (finished <{args.lag_minutes:.0f} min before it, or no finished.json), "
           f"{len(unarchived) - late} missed")
+    record.scope(red_on_testgrid=len(red_now), red_not_settled=late)
 
     # 3. every failed build in GCS
     queries = sorted({t["query"] for t in tabs})
@@ -674,13 +797,13 @@ def check(args, problems, notes):
     print(f"  gcs: {len(candidates)} builds created in window: " + ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
     print(f"  gcs: {len(judged)} of them no longer shown by TestGrid and not archived, judged by its rule"
           + (": " + ", ".join(f"{k}={v}" for k, v in sorted(judged_as.items())) if judged_as else ""))
+    record.scope(gcs_builds=len(candidates), judged_by_rule=len(judged))
 
     for n in notes:
         print("  note:", n)
     for pr in problems:
         print("  PROBLEM:", pr)
-    print("OK" if not problems else f"{len(problems)} problem(s)")
-    return 1 if problems else 0
+    return 1 if problems else 0  # (verify() says how many, once the verification is recorded)
 
 
 if __name__ == "__main__":

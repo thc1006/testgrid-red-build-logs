@@ -61,6 +61,8 @@ the config the tab had at the time, and marks it as taken from GCS.
 5. Rewrite the index and the charts, then run
    [`cross_check.py`](tool/cross_check.py). It checks the archive again on its
    own, and fails the run if a red build is missing or a stored file changed.
+   What it checked, and the outcome, are kept in the run's folder as
+   `verification.json`.
 
 The docstrings in [`tool/`](tool/) explain each step.
 [`tool/oracle/`](tool/oracle/README.md) checks the port of TestGrid's rule
