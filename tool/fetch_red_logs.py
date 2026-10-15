@@ -3242,6 +3242,32 @@ def run_dirs(root):
     return sorted(out, key=lambda rel: run_key(rel.rsplit("/", 1)[1]))
 
 
+def run_started(path):
+    """A run report's start time, None if it is unreadable or not a time it could have started at."""
+    try:
+        started = read_json(path).get("started")
+    except (OSError, ValueError, AttributeError):
+        return None
+    return started if plausible_time(started, time.time()) else None
+
+
+def gcs_sevenths(root, t0):
+    """The sevenths of the archived builds (see sampled()) that cross_check.py compares with GCS
+    again when it verifies the run started at t0: one for each UTC day from the day after the
+    run before it to the day of this one, at least this day's, so all seven after a week
+    without a run. Each build is compared at least once a week, even when a day has no run."""
+    day = int(t0 // 86400)
+    previous = next((s for s in (run_started(os.path.join(root, rel, "run.json")) for rel in reversed(run_dirs(root)))
+                     if s is not None and s < t0), None)
+    first = max(min(int(previous // 86400) + 1, day), day - 6) if previous is not None else day
+    return {d % 7 for d in range(first, day + 1)}
+
+
+def sampled(key, sevenths):
+    """Whether the build `key` ("job/build") is in one of these sevenths of the archive."""
+    return zlib.crc32(key.encode()) % 7 in sevenths
+
+
 def folder_time(name):
     """The UTC start time a run folder name encodes, None if it is not a real time."""
     try:
