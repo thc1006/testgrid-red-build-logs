@@ -489,9 +489,14 @@ def check(args, problems, notes, record):
         since = max(since, t0 - run["since_hours"] * 3600)
     settled = t0 - args.lag_minutes * 60
     tabs = [t for t in run["tabs"] if t.get("tab") is not None]
-    problems += [f"tab not scanned by the run: {t['dashboard']}#{t['tab']}: {t['error']}" for t in run["tabs"] if t.get("error")]
+    # (a dashboard's summary the run could not read, or a tab name in it that cannot be used, has no
+    # tab; an error of the whole run has no build)
+    problems += [(f"tab not scanned by the run: {t['dashboard']}#{t['tab']}" if t.get("tab") is not None
+                  else f"dashboard {t['dashboard']}") + f": {t['error']}" for t in run["tabs"] if t.get("error")]
     tabs = [t for t in tabs if not t.get("error")]
-    problems += [f"the run reported an error for {e['build']}: {e['error']}" for e in run.get("errors", [])]
+    for e in run.get("errors", []):
+        build = "" if e.get("build") is None else f" for {e['build']}"
+        problems.append(f"the run reported an error{build}: {e['error']}")
     # A gap in TestGrid history (or a lost retry list) means red builds may be gone
     # from TestGrid unseen, so the archive cannot be certified complete.
     serious = run.get("serious_warnings")
