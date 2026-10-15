@@ -605,6 +605,57 @@ class RunsTable(unittest.TestCase):
         self.assertEqual(row.count("|"), header.count("|"))
         self.assertIn(" | 0 | 0 | ok |", runs)
 
+    def test_each_runs_verification_is_shown(self):
+        """INDEX.md showed no run's verification (cab048a kept none: see VerificationRecord)."""
+        now = time.time()
+        # (what each run folder holds as verification.json, and the cell expected for it; "{v}" is the file)
+        cases = [(None, "not recorded"), ("not JSON", "unreadable"), ("null", "unreadable"),
+                 ({"outcome": "ok"}, "[ok]({v})"), ({"outcome": "problems", "problem_count": 3}, "[3 problems]({v})"),
+                 ({"outcome": "problems", "problem_count": 1}, "[1 problem]({v})"),
+                 ({"outcome": "problems"}, "[problems]({v})"), ({"outcome": "problems", "problem_count": True},
+                                                                "[problems]({v})"),
+                 ({"outcome": "problems", "problem_count": 0}, "[problems]({v})"),
+                 ({"outcome": "incomplete"}, "[incomplete]({v})"),
+                 ({"outcome": "timed out", "problem_count": 1}, "[timed out]({v})"),
+                 ({"outcome": "interrupted"}, "[interrupted]({v})"), ({"outcome": "stopped"}, "[stopped]({v})"),
+                 ({"outcome": "passed"}, "unreadable"), ("elsewhere.json", "unreadable"), ("nowhere", "unreadable"),
+                 ("a folder", "unreadable")]
+        with tempfile.TemporaryDirectory() as root:
+            want = {}
+            for i, (v, cell) in enumerate(cases):
+                rel = frl.new_run_dir(root, now - (len(cases) + 1 - i) * 3600)[1]
+                frl.write_json(os.path.join(root, rel, "run.json"), {"run": "x", "started": now, "outcomes": {}})
+                path = os.path.join(root, rel, "verification.json")
+                if v in ("elsewhere.json", "nowhere"):
+                    frl.write_json(os.path.join(root, rel, "elsewhere.json"), {"outcome": "ok"})
+                    os.symlink(v, path)  # (a link, to a file or to nothing: never followed)
+                elif v == "a folder":
+                    os.mkdir(path)
+                elif v is not None:
+                    with open(path, "w") as f:
+                        f.write(v if isinstance(v, str) else json.dumps(v))
+                want[rel] = cell.format(v=f"{rel}/verification.json")
+            cut = frl.new_run_dir(root, now - 3600)[1]  # (cut off before its report, but verified)
+            frl.write_json(os.path.join(root, cut, "verification.json"), {"outcome": "ok"})
+            want[cut] = f"[ok]({cut}/verification.json)"
+            current = frl.new_run_dir(root, now)[1]
+            want[current] = "pending"
+            frl.write_index(root, now, {"run": "x", "dir": current, "started": now, "tabs": [], "outcomes": {},
+                                        "errors": []})
+            with open(os.path.join(root, "INDEX.md")) as f:
+                runs = f.read().split("## Runs in the last")[1].split("\n## ")[0]
+        self.assertIn("| Run (UTC) | New builds | Updated | Collection result | Verification |", runs)  # fails: none
+        rows = {line.split("](")[1].split("/)")[0]: [c.strip() for c in line.strip("|").split("|")]
+                for line in runs.splitlines() if line.startswith("| [")}
+        self.assertEqual({rel: cells[-1] for rel, cells in rows.items()}, want)
+        self.assertEqual(rows[cut][-2], "no run report: the run was cut off")
+        note = runs.split("\n\n")[2]  # (after the one on Collection result)
+        self.assertTrue(note.startswith("Verification is the outcome"), note)
+        for value in ("ok", "problems", "timed out", "interrupted", "stopped", "incomplete", "pending", "not recorded",
+                      "unreadable"):  # (each the cell can show)
+            self.assertRegex(note, rf"\b{value}\b")
+        self.assertIn("ran before verifications were recorded", note)  # (as every run did before --record)
+
 
 class OneProblem(unittest.TestCase):
     def test_a_run_with_one_problem_says_so(self):
