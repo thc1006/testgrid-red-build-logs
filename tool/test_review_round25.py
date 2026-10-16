@@ -1338,6 +1338,96 @@ class CutOffRun(ArchiveWorld):
         self.assertIn(f"- {frl.STOPPED}", self.readme())
 
 
+class ArchiveLinks(ArchiveWorld):
+    """A link in the archive, to a file or folder outside it, put where the archive has a folder or a
+    file of its own; then a run that leaves the archived build alone."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        self.elsewhere = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.elsewhere)
+
+    def next_fetch(self):
+        newer = snowflake(time.time() - HOUR)
+        self.srv.table("dash", "t", fetch_table("bucket/logs/job", [newer], {"job.Overall": ([1], [""])},
+                                                start=int(time.time() - HOUR) * 1000))
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set()):
+            self.fetch()
+        return self.runs()[-1]
+
+    def index(self):
+        with open(os.path.join(self.root, "INDEX.md")) as f:
+            return f.read()
+
+    def outside_run(self, folder, name):
+        os.makedirs(os.path.join(folder, name))
+        started = frl.folder_time(name)
+        frl.write_json(os.path.join(folder, name, "run.json"),
+                       {"run": name, "dir": f"runs/{name[:7]}/{name}", "started": started, "since_hours": None,
+                        "max_job_hours": 6, "tabs": [{"dashboard": "OUTSIDEDASH", "tab": "x", "oldest": started - DAY}],
+                        "outcomes": {}, "errors": [], "warnings": [], "serious_warnings": []})
+
+    def test_a_run_folder_that_is_a_link(self):
+        """run_dirs passes over a run folder that is a link, but the charts (report.load_runs) read its
+        run.json, and INDEX.md's table of days named its dashboard."""
+        name = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime(time.time() - DAY))
+        self.outside_run(self.elsewhere, name)
+        os.symlink(os.path.join(self.elsewhere, name), os.path.join(self.root, "runs", name[:7], name))
+        self.next_fetch()
+        self.assertNotIn("OUTSIDEDASH", self.index())  # fails: | Day (UTC) | OUTSIDEDASH | dash |
+
+    def test_a_month_folder_that_is_a_link(self):
+        os.makedirs(os.path.join(self.elsewhere, "2026-01"))
+        self.outside_run(os.path.join(self.elsewhere, "2026-01"), "2026-01-05T010000Z")
+        os.symlink(os.path.join(self.elsewhere, "2026-01"), os.path.join(self.root, "runs", "2026-01"))
+        self.next_fetch()
+        self.assertNotIn("OUTSIDEDASH", self.index())  # fails: | Day (UTC) | OUTSIDEDASH | dash |
+
+    def test_a_meta_json_that_is_a_link(self):
+        path = os.path.join(self.bdir(), "meta.json")
+        meta = frl.read_json(path)
+        for t in meta["tabs"]:
+            for c in t["red_cells"]:
+                c["test"] = "OUTSIDETEST"
+        frl.write_json(os.path.join(self.elsewhere, "meta.json"), meta)
+        os.remove(path)
+        os.symlink(os.path.join(self.elsewhere, "meta.json"), path)
+        run = self.next_fetch()
+        self.assertNotIn("OUTSIDETEST", self.index())  # fails: its row, with the test named outside
+        self.assertIn("meta.json: ValueError: a link", json.dumps(run["errors"]))
+
+    def test_a_state_json_that_is_a_link(self):
+        state = frl.read_json(os.path.join(self.root, "state.json"))
+        rec = frl.recheck_rec(self.meta(), time.time(), self.key)
+        ghost = snowflake(time.time() - 5 * DAY)
+        state["given_up"] = {f"job/{ghost}": {"rec": dict(rec, build=ghost, tabs=[dict(t, red_cells=[]) for t in rec["tabs"]]),
+                                              "first_seen": time.time() - 20 * DAY, "last_error": "OUTSIDESTATE"}}
+        frl.write_json(os.path.join(self.elsewhere, "state.json"), state)
+        os.remove(os.path.join(self.root, "state.json"))
+        os.symlink(os.path.join(self.elsewhere, "state.json"), os.path.join(self.root, "state.json"))
+        run = self.next_fetch()
+        self.assertNotIn("OUTSIDESTATE", self.index())  # fails: the build only the outside state names, listed
+        self.assertIn("state.json is a link; starting without it", run["serious_warnings"])
+
+    def test_a_weeks_or_charts_folder_that_is_a_link(self):
+        """The week pages and the charts were written into the folder the link led to, and an older
+        week page there was removed."""
+        for name in ("weeks", "charts"):
+            with self.subTest(name):
+                outside = os.path.join(self.elsewhere, name)
+                os.makedirs(outside)
+                with open(os.path.join(outside, "2020-W01.md"), "w") as f:
+                    f.write("a page outside the archive\n")
+                shutil.rmtree(os.path.join(self.root, name))
+                os.symlink(outside, os.path.join(self.root, name))
+                self.next_fetch()
+                self.assertEqual(os.listdir(outside), ["2020-W01.md"])  # fails: the pages written there
+                self.assertFalse(os.path.islink(os.path.join(self.root, name)))
+
+
 class NotDoneWithItsComparisons(ArchiveWorld):
     """A red build archived 3 h after it finished: each run compares it with GCS."""
 
