@@ -4527,20 +4527,26 @@ def interrupt(signum, frame):
 
 def run(args, root, run_start, pool, deadline):
     ctx = context()
+    warnings = []
+    # (--list-only fetches and writes nothing: it goes on, and warns)
     try:
         excluded = load_excluded(root)
     except ExcludedUnreadable as e:
-        print(f"ERROR {e}: no run goes on until it is fixed, as it could fetch a build taken out", file=sys.stderr)
-        return 1
+        if not args.list_only:
+            print(f"ERROR {e}: no run goes on until it is fixed, as it could fetch a build taken out", file=sys.stderr)
+            return 1
+        excluded = frozenset()
+        warnings.append(f"{e}: the builds it takes out are listed too")
     # (a link in the archive is never followed: the run's folder would be made where it leads)
     month = dt.datetime.fromtimestamp(run_start, dt.UTC).strftime("%Y-%m")
     for path in (os.path.join(root, "runs"), os.path.join(root, "runs", month)):
-        if os.path.islink(path):
+        if os.path.islink(path) and not args.list_only:
             print(f"ERROR {path} is a link: no run goes on until it is fixed, as it would write where it leads",
                   file=sys.stderr)
             return 1
+        if os.path.islink(path):
+            warnings.append(f"{path} is a link: the run folders in it are not read")
     timelines = Timelines(run_start)  # (each job's builds that TestGrid's reads of a judged build depend on)
-    warnings = []
     if not args.list_only:
         sweep_parts(root)
         migrate_old_layout(root, warnings)

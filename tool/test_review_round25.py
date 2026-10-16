@@ -1514,6 +1514,33 @@ class ArchiveLinks(ArchiveWorld):
                 os.remove(os.path.join(self.root, path))
                 shutil.move(target, os.path.join(self.root, path))
 
+    def list_only(self):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = frl.main(["--archive", self.root, "--dashboard", "dash", "--testgrid", self.srv.url,
+                             "--gcs", self.srv.url, "--list-only"])
+        return code, out.getvalue(), err.getvalue()
+
+    def test_list_only_goes_on_where_a_run_stops(self):
+        """--list-only fetches and writes nothing, but 7620f6d stopped it too for a runs/ folder that
+        is a link, and 594fc25 for an excluded.json it cannot use."""
+        target = os.path.join(self.elsewhere, "runs")
+        shutil.move(os.path.join(self.root, "runs"), target)
+        os.symlink(target, os.path.join(self.root, "runs"))
+        before = sorted(os.listdir(target))
+        code, out, err = self.list_only()
+        self.assertEqual(code, 0)  # fails: 1
+        self.assertIn(f"job {self.build}", out)
+        self.assertIn("runs is a link: the run folders in it are not read", err)
+        self.assertEqual(sorted(os.listdir(target)), before)
+        os.remove(os.path.join(self.root, "runs"))
+        shutil.move(target, os.path.join(self.root, "runs"))
+        with open(os.path.join(self.root, frl.EXCLUDED), "w") as f:
+            f.write("{")
+        code, out, err = self.list_only()
+        self.assertEqual(code, 0)  # fails: 1
+        self.assertIn("the builds it takes out are listed too", err)
+
     def test_the_charts_read_the_run_folders_run_dirs_lists_only(self):
         """report.load_runs read every runs/*/*/run.json: one in a folder that is not a run's (named
         otherwise, or in another month's folder) showed in INDEX.md's table of days."""
