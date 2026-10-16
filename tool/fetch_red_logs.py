@@ -3843,13 +3843,19 @@ def holdings(entries, waiting, current_run):
 def left_for_later(left):
     """INDEX.md's list of what later runs still have to search or judge, from a run report's
     "left_for_later" (see run()): none, if there is nothing."""
-    gaps = left.get("gap_parts") if isinstance(left, dict) and isinstance(left.get("gap_parts"), dict) else {}
-    ranges = left.get("config_ranges") if isinstance(left, dict) and isinstance(left.get("config_ranges"), dict) else {}
+    def part(name):
+        value = left.get(name) if isinstance(left, dict) else None
+        return value if isinstance(value, dict) else {}
+    gaps, ranges, unlisted = part("gap_parts"), part("config_ranges"), part("unlisted")
+
+    def again(key):  # (a tab no longer listed is not read, and is forgotten UNLISTED_DAYS after that)
+        return f"if TestGrid lists the tab again by {iso(unlisted[key] + UNLISTED_DAYS * 86400)}"
     lines = [f"- {md_cell(key)}: the older part of its history gap, from {iso(lo)} to {iso(hi)}, is searched in GCS "
-             "by the next runs" for key, (lo, hi) in sorted(gaps.items())]
+             + (again(key) if key in unlisted else "by the next runs") for key, (lo, hi) in sorted(gaps.items())]
     lines += [f"- {md_cell(key)}: {r['ranges']} range{'' if r['ranges'] == 1 else 's'} of builds a scan saw, waiting "
-              f"for a config of the tab not known yet (the oldest scan {iso(r['oldest_scan'])}); each is dropped "
-              f"{GIVE_UP_DAYS} days after its scan" for key, r in sorted(ranges.items())]
+              f"for a config of the tab not known yet (the oldest scan {iso(r['oldest_scan'])}); "
+              + (f"looked at again {again(key)}" if key in unlisted else f"each is dropped {GIVE_UP_DAYS} days after its scan")
+              for key, r in sorted(ranges.items())]
     return ["## Left for later runs", ""] + lines + [""] if lines else []
 
 
@@ -5092,6 +5098,8 @@ def run(args, root, run_start, pool, deadline):
             "config_ranges": {k: {"ranges": len(t["changed_pending"]),
                                   "oldest_scan": min(p["since"] for p in t["changed_pending"])}
                               for k, t in sorted(tab_scans.items()) if t.get("changed_pending")}}
+    left["unlisted"] = {k: tab_scans[k]["missing_since"] for k in sorted(set(left["gap_parts"]) | set(left["config_ranges"]))
+                        if tab_scans[k].get("missing_since")}  # (when TestGrid stopped listing the tab)
     report_ = {"run": run_id, "dir": run_rel, "started": run_start, "tool": tool_version(), "github": github_run(),
                "since_hours": args.since_hours, "max_job_hours": args.max_job_hours, "testgrid_config": config_record,
                "tabs": reports, "red_builds_seen": len(builds),

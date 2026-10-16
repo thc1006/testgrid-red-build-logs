@@ -496,6 +496,21 @@ class LeftForLater(ttc.ConfigWorld):
         self.judged((self.now - 60 * DAY, self.tab(ttc.entry(self.HIDE))))
         self.assertNotIn("## Left for later runs", self.index())
 
+    def test_a_tab_no_longer_listed(self):
+        # (it is not read: its gap is searched, and its ranges looked at, only if TestGrid lists it again)
+        s0, gone = self.now - 20 * DAY, self.now - 5 * DAY
+        part, pending = [s0 - 50 * DAY, s0 - 14 * DAY], {"since": s0, "lo": s0 - 7 * HOUR, "hi": s0 - 5 * HOUR}
+        self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 60 * HOUR},
+                             "dash#gone": {"scan": s0, "oldest": s0 - 60 * HOUR, "missing_since": gone,
+                                           "unsearched": part, "changed_pending": [pending]}})
+        self.judged((self.now - 40 * DAY, {"dash": {"t": ttc.entry(""), "gone": ttc.entry("")}}))
+        by = frl.iso(gone + 30 * DAY)
+        self.assertIn(f"- dash#gone: the older part of its history gap, from {frl.iso(part[0])} to {frl.iso(part[1])}, "
+                      f"is searched in GCS if TestGrid lists the tab again by {by}\n"
+                      "- dash#gone: 1 range of builds a scan saw, waiting for a config of the tab not known yet (the "
+                      f"oldest scan {frl.iso(s0)}); looked at again if TestGrid lists the tab again by {by}\n",
+                      self.index())  # fails: no such list
+
     def test_the_index_lists_what_later_runs_still_have_to_do(self):
         """INDEX.md said nothing of either: they were only in state.json (and the run that found the
         gap's older part warned of it)."""
