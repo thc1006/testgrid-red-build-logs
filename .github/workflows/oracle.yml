@@ -3,9 +3,9 @@ name: Check the TestGrid rule
 # tool/testgrid_rule.py ports the rule TestGrid paints a build's cells by, to
 # judge builds TestGrid no longer shows. This builds TestGrid's own code at the
 # commit the port follows (tool/oracle/pinned.json) and checks the port against
-# it, and checks that TestGrid production still runs that commit; when it does not,
-# checks the port against the commit it runs, and proposes it when nothing the
-# port follows changed.
+# it, and checks that TestGrid's production manifests still deploy that commit; when
+# they do not, checks the port against the commit they deploy, and proposes it when
+# nothing the port follows changed.
 on:
   schedule:
     - cron: "41 5 * * *" # daily
@@ -112,14 +112,15 @@ jobs:
           export TGORACLE="$RUNNER_TEMP/oracle/tgoracle"
           uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 2
 
-      - name: TestGrid production still runs the pinned commit
+      - name: TestGrid's production manifests still deploy the pinned commit
         id: drift
         if: ${{ !cancelled() }}
         run: oracle/drift.sh
 
-  # When production runs another commit: the port checked against TestGrid's code at
-  # that commit, and pinned.json moved there on a branch (and proposed as a pull
-  # request, where GitHub Actions may open one) when nothing the port follows changed.
+  # When production's manifests deploy another commit: the port checked against
+  # TestGrid's code at that commit, and pinned.json moved there on a branch (and
+  # proposed as a pull request, where GitHub Actions may open one) when nothing the
+  # port follows changed.
   follow:
     name: Port against production's new commit
     needs: oracle

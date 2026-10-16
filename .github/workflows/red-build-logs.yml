@@ -114,10 +114,10 @@ jobs:
         timeout-minutes: 5
         run: uv sync --no-dev --locked --project tool
 
-      # The rule builds TestGrid no longer shows are judged by follows the commit TestGrid
-      # production runs (tool/oracle/pinned.json). If production moved, this run warns;
+      # The rule builds TestGrid no longer shows are judged by follows the commit TestGrid's
+      # production manifests deploy (tool/oracle/pinned.json). If they moved, this run warns;
       # the oracle workflow (daily) checks the port against the new commit.
-      - name: TestGrid production still runs the commit the port follows
+      - name: TestGrid's production manifests still deploy the commit the port follows
         continue-on-error: true
         timeout-minutes: 2
         run: tool/oracle/drift.sh
