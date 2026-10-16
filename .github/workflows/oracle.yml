@@ -164,7 +164,7 @@ jobs:
           TABULATOR: ${{ needs.oracle.outputs.tabulator }}
         run: |
           if [ -z "$UPDATER" ] || [ "$UPDATER" != "$TABULATOR" ]; then
-            echo "::error::Production's updater (${UPDATER:-unknown}) and tabulator (${TABULATOR:-unknown}) do not run one commit: compare each with the port by hand."
+            echo "::error::TestGrid's production manifests deploy the updater (${UPDATER:-unknown}) and the tabulator (${TABULATOR:-unknown}) at different commits: compare each with the port by hand."
             exit 1
           fi
           oracle/follow.sh "$UPDATER" "$GITHUB_RUN_ID"
