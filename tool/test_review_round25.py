@@ -509,6 +509,24 @@ class LackingRecordAndLaterConfigs(ttc.ConfigWorld):
         self.assertEqual(self.judged(*configs)["outcomes"], {})  # fails: held
         self.assertEqual(self.state()["watch"], {})  # (judged: not red, by C3 without t and C4 hiding its row)
 
+    def test_a_config_just_uploaded_after_one_without_the_tab_too(self):
+        """549f053 kept no record of a tab the latest config lacks if that config was uploaded so
+        recently that TestGrid may not have taken it, though the config before lacked the tab too,
+        so TestGrid listed it under neither. Once TestGrid no longer listed the tab, the build was
+        judged not red; the run that saw it listed warned only that TestGrid may not have taken
+        the latest config yet."""
+        other = ttc.entry("", name="otherjob", gcs_prefix="bucket/logs/otherjob")
+        configs = [(self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
+                   (self.now - 20 * HOUR, {"dash": {"other": other}}),
+                   (self.now - 600, {"dash": {"other": other}})]
+        self.record(None)
+        run = self.judged(*configs)
+        self.assertEqual(run["outcomes"], {"held": [f"job/{self.b2}"]})
+        self.assertIn("it lacks tabs TestGrid shows", " ".join(run["serious_warnings"]))  # fails: not serious
+        self.srv.summary("dash", {"other": "PASSING"})
+        self.srv.table("dash", "other", fetch_table("bucket/logs/otherjob", [], {}))
+        self.assertEqual(self.judged(*configs)["outcomes"], {"held": [f"job/{self.b2}"]})
+
     def later(self):
         """C2 (20 hours ago) has no t, C3 (5 hours ago) has t, hiding the build's red row."""
         return [(self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
