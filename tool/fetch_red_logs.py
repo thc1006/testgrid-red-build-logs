@@ -3462,9 +3462,11 @@ def migrate_old_layout(root, warnings):
             if valid_meta(meta) and (meta.get("job"), meta.get("build")) == (job, build) and \
                     isinstance(meta.get("archived_by_run"), str):
                 builds.append((src, job, build, meta))
-            elif real_dir(src) and all(n in LOG_FILES or n.endswith(".part") for n in os.listdir(src)):
+            elif real_dir(src) and all((n in LOG_FILES or n.endswith(".part")) and file_or_gone(os.path.join(src, n))
+                                       for n in os.listdir(src)):
                 for n in os.listdir(src):  # a download the old code never finished: fetched again
-                    os.remove(os.path.join(src, n))
+                    with contextlib.suppress(FileNotFoundError):
+                        os.remove(os.path.join(src, n))
                 os.rmdir(src)
             else:
                 warnings.append(f"old layout: logs/{job}/{build} has no usable meta.json; left in place")
