@@ -3785,7 +3785,8 @@ def verification_of(root, rel):
 def show_verifications(root):
     """Put each run's verification, as its verification.json records it now, in INDEX.md's table of
     runs (the fetch writes the table before the run it makes is verified: "pending"), and change
-    nothing else. Returns how many rows changed."""
+    nothing else: only the rows of run folders run_dirs lists (a link in the archive is never
+    followed). Returns how many rows changed."""
     path = os.path.join(root, "INDEX.md")
     if os.path.islink(path):  # (a link in the archive is never followed: the next fetch writes INDEX.md)
         return 0
@@ -3794,13 +3795,13 @@ def show_verifications(root):
             lines = f.read().split("\n")
     except FileNotFoundError:
         return 0
-    changed, table = 0, False
+    changed, table, listed = 0, False, set(run_dirs(root))
     for i, line in enumerate(lines):
         if line.startswith("## "):
             table = line.startswith("## Runs in the last ")
         m = re.match(r"\| \[[^\]]*\]\((runs/[0-9]{4}-[0-9]{2}/[^/)]+)/\) \| ", line) if table else None
         cut = line.rfind(" | ", 0, len(line) - 2)
-        if m and line.endswith(" |") and cut > m.end() - 4:
+        if m and m.group(1) in listed and line.endswith(" |") and cut > m.end() - 4:
             new = line[:cut + 3] + verification_of(root, m.group(1)) + " |"
             if new != line:
                 lines[i], changed = new, changed + 1

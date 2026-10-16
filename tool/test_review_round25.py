@@ -928,6 +928,25 @@ class VerificationInTheIndex(ArchiveWorld):
         self.assertEqual(self.fetch(), 0)
         self.assertFalse(os.path.islink(index))  # (the next fetch writes INDEX.md)
 
+    def test_a_run_in_a_month_folder_that_is_a_link_keeps_its_row(self):
+        """--show-verifications read a row's verification.json through a link from the run's month
+        folder, as the workflow shows the verifications after a fetch that such a link stops
+        (7620f6d)."""
+        self.assertEqual(self.verify(), 0)
+        self.assertEqual(self.show_verifications(), 0)
+        before = self.row()
+        month = self.rel.split("/")[1]
+        elsewhere = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, elsewhere)
+        target = os.path.join(elsewhere, month)
+        shutil.move(os.path.join(self.root, "runs", month), target)
+        os.symlink(target, os.path.join(self.root, "runs", month))
+        frl.write_json(os.path.join(target, self.rel.rsplit("/", 1)[1], "verification.json"),
+                       {"outcome": "problems", "problem_count": 777})
+        self.assertEqual(self.fetch(), 1)
+        self.assertEqual(self.show_verifications(), 0)
+        self.assertEqual(self.row(), before)  # fails: [777 problems](...)
+
     def test_a_page_that_is_a_link_is_replaced_not_read(self):
         """write_text read a page that is a link, to leave it as it was if it held the same text: a
         README.md or INDEX.md that is a link to /dev/zero made every run read until it ran out of
