@@ -777,8 +777,8 @@ class StateJsonTabs(unittest.TestCase):
         for bad in (5, ["since", "lo", "hi"], [["since", "lo", "hi"]], [dict(good, since="x")], [dict(good, lo=t)],
                     [dict(good, x=1)]):
             self.assertNotIn("changed_pending", self.tab(changed_pending=bad), bad)
-        many = [dict(good, since=t + i) for i in range(61)]  # (the last 60 at most)
-        self.assertEqual(self.tab(changed_pending=many)["changed_pending"], many[1:])
+        many = [dict(good, since=t + i) for i in range(61)]  # (all: run() drops those past PENDING_KEPT, saying so)
+        self.assertEqual(self.tab(changed_pending=many)["changed_pending"], many)
 
     def test_only_a_span_of_two_times(self):  # MF2056, MF2060, MF2062, MF2066
         t = time.time() - 3 * DAY
