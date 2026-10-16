@@ -172,9 +172,9 @@ class SeventhsOfRunsNotDone(unittest.TestCase):
     def test_no_run_done_in_the_week_before(self):
         self.run_at(-50, compared=False)
         self.run_at(-20, verified="problems")
-        self.assertEqual(self.sevenths(6), set(range(7)))  # fails: {DAY - 1, DAY}
+        self.assertEqual(self.sevenths(6), set(range(7)))  # fails: {DAY} only
         self.run_at(-8 * 24)  # (one done more than a week before: all seven still)
-        self.assertEqual(self.sevenths(6), set(range(7)))  # fails: {DAY - 1, DAY}
+        self.assertEqual(self.sevenths(6), set(range(7)))
 
 
 class ComparedAgainAfterACutOff(ArchiveWorld):
