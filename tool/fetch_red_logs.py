@@ -79,6 +79,7 @@ import random
 import re
 import shutil
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -4276,8 +4277,15 @@ def real_dir(path):
 
 def file_or_gone(path):
     """Neither a folder nor a link: a file, as a download writes, or nothing any more (one that went
-    while it was looked at, as a temp file a cut-off worker removes)."""
-    return not os.path.isdir(path) and not os.path.islink(path)
+    while it was looked at, as a temp file a cut-off worker removes). One that cannot be looked at is
+    neither."""
+    try:
+        mode = os.lstat(path).st_mode
+    except (FileNotFoundError, NotADirectoryError):
+        return True
+    except OSError:
+        return False
+    return not stat.S_ISDIR(mode) and not stat.S_ISLNK(mode)
 
 
 def archived_intact(target, deep=False):
