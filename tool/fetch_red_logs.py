@@ -53,6 +53,7 @@ under --archive:
   weeks/<ISO week>.md, .json        every archived build, one page per ISO week (UTC)
   index.json                        the list of weekly pages
   state.json                        per-tab last scan, builds to retry or given up on
+  excluded.json                     builds taken out for good, by hand (see load_excluded)
 """
 import argparse
 import bisect
@@ -3953,6 +3954,46 @@ def lock_archive(root):
     return f
 
 
+EXCLUDED = "excluded.json"  # in the archive: builds taken out of it for good (see load_excluded)
+
+
+class ExcludedUnreadable(Exception):
+    """excluded.json is there but cannot be used: no run goes on, as it could fetch a build taken out."""
+
+
+def load_excluded(root):
+    """The builds the archive's excluded.json takes out for good, {"job/build": {"reason": why}},
+    edited by hand (such as for a log that must not stay public): each run removes their folders
+    and never fetches them again, and cross_check.py does not count them as missing. Raises
+    ExcludedUnreadable when the file is there but cannot be used."""
+    path = os.path.join(root, EXCLUDED)
+    if os.path.islink(path):  # (a link in the archive is never followed)
+        raise ExcludedUnreadable(f"{path} is a link")
+    try:
+        data = read_json(path)
+    except (OSError, ValueError) as e:
+        raise ExcludedUnreadable(f"{path}: {type(e).__name__}: {e}") from None
+    if data is None and not os.path.lexists(path):
+        return frozenset()
+
+    def usable(k, v):
+        job, _, build = k.partition("/") if isinstance(k, str) else ("", "", "")
+        return JOB_RE.fullmatch(job) and BUILD_RE.fullmatch(build) and isinstance(v, dict) \
+            and is_text(v.get("reason"), 1000) and v["reason"].strip()
+    bad = [str(k)[:80] for k, v in data.items() if not usable(k, v)] if isinstance(data, dict) else ["(not an object)"]
+    if bad:
+        raise ExcludedUnreadable(f'{path}: not {{"job/build": {{"reason": "why"}}}} for {", ".join(bad[:3])}')
+    return frozenset(data)
+
+
+def remove_build(target):
+    """Remove a build folder and the files in it (a build taken out, see load_excluded)."""
+    for name in listdir(target):
+        remove(os.path.join(target, name))
+    remove_if_empty(target)
+    remove_if_empty(os.path.dirname(target))  # (its job folder, if no other build is in it)
+
+
 def load_state(root, warnings):
     try:
         state = read_json(os.path.join(root, "state.json"))
@@ -4400,6 +4441,11 @@ def interrupt(signum, frame):
 
 def run(args, root, run_start, pool, deadline):
     ctx = context()
+    try:
+        excluded = load_excluded(root)
+    except ExcludedUnreadable as e:
+        print(f"ERROR {e}: no run goes on until it is fixed, as it could fetch a build taken out", file=sys.stderr)
+        return 1
     timelines = Timelines(run_start)  # (each job's builds that TestGrid's reads of a judged build depend on)
     warnings = []
     if not args.list_only:
@@ -4407,7 +4453,15 @@ def run(args, root, run_start, pool, deadline):
         migrate_old_layout(root, warnings)
         clean_partial_builds(root, warnings)
     state = load_state(root, warnings)
+    for name in ("unresolved", "given_up", "watch"):  # (a build taken out is not retried or watched)
+        state[name] = {k: v for k, v in state[name].items() if k not in excluded}
     known, duplicates = archived_builds(root)
+    # builds taken out for good (excluded.json): their folders go, and they are never fetched again
+    taken_out = sorted(k for k in excluded if k in known)
+    for key in taken_out:
+        rel = known.pop(key)
+        if not args.list_only:
+            remove_build(os.path.join(root, rel))
     # the archived builds in this run's sevenths: compared with GCS even if final (cross_check.py
     # compares them too), see gcs_sevenths
     sevenths = gcs_sevenths(root, run_start)
@@ -4443,6 +4497,9 @@ def run(args, root, run_start, pool, deadline):
         rule = rules.get(f"{dashboard}#{tab}")
         return config_mismatch(rule, table, query) if rule else None
     reports, builds, visible, running, shown_on = scan(args.testgrid, args.gcs, dashboards, pool, deadline, check)
+    shown_out = {f"{job}/{build}" for job, build in builds if f"{job}/{build}" in excluded}
+    builds = {k: b for k, b in builds.items() if f"{k[0]}/{k[1]}" not in excluded}
+    running = {k: b for k, b in running.items() if f"{k[0]}/{k[1]}" not in excluded}
     timings = {"scan": round(time.time() - run_start, 2)}
     job_hours = {}  # per tab, the job durations to remember for the next run
     for r in reports:
@@ -4766,7 +4823,7 @@ def run(args, root, run_start, pool, deadline):
         # Builds retried anyway are not taken again: one known to be red (waiting to be
         # archived) is only judged for the gap's tab, and one watched gains that tab.
         in_retry = {f"{x['job']}/{x['build']}": x for x in retry}
-        backfill = backfill_gaps(gaps, args.gcs, pool, deadline, visible, set(known) | queued,
+        backfill = backfill_gaps(gaps, args.gcs, pool, deadline, visible, set(known) | queued | excluded,
                                  known=(set(known) - queued) | (in_retry.keys() & set(state["unresolved"])),
                                  tab_rules=tab_rules, watched={k: x for k, x in in_retry.items() if x.get("watch")},
                                  timelines=timelines)
@@ -4873,6 +4930,8 @@ def run(args, root, run_start, pool, deadline):
             r["config_mismatch"] = mismatch_of[key]
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors), 0, {}, {}
     uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
+    if taken_out or shown_out:  # (taken out of the archive now, or shown red by TestGrid and left out)
+        outcomes["excluded"] = sorted(set(taken_out) | shown_out)
     recheck_failed = False  # (a comparison with GCS failed)
     # judged by the gap search just now and still running, overdue on TestGrid, or watched and still
     # shown by TestGrid: watched without a look now, for as long as a build is ever watched

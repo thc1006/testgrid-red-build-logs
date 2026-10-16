@@ -6,6 +6,7 @@ Run: cd tool && uv run --frozen python -m unittest test_review_round25 -v
 """
 import contextlib
 import io
+import json
 import os
 import shutil
 import sys
@@ -460,6 +461,73 @@ class LeftForLater(ttc.ConfigWorld):
                       "in GCS by the next runs\n"
                       f"- dash#t: 1 range of builds a scan saw, waiting for a config of the tab not known yet (the "
                       f"oldest scan {frl.iso(pending['since'])}); each is dropped 14 days after its scan\n", self.index())
+
+
+
+# ------------------------------------------------------------------ a build taken out of the archive for good
+
+class TakenOut(ArchiveWorld):
+    """A red build archived, then taken out by hand (as for a log that must not stay public):
+    excluded.json names it. TestGrid still shows it red."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * DAY)
+        self.calls = []
+        self.srv.route(self.base + "/build-log.txt", obj(b"a log that must not stay public\n", "1", self.calls))
+        self.assertEqual(self.fetch(), 0)
+
+    def exclude(self, text=None):
+        with open(os.path.join(self.root, "excluded.json"), "w") as f:
+            f.write(text if text is not None else json.dumps({self.key: {"reason": "it holds a token"}}) + "\n")
+
+    def state(self):
+        return frl.read_json(os.path.join(self.root, "state.json"))
+
+    def test_control_a_build_removed_by_hand_comes_back(self):
+        shutil.rmtree(self.bdir())
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"archived": [self.key]})
+
+    def test_a_build_taken_out_is_removed_and_never_fetched_again(self):
+        """No run read a list of builds taken out: one removed by hand was archived again by the
+        next run, as TestGrid still showed it red, and nothing kept a run from it."""
+        self.exclude()
+        asked = len(self.calls)
+        self.assertEqual(self.fetch(), 0)
+        self.assertIsNone(self.bdir())  # fails: still there
+        self.assertEqual(self.runs()[-1]["outcomes"], {"excluded": [self.key]})
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual((self.bdir(), len(self.calls)), (None, asked))  # (its log is not asked for again)
+        self.assertEqual(self.check()[0], 0)  # (cross_check.py does not count it as missing)
+
+    def test_one_waiting_to_be_archived_is_dropped(self):
+        shutil.rmtree(self.bdir())
+        self.srv.route(self.base + "/build-log.txt", (503, {}, b""))
+        self.assertEqual(self.fetch(), 1)  # (the log could not be fetched: retried by the next runs)
+        self.assertIn(self.key, self.state()["unresolved"])
+        self.exclude()
+        self.assertEqual(self.fetch(), 0)  # fails: 1, as it is retried
+        self.assertNotIn(self.key, self.state()["unresolved"])
+        self.assertEqual(self.runs()[-1]["outcomes"], {"excluded": [self.key]})
+
+    def test_a_list_that_cannot_be_used_stops_the_run(self):
+        # (it could fetch a build taken out again)
+        runs = len(frl.run_dirs(self.root))
+        for text in ("{", "[]", "null", json.dumps({"job/x": {"reason": "why"}}), json.dumps({self.key: {}}),
+                     json.dumps({self.key: {"reason": " "}})):
+            self.exclude(text)
+            self.assertEqual(self.fetch(), 1, text)  # fails: 0
+            self.assertEqual(len(frl.run_dirs(self.root)), runs, text)
+        code, out = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("cannot use the archive's excluded.json", out)
+
+    def test_cross_check_reports_one_still_archived(self):
+        self.exclude()
+        code, out = self.check()  # (before a run took it out)
+        self.assertEqual(code, 1)  # fails: 0, not checked
+        self.assertIn(f"{self.key}: taken out (excluded.json), but still archived", out)
 
 
 if __name__ == "__main__":

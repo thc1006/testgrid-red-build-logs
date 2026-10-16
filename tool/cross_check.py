@@ -512,6 +512,13 @@ def check(args, problems, notes, record):
 
     known, duplicates = frl.archived_builds(root)
     problems += [f"two copies of one build: {d}" for d in duplicates]
+    # builds taken out of the archive for good (its excluded.json): not missing, and not to be there
+    try:
+        excluded = frl.load_excluded(root)
+    except frl.ExcludedUnreadable as e:
+        problems.append(f"cannot use the archive's {frl.EXCLUDED}: {e}")
+        excluded = frozenset()
+    problems += [f"{key}: taken out ({frl.EXCLUDED}), but still archived" for key in sorted(excluded & set(known))]
     if os.path.isdir(os.path.join(root, "logs")):
         problems.append("the archive still has an old-layout logs/ folder that the fetch could not move")
     # The archive cannot hold builds that scrolled off TestGrid before its first run
@@ -631,7 +638,7 @@ def check(args, problems, notes, record):
                 oldest_shown[table["query"]] = min(oldest_shown.get(table["query"], start), start)
             if start >= since and cells & PAINTED_RED:
                 red_now.setdefault((job, build), (table["query"], [], start))[1].append(f"{dashboard}#{tab}")
-    unarchived = [(k, v) for k, v in red_now.items() if k not in archived]
+    unarchived = [(k, v) for k, v in red_now.items() if k not in archived and f"{k[0]}/{k[1]}" not in excluded]
     finished = dict(zip([k for k, _ in unarchived],
                         pool.map(lambda kv: try_json(f"{args.gcs}/{kv[1][0]}/{kv[0][1]}/finished.json"), unarchived),
                         strict=True))
@@ -682,7 +689,7 @@ def check(args, problems, notes, record):
     unread = {t["query"] for t in tabs if tables.get((t["dashboard"], t["tab"])) is None} | undecoded
     unlisted = [(q, b) for (q, b), fin in results.items()
                 if not (isinstance(fin, dict) and number(fin.get("timestamp")) and fin["timestamp"] > settled)
-                and (job_of[q], b) not in archived and (job_of[q], b) not in shown
+                and (job_of[q], b) not in archived and (job_of[q], b) not in shown and f"{job_of[q]}/{b}" not in excluded
                 and created(b) >= archive_start and q not in unread and q in oldest_shown and created(b) < oldest_shown[q]]
 
     # ... and over time, as the archive learned it (its state.json: frl.ConfigHistory), as the fetch judges by it
