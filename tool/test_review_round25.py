@@ -1876,6 +1876,17 @@ class NamedAsADownload(ArchiveWorld):
         self.assertTrue(os.path.islink(os.path.join(self.bdir(), "podinfo.json")))  # fails: removed
         self.assertIn("podinfo.json: not listed in its meta.json, and not a file a download writes", " ".join(warnings))
 
+    def test_a_meta_json_naming_its_log_otherwise_than_as_text_names_no_stray(self):
+        """stray_files put the names a meta.json gives in a set: a list as the log's "file" raised
+        TypeError at the start of every run."""
+        meta = self.meta()
+        meta["log"] = dict(meta["log"], file=["build-log.txt"])
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        frl.clean_partial_builds(self.root, [])  # fails: TypeError: unhashable type: 'list'
+        self.assertTrue(os.path.exists(os.path.join(self.bdir(), "build-log.txt")))
+        self.fetch()  # (and the run goes on)
+        self.assertTrue(os.path.exists(os.path.join(self.bdir(), "build-log.txt")))
+
     def test_control_what_a_download_left_is_removed(self):
         os.makedirs(self.folder)
         for name in ("build-log.txt", ".build-log.txt.x1y2.part"):
