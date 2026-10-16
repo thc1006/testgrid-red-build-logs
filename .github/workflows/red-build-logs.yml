@@ -179,11 +179,13 @@ jobs:
             exit 0
           fi
           # A build folder without meta.json is a download that was cut off: leave
-          # it out; the build is retried by a later run.
-          shopt -s nullglob
-          for d in archive/runs/*/*/*/*/; do
-            [ -e "${d}meta.json" ] || rm -rf -- "$d"
-          done
+          # it out; the build is retried by a later run. (find follows no link, as
+          # the fetch follows none in the archive: one may lead outside it.)
+          if [ -d archive/runs ]; then
+            while IFS= read -r -d '' d; do
+              [ -e "$d/meta.json" ] || rm -rf -- "$d"
+            done < <(find archive/runs -mindepth 4 -maxdepth 4 -type d -print0)
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add archive
