@@ -37,7 +37,7 @@ for component in updater tabulator; do
   echo "production manifest of the $component: $tag (commit $running), pinned: $pinned"
   echo "$component=$running" >> "${GITHUB_OUTPUT:-/dev/null}"
   if [ -z "$running" ] || ! same; then
-    echo "::error::TestGrid's production manifest now deploys the $component $tag, not the pinned commit $pinned: see tool/oracle/README.md (When TestGrid production moves to another commit)."
+    echo "::error::TestGrid's production manifest now deploys the $component $tag, not the pinned commit $pinned: see tool/oracle/README.md (When TestGrid's production manifests move to another commit)."
     moved=true
     status=1
   fi

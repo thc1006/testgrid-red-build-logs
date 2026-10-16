@@ -85,7 +85,7 @@ check "real builds" uv run --locked --no-dev python -I oracle/fuzz/realdiff.py .
   fi
 } >> "$summary"
 if [ -n "$changed" ] || [ ${#failed[@]} -gt 0 ]; then
-  echo "::error::TestGrid production moved to $version: compare what changed with the port (tool/oracle/README.md), then move pinned.json."
+  echo "::error::TestGrid's production manifests moved to $version: compare what changed with the port (tool/oracle/README.md), then move pinned.json."
   exit 1
 fi
 

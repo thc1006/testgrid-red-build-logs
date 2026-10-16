@@ -74,7 +74,7 @@ uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 3   # the 
 python3 -I oracle/fuzz/golden.py testdata/testgrid_rule_golden.jsonl.gz   # only when the rule changed
 ```
 
-## When TestGrid production moves to another commit
+## When TestGrid's production manifests move to another commit
 
 The daily workflow notices, and proposes the new commit itself when nothing the
 port follows changed. When something did:
