@@ -3549,10 +3549,9 @@ def clean_partial_builds(root, warnings):
 
     Only files a download writes are removed; a folder holding anything else is reported, not touched.
     """
-    def downloaded(target, n):  # (a file a download writes: a regular file of such a name, not a folder or link)
-        path = os.path.join(target, n)
+    def downloaded(target, n):  # (a file a download writes: one of such a name, not a folder or link)
         return bool(n in LOG_FILES or PART_RE.fullmatch(n) or (n.startswith(".") and n.endswith(".part"))) \
-            and os.path.isfile(path) and not os.path.islink(path)
+            and file_or_gone(os.path.join(target, n))
     for run_rel in run_dirs(root):
         run_abs = os.path.join(root, run_rel)
         for job in listdir(run_abs):
@@ -4256,6 +4255,12 @@ def sweep_parts(root):
 def real_dir(path):
     """A directory that is not a symlink (symlinks in the archive are never followed)."""
     return os.path.isdir(path) and not os.path.islink(path)
+
+
+def file_or_gone(path):
+    """Neither a folder nor a link: a file, as a download writes, or nothing any more (one that went
+    while it was looked at, as a temp file a cut-off worker removes)."""
+    return not os.path.isdir(path) and not os.path.islink(path)
 
 
 def archived_intact(target, deep=False):
