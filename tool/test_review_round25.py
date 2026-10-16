@@ -670,6 +670,30 @@ class LackingRecordWhileAnUploadRan(ttc.ConfigWorld):
         self.assertEqual(outcomes, {"held": [b2]})  # fails: {}
 
 
+class TwoUploadsInOneSecond(unittest.TestCase):
+    """history_rules: two runs of the upload job began in the same second, Ra with tab t (it ended
+    30 minutes later) and Rb without (5 seconds later); a lacking_tabs record a minute after they
+    began. 13c666e took one run's end for both, the last listed: in one order, Ra's config, not
+    uploaded yet then, explained the record."""
+
+    def eras_of_r1(self, first):
+        S, entry = 1_790_000_000, ttc.entry("")
+        runs = [(S - 30 * DAY, S - 30 * DAY + 5, {"d#t": entry}), (S - 5 * DAY, S - 5 * DAY + 5, {}),
+                (S, S + 1800, {"d#t": entry}), (S, S + 5, {})]
+        if first == "Rb":
+            runs[2], runs[3] = runs[3], runs[2]
+        h = frl.ConfigHistory()
+        h.runs = [dict(build=str(1000 + i), commit=f"{i:040x}", started=started, finished=finished, tabs=tabs,
+                       group_changes=None, listed=None, failed=None, recipe=None, built=None)
+                  for i, (started, finished, tabs) in enumerate(runs)]
+        eras = frl.history_rules(h, ["d#t"], S + 3600, {"d#t": S + 60})["d#t"]["eras"]
+        return [e for lo, _, e in eras if lo == S - 5 * DAY]  # (R1's, without t, before the record)
+
+    def test_in_either_order(self):
+        self.assertEqual(self.eras_of_r1("Rb"), [frl.UNKNOWN])
+        self.assertEqual(self.eras_of_r1("Ra"), [frl.UNKNOWN])  # fails: [None]
+
+
 # ------------------------------------------------------------------ INDEX.md shows the run's verification
 
 class VerificationInTheIndex(ArchiveWorld):
