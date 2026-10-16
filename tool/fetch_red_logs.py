@@ -3573,11 +3573,12 @@ def clean_partial_builds(root, warnings):
         run_abs = os.path.join(root, run_rel)
         for job in listdir(run_abs):
             job_abs = os.path.join(run_abs, job)
-            if job in RUN_FILES or not real_dir(job_abs):
+            # (only folders named as a download names them, as archived_builds reads them)
+            if job in RUN_FILES or not JOB_RE.fullmatch(job) or not real_dir(job_abs):
                 continue
             for build in listdir(job_abs):
                 target = os.path.join(job_abs, build)
-                if not real_dir(target):
+                if not BUILD_RE.fullmatch(build) or not real_dir(target):
                     continue
                 if os.path.islink(os.path.join(target, "meta.json")):  # (a link in the archive is never followed)
                     warnings.append(f"{run_rel}/{job}/{build}: its meta.json is a link; nothing in the folder is removed")
