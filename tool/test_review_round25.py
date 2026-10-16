@@ -204,9 +204,11 @@ class SeventhsOfRunsNotDone(unittest.TestCase):
 
     def test_or_was_killed_before_it_wrote_its_report(self):
         """A run killed before it wrote run.json (as a step's timeout does, at last), whose folder
-        holds what it fetched, counted as no run."""
+        holds what it fetched, counted as no run. (A run writes one from its start now.)"""
         self.run_at(1)
-        frl.new_run_dir(self.root, self.DAY * 86400 + 5 * 3600)  # (its folder, without run.json)
+        rel = frl.new_run_dir(self.root, self.DAY * 86400 + 5 * 3600)[1]  # (its folder, without run.json)
+        os.makedirs(os.path.join(self.root, rel, "job", "1"))
+        frl.write_json(os.path.join(self.root, rel, "job", "1", "meta.json"), {"job": "job", "build": "1"})
         self.assertEqual(self.sevenths(30), self.days(0, 1))  # fails: {DAY + 1} only
 
     def test_a_run_not_done_on_the_day_of_the_last_done_one(self):
@@ -1144,6 +1146,24 @@ class NotDoneWithItsComparisons(ArchiveWorld):
         run = self.runs()[-1]
         self.assertIn("comparing the archived copy with GCS failed", json.dumps(run["errors"]))
         self.assertIs(run["gcs_compared"], False)
+
+    def test_a_run_killed_during_its_downloads_leaves_a_report(self):
+        """A run wrote run.json once its downloads ended: one killed before (a step's timeout kills
+        it at last) left a folder without it, empty if all it fetched went to older folders, and
+        empty folders are removed. Later runs took no such run to have been, so not one that was not
+        done with its sevenths."""
+        seen = []
+        real = frl.archive
+
+        def archive(*args, **kwargs):
+            seen.append(frl.read_json(os.path.join(self.root, frl.run_dirs(self.root)[-1], "run.json")))
+            return real(*args, **kwargs)
+        with mock.patch.object(frl, "archive", archive):
+            self.assertEqual(self.fetch(), 0)
+        self.assertIsNotNone(seen[0])  # fails: None, no run.json yet
+        self.assertEqual((seen[0]["started"], seen[0]["gcs_compared"], seen[0]["errors"]),
+                         (self.runs()[-1]["started"], False,
+                          [{"build": None, "error": "the run stopped before it finished"}]))
 
     def test_when_the_deadline_came_during_the_scan(self):  # (kills a mutant)
         def slow_summary(h):
