@@ -4013,15 +4013,20 @@ def remove_build(target):
 
 
 def linking(root, keys):
-    """The run folders whose README.md links the folder of a build of `keys` ("job/build")."""
+    """The run folders whose README.md lists a build of `keys` ("job/build"): links its folder,
+    or the build on Prow, as its row does (a README that is a link is never followed)."""
+    marks = [mark.encode() for key in keys for mark in (f"/{key}/", f"/{key})")]
     out = set()
     for rel in run_dirs(root) if keys else ():
+        path = os.path.join(root, rel, "README.md")
         try:
-            with open(os.path.join(root, rel, "README.md"), encoding="utf-8") as f:
-                text = f.read()
-        except (OSError, UnicodeDecodeError):
+            if os.path.islink(path) or not os.path.isfile(path):
+                continue
+            with open(path, "rb") as f:  # (one a hand edit left not UTF-8 too)
+                data = f.read()
+        except OSError:
             continue
-        if any(f"/{key}/" in text for key in keys):
+        if any(mark in data for mark in marks):
             out.add(rel)
     return out
 

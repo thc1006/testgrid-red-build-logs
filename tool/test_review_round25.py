@@ -824,10 +824,11 @@ class TakenOutOfAnOlderRun(ArchiveWorld):
     """A red build a run archived 3.8 days ago, then taken out: INDEX.md rewrites the READMEs of
     recent run folders only."""
 
-    def archived(self, ago):
-        """Its run folder, of a run `ago` seconds ago."""
+    def archived(self, ago, log=True):
+        """Its run folder, of a run `ago` seconds ago (without a file, as GCS had none, if not log)."""
         self.finished(ago=ago + 0.1 * DAY)
-        self.srv.route(self.base + "/build-log.txt", obj(b"a log that must not stay public\n"))
+        if log:
+            self.srv.route(self.base + "/build-log.txt", obj(b"a log that must not stay public\n"))
         real = time.time
         with mock.patch("time.time", lambda: real() - ago):
             self.assertEqual(self.fetch(), 0)
@@ -874,6 +875,40 @@ class TakenOutOfAnOlderRun(ArchiveWorld):
         self.assertNotIn(self.build, self.readme(rel))
         self.assertNotIn(f"/{self.key}/", self.readme(later))  # fails: "- refreshed: [job/…](…/job/…/)"
         self.assertIn(f"- refreshed: {self.key}\n", self.readme(later))  # (as its run.json says)
+
+    def test_one_archived_without_a_file(self):
+        """Its row links the build on Prow only (no file of it is archived): linking() looked for
+        a link to its folder."""
+        rel = self.archived(3.8 * DAY, log=False)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"archived-without-log": [self.key]})
+        self.exclude()
+        self.assertEqual(self.fetch(), 0)
+        self.assertNotIn(self.build, self.readme(rel))  # fails: its row
+
+    def test_a_readme_not_utf8(self):
+        """(a byte a hand edit left): linking() could not decode it, and passed it over."""
+        rel = self.archived(3.8 * DAY)
+        with open(os.path.join(self.root, rel, "README.md"), "ab") as f:
+            f.write(b"\xff\n")
+        self.exclude()
+        self.assertEqual(self.fetch(), 0)
+        with open(os.path.join(self.root, rel, "README.md"), "rb") as f:
+            self.assertNotIn(self.build.encode(), f.read())  # fails: its row, with a link to its log
+
+    def test_a_readme_that_is_a_link_is_not_followed(self):
+        """linking() read a README.md that is a link, as no other reader of the archive does: one
+        to /dev/zero, in a run folder older than INDEX.md's, made every run read until it ran out
+        of memory."""
+        rel = self.archived(3.8 * DAY)
+        elsewhere = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, elsewhere)
+        outside = os.path.join(elsewhere, "README.md")
+        with open(outside, "w") as f:
+            f.write(f"[x](../../../runs/{rel}/{self.key}/)\n")
+        readme = os.path.join(self.root, frl.run_dirs(self.root)[0], "README.md")
+        os.remove(readme)
+        os.symlink(outside, readme)
+        self.assertEqual(frl.linking(self.root, frozenset({self.key})), set())  # fails: the folder, by the file linked
 
     def test_its_runs_readme_lists_it_no_more(self):
         self.finished(ago=3.9 * DAY)
