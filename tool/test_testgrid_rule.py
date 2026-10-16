@@ -1,7 +1,7 @@
 """testgrid_rule against TestGrid's own code: testdata/testgrid_rule_golden.jsonl.gz holds
-what TestGrid's updater (tool/oracle, built from the commit production runs) made of 590
-builds, edge cases and random ones; each is replayed here. Then the helpers, and
-gcs_column reading a build over HTTP as TestGrid's GCS client does."""
+what TestGrid's updater (tool/oracle, built from the commit TestGrid's production manifests
+deploy) made of 590 builds, edge cases and random ones; each is replayed here. Then the
+helpers, and gcs_column reading a build over HTTP as TestGrid's GCS client does."""
 import base64
 import gzip
 import json

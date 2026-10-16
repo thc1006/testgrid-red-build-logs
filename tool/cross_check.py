@@ -7,8 +7,10 @@ For one run (default: the latest):
              no other stored file sits next to it; and GCS still holds the
              content it was taken from, checked for the builds of the last
              --hours and a seventh of the older ones for each day since the
-             run before (so each at least once a week; the run's fetch
-             compares the same ones, see fetch_red_logs.gcs_sevenths); a
+             last run done with its own (so each at least once a week, even
+             when a run is cut off or its verification finds a difference; the
+             run's fetch compares the same ones, see
+             fetch_red_logs.gcs_sevenths); a
              build archived without a log still has none in GCS. Then what
              the archive holds, by kind.
   testgrid   every column TestGrid paints red now, whose build finished well
@@ -437,8 +439,9 @@ def inventory(archived, root):
             count("still compared with GCS on every run")
         if m.get("backfilled"):
             count("taken from GCS, judged by TestGrid's rule")
-    try:
-        state = frl.read_json(os.path.join(root, "state.json"))
+    try:  # (one that is a link is not read, as the fetch does not read it)
+        path = os.path.join(root, "state.json")
+        state = {} if os.path.islink(path) else frl.read_json(path)
     except (OSError, ValueError):
         state = {}
     for key, what in (("unresolved", "waiting to be archived"), ("given_up", "given up on"), ("watch", "watched")):
@@ -510,6 +513,13 @@ def check(args, problems, notes, record):
 
     known, duplicates = frl.archived_builds(root)
     problems += [f"two copies of one build: {d}" for d in duplicates]
+    # builds taken out of the archive for good (its excluded.json): not missing, and not to be there
+    try:
+        excluded = frl.load_excluded(root)
+    except frl.ExcludedUnreadable as e:
+        problems.append(f"cannot use the archive's {frl.EXCLUDED}: {e}")
+        excluded = frozenset()
+    problems += [f"{key}: taken out ({frl.EXCLUDED}), but still archived" for key in sorted(excluded & set(known))]
     if os.path.isdir(os.path.join(root, "logs")):
         problems.append("the archive still has an old-layout logs/ folder that the fetch could not move")
     # The archive cannot hold builds that scrolled off TestGrid before its first run
@@ -540,9 +550,10 @@ def check(args, problems, notes, record):
 
     # 1. integrity: every archived file on disk, whatever its age; and what GCS holds
     # now for the builds of the window, and for a seventh of the older ones per day
-    # since the run before this one (a different seventh each day, so each is
-    # compared again at least once a week, even when a day has no run; the run's
-    # fetch compared the same ones, final or not)
+    # since the last run done with its own (a different seventh each day, so each is
+    # compared again at least once a week, even when a day has no run or a run is
+    # cut off; the run's fetch compared the same ones, final or not: see
+    # fetch_red_logs.gcs_sevenths)
     sevenths = frl.gcs_sevenths(root, t0)
 
     def compare_with_gcs(m):
@@ -588,8 +599,8 @@ def check(args, problems, notes, record):
                 problems.append(p)
     compared = sum(1 for _, m in items if compare_with_gcs(m))
     print(f"  integrity: {len(items)} builds' files checked on disk, {compared} of them compared with GCS (those "
-          f"from the window, and {len(sevenths)}/7 of the rest, one seventh per day since the run before): {bad} differ, "
-          f"{len(unsettled)} not settled yet")
+          f"from the window, and {len(sevenths)}/7 of the rest, one seventh per day since the last run done with its "
+          f"own): {bad} differ, {len(unsettled)} not settled yet")
     print("  inventory: " + inventory(archived, root))
     record.scope(compared_with_gcs=compared, sevenths=sorted(sevenths), differ=bad, not_settled=len(unsettled))
 
@@ -628,7 +639,8 @@ def check(args, problems, notes, record):
                 oldest_shown[table["query"]] = min(oldest_shown.get(table["query"], start), start)
             if start >= since and cells & PAINTED_RED:
                 red_now.setdefault((job, build), (table["query"], [], start))[1].append(f"{dashboard}#{tab}")
-    unarchived = [(k, v) for k, v in red_now.items() if k not in archived]
+    taken_out = [k for k in red_now if k not in archived and f"{k[0]}/{k[1]}" in excluded]  # (not missing)
+    unarchived = [(k, v) for k, v in red_now.items() if k not in archived and f"{k[0]}/{k[1]}" not in excluded]
     finished = dict(zip([k for k, _ in unarchived],
                         pool.map(lambda kv: try_json(f"{args.gcs}/{kv[1][0]}/{kv[0][1]}/finished.json"), unarchived),
                         strict=True))
@@ -652,7 +664,8 @@ def check(args, problems, notes, record):
                             f"finished.json {'present' if fin is not None else 'missing'}")
         else:
             late += 1
-    print(f"  testgrid: {len(red_now)} red builds in window, {len(red_now) - len(unarchived)} archived, "
+    print(f"  testgrid: {len(red_now)} red builds in window, {len(red_now) - len(unarchived) - len(taken_out)} archived, "
+          + (f"{len(taken_out)} taken out ({frl.EXCLUDED}), " if taken_out else "") +
           f"{late} not settled at run time (finished <{args.lag_minutes:.0f} min before it, or no finished.json), "
           f"{len(unarchived) - late} missed")
     record.scope(red_on_testgrid=len(red_now), red_not_settled=late)
@@ -679,12 +692,13 @@ def check(args, problems, notes, record):
     unread = {t["query"] for t in tabs if tables.get((t["dashboard"], t["tab"])) is None} | undecoded
     unlisted = [(q, b) for (q, b), fin in results.items()
                 if not (isinstance(fin, dict) and number(fin.get("timestamp")) and fin["timestamp"] > settled)
-                and (job_of[q], b) not in archived and (job_of[q], b) not in shown
+                and (job_of[q], b) not in archived and (job_of[q], b) not in shown and f"{job_of[q]}/{b}" not in excluded
                 and created(b) >= archive_start and q not in unread and q in oldest_shown and created(b) < oldest_shown[q]]
 
     # ... and over time, as the archive learned it (its state.json: frl.ConfigHistory), as the fetch judges by it
-    try:
-        state = frl.read_json(os.path.join(root, "state.json"))
+    try:  # (one that is a link is not read, as the fetch does not read it)
+        path = os.path.join(root, "state.json")
+        state = {} if os.path.islink(path) else frl.read_json(path)
     except (OSError, ValueError):
         state = {}
     state = state if isinstance(state, dict) else {}
@@ -696,8 +710,13 @@ def check(args, problems, notes, record):
     rule_of = {}  # per "dashboard#tab", the tab's rule as the fetch takes it (frl.tab_verdict)
     current, _ = history.current()
     keys = [f"{t['dashboard']}#{t['tab']}" for t in tabs]
-    over_time = frl.history_rules(history, keys, t0, [k for k in keys if current is not None and k not in current],
-                                  {f"{t['dashboard']}#{t['tab']}": t["query"] for t in tabs}, era_rule)
+    # (and those a run saw TestGrid list while the latest config known lacked them, as the fetch keeps them)
+    recorded = state.get("lacking_tabs") if isinstance(state.get("lacking_tabs"), dict) else {}
+    lacking = {k: v for k, v in recorded.items() if isinstance(k, str) and frl.plausible_time(v, time.time())
+               and t0 - v <= (frl.HELD_DAYS + 1) * 86400}
+    lacking.update(dict.fromkeys([k for k in keys if current is not None and k not in current], t0))
+    over_time = frl.history_rules(history, keys, t0, lacking, {f"{t['dashboard']}#{t['tab']}": t["query"] for t in tabs},
+                                  era_rule)
     for t in tabs:
         key, rule = f"{t['dashboard']}#{t['tab']}", rules.get((t["dashboard"], t["tab"]))
         rule_of[key] = {"rows": rows_of.get((t["dashboard"], t["tab"]))}
@@ -781,7 +800,7 @@ def check(args, problems, notes, record):
             if key in archived:
                 notes.append(f"{key[0]}/{b}: red on TestGrid but Prow says SUCCESS (archived)")
             continue
-        if key in archived:
+        if key in archived or f"{key[0]}/{b}" in excluded:  # (one taken out, see frl.load_excluded, is not missing)
             continue
         cells = statuses.get(key)
         if (q, b) in judged:

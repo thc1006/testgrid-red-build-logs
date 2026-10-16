@@ -193,7 +193,8 @@ class Staleness(ttc.ConfigWorld):
         self.assertEqual(self.fetch_with(other), 1)
         run = self.runs()[-1]
         self.assertIn("has no tab dash#t", " ".join(run["warnings"]))
-        self.assertIn("TestGrid's config was last read", " ".join(run["serious_warnings"]))
+        # (TestGrid shows the tab, under a config not known: a serious warning of its own)
+        self.assertIn("it lacks tabs TestGrid shows", " ".join(run["serious_warnings"]))
         self.assertAlmostEqual(run["tabs"][0]["config_read"], self.now - 30 * DAY, delta=1)
 
 

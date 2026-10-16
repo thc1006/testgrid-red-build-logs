@@ -87,9 +87,9 @@ jobs:
       group: red-build-logs-archive-${{ github.ref }}
       cancel-in-progress: false
     runs-on: ubuntu-24.04
-    # More than the step timeouts below (5 + 2 + 34 + 50 + 20 + 10) plus checkout and
+    # More than the step timeouts below (5 + 2 + 34 + 50 + 20 + 2 + 10) plus checkout and
     # setup-uv, so the commit step always gets to run.
-    timeout-minutes: 130
+    timeout-minutes: 132
     permissions:
       contents: write # push the archive back to the branch
     steps:
@@ -114,10 +114,10 @@ jobs:
         timeout-minutes: 5
         run: uv sync --no-dev --locked --project tool
 
-      # The rule builds TestGrid no longer shows are judged by follows the commit TestGrid
-      # production runs (tool/oracle/pinned.json). If production moved, this run warns;
+      # The rule builds TestGrid no longer shows are judged by follows the commit TestGrid's
+      # production manifests deploy (tool/oracle/pinned.json). If they moved, this run warns;
       # the oracle workflow (daily) checks the port against the new commit.
-      - name: TestGrid production still runs the commit the port follows
+      - name: TestGrid's production manifests still deploy the commit the port follows
         continue-on-error: true
         timeout-minutes: 2
         run: tool/oracle/drift.sh
@@ -154,6 +154,14 @@ jobs:
         timeout-minutes: 20
         run: exec tool/.venv/bin/python tool/cross_check.py --archive archive --hours 48 --record
 
+      # The fetch wrote INDEX.md before the run was verified: put the verification's
+      # outcome (verification.json) in its table of runs, so the commit shows it.
+      - name: Show the verification in INDEX.md
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        timeout-minutes: 2
+        run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --show-verifications
+
       # Commit whatever was archived even when a step failed or timed out (a step
       # timeout is a failure, not a cancellation). The run's report in its folder
       # under archive/runs/ says what went wrong; an interrupted fetch writes one
@@ -170,12 +178,15 @@ jobs:
             echo "No archive/ to commit."
             exit 0
           fi
-          # A build folder without meta.json is a download that was cut off: leave
-          # it out; the build is retried by a later run.
-          shopt -s nullglob
-          for d in archive/runs/*/*/*/*/; do
-            [ -e "${d}meta.json" ] || rm -rf -- "$d"
-          done
+          # Leave out what cut-off downloads left, such as a build folder without
+          # meta.json: the fetch removes it by its own rule at its start and end, and
+          # this is that rule, for a fetch killed before its end. The builds are
+          # retried by a later run. (Without the tool installed, no fetch ran.) It
+          # runs without the token, which only the push needs.
+          if [ -x tool/.venv/bin/python ]; then
+            env -u GITHUB_TOKEN tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --clean-partial ||
+              echo "::warning::Could not remove what cut-off downloads left: the next run removes it."
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add archive

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# When TestGrid production runs another commit than the pinned one (drift.sh):
+# When TestGrid's production manifests deploy another commit than the pinned one (drift.sh):
 # build TestGrid's code at that commit, check the port against it as against the
 # pinned one, and list what changed in the code the port follows
 # (relevant_diff.py). When nothing it follows changed and every check passes,
@@ -67,7 +67,7 @@ check "test names" python3 -I oracle/fuzz/fmtdiff.py "$seed" 20000
 check "real builds" uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 2
 
 {
-  echo "## TestGrid production runs $version"
+  echo "## TestGrid's production manifests deploy $version"
   echo
   echo "Pinned: $pinned."
   if [ -n "$changed" ]; then
@@ -85,7 +85,7 @@ check "real builds" uv run --locked --no-dev python -I oracle/fuzz/realdiff.py .
   fi
 } >> "$summary"
 if [ -n "$changed" ] || [ ${#failed[@]} -gt 0 ]; then
-  echo "::error::TestGrid production moved to $version: compare what changed with the port (tool/oracle/README.md), then move pinned.json."
+  echo "::error::TestGrid's production manifests moved to $version: compare what changed with the port (tool/oracle/README.md), then move pinned.json."
   exit 1
 fi
 
@@ -123,7 +123,7 @@ else
   git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" push -q origin "HEAD:refs/heads/$branch"
 fi
 if url=$(gh pr create --head "$branch" --base main --title "oracle: follow TestGrid production to $short" \
-    --body "TestGrid production runs $version. Nothing in the code the port follows changed since $pinned, and every check passed against it: see $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID." 2>&1); then
+    --body "TestGrid's production manifests deploy $version. Nothing in the code the port follows changed since $pinned, and every check passed against it: see $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID." 2>&1); then
   echo "Proposed: $url" | tee -a "$summary"
 else
   echo "Could not open a pull request ($url). Open one from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$branch" | tee -a "$summary"

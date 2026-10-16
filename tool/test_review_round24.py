@@ -545,7 +545,10 @@ class CommitStep(unittest.TestCase):
         self.assertEqual(self.pushed()[f"{NEW}/build-log.txt.gz"], LIMIT)
 
     def test_control_a_build_folder_without_meta_json_is_left_out(self):
-        # (a download cut off part-way: removed first, so its size stops nothing)
+        # (a download cut off part-way: removed first, by the fetch's rule, so its size stops nothing)
+        if not os.path.exists(os.path.join(HERE, ".venv", "bin", "python")):
+            self.skipTest("the commit step runs tool/.venv/bin/python, and there is none (uv run makes it)")
+        os.symlink(HERE, os.path.join(self.repo, "tool"))  # (the tool installed, as when a fetch ran)
         cut = NEW[:-1] + "1"
         self.write(f"{cut}/build-log.txt.gz", size=LIMIT + 1)
         self.write(f"{NEW}/build-log.txt.gz", b"a new log")
@@ -1158,9 +1161,11 @@ class Sevenths(unittest.TestCase):
         """(cab048a computed them inside cross_check.check: it has no frl.gcs_sevenths)"""
         with tempfile.TemporaryDirectory() as root:
             day = 20_000 * 86400
-            for started in (day - 10 * 86400, day - 3 * 86400 + 5, day + 7200):
+            for started in (day - 10 * 86400, day - 3 * 86400 + 5, day + 7200):  # (each done with its sevenths)
                 rel = frl.new_run_dir(root, started)[1]
-                frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": started})
+                frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": started,
+                                                                     "gcs_compared": True})
+                frl.write_json(os.path.join(root, rel, "verification.json"), {"outcome": "ok", "scope": {"differ": 0}})
             rel = frl.new_run_dir(root, day - 86400)[1]  # (a report with a start no run can have: passed over)
             frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": 0})
             with mock.patch("time.time", return_value=day + 86400):

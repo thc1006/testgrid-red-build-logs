@@ -4,8 +4,8 @@
 needs it for builds TestGrid no longer shows (a gap between runs) or showed running
 long past their time, and `cross_check.py` uses it to check that none of those was
 missed. This folder
-builds TestGrid's own code, at the commit TestGrid production runs, to check the
-port against.
+builds TestGrid's own code, at the commit TestGrid's production manifests deploy, to
+check the port against.
 
 - `pinned.json`: that commit (TestGrid production's updater image tag in
   `cluster/prod/updater.yaml` ends in `-g<commit>`) and the Go version it is
@@ -46,11 +46,12 @@ port. It does all of this:
 - runs the filter's edge cases and 20,000 random ones;
 - runs Go's `fmt.Sprintf` against `gofmt.py` (a test group's `test_name_config`
   names its rows with it) on 20,000 random formats (`gocheck`'s "sprintf");
-- fails if TestGrid production's updater or tabulator no longer runs the pinned
-  commit (`drift.sh`, checked even when another check failed; every archive run
-  checks it too, and warns);
-- then, if production moved, `follow.sh` builds TestGrid's code at the commit it
-  runs, runs every check above against it, and lists what changed between the
+- fails if TestGrid's production manifests (`cluster/prod/updater.yaml` and
+  `tabulator.yaml`) no longer deploy the pinned commit of its updater or tabulator
+  (`drift.sh`, checked even when another check failed; every archive run checks it
+  too, and warns);
+- then, if the manifests moved, `follow.sh` builds TestGrid's code at the commit
+  they deploy, runs every check above against it, and lists what changed between the
   two commits in the code the port follows (`relevant_diff.py`). When nothing did
   and every check passes, it moves `pinned.json` (and regenerates
   `testgrid_types.json`) on the branch `follow-testgrid-<commit>` and proposes it
@@ -73,7 +74,7 @@ uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 3   # the 
 python3 -I oracle/fuzz/golden.py testdata/testgrid_rule_golden.jsonl.gz   # only when the rule changed
 ```
 
-## When TestGrid production moves to another commit
+## When TestGrid's production manifests move to another commit
 
 The daily workflow notices, and proposes the new commit itself when nothing the
 port follows changed. When something did:

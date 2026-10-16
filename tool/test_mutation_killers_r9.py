@@ -1583,9 +1583,9 @@ echo "        image: gcr.io/k8s-testgrid/$component:${!tag}"
 
 
 class Drift(unittest.TestCase):
-    """oracle/drift.sh: whether TestGrid production's updater and tabulator run the pinned commit
-    (their image tags, as cluster/prod's YAML gives them: -g<commit> after a release, or the release
-    itself), offline (curl a stand-in)."""
+    """oracle/drift.sh: whether TestGrid's production manifests deploy its updater and tabulator at the
+    pinned commit (their image tags, as cluster/prod's YAML gives them: -g<commit> after a release, or
+    the release itself), offline (curl a stand-in)."""
 
     def drift(self, updater, tabulator, pinned=None):
         """drift.sh's exit code and outputs, production running these image tags."""

@@ -611,7 +611,9 @@ class CrossCheckRound7(r4.World):
         self.assertEqual(set(seen), {started})
 
     def test_older_builds_are_compared_for_every_day_since_the_run_before(self):
-        self.earlier_run(self.now - 3 * DAY)
+        d = self.earlier_run(self.now - 3 * DAY)  # (done with its sevenths: it compared them all, and so did its verification)
+        frl.write_json(os.path.join(d, "run.json"), dict(frl.read_json(os.path.join(d, "run.json")), gcs_compared=True))
+        frl.write_json(os.path.join(d, "verification.json"), {"outcome": "ok", "scope": {"differ": 0}})
         self.finished(ago=3 * HOUR)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.srv.gcs_listing("bucket", [])

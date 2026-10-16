@@ -30,9 +30,11 @@ every run until RECHECK_HOURS after it finished (GIVE_UP_DAYS after it was
 archived, for one without a log or finished.json), and fetched again whenever
 GCS holds different content. After that (it is final), it is compared at least
 once a week: each run compares the seventh of the archive for its UTC day, and
-those of the days since the run before (see gcs_sevenths), as cross_check.py
-does. One a run cut off did not get to waits for the next run that compares its
-seventh. A copy taken less than SETTLE_HOURS after the build finished, or before
+those of the days since the last run done with its own (it compared them all,
+and its verification found none differing: see gcs_sevenths), as
+cross_check.py does. So one a run cut off did not get to is compared by the
+next run. A copy taken
+less than SETTLE_HOURS after the build finished, or before
 it finished at all, is marked as not settled.
 
 Each run gets its own folder; a build is stored in the folder of the run that
@@ -52,6 +54,7 @@ under --archive:
   weeks/<ISO week>.md, .json        every archived build, one page per ISO week (UTC)
   index.json                        the list of weekly pages
   state.json                        per-tab last scan, builds to retry or given up on
+  excluded.json                     builds taken out for good, by hand (see load_excluded)
 """
 import argparse
 import bisect
@@ -74,7 +77,9 @@ import operator
 import os
 import random
 import re
+import shutil
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -136,10 +141,12 @@ HELD_DAYS = 60  # watch a build only its tab's unfollowed config keeps undecided
 SETTLE_HOURS = 2
 RECHECK_HOURS = 48  # compare an archived build with GCS on every run until this long after it finished
 UNLISTED_DAYS = 30  # forget a tab missing from its dashboard's summary after this long
+STOPPED = "the run stopped before it finished"  # the error of a run's report until the run ends (see run())
+PENDING_KEPT = 60  # ranges of builds a scan saw that a tab keeps waiting for a config, at most (see run())
 SERIOUS = ("may be missing", "state.json", "no longer listed", "old layout",  # warnings that fail the run
            "cannot be judged from GCS", "TestGrid's config was last read", "TestGrid's config was never read",
            "the filters cannot be applied here", "does not match the tab", "still not known",
-           "lacks tabs TestGrid shows", "has not run since")
+           "lacks tabs TestGrid shows", "has not run since", "were not compared with GCS before the run")
 CONFIG_STALE_DAYS = 3  # TestGrid's config not read for this long is a serious warning
 CONFIG_KEEP_DAYS = HELD_DAYS + 17  # TestGrid's config over time is kept this long (a held build's days of results)
 BACKFILL_SLACK_HOURS = 6  # a build may start this long after its ID was made
@@ -1514,20 +1521,31 @@ def save_log(base, target, compress, max_bytes):
 
 def stray_files(target, meta):
     """Stored-file names in a build folder that its meta.json does not list: what a copy
-    cut off part-way leaves (parts of a newer copy, or a copy in the other form)."""
-    listed = set()
+    cut off part-way leaves (parts of a newer copy, or a copy in the other form). None at all
+    if the meta.json names a file otherwise than intact() reads names: it cannot say which are its own."""
+    listed = []
     for default, key in (("build-log.txt", "log"), ("podinfo.json", "podinfo")):
         info = meta.get(key)
-        if info and isinstance(info, dict) and not info.get("omitted"):  # (as intact() reads it)
-            parts = info.get("parts")
-            listed |= ({p.get("file") for p in parts if isinstance(p, dict)} if isinstance(parts, list)
-                       else {info.get("file", default)})
-    return sorted(n for n in listdir(target) if (n in LOG_FILES or PART_RE.fullmatch(n)) and n not in listed)
+        if info and not isinstance(info, dict):  # (one intact() cannot read)
+            return []
+        if info and not info.get("omitted"):  # (as intact() reads it)
+            name = info.get("file", default)
+            if not isinstance(name, str) or name not in LOG_FILES:
+                return []
+            if "parts" in info:  # (name.000, name.001, ..., as part_paths() reads them)
+                parts = info["parts"]
+                names = [p.get("file") if isinstance(p, dict) else None for p in parts] if isinstance(parts, list) else []
+                if not names or names != [f"{name}.{i:03d}" for i in range(len(names))]:
+                    return []
+                listed += names
+            else:
+                listed.append(name)
+    return sorted(n for n in listdir(target) if (n in LOG_FILES or PART_RE.fullmatch(n)) and n not in set(listed))
 
 
 class RecheckError(Exception):
-    """Comparing an intact archived build with GCS failed; its copy stays and is compared again by a
-    later run (a final one, by the next run that compares its seventh: see gcs_sevenths)."""
+    """Comparing an intact archived build with GCS failed; its copy stays and is compared again by the
+    next run (the run is not done with its sevenths: see gcs_sevenths)."""
 
 
 def read_finished(base):
@@ -2766,28 +2784,48 @@ class ConfigHistory:
         alone = all(a["finished"] is None or a["finished"] <= b["started"] for a, b in itertools.pairwise(self.runs))
         return self.runs[i + 1]["started"] if i + 1 < len(self.runs) and alone else math.inf
 
+    def taken(self, key, at, slack=0):
+        """Whether a config with the tab may be TestGrid's at `at` (or until `slack` after it was
+        replaced): one whose run had uploaded it by then (ended), not replaced before then."""
+        return any(r["tabs"] is not None and r["tabs"].get(key) is not None
+                   and self.ended(i) < at <= self.replaced(self.ended(i)) + slack for i, r in enumerate(self.runs))
+
     def replaced(self, after):
         """When the config in force at `after` was replaced at the latest: by the upload of a
         run that began then or later, by its finish (and PICKUP)."""
         return min((r["finished"] + PICKUP for r in self.runs if r["finished"] is not None and r["started"] >= after),
                    default=math.inf)
 
-    def eras(self, key):
+    def eras(self, key, lacked=None):
         """The tab's entry over time, as [(from, to, entry)]: entry None while TestGrid had no
         such tab, UNKNOWN while the archive does not know it; a run's entry from its start
         until a run that began after it ended uploaded its config (and PICKUP: either may be
         in force then; and the tabulator may show the columns read before by its filters
-        TABULATE longer, see tab_verdict)."""
+        TABULATE longer, see tab_verdict). Runs with the same entry make one era. A tab TestGrid
+        listed while the latest config known lacked it (`lacked`: when it last did, see run()):
+        the runs without it that began before then, after the last run with it that had uploaded
+        its config by then (ended), have it as not known, each in an era of its own (their
+        configs of it may differ)."""
         if not self.runs:
             return []
-        out = [(-math.inf, self.replaced(-math.inf), UNKNOWN)]
-        for i, r in enumerate(self.runs):
-            entry = UNKNOWN if r["tabs"] is None else r["tabs"].get(key)
+        known = [UNKNOWN if r["tabs"] is None else r["tabs"].get(key) for r in self.runs]
+        entries = known
+        if lacked is not None:
+            last = max((i for i, e in enumerate(known) if e is not None and e is not UNKNOWN and self.ended(i) < lacked),
+                       default=-1)
+            entries = [UNKNOWN if e is None and i > last and r["started"] < lacked else e
+                       for i, (r, e) in enumerate(zip(self.runs, known, strict=True))]
+        # (one taken as not known so stays apart from the runs next to it, one not known yet or taken
+        # so too: config_changed sees a change from its config, or to it, between two eras, as events
+        # has none for it)
+        out, was = [(-math.inf, self.replaced(-math.inf), UNKNOWN)], [UNKNOWN]
+        for i, (r, entry, before) in enumerate(zip(self.runs, entries, known, strict=True)):
             end = self.replaced(self.ended(i))
-            if out[-1][2] == entry:
-                out[-1] = (out[-1][0], end, entry)
+            if out[-1][2] == entry and was[-1] == before and not (entry is UNKNOWN and before is None):
+                out[-1] = (out[-1][0], max(out[-1][1], end), entry)  # (one of them may end later than the last)
             else:
                 out.append((r["started"], end, entry))
+                was.append(before)
         return out
 
     @staticmethod
@@ -2874,6 +2912,14 @@ def config_changed(rule, since, newest=math.inf):
     return None if unknown else False
 
 
+def pending_dropped(key, p, why):
+    """The serious warning for a range of builds a scan saw (a tab's "changed_pending", see run())
+    that the archive stops waiting to judge."""
+    return (f"{key}: the builds made from {iso(p['lo'])} to {iso(p['hi'])}, seen not red by the scan of "
+            f"{iso(p['since'])}, cannot be judged from GCS: {why}; no longer judged, though TestGrid may have "
+            "shown them red")
+
+
 def first_listed(run):
     """When the archive first listed a run of the upload job (for one listed before it kept
     that: when the run ended, or began)."""
@@ -2894,20 +2940,18 @@ def judged_since(state, now):
     return min(times)
 
 
-def history_rules(history, keys, now, lacking=(), queries=None, era_rule=None):
+def history_rules(history, keys, now, lacking=None, queries=None, era_rule=None):
     """Per tab ("dashboard#tab", of `keys`), what its config over time (a ConfigHistory) says
     for tab_verdict: {"eras": its configs (see ConfigHistory.eras; era_rule(entry) makes each
     entry's rule), "events": the updates that read its columns again (see
     ConfigHistory.events: of the test groups it showed that read its job, queries[key])}.
-    A tab TestGrid shows now that the latest config known lacks (in `lacking`): its config
-    since its last entry is not known (UNKNOWN). Tabs without eras are left out."""
-    queries, era_rule = queries or {}, era_rule or (lambda entry: entry)
+    A tab TestGrid showed while the latest config known lacked it (`lacking`: {key: when it
+    last did}): its configs then are not known, as ConfigHistory.eras takes them. Tabs without
+    eras are left out."""
+    lacking, queries, era_rule = lacking or {}, queries or {}, era_rule or (lambda entry: entry)
     out = {}
     for key in keys:
-        eras = [(lo, hi, era_rule(entry)) for lo, hi, entry in history.eras(key)]
-        if key in lacking:
-            last = max((i for i, (_, _, e) in enumerate(eras) if e is not None and e is not UNKNOWN), default=-1)
-            eras = [(lo, hi, UNKNOWN if e is None and i > last else e) for i, (lo, hi, e) in enumerate(eras)]
+        eras = [(lo, hi, era_rule(entry)) for lo, hi, entry in history.eras(key, lacking.get(key))]
         if eras:
             out[key] = {"eras": eras, "events": history.events(key, now, queries.get(key))}
     return out
@@ -3256,25 +3300,79 @@ def run_dirs(root):
     return sorted(out, key=lambda rel: run_key(rel.rsplit("/", 1)[1]))
 
 
-def run_started(path):
-    """A run report's start time, None if it is unreadable or not a time it could have started at."""
+def read_report(root, rel):
+    """The report (run.json) of the run folder rel: None if it is missing, cannot be read, or is a
+    link (a link in the archive is never followed)."""
+    path = os.path.join(root, rel, "run.json")
     try:
-        started = read_json(path).get("started")
+        return None if os.path.islink(path) else read_json(path)
+    except (ValueError, OSError):
+        return None
+
+
+def stopped(run):
+    """Whether a run report (see read_report) is the one a run has until it ends (with the error
+    STOPPED): the run was cut off after it wrote it."""
+    errors = run.get("errors") if isinstance(run, dict) else None
+    return isinstance(errors, list) and any(isinstance(e, dict) and e.get("error") == STOPPED for e in errors)
+
+
+def run_started(path):
+    """A run report's start time, None if it is unreadable or not a time it could have started at
+    (or a link: a link in the archive is never followed)."""
+    try:
+        started = None if os.path.islink(path) else read_json(path).get("started")
     except (OSError, ValueError, AttributeError):
         return None
     return started if plausible_time(started, time.time()) else None
 
 
+def sevenths_done(root, rel):
+    """Whether the run in folder rel was done with its sevenths of the archive (see gcs_sevenths):
+    its fetch compared all it was due to with GCS ("gcs_compared" in its run.json), and its
+    verification compared them too and found none differing ("differ" in its verification.json),
+    whatever else it found (a tab that cannot be read, say)."""
+    try:
+        path = os.path.join(root, rel, "run.json")
+        run = None if os.path.islink(path) else read_json(path)  # (a link in the archive is never followed)
+        path = os.path.join(root, rel, "verification.json")
+        v = None if os.path.islink(path) else read_json(path)
+    except (OSError, ValueError):
+        return False
+    scope = v.get("scope") if isinstance(v, dict) else None
+    return isinstance(run, dict) and run.get("gcs_compared") is True and isinstance(scope, dict) \
+        and is_int(scope.get("differ")) and scope["differ"] == 0
+
+
 def gcs_sevenths(root, t0):
     """The sevenths of the archived builds (see sampled()) that the run started at t0 compares
-    with GCS again, final or not: one for each UTC day from the day after the run before it
-    to the day of this one, at least this day's, so all seven after a week without a run.
-    Each build is compared at least once a week, even when a day has no run. cross_check.py
-    compares the same ones when it verifies that run."""
+    with GCS again, final or not: one for each UTC day from the day after the last run before it
+    that was done with its own (see sevenths_done) to the day of this one, and that run's day too
+    if a run later that day was not; at least this day's, so all seven when no run of the week
+    before was done with them. Each build is so compared, and verified, at least once a week, even
+    when a day has no run, or a run is cut off or its verification finds a difference. The first run
+    (none before it) compares this day's only. cross_check.py compares the same ones when it
+    verifies that run."""
     day = int(t0 // 86400)
-    previous = next((s for s in (run_started(os.path.join(root, rel, "run.json")) for rel in reversed(run_dirs(root)))
-                     if s is not None and s < t0), None)
-    first = max(min(int(previous // 86400) + 1, day), day - 6) if previous is not None else day
+    earlier, after, first = False, None, day - 6  # (after: the day of the earliest run not done since)
+    for rel in reversed(run_dirs(root)):
+        # (a run whose report is missing, as one killed before it wrote one, cannot be read, or has no
+        # start a run can have: by when its folder was made, not done)
+        started = run_started(os.path.join(root, rel, "run.json"))
+        done = started is not None and sevenths_done(root, rel)
+        started = started or folder_time(rel.rsplit("/", 1)[1])
+        if started is None or started >= t0:
+            continue
+        earlier = True
+        if started < (day - 7) * 86400:
+            break  # (an older one cannot add a day)
+        if done:
+            first = int(started // 86400) + 1 if after is None else min(after, int(started // 86400) + 1)
+            break
+        after = int(started // 86400)
+    if not earlier:
+        first = day
+    first = max(min(first, day), day - 6)
     return {d % 7 for d in range(first, day + 1)}
 
 
@@ -3373,9 +3471,11 @@ def migrate_old_layout(root, warnings):
             if valid_meta(meta) and (meta.get("job"), meta.get("build")) == (job, build) and \
                     isinstance(meta.get("archived_by_run"), str):
                 builds.append((src, job, build, meta))
-            elif real_dir(src) and all(n in LOG_FILES or n.endswith(".part") for n in os.listdir(src)):
+            elif real_dir(src) and all((n in LOG_FILES or n.endswith(".part")) and file_or_gone(os.path.join(src, n))
+                                       for n in os.listdir(src)):
                 for n in os.listdir(src):  # a download the old code never finished: fetched again
-                    os.remove(os.path.join(src, n))
+                    with contextlib.suppress(FileNotFoundError):
+                        os.remove(os.path.join(src, n))
                 os.rmdir(src)
             else:
                 warnings.append(f"old layout: logs/{job}/{build} has no usable meta.json; left in place")
@@ -3402,9 +3502,29 @@ def migrate_old_layout(root, warnings):
         name = m["archived_by_run"]
         if RUN_RE.fullmatch(name) and folder_time(name) is not None:  # rewritten by a migration cut off before the move
             folder_of.setdefault(name, name)
-    for old in sorted({m["archived_by_run"] for *_, m in builds} | set(reports), key=lambda o: started_of(o) or 0):
+    olds = {m["archived_by_run"] for *_, m in builds} | set(reports)
+
+    def blocked(paths):  # (nothing moves while a folder it would move into is a link, never followed in the archive,
+        # or is not a folder at all)
+        found = [p for p in paths if os.path.lexists(os.path.join(root, p)) and not real_dir(os.path.join(root, p))]
+        if found:
+            link = os.path.islink(os.path.join(root, found[0]))
+            warnings.append(f"old layout: {found[0]} is {'a link' if link else 'not a folder'}, so nothing is moved into run "
+                            "folders until it is fixed" + (", as it would be moved where the link leads" if link else ""))
+        return bool(found)
+    months = {folder_of[old][:7] if old in folder_of else dt.datetime.fromtimestamp(started_of(old), dt.UTC).strftime("%Y-%m")
+              for old in olds if old in folder_of or started_of(old) is not None}
+    if blocked(["runs", *(f"runs/{m}" for m in sorted(months))]):  # (before folder_for makes run folders in them)
+        return
+    for old in sorted(olds, key=lambda o: started_of(o) or 0):
         if old not in folder_of and started_of(old) is not None:
             folder_of[old] = folder_for(old)
+    # (and the run folders and job folders: one an earlier, cut-off migration named may be either)
+    rids = {old: folder_of[old] for old in olds if old in folder_of}
+    if blocked(sorted({f"runs/{rid[:7]}/{rid}" for rid in rids.values()}
+                     | {f"runs/{rids[m['archived_by_run']][:7]}/{rids[m['archived_by_run']]}/{job}"
+                        for _, job, _, m in builds if m["archived_by_run"] in rids})):
+        return
     known, _ = archived_builds(root)
     for src, job, build, meta in builds:
         old = meta["archived_by_run"]
@@ -3413,9 +3533,15 @@ def migrate_old_layout(root, warnings):
             continue
         rid = folder_of[old]
         dest = os.path.join(runs, rid[:7], rid, job, build)
-        if f"{job}/{build}" in known or os.path.exists(dest):
-            where = known.get(f"{job}/{build}") or os.path.relpath(dest, root)
-            warnings.append(f"old layout: logs/{job}/{build} is also archived at {where}; left in place")
+        if os.path.islink(dest):  # (a link in the archive is never followed)
+            warnings.append(f"old layout: logs/{job}/{build}: {os.path.relpath(dest, root)} is a link; left in place")
+            continue
+        if f"{job}/{build}" in known:
+            warnings.append(f"old layout: logs/{job}/{build} is also archived at {known[f'{job}/{build}']}; left in place")
+            continue
+        if os.path.lexists(dest):  # (no archived copy: not a folder, or one without a meta.json)
+            warnings.append(f"old layout: logs/{job}/{build}: {os.path.relpath(dest, root)} is taken by what is not an "
+                            "archived copy of it; left in place")
             continue
         # meta.json first, then the move: a migration cut off in between finds the build
         # still under logs/, already naming its folder, and moves it on the next run
@@ -3445,22 +3571,45 @@ def clean_partial_builds(root, warnings):
 
     Only files a download writes are removed; a folder holding anything else is reported, not touched.
     """
+    def downloaded(target, n):  # (a file a download writes: one of such a name, not a folder or link)
+        return bool(n in LOG_FILES or PART_RE.fullmatch(n) or (n.startswith(".") and n.endswith(".part"))) \
+            and file_or_gone(os.path.join(target, n))
     for run_rel in run_dirs(root):
         run_abs = os.path.join(root, run_rel)
         for job in listdir(run_abs):
             job_abs = os.path.join(run_abs, job)
-            if job in RUN_FILES or not real_dir(job_abs):
+            # (only folders named as a download names them, as archived_builds reads them)
+            if job in RUN_FILES or not JOB_RE.fullmatch(job) or not real_dir(job_abs):
                 continue
             for build in listdir(job_abs):
                 target = os.path.join(job_abs, build)
-                if not real_dir(target):
+                if not BUILD_RE.fullmatch(build) or not real_dir(target):
+                    continue
+                try:
+                    os.listdir(target)
+                except (FileNotFoundError, NotADirectoryError):
+                    continue
+                except OSError as e:  # (what is in it cannot be told)
+                    warnings.append(f"{run_rel}/{job}/{build}: cannot be listed ({type(e).__name__}); nothing in the "
+                                    "folder is removed")
+                    continue
+                if os.path.islink(os.path.join(target, "meta.json")):  # (a link in the archive is never followed)
+                    warnings.append(f"{run_rel}/{job}/{build}: its meta.json is a link; nothing in the folder is removed")
                     continue
                 if os.path.exists(os.path.join(target, "meta.json")):
+                    if not os.path.isfile(os.path.join(target, "meta.json")):  # (the index reads only a file)
+                        warnings.append(f"{run_rel}/{job}/{build}: its meta.json is not a file; nothing in the folder "
+                                        "is removed")
+                        continue
                     try:
                         meta = read_json(os.path.join(target, "meta.json"))
                     except (ValueError, OSError):
                         continue  # reported as unreadable by the index
                     for n in stray_files(target, meta) if valid_meta(meta) else []:
+                        if not file_or_gone(os.path.join(target, n)):  # (not what a copy cut off part-way leaves)
+                            warnings.append(f"{run_rel}/{job}/{build}/{n}: not listed in its meta.json, and not a file "
+                                            "a download writes; left alone")
+                            continue
                         try:
                             remove(os.path.join(target, n))
                             warnings.append(f"{run_rel}/{job}/{build}/{n}: removed, as its meta.json does not list "
@@ -3470,8 +3619,7 @@ def clean_partial_builds(root, warnings):
                                             f"cannot be removed: {e}")
                     continue
                 names = listdir(target)
-                if all(n in LOG_FILES or PART_RE.fullmatch(n) or (n.startswith(".") and n.endswith(".part"))
-                       for n in names):
+                if all(downloaded(target, n) for n in names):
                     for n in names:
                         remove(os.path.join(target, n))
                     remove_build_dir(target)
@@ -3604,11 +3752,13 @@ def short(d):
 
 
 def write_text(path, text):
-    """Write path atomically, leaving it untouched when the content is the same."""
+    """Write path atomically, leaving it untouched when the content is the same (a link there is
+    replaced, not read)."""
     try:
-        with open(path, encoding="utf-8") as f:
-            if f.read() == text:
-                return
+        if not os.path.islink(path):
+            with open(path, encoding="utf-8") as f:
+                if f.read() == text:
+                    return
     except (FileNotFoundError, UnicodeDecodeError):
         pass
     write_file(path, text)
@@ -3655,13 +3805,7 @@ def run_rows(root, first_day, current=None):
         name = rel.rsplit("/", 1)[1]
         if dt.date.fromisoformat(name[:10]) < first_day:
             break
-        if current and current.get("dir") == rel:
-            run = current
-        else:
-            try:
-                run = read_json(os.path.join(root, rel, "run.json"))
-            except (ValueError, OSError):
-                run = None
+        run = current if current and current.get("dir") == rel else read_report(root, rel)
         verified = "pending" if current and current.get("dir") == rel else verification_of(root, rel)
         if not isinstance(run, dict):
             result = "unreadable run report" if os.path.lexists(os.path.join(root, rel, "run.json")) else \
@@ -3689,6 +3833,34 @@ def verification_of(root, rel):
     if outcome == "problems" and is_int(n := v.get("problem_count")) and n > 0:
         outcome = problems_text(n)
     return f"[{outcome}]({rel}/verification.json)"
+
+
+def show_verifications(root):
+    """Put each run's verification, as its verification.json records it now, in INDEX.md's table of
+    runs (the fetch writes the table before the run it makes is verified: "pending"), and change
+    nothing else: only the rows of run folders run_dirs lists (a link in the archive is never
+    followed). Returns how many rows changed."""
+    path = os.path.join(root, "INDEX.md")
+    if os.path.islink(path):  # (a link in the archive is never followed: the next fetch writes INDEX.md)
+        return 0
+    try:
+        with open(path, encoding="utf-8") as f:
+            lines = f.read().split("\n")
+    except FileNotFoundError:
+        return 0
+    changed, table, listed = 0, False, set(run_dirs(root))
+    for i, line in enumerate(lines):
+        if line.startswith("## "):
+            table = line.startswith("## Runs in the last ")
+        m = re.match(r"\| \[[^\]]*\]\((runs/[0-9]{4}-[0-9]{2}/[^/)]+)/\) \| ", line) if table else None
+        cut = line.rfind(" | ", 0, len(line) - 2)
+        if m and m.group(1) in listed and line.endswith(" |") and cut > m.end() - 4:
+            new = line[:cut + 3] + verification_of(root, m.group(1)) + " |"
+            if new != line:
+                lines[i], changed = new, changed + 1
+    if changed:
+        write_text(path, "\n".join(lines))
+    return changed
 
 
 def write_run_readme(root, rel, run, entries):
@@ -3777,6 +3949,25 @@ def holdings(entries, waiting, current_run):
             + [f"| {md_cell(what)} | {n} |" for what, n in rows])
 
 
+def left_for_later(left):
+    """INDEX.md's list of what later runs still have to search or judge, from a run report's
+    "left_for_later" (see run()): none, if there is nothing."""
+    def part(name):
+        value = left.get(name) if isinstance(left, dict) else None
+        return value if isinstance(value, dict) else {}
+    gaps, ranges, unlisted = part("gap_parts"), part("config_ranges"), part("unlisted")
+
+    def again(key):  # (a tab no longer listed is not read, and is forgotten UNLISTED_DAYS after that)
+        return f"if TestGrid lists the tab again by {iso(unlisted[key] + UNLISTED_DAYS * 86400)}"
+    lines = [f"- {md_cell(key)}: the older part of its history gap, from {iso(lo)} to {iso(hi)}, is searched in GCS "
+             + (again(key) if key in unlisted else "by the next runs") for key, (lo, hi) in sorted(gaps.items())]
+    lines += [f"- {md_cell(key)}: {r['ranges']} range{'' if r['ranges'] == 1 else 's'} of builds a scan saw, waiting "
+              f"for a config of the tab not known yet (the oldest scan {iso(r['oldest_scan'])}); "
+              + (f"looked at again {again(key)}" if key in unlisted else f"each is dropped {GIVE_UP_DAYS} days after its scan")
+              for key, r in sorted(ranges.items())]
+    return ["## Left for later runs", ""] + lines + [""] if lines else []
+
+
 def write_index(root, now, current_run=None, missing=(), known=None):
     """Rewrite INDEX.md, the weekly pages, the charts and recent runs' READMEs.
 
@@ -3789,6 +3980,8 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     weeks = {}
     for e in entries:
         weeks.setdefault(week_of(e["time"]), []).append(e)
+    if os.path.islink(os.path.join(root, "weeks")):  # (a link in the archive is never followed: a folder replaces it)
+        os.remove(os.path.join(root, "weeks"))
     os.makedirs(os.path.join(root, "weeks"), exist_ok=True)
     listing = []
     for key in sorted(weeks, reverse=True):
@@ -3827,10 +4020,11 @@ def write_index(root, now, current_run=None, missing=(), known=None):
              "(../README.md#limits)); times are UTC. Each run's downloads are in its own folder under "
              "[runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is "
              "compared with GCS on every run and fetched again if GCS changes.", ""]
-    lines += report.write_charts(root, counted, now, current_run)
+    lines += report.write_charts(root, counted, now, current_run, run_dirs(root))
     if waiting:
         lines += ["## Not archived yet", "", f"{len(waiting)} red builds without an intact local copy yet."]
         lines += build_rows(waiting, files=False) + [""]
+    lines += left_for_later((current_run or {}).get("left_for_later"))
     lines += [f"## Runs in the last {report.HEAT_DAYS} days", "",
               "Collection result is how the run's fetch went: ok, interrupted, its number of problems (errors, "
               "serious warnings, and the tabs and dashboard summaries it could not read, listed in the README of "
@@ -3839,7 +4033,8 @@ def write_index(root, now, current_run=None, missing=(), known=None):
               "follows the fetch ([cross_check.py](../tool/cross_check.py)).", "",
               "Verification is the outcome that verification recorded in the run's verification.json: ok, its "
               "number of problems, timed out, interrupted, stopped (by an error), or incomplete (it ended "
-              "without recording one). It is pending for the run that wrote this page (it is verified after); not "
+              "without recording one). It is pending for the run that wrote this page until its verification ends, when "
+              "the workflow puts the outcome here; not "
               "recorded when the run has no verification.json (it ran before verifications were recorded, was not "
               "verified, or none could be written); and unreadable when the file is damaged.", "",
               "| Run (UTC) | New builds | Updated | Collection result | Verification |", "|---|---:|---:|---|---|"]
@@ -3850,16 +4045,17 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     lines += [f"- [{w['week']}]({w['page']}): {short(dt.date.fromisoformat(w['from']))} – "
               f"{short(dt.date.fromisoformat(w['to']))}, {w['builds']} builds" for w in listing]
     write_text(os.path.join(root, "INDEX.md"), "\n".join(lines) + "\n")
-    # Recent runs' READMEs show their builds' current state (a provisional file can settle later).
+    # Recent runs' READMEs show their builds' current state (a provisional file can settle later), and,
+    # whatever their age, those of runs cut off (with no report, or the one a run has until it ends)
+    # what they archived (see run()); a run folder without one gets one.
     horizon = now - RECHECK_HOURS * 3600 - 86400
     for rel in run_dirs(root):
         if current_run and current_run.get("dir") == rel:
             write_run_readme(root, rel, current_run, entries)
-        elif folder_time(rel.rsplit("/", 1)[1]) >= horizon:
-            try:
-                run = read_json(os.path.join(root, rel, "run.json"))
-            except (ValueError, OSError):
-                run = None
+            continue
+        run = read_report(root, rel)
+        if folder_time(rel.rsplit("/", 1)[1]) >= horizon or not os.path.lexists(os.path.join(root, rel, "run.json")) \
+                or stopped(run) or not os.path.lexists(os.path.join(root, rel, "README.md")):
             write_run_readme(root, rel, run, entries)
     return entries, bad
 
@@ -3876,12 +4072,83 @@ def lock_archive(root):
     return f
 
 
-def load_state(root, warnings):
+EXCLUDED = "excluded.json"  # in the archive: builds taken out of it for good (see load_excluded)
+
+
+class ExcludedUnreadable(Exception):
+    """excluded.json is there but cannot be used: no run goes on, as it could fetch a build taken out."""
+
+
+def load_excluded(root):
+    """The builds the archive's excluded.json takes out for good, {"job/build": {"reason": why}},
+    edited by hand (such as for a log that must not stay public): each run removes their folders
+    and never fetches them again, and cross_check.py does not count them as missing. Raises
+    ExcludedUnreadable when the file is there but cannot be used."""
+    path = os.path.join(root, EXCLUDED)
+    if os.path.islink(path):  # (a link in the archive is never followed)
+        raise ExcludedUnreadable(f"{path} is a link")
     try:
-        state = read_json(os.path.join(root, "state.json"))
+        data = read_json(path)
+    except (OSError, ValueError) as e:
+        raise ExcludedUnreadable(f"{path}: {type(e).__name__}: {e}") from None
+    if data is None and not os.path.lexists(path):
+        return frozenset()
+
+    def usable(k, v):
+        job, _, build = k.partition("/") if isinstance(k, str) else ("", "", "")
+        return JOB_RE.fullmatch(job) and BUILD_RE.fullmatch(build) and not build.startswith("0") \
+            and isinstance(v, dict) and is_text(v.get("reason"), 1000) and v["reason"].strip()  # (no build has a 0 first)
+    bad = [str(k)[:80] for k, v in data.items() if not usable(k, v)] if isinstance(data, dict) else ["(not an object)"]
+    if bad:
+        raise ExcludedUnreadable(f'{path}: not {{"job/build": {{"reason": "why"}}}} for {", ".join(bad[:3])}')
+    return frozenset(data)
+
+
+def write_cut_off_readme(root, rel):
+    """The README of the folder of a run cut off before it ended, as the run writes it from its start
+    (see run()): every later run writes it again, with what the run archived (see write_index)."""
+    write_text(os.path.join(root, rel, "README.md"),
+               f"# Run {run_title(rel.rsplit('/', 1)[1])} UTC\n\nThis run was cut off before it ended. The next run "
+               "lists the builds it archived here.\n")
+
+
+def remove_build(target):
+    """Remove a build folder, whatever is in it (a build taken out, see load_excluded), and its job
+    folder if no other build is in it. Raises OSError if it cannot (rmtree never follows a link)."""
+    with context().write_lock:
+        refuse_if_abandoned(target)
+        shutil.rmtree(target)
+    remove_if_empty(os.path.dirname(target))
+
+
+def linking(root, keys):
+    """The run folders whose README.md lists a build of `keys` ("job/build"): links its folder,
+    or the build on Prow, as its row does (a README that is a link is never followed)."""
+    marks = [mark.encode() for key in keys for mark in (f"/{key}/", f"/{key})")]
+    out = set()
+    for rel in run_dirs(root) if keys else ():
+        path = os.path.join(root, rel, "README.md")
+        try:
+            if os.path.islink(path) or not os.path.isfile(path):
+                continue
+            with open(path, "rb") as f:  # (one a hand edit left not UTF-8 too)
+                data = f.read()
+        except OSError:
+            continue
+        if any(mark in data for mark in marks):
+            out.add(rel)
+    return out
+
+
+def load_state(root, warnings):
+    path = os.path.join(root, "state.json")
+    try:
+        state = {} if os.path.islink(path) else read_json(path)  # (a link in the archive is never followed)
     except ValueError as e:
         warnings.append(f"state.json is corrupt ({e}); starting without it")
         state = {}
+    if os.path.islink(path):
+        warnings.append("state.json is a link; starting without it")
     if state is None:
         state = {}  # a new archive
     if not isinstance(state, dict):
@@ -3929,7 +4196,7 @@ def load_state(root, warnings):
                        and all(plausible_time(p[x], now) for x in p) and p["lo"] < p["hi"]] \
                 if isinstance(v.get("changed_pending"), list) else []
             if waiting:
-                tabs[k]["changed_pending"] = waiting[-60:]
+                tabs[k]["changed_pending"] = waiting
         else:
             warnings.append(f"state.json: dropped a malformed tabs entry {str(k)[:80]!r}")
     # each tab's TestGrid config: {"config": entry, "read": when, "mismatch": record}, kept apart from
@@ -3968,12 +4235,18 @@ def load_state(root, warnings):
                                          for k in ("committed", "uploaded"))):
         warnings.append("state.json: dropped a malformed testgrid_config record")
         read = None
+    # tabs TestGrid listed while the latest config known lacked them: when it last did (see run())
+    lacked = state.get("lacking_tabs")
+    if lacked is not None and not (isinstance(lacked, dict) and all(isinstance(k, str) and plausible_time(v, now)
+                                                                    for k, v in lacked.items())):
+        warnings.append("state.json: dropped a malformed lacking_tabs record")
+        lacked = None
     # Older archives also kept "no_log" here; the builds' own meta.json now says what to re-check.
     # (ConfigHistory checks the config history.)
     return {"tabs": tabs, "unresolved": entries("unresolved"), "given_up": entries("given_up"),
             "watch": entries("watch"), "tab_configs": configs, **({"testgrid_config": read} if read else {}),
             "config_uploads": state.get("config_uploads"), "config_entries": state.get("config_entries"),
-            "config_relist_after": state.get("config_relist_after")}
+            "config_relist_after": state.get("config_relist_after"), **({"lacking_tabs": lacked} if lacked else {})}
 
 
 def valid_rec(rec, now):
@@ -4026,6 +4299,19 @@ def real_dir(path):
     return os.path.isdir(path) and not os.path.islink(path)
 
 
+def file_or_gone(path):
+    """Neither a folder nor a link: a file, as a download writes, or nothing any more (one that went
+    while it was looked at, as a temp file a cut-off worker removes). One that cannot be looked at is
+    neither."""
+    try:
+        mode = os.lstat(path).st_mode
+    except (FileNotFoundError, NotADirectoryError):
+        return True
+    except OSError:
+        return False
+    return not stat.S_ISDIR(mode) and not stat.S_ISLNK(mode)
+
+
 def archived_intact(target, deep=False):
     try:
         meta = read_json(os.path.join(target, "meta.json"))
@@ -4053,6 +4339,16 @@ def add_sightings(target, rec, run_id):
         if meta.get(key) == run_id:
             return outcome
     return "already-archived"
+
+
+def due_in_gcs(target, sampled):
+    """Whether an archived build is due to be compared with GCS (see recheck): until it is
+    final, or when it is in the run's sevenths (sampled)."""
+    try:
+        meta = read_json(os.path.join(target, "meta.json"))
+    except (ValueError, OSError):
+        return False  # (reported as unreadable by the index)
+    return isinstance(meta, dict) and (not meta.get("final") or sampled)
 
 
 def recheck_rec(meta, now, key):
@@ -4239,7 +4535,15 @@ def main(argv=None):
                    help="TestGrid's config for the tabs, as testgrid_config.sh writes it: the rows each tab shows and "
                         "its test group's options, to judge builds TestGrid no longer shows (default, or when it "
                         "cannot be read: the config the last run read, kept in state.json)")
-    p.add_argument("--list-only", action="store_true", help="print the red builds without downloading")
+    only = p.add_mutually_exclusive_group()  # (each does one thing, and no run)
+    only.add_argument("--list-only", action="store_true", help="print the red builds without downloading")
+    only.add_argument("--show-verifications", action="store_true",
+                      help="only put each run's verification, as its verification.json records it, in INDEX.md's "
+                           "table of runs (the workflow does this once the run is verified)")
+    only.add_argument("--clean-partial", action="store_true",
+                      help="only remove what cut-off downloads and killed runs left (temp files, build folders without "
+                           "meta.json, stored files their meta.json does not list), as a run does at its start (the "
+                           "workflow does this before it commits, for a fetch killed before its end)")
     p.add_argument("--testgrid", default=TESTGRID)
     p.add_argument("--gcs", default=GCS)
     args = p.parse_args(argv)
@@ -4247,6 +4551,27 @@ def main(argv=None):
     run_start = time.time()
     tool_version()  # (asked once, now: the run's report gives it)
     root = args.archive
+    # (a run makes the archive where nothing is; --show-verifications and --clean-partial have nothing to change)
+    # ("x/" would make lexists follow a link, and deny a file)
+    if not os.path.isdir(root) and (os.path.lexists(root.rstrip(os.sep) or os.sep) or args.show_verifications
+                                    or args.clean_partial):
+        print(f"ERROR {root} is not a folder: no archive is there", file=sys.stderr)
+        return 1
+    if args.show_verifications or args.clean_partial:
+        lock = lock_archive(root)
+        if lock is None:
+            print(f"ERROR another run holds {os.path.join(root, '.lock')}", file=sys.stderr)
+            return 2
+        with lock:
+            if args.show_verifications:
+                print(f"INDEX.md: {show_verifications(root)} rows of runs show their verification anew")
+            if args.clean_partial:
+                sweep_parts(root)
+                warnings = []
+                clean_partial_builds(root, warnings)
+                for w in warnings:
+                    print("WARNING", w, file=sys.stderr)
+        return 0
     lock = None
     if not args.list_only:
         lock = lock_archive(root)
@@ -4296,14 +4621,52 @@ def interrupt(signum, frame):
 
 def run(args, root, run_start, pool, deadline):
     ctx = context()
-    timelines = Timelines(run_start)  # (each job's builds that TestGrid's reads of a judged build depend on)
     warnings = []
+    # (--list-only fetches and writes nothing: it goes on, and warns)
+    try:
+        excluded = load_excluded(root)
+    except ExcludedUnreadable as e:
+        if not args.list_only:
+            print(f"ERROR {e}: no run goes on until it is fixed, as it could fetch a build taken out", file=sys.stderr)
+            return 1
+        excluded = frozenset()
+        warnings.append(f"{e}: the builds it takes out are listed too")
+    # (a link in the archive is never followed: the run's folder would be made where it leads)
+    month = dt.datetime.fromtimestamp(run_start, dt.UTC).strftime("%Y-%m")
+    for path in (os.path.join(root, "runs"), os.path.join(root, "runs", month)):
+        if os.path.islink(path) and not args.list_only:
+            print(f"ERROR {path} is a link: no run goes on until it is fixed, as it would write where it leads",
+                  file=sys.stderr)
+            return 1
+        if os.path.islink(path):
+            warnings.append(f"{path} is a link: the run folders in it are not read")
+        elif os.path.lexists(path) and not os.path.isdir(path) and not args.list_only:  # (the run's folder goes in it)
+            print(f"ERROR {path} is not a folder: no run goes on until it is fixed", file=sys.stderr)
+            return 1
+    timelines = Timelines(run_start)  # (each job's builds that TestGrid's reads of a judged build depend on)
     if not args.list_only:
         sweep_parts(root)
         migrate_old_layout(root, warnings)
         clean_partial_builds(root, warnings)
     state = load_state(root, warnings)
+    for name in ("unresolved", "given_up", "watch"):  # (a build taken out is not retried or watched)
+        state[name] = {k: v for k, v in state[name].items() if k not in excluded}
     known, duplicates = archived_builds(root)
+    # builds taken out for good (excluded.json): their folders go, and they are never fetched again
+    taken_out, take_out_errors = sorted(k for k in excluded if k in known), []
+    for key in taken_out:
+        rel = known.pop(key)
+        if not args.list_only:
+            try:
+                remove_build(os.path.join(root, rel))
+                # (the last build of the folder of a run cut off before its report, left by code before the
+                # README from the start: the folder stays, as such a run's does, see gcs_sevenths)
+                folder = rel.rsplit("/", 2)[0]
+                if not os.path.lexists(os.path.join(root, folder, "run.json")) and not listdir(os.path.join(root, folder)):
+                    write_cut_off_readme(root, folder)
+            except OSError as e:
+                take_out_errors.append({"build": key, "error": f"taking it out ({EXCLUDED}) failed: "
+                                                              f"{type(e).__name__}: {e}"})
     # the archived builds in this run's sevenths: compared with GCS even if final (cross_check.py
     # compares them too), see gcs_sevenths
     sevenths = gcs_sevenths(root, run_start)
@@ -4339,6 +4702,9 @@ def run(args, root, run_start, pool, deadline):
         rule = rules.get(f"{dashboard}#{tab}")
         return config_mismatch(rule, table, query) if rule else None
     reports, builds, visible, running, shown_on = scan(args.testgrid, args.gcs, dashboards, pool, deadline, check)
+    shown_out = {f"{job}/{build}" for job, build in builds if f"{job}/{build}" in excluded}
+    builds = {k: b for k, b in builds.items() if f"{k[0]}/{k[1]}" not in excluded}
+    running = {k: b for k, b in running.items() if f"{k[0]}/{k[1]}" not in excluded}
     timings = {"scan": round(time.time() - run_start, 2)}
     job_hours = {}  # per tab, the job durations to remember for the next run
     for r in reports:
@@ -4399,11 +4765,20 @@ def run(args, root, run_start, pool, deadline):
     unread = {r["dashboard"] for r in reports} - summaries_ok
     shown = listed | {k for k, t in state["tabs"].items() if k.split("#", 1)[0] in unread and not t.get("missing_since")}
     lacking = sorted(k for k in shown if current is not None and k not in current)
+    # (but one a config with the tab may still be in force for, as ConfigHistory.eras takes them, and an
+    # hour more, once its run has uploaded it: the latest config may not be TestGrid's yet, and TestGrid
+    # then lists the tabs it dropped)
+    untaken = {k for k in lacking if history.taken(k, run_start, 3600)}
+    # ... and one TestGrid listed so before, past that: its config since its last entry before then is not
+    # known either, in the configs that came into force before then, though TestGrid no longer lists it (it
+    # showed the tab then), for as long as a build held for it may wait
+    lacked = {k: t for k, t in (state.get("lacking_tabs") or {}).items() if run_start - t <= (HELD_DAYS + 1) * 86400}
+    lacked.update(dict.fromkeys([k for k in lacking if k not in untaken], run_start))
     queries = {k: t["query"] for k, t in state["tabs"].items() if isinstance(t.get("query"), str)}
     queries.update((f"{r['dashboard']}#{r['tab']}", r["query"]) for r in reports
                    if r.get("tab") is not None and not r.get("error") and r.get("query"))
     for key, got in history_rules(history, sorted({k for r in history.runs if r["tabs"] for k in r["tabs"]} | set(tab_rules)),
-                                  run_start, lacking, queries, era_rule).items():
+                                  run_start, {**lacked, **dict.fromkeys(lacking, run_start)}, queries, era_rule).items():
         tab_rules[key] = dict(tab_rules.get(key, {}), **got)
     previous_read = state.get("testgrid_config") or {}
     source = config_source or previous_read.get("source") or {}
@@ -4411,15 +4786,14 @@ def run(args, root, run_start, pool, deadline):
     # (a run whose config is not known yet, listed less than CONFIG_STALE_DAYS ago: it may be the config
     # of tabs TestGrid shows that the latest known one lacks)
     awaited = [r for r in later_unknown if run_start - first_listed(r) <= CONFIG_STALE_DAYS * 86400]
-    if lacking:
-        fresh = current_run["finished"] is not None and run_start - current_run["finished"] <= PICKUP + 3600
-        warnings.append(f"TestGrid's config ({about}) has no tab {', '.join(lacking[:3])}"
-                        f"{', ...' if len(lacking) > 3 else ''}"
-                        + (", which TestGrid may not have taken yet" if fresh else
-                           ", which a later run of its upload job whose config is not known yet may have" if awaited else
-                           ": it lacks tabs TestGrid shows (is it built for their dashboard?)")
-                        + "; builds TestGrid may have shown there since the tab's last config are decided once a "
-                        "config with the tab is read")
+    for keys, why in ((sorted(untaken), ", which TestGrid may not have taken yet"),
+                      ([k for k in lacking if k not in untaken],
+                       ", which a later run of its upload job whose config is not known yet may have" if awaited else
+                       ": it lacks tabs TestGrid shows (is it built for their dashboard?)")):
+        if keys:
+            warnings.append(f"TestGrid's config ({about}) has no tab {', '.join(keys[:3])}{', ...' if len(keys) > 3 else ''}"
+                            + why + "; builds TestGrid may have shown there since the tab's last config are decided once "
+                            "a config with the tab is read")
     if loaded and loaded["failed"]:
         failed = sorted(loaded["failed"].items())
         warnings.append(f"TestGrid's config of {len(failed)} runs of its upload job could not be built now: "
@@ -4474,8 +4848,11 @@ def run(args, root, run_start, pool, deadline):
             if m and m["until"] is None:
                 warnings.append(f"{key}: TestGrid's config ({about}) does not match the tab since {iso(m['since'])}: "
                                 f"{m['detail']}; builds it no longer shows are judged by the rows its table shows too")
-        stale = [k for k in sorted(involved & set(tab_config)) if not (plausible_time(config_read.get(k), run_start)
-                                                                    and run_start - config_read[k] <= CONFIG_STALE_DAYS * 86400)]
+        # (not one the latest config known dropped: no config of it is left to read, and its builds are
+        # judged by its configs over time)
+        stale = [k for k in sorted(involved & set(tab_config)) if (current is None or k in current)
+                 and not (plausible_time(config_read.get(k), run_start)
+                          and run_start - config_read[k] <= CONFIG_STALE_DAYS * 86400)]
         if stale:
             last = min((config_read[k] for k in stale if plausible_time(config_read.get(k), run_start)), default=None)
             warnings.append(f"TestGrid's config was last read {iso(last) if last else 'at an unknown time'} for "
@@ -4495,6 +4872,8 @@ def run(args, root, run_start, pool, deadline):
                             f"{', ...' if len(never) > 3 else ''}) is not known yet: their builds are decided once a "
                             "run has read it")
     read_ok, gaps = {}, []
+    # per tab, the ranges this run stops waiting for: (range, whether it is the one derived from the last scan, why)
+    dropped, failed_search = {}, set()
     for r in reports:
         if r.get("tab") is None or r.get("error"):
             continue
@@ -4536,7 +4915,8 @@ def run(args, root, run_start, pool, deadline):
             # in the tab's state until then, GIVE_UP_DAYS at most).
             changed, waiting = [], []
             if not first and prev.get("oldest") is not None:
-                seen = list(prev.get("changed_pending") or ())
+                kept = list(prev.get("changed_pending") or ())
+                seen = list(kept)
                 top = min(floor, r["oldest"])
                 if prev["oldest"] < top:
                     seen.append({"since": prev["scan"], "lo": prev["oldest"], "hi": top})
@@ -4546,6 +4926,13 @@ def run(args, root, run_start, pool, deadline):
                         changed.append((p["lo"], p["hi"], p["since"]))
                     elif status is None and run_start - p["since"] <= GIVE_UP_DAYS * 86400:
                         waiting.append(p)
+                    elif status is None:
+                        dropped.setdefault(key, []).append((p, p not in kept, "a config of the tab in force since that "
+                                                            f"scan is still not known {GIVE_UP_DAYS} days later"))
+                for p in waiting[:-PENDING_KEPT]:  # (the oldest past those a tab keeps)
+                    dropped.setdefault(key, []).append((p, p not in kept, f"more than {PENDING_KEPT} ranges of the "
+                                                        "tab wait for a config"))
+                waiting = waiting[-PENDING_KEPT:]
             if recent is not None or older or changed:
                 gaps.append((key, r, recent, older, changed))
         if r.get("oldest"):
@@ -4563,6 +4950,13 @@ def run(args, root, run_start, pool, deadline):
                 prev = dict(prev, missing_since=run_start)
             elif run_start - prev["missing_since"] > UNLISTED_DAYS * 86400:
                 warnings.append(f"{key}: unlisted for {UNLISTED_DAYS} days; forgetting it")
+                # (a tab not listed is not read, so the ranges it kept are never judged)
+                warnings += [pending_dropped(key, p, "the tab is no longer listed, and is forgotten")
+                             for p in prev.get("changed_pending") or ()]
+                if "unsearched" in prev:
+                    warnings.append(f"{key}: the older part of its history gap, from {iso(prev['unsearched'][0])} to "
+                                    f"{iso(prev['unsearched'][1])}, cannot be searched in GCS: the tab is no longer "
+                                    "listed, and is forgotten; red builds in it may be missing")
                 continue
         elif key in listed and prev.get("missing_since"):  # (listed again, whether its table could be read or not)
             prev = {k: v for k, v in prev.items() if k != "missing_since"}
@@ -4652,7 +5046,7 @@ def run(args, root, run_start, pool, deadline):
         # Builds retried anyway are not taken again: one known to be red (waiting to be
         # archived) is only judged for the gap's tab, and one watched gains that tab.
         in_retry = {f"{x['job']}/{x['build']}": x for x in retry}
-        backfill = backfill_gaps(gaps, args.gcs, pool, deadline, visible, set(known) | queued,
+        backfill = backfill_gaps(gaps, args.gcs, pool, deadline, visible, set(known) | queued | excluded,
                                  known=(set(known) - queued) | (in_retry.keys() & set(state["unresolved"])),
                                  tab_rules=tab_rules, watched={k: x for k, x in in_retry.items() if x.get("watch")},
                                  timelines=timelines)
@@ -4696,14 +5090,17 @@ def run(args, root, run_start, pool, deadline):
                 # older gap, so the next run searches them again.
                 if key in state["tabs"]:
                     old = state["tabs"][key]
+                    # (but not a range this run stopped waiting for: it is dropped, and said so below)
+                    gone = [p for p, derived, _ in dropped.get(key, ()) if not derived]
+                    pending = [p for p in old.get("changed_pending", ()) if p not in gone]
                     tab_scans[key] = dict(job_hours.get(key, {}), scan=old["scan"], oldest=old["oldest"],
                                           query=r["query"], **({"margin": old["margin"]} if "margin" in old else {}),
                                           **({"rows": r["rows"]} if known_rows(r.get("rows")) else {}),
                                           **({"unsearched": old["unsearched"]} if "unsearched" in old else {}),
-                                          **({"changed_pending": old["changed_pending"]}
-                                             if "changed_pending" in old else {}))
+                                          **({"changed_pending": pending} if pending else {}))
                 else:
                     tab_scans.pop(key, None)
+                failed_search.add(key)
                 warnings.append(f"{key}: {'; '.join(what)}; red builds in between may be missing; looking them up "
                                 "in GCS failed; the next run tries again")
                 continue
@@ -4725,6 +5122,10 @@ def run(args, root, run_start, pool, deadline):
                      f"({iso(last_scan(key))}) needed them from "
                      f"{iso(floor if floor is not None else older[0] if older else min(c[0] for c in changed))}"
                      "; red builds in between may be missing" for key, r, floor, older, changed in gaps]
+    # Each range this run stopped waiting for, but the one derived from a scan that a failed gap search
+    # keeps: the next run derives it again.
+    warnings += [pending_dropped(key, p, why) for key, ranges in sorted(dropped.items()) for p, derived, why in ranges
+                 if not (derived and key in failed_search)]
     tab_errors = [r for r in reports if r.get("error")]
     # tabs whose builds this run judges from GCS (a history gap, or watched builds) without any config
     # of theirs: neither one read nor their configs over time (by which tab_verdict judges them otherwise)
@@ -4757,7 +5158,16 @@ def run(args, root, run_start, pool, deadline):
             r.update(config=tab_config[key], config_read=config_read.get(key))
         if key in mismatch_of:
             r["config_mismatch"] = mismatch_of[key]
-    outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors), 0, {}, {}
+    # A README from the start, that the run was cut off, as one killed before it ends leaves it (a step's
+    # timeout kills it at last): its folder stays, though what it fetches again is stored in older ones,
+    # and later runs see a run not done with its sevenths (see gcs_sevenths). The run writes it again once
+    # it has its report; each later run does for a run that did not end (see write_index).
+    write_cut_off_readme(root, run_rel)
+    outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors) + take_out_errors, 0, {}, {}
+    uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
+    if taken_out or shown_out:  # (taken out of the archive now, or shown red by TestGrid and left out)
+        outcomes["excluded"] = sorted(set(taken_out) | shown_out)
+    recheck_failed = False  # (a comparison with GCS failed)
     # judged by the gap search just now and still running, overdue on TestGrid, or watched and still
     # shown by TestGrid: watched without a look now, for as long as a build is ever watched
     for w in running_gap + list(stalled.values()) + still_shown:
@@ -4791,6 +5201,8 @@ def run(args, root, run_start, pool, deadline):
             key = f"{b['job']}/{b['build']}"
             if key in known:
                 outcomes.setdefault("not-checked", []).append(key)
+                if due_in_gcs(os.path.join(root, known[key]), key in resampled):
+                    uncompared.append(key)
             elif b.get("watch"):
                 watch[key] = {"rec": b, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
             else:
@@ -4822,10 +5234,15 @@ def run(args, root, run_start, pool, deadline):
         try:
             if fut in not_done:
                 if archived_intact(target_of(b), deep=True):
-                    # Finished just as the run gave up, or already on disk; one
-                    # that is not final yet is compared with GCS next run, and a final
-                    # one by the next run that compares its seventh.
-                    outcomes.setdefault(add_sightings(target_of(b), b, run_id), []).append(key)
+                    # Finished just as the run gave up, or already on disk. One due to be
+                    # compared with GCS that this run did not update was not compared to the end
+                    # ("not-checked"): the next run compares it (the run is not done with its
+                    # sevenths, see gcs_sevenths).
+                    outcome = add_sightings(target_of(b), b, run_id)
+                    if outcome == "already-archived" and due_in_gcs(target_of(b), key in resampled):
+                        outcome = "not-checked"
+                        uncompared.append(key)
+                    outcomes.setdefault(outcome, []).append(key)
                     continue
                 cause = "interrupted" if interrupted else "run timeout reached"
                 raise TimeoutError(f"{cause} before this build was done")
@@ -4840,9 +5257,10 @@ def run(args, root, run_start, pool, deadline):
             elif outcome in ("watching", "held"):
                 watch[key] = {"rec": b, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
         except RecheckError as e:
-            # The archived copy stays as it is, and a later run compares it again (a final one, the next
-            # run that compares its seventh).
+            # The archived copy stays as it is, and the next run compares it again (the run is not done
+            # with its sevenths, see gcs_sevenths).
             errors.append({"build": key, "error": str(e)})
+            recheck_failed = True
         except Exception as e:
             message = f"{type(e).__name__}: {e}"
             if b.get("watch") and not getattr(e, "red_rec", None):
@@ -4866,6 +5284,12 @@ def run(args, root, run_start, pool, deadline):
     for names in outcomes.values():
         names.sort()
     errors.sort(key=lambda e: e["build"] or "")
+    if uncompared:
+        uncompared.sort()
+        warnings.append(f"{len(uncompared)} archived builds were not compared with GCS before the run "
+                        f"{'was interrupted' if interrupted else 'reached its deadline'} "
+                        f"({', '.join(uncompared[:3])}{', ...' if len(uncompared) > 3 else ''}): the next run "
+                        "compares them")
     recs = {f"{b['job']}/{b['build']}": b for b in selected + retry + running_gap + list(stalled.values()) + still_shown}
     warnings += [f"{key}: still not decided {GIVE_UP_DAYS} days after it was made (not finished, or TestGrid still "
                  "shows it running, or it has no usable start time, so TestGrid never paints it red); no longer watched"
@@ -4880,13 +5304,24 @@ def run(args, root, run_start, pool, deadline):
     # retry list means builds may be missing without an error naming them.
     serious = [w for w in warnings if any(k in w for k in SERIOUS)]
     config_record = {"source": config_source, "read": run_start} if config_source else previous_read or None
+    # (what later runs still have to search or judge: the older parts of history gaps, and the ranges of
+    # builds a scan saw that wait for a config not known yet)
+    left = {"gap_parts": {k: t["unsearched"] for k, t in sorted(tab_scans.items()) if "unsearched" in t},
+            "config_ranges": {k: {"ranges": len(t["changed_pending"]),
+                                  "oldest_scan": min(p["since"] for p in t["changed_pending"])}
+                              for k, t in sorted(tab_scans.items()) if t.get("changed_pending")}}
+    left["unlisted"] = {k: tab_scans[k]["missing_since"] for k in sorted(set(left["gap_parts"]) | set(left["config_ranges"]))
+                        if tab_scans[k].get("missing_since")}  # (when TestGrid stopped listing the tab)
     report_ = {"run": run_id, "dir": run_rel, "started": run_start, "tool": tool_version(), "github": github_run(),
                "since_hours": args.since_hours, "max_job_hours": args.max_job_hours, "testgrid_config": config_record,
                "tabs": reports, "red_builds_seen": len(builds),
                "retried_from_state": len(retry) - rechecks - backfilled - (len(new_watch) - len(running_gap)),
                "rechecked": rechecks, "watched": len(watch),
                "backfilled_from_gcs": len(outcomes.get("backfilled", [])), "outcomes": outcomes,
-               "errors": errors, "warnings": warnings, "serious_warnings": serious, "interrupted": interrupted}
+               "errors": errors, "warnings": warnings, "serious_warnings": serious, "interrupted": interrupted,
+               # (whether it compared with GCS all the archived builds it was due to: see gcs_sevenths)
+               "gcs_compared": not (uncompared or recheck_failed or interrupted),
+               "left_for_later": {k: v for k, v in left.items() if v}}
     run_json = os.path.join(root, run_rel, "run.json")
     # Save what the next run needs before drawing the pages and charts: a failure
     # there must not lose a build that is about to scroll off TestGrid.
@@ -4906,9 +5341,10 @@ def run(args, root, run_start, pool, deadline):
     write_json(os.path.join(root, "state.json"),
                {"tabs": tab_scans, "unresolved": unresolved, "given_up": given_up, "watch": watch,
                 "tab_configs": tab_configs, **({"testgrid_config": config_record} if config_record else {}),
+                **({"lacking_tabs": lacked} if lacked else {}),
                 **({"config_uploads": uploads, "config_entries": entries} if uploads else {}),
                 **({"config_relist_after": history.relist_after} if history.relist_after is not None else {})})
-    write_json(run_json, dict(report_, errors=errors + [{"build": None, "error": "the run stopped before it finished"}]))
+    write_json(run_json, dict(report_, errors=errors + [{"build": None, "error": STOPPED}]))
     # What failed or cut-off downloads left (a build folder without meta.json, stored files
     # a meta.json does not list, an empty job folder) goes now, so it is not committed;
     # those builds are fetched again. Abandoned workers can no longer write (see abandon()).
@@ -4932,9 +5368,18 @@ def run(args, root, run_start, pool, deadline):
     concurrency = {"cpus": cpu_count(), "start": args.start_concurrency, "ceiling": ctx.limit.ceiling, **ctx.stats()}
     final = dict(report_, errors=errors, finished=time.time(), bytes_downloaded=downloaded, concurrency=concurrency,
                  timings=timings, cpu_seconds=round(cpu.user + cpu.system, 2))
+    if entries is None:
+        # (the index could not be written: the README from the start, that says the run was cut off, goes,
+        # and the next run writes one; before the final report, so no run that ended keeps it)
+        with contextlib.suppress(OSError):
+            os.remove(os.path.join(root, run_rel, "README.md"))
     write_json(run_json, final)
     if entries is not None:
         write_run_readme(root, run_rel, final, entries)
+        # (an older run folder's README links a build taken out no more: write_index rewrites recent ones
+        # only, and the run that took it out may have been cut off before this, or a person removed it)
+        for rel in sorted(linking(root, excluded) - {run_rel}):
+            write_run_readme(root, rel, read_report(root, rel), entries)
 
     counts = [f"{k}={len(v)}" for k, v in sorted(outcomes.items())] + [f"errors={len(errors)}"]
     print(f"run {run_id}: {tabs_read_text(reports)}, {len(builds)} red builds on TestGrid, "

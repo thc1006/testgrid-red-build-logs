@@ -78,14 +78,13 @@ from GCS.
   test group sets such an option now, the run fails rather than guess.
 - TestGrid can show a tab missing from the latest config the archive knows. A
   build TestGrid may have shown there after the tab's last config was replaced
-  waits as above. If TestGrid stops listing the tab first, the build is judged
-  as if the tab had been gone since then. So it is not red, though TestGrid may
-  have shown it red meanwhile.
+  waits as above, even once TestGrid stops listing the tab.
 - A build can scroll off after a run read its tab and saw it, not red. If the
   tab's config changed after the last such run, the build is judged from GCS.
   If a config the archive does not know yet was in force since, the build waits
   for it, at most 14 days after that run. If it is still not known then, the
-  build is dropped without a warning of its own.
+  build is dropped, and the run fails with a warning that TestGrid may have
+  shown it red.
 - Red builds in a long gap in TestGrid's history can be missing for several
   runs. GCS is searched newest first: up to 28 days back in the run that finds
   the gap, then 14 days more in each later run.
@@ -117,9 +116,9 @@ from GCS.
    without a log or without `finished.json` is compared until 14 days after it
    was archived. After that, it is compared at least once a week. The archive's
    builds are split into seven by a hash of their job and build. Each run
-   compares the seventh for its UTC day, and those of any days since the run
-   before, as `cross_check.py` does. A run cut off before it got to a build
-   leaves it to the next run that compares its seventh.
+   compares the seventh for its UTC day, and those of the days since the last
+   run that finished its comparisons and whose verification found no difference.
+   `cross_check.py` compares the same ones.
 5. Rewrite the index and the charts, then run
    [`cross_check.py`](tool/cross_check.py). It checks the archive again on its
    own, and fails the run if a red build is missing or a stored file changed.
@@ -151,6 +150,19 @@ every 12 hours.
 GitHub disables the schedule of a public repository after 60 days without
 activity. If that happens, enable the workflow again from the Actions tab, or
 with `gh workflow enable red-build-logs.yml`.
+
+## Taking a build out
+
+To take a build out for good, such as a log that must not stay public, add it
+to `archive/excluded.json`:
+
+```json
+{"ci-kubernetes-unit/2110090875689242624": {"reason": "the log holds a token"}}
+```
+
+The next run removes its folder and never fetches it again, and
+`cross_check.py` does not count it as missing. Its files stay in the git
+history until that is rewritten. A run stops if it cannot use the file.
 
 ## Running it locally
 
