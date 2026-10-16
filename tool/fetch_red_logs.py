@@ -3296,12 +3296,11 @@ def read_report(root, rel):
         return None
 
 
-def ended(run):
-    """Whether a run report (see read_report) is that of a run that ended: not none (cut off before it
-    wrote one), nor one with the error it has until the run ends (STOPPED)."""
+def stopped(run):
+    """Whether a run report (see read_report) is the one a run has until it ends (with the error
+    STOPPED): the run was cut off after it wrote it."""
     errors = run.get("errors") if isinstance(run, dict) else None
-    return isinstance(run, dict) and not any(isinstance(e, dict) and e.get("error") == STOPPED
-                                             for e in (errors if isinstance(errors, list) else ()))
+    return isinstance(errors, list) and any(isinstance(e, dict) and e.get("error") == STOPPED for e in errors)
 
 
 def run_started(path):
@@ -3981,16 +3980,18 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     lines += [f"- [{w['week']}]({w['page']}): {short(dt.date.fromisoformat(w['from']))} – "
               f"{short(dt.date.fromisoformat(w['to']))}, {w['builds']} builds" for w in listing]
     write_text(os.path.join(root, "INDEX.md"), "\n".join(lines) + "\n")
-    # Recent runs' READMEs show their builds' current state (a provisional file can settle later), and
-    # those of runs that did not end, whatever their age, what they archived (see run()).
+    # Recent runs' READMEs show their builds' current state (a provisional file can settle later), and,
+    # whatever their age, those of runs cut off (with no report, or the one a run has until it ends)
+    # what they archived (see run()); a run folder without one gets one.
     horizon = now - RECHECK_HOURS * 3600 - 86400
     for rel in run_dirs(root):
         if current_run and current_run.get("dir") == rel:
             write_run_readme(root, rel, current_run, entries)
-        else:
-            run = read_report(root, rel)
-            if folder_time(rel.rsplit("/", 1)[1]) >= horizon or not ended(run):
-                write_run_readme(root, rel, run, entries)
+            continue
+        run = read_report(root, rel)
+        if folder_time(rel.rsplit("/", 1)[1]) >= horizon or not os.path.lexists(os.path.join(root, rel, "run.json")) \
+                or stopped(run) or not os.path.lexists(os.path.join(root, rel, "README.md")):
+            write_run_readme(root, rel, run, entries)
     return entries, bad
 
 
