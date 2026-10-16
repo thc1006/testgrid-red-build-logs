@@ -78,7 +78,8 @@ def load_runs(root, current_run=None):
     """Every readable run report (runs/<YYYY-MM>/<run>/run.json), plus the current run's."""
     runs = {}
     for path in glob.glob(os.path.join(glob.escape(root), "runs", "*", "*", "run.json")):
-        if os.path.islink(path):  # (a link in the archive is never followed)
+        folder = os.path.dirname(path)  # (a link in the archive is never followed: the report, or a folder of it)
+        if any(os.path.islink(p) for p in (path, folder, os.path.dirname(folder), os.path.join(root, "runs"))):
             continue
         try:
             with open(path, encoding="utf-8") as f:
@@ -529,6 +530,8 @@ def picture(name, alt):
 def write_charts(root, entries, now, current_run=None):
     """Write charts/*.svg and return the Markdown that shows them."""
     s = summarize(entries, load_runs(root, current_run), now)
+    if os.path.islink(os.path.join(root, "charts")):  # (a link in the archive is never followed: a folder replaces it)
+        os.remove(os.path.join(root, "charts"))
     os.makedirs(os.path.join(root, "charts"), exist_ok=True)
     for mode in THEMES:
         for name, render in (("trend", render_trend), ("tabs", render_heatmap)):

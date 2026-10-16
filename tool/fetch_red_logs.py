@@ -3619,6 +3619,8 @@ def load_index(root, now, known=None):
     for key, rel in sorted(known.items()):
         job, build = key.split("/", 1)
         try:
+            if os.path.islink(os.path.join(root, rel, "meta.json")):  # (a link in the archive is never followed)
+                raise ValueError("a link")
             meta = read_json(os.path.join(root, rel, "meta.json"))
             if not valid_meta(meta):
                 raise ValueError("not an archive meta.json")
@@ -3912,6 +3914,8 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     weeks = {}
     for e in entries:
         weeks.setdefault(week_of(e["time"]), []).append(e)
+    if os.path.islink(os.path.join(root, "weeks")):  # (a link in the archive is never followed: a folder replaces it)
+        os.remove(os.path.join(root, "weeks"))
     os.makedirs(os.path.join(root, "weeks"), exist_ok=True)
     listing = []
     for key in sorted(weeks, reverse=True):
@@ -4061,11 +4065,14 @@ def linking(root, keys):
 
 
 def load_state(root, warnings):
+    path = os.path.join(root, "state.json")
     try:
-        state = read_json(os.path.join(root, "state.json"))
+        state = {} if os.path.islink(path) else read_json(path)  # (a link in the archive is never followed)
     except ValueError as e:
         warnings.append(f"state.json is corrupt ({e}); starting without it")
         state = {}
+    if os.path.islink(path):
+        warnings.append("state.json is a link; starting without it")
     if state is None:
         state = {}  # a new archive
     if not isinstance(state, dict):
