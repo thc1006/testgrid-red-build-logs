@@ -3283,9 +3283,10 @@ def run_dirs(root):
 
 
 def run_started(path):
-    """A run report's start time, None if it is unreadable or not a time it could have started at."""
+    """A run report's start time, None if it is unreadable or not a time it could have started at
+    (or a link: a link in the archive is never followed)."""
     try:
-        started = read_json(path).get("started")
+        started = None if os.path.islink(path) else read_json(path).get("started")
     except (OSError, ValueError, AttributeError):
         return None
     return started if plausible_time(started, time.time()) else None
@@ -3297,9 +3298,10 @@ def sevenths_done(root, rel):
     verification compared them too and found none differing ("differ" in its verification.json),
     whatever else it found (a tab that cannot be read, say)."""
     try:
-        run = read_json(os.path.join(root, rel, "run.json"))
+        path = os.path.join(root, rel, "run.json")
+        run = None if os.path.islink(path) else read_json(path)  # (a link in the archive is never followed)
         path = os.path.join(root, rel, "verification.json")
-        v = None if os.path.islink(path) else read_json(path)  # (a link in the archive is never followed)
+        v = None if os.path.islink(path) else read_json(path)
     except (OSError, ValueError):
         return False
     scope = v.get("scope") if isinstance(v, dict) else None
@@ -3319,9 +3321,9 @@ def gcs_sevenths(root, t0):
     day = int(t0 // 86400)
     earlier, after, first = False, None, day - 6  # (after: the day of the earliest run not done since)
     for rel in reversed(run_dirs(root)):
-        report = os.path.join(root, rel, "run.json")
-        # (a run killed before it wrote its report, by a step's timeout say, by when its folder was made)
-        started = run_started(report) if os.path.lexists(report) else folder_time(rel.rsplit("/", 1)[1])
+        # (a run whose report is missing, as one killed before code that writes it from the start did,
+        # or cannot be read: by when its folder was made, not done)
+        started = run_started(os.path.join(root, rel, "run.json")) or folder_time(rel.rsplit("/", 1)[1])
         if started is None or started >= t0:
             continue
         earlier = True
