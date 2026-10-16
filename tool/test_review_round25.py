@@ -519,11 +519,13 @@ class LackingThenUnlisted(ttc.ConfigWorld):
             self.assertEqual("dash#t" in self.state().get("lacking_tabs", {}), kept, days)
 
     def test_a_config_just_uploaded_is_said_not_taken_yet(self):  # (kills a mutant)
-        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
+        # (t's config read a day ago, under C1: no other warning is serious)
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}},
+                       tab_configs={"dash#t": {"config": ttc.entry(self.HIDE), "read": self.now - DAY}})
         run = self.judged((self.now - 30 * DAY, {"dash": {"t": ttc.entry(self.HIDE)}}),
                           (self.now - 600, {"dash": {"other": ttc.entry("")}}))
         self.assertIn("has no tab dash#t, which TestGrid may not have taken yet", " ".join(run["warnings"]))
-        self.assertFalse(any("lacks tabs TestGrid shows" in w for w in run["serious_warnings"]))
+        self.assertEqual(run["serious_warnings"], [])
 
     def test_so_is_one_uploaded_an_hour_ago(self):  # (kills a mutant)
         # (past PICKUP; TestGrid's summary may list the tab an hour longer)
