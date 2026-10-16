@@ -4596,14 +4596,15 @@ def run(args, root, run_start, pool, deadline):
     unread = {r["dashboard"] for r in reports} - summaries_ok
     shown = listed | {k for k, t in state["tabs"].items() if k.split("#", 1)[0] in unread and not t.get("missing_since")}
     lacking = sorted(k for k in shown if current is not None and k not in current)
-    # (a config uploaded this recently may not be TestGrid's yet: TestGrid then lists the tabs it dropped,
-    # under the configs before, as ConfigHistory.eras takes them)
-    fresh = bool(lacking) and current_run["finished"] is not None and run_start - current_run["finished"] <= PICKUP + 3600
+    # (but one a config with the tab may still be in force for, as ConfigHistory.eras takes them, and an
+    # hour more: the latest config may not be TestGrid's yet, and TestGrid then lists the tabs it dropped)
+    untaken = {k for k in lacking if any(lo <= run_start <= hi + 3600 and e is not None and e is not UNKNOWN
+                                         for lo, hi, e in history.eras(k))}
     # ... and one TestGrid listed so before, past that: its config since its last entry before then is not
     # known either, in the configs that came into force before then, though TestGrid no longer lists it (it
     # showed the tab then), for as long as a build held for it may wait
     lacked = {k: t for k, t in (state.get("lacking_tabs") or {}).items() if run_start - t <= (HELD_DAYS + 1) * 86400}
-    lacked.update(dict.fromkeys([] if fresh else lacking, run_start))
+    lacked.update(dict.fromkeys([k for k in lacking if k not in untaken], run_start))
     queries = {k: t["query"] for k, t in state["tabs"].items() if isinstance(t.get("query"), str)}
     queries.update((f"{r['dashboard']}#{r['tab']}", r["query"]) for r in reports
                    if r.get("tab") is not None and not r.get("error") and r.get("query"))
@@ -4616,14 +4617,14 @@ def run(args, root, run_start, pool, deadline):
     # (a run whose config is not known yet, listed less than CONFIG_STALE_DAYS ago: it may be the config
     # of tabs TestGrid shows that the latest known one lacks)
     awaited = [r for r in later_unknown if run_start - first_listed(r) <= CONFIG_STALE_DAYS * 86400]
-    if lacking:
-        warnings.append(f"TestGrid's config ({about}) has no tab {', '.join(lacking[:3])}"
-                        f"{', ...' if len(lacking) > 3 else ''}"
-                        + (", which TestGrid may not have taken yet" if fresh else
-                           ", which a later run of its upload job whose config is not known yet may have" if awaited else
-                           ": it lacks tabs TestGrid shows (is it built for their dashboard?)")
-                        + "; builds TestGrid may have shown there since the tab's last config are decided once a "
-                        "config with the tab is read")
+    for keys, why in ((sorted(untaken), ", which TestGrid may not have taken yet"),
+                      ([k for k in lacking if k not in untaken],
+                       ", which a later run of its upload job whose config is not known yet may have" if awaited else
+                       ": it lacks tabs TestGrid shows (is it built for their dashboard?)")):
+        if keys:
+            warnings.append(f"TestGrid's config ({about}) has no tab {', '.join(keys[:3])}{', ...' if len(keys) > 3 else ''}"
+                            + why + "; builds TestGrid may have shown there since the tab's last config are decided once "
+                            "a config with the tab is read")
     if loaded and loaded["failed"]:
         failed = sorted(loaded["failed"].items())
         warnings.append(f"TestGrid's config of {len(failed)} runs of its upload job could not be built now: "
