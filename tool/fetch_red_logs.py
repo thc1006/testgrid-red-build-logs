@@ -2915,15 +2915,16 @@ def history_rules(history, keys, now, lacking=None, queries=None, era_rule=None)
     ConfigHistory.events: of the test groups it showed that read its job, queries[key])}.
     A tab TestGrid showed while the latest config known lacked it (`lacking`: {key: when it
     last did}): of the configs that came into force before then, those after its last entry
-    have it as not known (UNKNOWN). Tabs without eras are left out."""
+    uploaded by then have it as not known (UNKNOWN). Tabs without eras are left out."""
     lacking, queries, era_rule = lacking or {}, queries or {}, era_rule or (lambda entry: entry)
+    uploaded = {r["started"]: history.ended(i) for i, r in enumerate(history.runs)}  # (at the latest)
     out = {}
     for key in keys:
         eras = [(lo, hi, era_rule(entry)) for lo, hi, entry in history.eras(key, lacking.get(key))]
         if key in lacking:
             seen = lacking[key]
-            last = max((i for i, (lo, _, e) in enumerate(eras) if lo < seen and e is not None and e is not UNKNOWN),
-                       default=-1)
+            last = max((i for i, (lo, _, e) in enumerate(eras) if uploaded.get(lo, math.inf) < seen
+                        and e is not None and e is not UNKNOWN), default=-1)
             eras = [(lo, hi, UNKNOWN if e is None and i > last and lo < seen else e) for i, (lo, hi, e) in enumerate(eras)]
         if eras:
             out[key] = {"eras": eras, "events": history.events(key, now, queries.get(key))}
