@@ -638,6 +638,7 @@ def check(args, problems, notes, record):
                 oldest_shown[table["query"]] = min(oldest_shown.get(table["query"], start), start)
             if start >= since and cells & PAINTED_RED:
                 red_now.setdefault((job, build), (table["query"], [], start))[1].append(f"{dashboard}#{tab}")
+    taken_out = [k for k in red_now if k not in archived and f"{k[0]}/{k[1]}" in excluded]  # (not missing)
     unarchived = [(k, v) for k, v in red_now.items() if k not in archived and f"{k[0]}/{k[1]}" not in excluded]
     finished = dict(zip([k for k, _ in unarchived],
                         pool.map(lambda kv: try_json(f"{args.gcs}/{kv[1][0]}/{kv[0][1]}/finished.json"), unarchived),
@@ -662,7 +663,8 @@ def check(args, problems, notes, record):
                             f"finished.json {'present' if fin is not None else 'missing'}")
         else:
             late += 1
-    print(f"  testgrid: {len(red_now)} red builds in window, {len(red_now) - len(unarchived)} archived, "
+    print(f"  testgrid: {len(red_now)} red builds in window, {len(red_now) - len(unarchived) - len(taken_out)} archived, "
+          + (f"{len(taken_out)} taken out ({frl.EXCLUDED}), " if taken_out else "") +
           f"{late} not settled at run time (finished <{args.lag_minutes:.0f} min before it, or no finished.json), "
           f"{len(unarchived) - late} missed")
     record.scope(red_on_testgrid=len(red_now), red_not_settled=late)
@@ -791,7 +793,7 @@ def check(args, problems, notes, record):
             if key in archived:
                 notes.append(f"{key[0]}/{b}: red on TestGrid but Prow says SUCCESS (archived)")
             continue
-        if key in archived:
+        if key in archived or f"{key[0]}/{b}" in excluded:  # (one taken out, see frl.load_excluded, is not missing)
             continue
         cells = statuses.get(key)
         if (q, b) in judged:
