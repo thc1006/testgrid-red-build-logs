@@ -3562,12 +3562,19 @@ def clean_partial_builds(root, warnings):
                 target = os.path.join(job_abs, build)
                 if not real_dir(target):
                     continue
+                if os.path.islink(os.path.join(target, "meta.json")):  # (a link in the archive is never followed)
+                    warnings.append(f"{run_rel}/{job}/{build}: its meta.json is a link; nothing in the folder is removed")
+                    continue
                 if os.path.exists(os.path.join(target, "meta.json")):
                     try:
                         meta = read_json(os.path.join(target, "meta.json"))
                     except (ValueError, OSError):
                         continue  # reported as unreadable by the index
                     for n in stray_files(target, meta) if valid_meta(meta) else []:
+                        if not file_or_gone(os.path.join(target, n)):  # (not what a copy cut off part-way leaves)
+                            warnings.append(f"{run_rel}/{job}/{build}/{n}: not listed in its meta.json, and not a file "
+                                            "a download writes; left alone")
+                            continue
                         try:
                             remove(os.path.join(target, n))
                             warnings.append(f"{run_rel}/{job}/{build}/{n}: removed, as its meta.json does not list "
