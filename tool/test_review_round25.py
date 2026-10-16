@@ -15,6 +15,8 @@ import unittest
 import zlib
 from unittest import mock
 
+import yaml
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import cross_check as cc  # noqa: E402
@@ -358,6 +360,69 @@ class LackingThenUnlisted(ttc.ConfigWorld):
             frl.write_json(os.path.join(self.root, "state.json"), dict(self.state(), lacking_tabs=bad))
             self.assertNotIn("lacking_tabs", frl.load_state(self.root, warnings))
         self.assertEqual(warnings, ["state.json: dropped a malformed lacking_tabs record"] * 3)
+
+
+# ------------------------------------------------------------------ INDEX.md shows the run's verification
+
+class VerificationInTheIndex(ArchiveWorld):
+    """A run that archived one red build, then its verification (cross_check.py --record), as the
+    workflow runs them. The fetch writes INDEX.md before the run is verified: its row says pending."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        self.rel = frl.run_dirs(self.root)[-1]
+
+    def verify(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            return cc.main(["--archive", self.root, "--testgrid", self.srv.url, "--gcs", self.srv.url, "--hours", "200",
+                            "--record"])
+
+    def row(self):
+        with open(os.path.join(self.root, "INDEX.md")) as f:
+            return next(line for line in f.read().splitlines() if line.startswith("| [") and f"]({self.rel}/)" in line)
+
+    def show_verifications(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            return frl.main(["--archive", self.root, "--show-verifications"])
+
+    def test_control_the_fetch_writes_pending(self):
+        self.assertTrue(self.row().endswith(" | ok | pending |"), self.row())
+
+    def test_the_verification_is_shown_before_the_commit(self):
+        """The workflow committed INDEX.md as the fetch wrote it: its row of the run said pending
+        whatever the verification recorded (fetch_red_logs.py:3665, run_rows), until the next run's
+        fetch wrote it again (half a day later)."""
+        self.assertEqual(self.verify(), 0)
+        with open(os.path.join(self.root, "INDEX.md")) as f:
+            before = f.read()
+        self.assertEqual(self.show_verifications(), 0)  # fails: no --show-verifications
+        self.assertEqual(self.row()[-len(f" | [ok]({self.rel}/verification.json) |"):],
+                         f" | [ok]({self.rel}/verification.json) |")
+        with open(os.path.join(self.root, "INDEX.md")) as f:
+            after = f.read()
+        self.assertEqual(after.replace(f" | [ok]({self.rel}/verification.json) |", " | pending |"), before)
+
+    def test_so_are_its_problems(self):
+        os.remove(os.path.join(self.bdir(), "build-log.txt"))
+        self.assertEqual(self.verify(), 1)
+        self.assertEqual(self.show_verifications(), 0)  # fails: no --show-verifications
+        self.assertTrue(self.row().endswith(f" | [1 problem]({self.rel}/verification.json) |"), self.row())
+
+    def test_and_that_none_was_recorded(self):
+        self.assertEqual(self.show_verifications(), 0)  # fails: no --show-verifications
+        self.assertTrue(self.row().endswith(" | ok | not recorded |"), self.row())
+
+    def test_the_workflow_shows_it_after_the_verification_and_before_the_commit(self):
+        with open(os.path.join(HERE, "..", ".github", "workflows", "red-build-logs.yml")) as f:
+            steps = yaml.safe_load(f)["jobs"]["archive"]["steps"]
+        names = [s.get("name") for s in steps]
+        show = next(i for i, s in enumerate(steps) if "--show-verifications" in s.get("run", ""))  # fails: none
+        self.assertLess(names.index("Verify the archive against TestGrid and GCS"), show)
+        self.assertLess(show, names.index("Commit the archive"))
+        self.assertEqual(steps[show]["if"], "${{ !cancelled() }}")  # (after a failed or timed-out verification too)
 
 
 if __name__ == "__main__":

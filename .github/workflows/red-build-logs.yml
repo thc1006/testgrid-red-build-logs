@@ -87,9 +87,9 @@ jobs:
       group: red-build-logs-archive-${{ github.ref }}
       cancel-in-progress: false
     runs-on: ubuntu-24.04
-    # More than the step timeouts below (5 + 2 + 34 + 50 + 20 + 10) plus checkout and
+    # More than the step timeouts below (5 + 2 + 34 + 50 + 20 + 2 + 10) plus checkout and
     # setup-uv, so the commit step always gets to run.
-    timeout-minutes: 130
+    timeout-minutes: 132
     permissions:
       contents: write # push the archive back to the branch
     steps:
@@ -153,6 +153,14 @@ jobs:
         continue-on-error: true
         timeout-minutes: 20
         run: exec tool/.venv/bin/python tool/cross_check.py --archive archive --hours 48 --record
+
+      # The fetch wrote INDEX.md before the run was verified: put the verification's
+      # outcome (verification.json) in its table of runs, so the commit shows it.
+      - name: Show the verification in INDEX.md
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        timeout-minutes: 2
+        run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --show-verifications
 
       # Commit whatever was archived even when a step failed or timed out (a step
       # timeout is a failure, not a cancellation). The run's report in its folder
