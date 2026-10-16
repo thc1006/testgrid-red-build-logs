@@ -321,6 +321,24 @@ class PendingRanges(ttc.ConfigWorld):
                       run["serious_warnings"])  # fails: not there
         self.assertEqual(self.known(s0)["outcomes"], {})  # (dropped: not judged once the config is known)
 
+    def test_one_past_those_a_tab_keeps(self):
+        """load_state kept the newest 60 ranges of a tab: an older one, while a config stayed not
+        known through more than 60 runs in 14 days, went with no warning."""
+        s0 = self.now - 8 * DAY
+        ranges = [{"since": s0 + i * 3 * HOUR, "lo": s0 - 7 * HOUR + i * 3 * HOUR, "hi": s0 - 4 * HOUR + i * 3 * HOUR}
+                  for i in range(61)]
+        self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 60 * HOUR,
+                                        "changed_pending": ranges}})
+        # (the upload job ran every 3 hours since s0, and none of its configs is known)
+        run = self.judged((self.now - 40 * DAY, self.tab(ttc.entry(self.HIDE))),
+                          *[(s0 - HOUR + i * 3 * HOUR, None) for i in range(64)])
+        for p in ranges[:2]:  # (the run's own range, from the last scan, came after them)
+            self.assertIn(f"dash#t: the builds made from {frl.iso(p['lo'])} to {frl.iso(p['hi'])}, seen not red by the "
+                          f"scan of {frl.iso(p['since'])}, cannot be judged from GCS: more than 60 ranges of the tab wait "
+                          "for a config; no longer judged, though TestGrid may have shown them red",
+                          run["serious_warnings"])  # fails: not there
+        self.assertEqual(self.state()["tabs"]["dash#t"]["changed_pending"][:-1], ranges[2:])
+
     def test_once_though_the_gap_search_fails(self):
         # (a run whose gap search fails keeps the tab's ranges for the next run: not the one it dropped)
         b, s0, made, run = self.world(14 * DAY + 60, then=self.listing_fails)

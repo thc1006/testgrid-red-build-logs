@@ -140,6 +140,7 @@ HELD_DAYS = 60  # watch a build only its tab's unfollowed config keeps undecided
 SETTLE_HOURS = 2
 RECHECK_HOURS = 48  # compare an archived build with GCS on every run until this long after it finished
 UNLISTED_DAYS = 30  # forget a tab missing from its dashboard's summary after this long
+PENDING_KEPT = 60  # ranges of builds a scan saw that a tab keeps waiting for a config, at most (see run())
 SERIOUS = ("may be missing", "state.json", "no longer listed", "old layout",  # warnings that fail the run
            "cannot be judged from GCS", "TestGrid's config was last read", "TestGrid's config was never read",
            "the filters cannot be applied here", "does not match the tab", "still not known",
@@ -4076,7 +4077,7 @@ def load_state(root, warnings):
                        and all(plausible_time(p[x], now) for x in p) and p["lo"] < p["hi"]] \
                 if isinstance(v.get("changed_pending"), list) else []
             if waiting:
-                tabs[k]["changed_pending"] = waiting[-60:]
+                tabs[k]["changed_pending"] = waiting
         else:
             warnings.append(f"state.json: dropped a malformed tabs entry {str(k)[:80]!r}")
     # each tab's TestGrid config: {"config": entry, "read": when, "mismatch": record}, kept apart from
@@ -4696,7 +4697,7 @@ def run(args, root, run_start, pool, deadline):
                             f"{', ...' if len(never) > 3 else ''}) is not known yet: their builds are decided once a "
                             "run has read it")
     read_ok, gaps = {}, []
-    # per tab, the ranges this run stops waiting for: (range, whether it is the one derived from the last scan)
+    # per tab, the ranges this run stops waiting for: (range, whether it is the one derived from the last scan, why)
     dropped, failed_search = {}, set()
     for r in reports:
         if r.get("tab") is None or r.get("error"):
@@ -4751,7 +4752,12 @@ def run(args, root, run_start, pool, deadline):
                     elif status is None and run_start - p["since"] <= GIVE_UP_DAYS * 86400:
                         waiting.append(p)
                     elif status is None:
-                        dropped.setdefault(key, []).append((p, p not in kept))
+                        dropped.setdefault(key, []).append((p, p not in kept, "a config of the tab in force since that "
+                                                            f"scan is still not known {GIVE_UP_DAYS} days later"))
+                for p in waiting[:-PENDING_KEPT]:  # (the oldest past those a tab keeps)
+                    dropped.setdefault(key, []).append((p, p not in kept, f"more than {PENDING_KEPT} ranges of the "
+                                                        "tab wait for a config"))
+                waiting = waiting[-PENDING_KEPT:]
             if recent is not None or older or changed:
                 gaps.append((key, r, recent, older, changed))
         if r.get("oldest"):
@@ -4910,7 +4916,7 @@ def run(args, root, run_start, pool, deadline):
                 if key in state["tabs"]:
                     old = state["tabs"][key]
                     # (but not a range this run stopped waiting for: it is dropped, and said so below)
-                    gone = [p for p, derived in dropped.get(key, ()) if not derived]
+                    gone = [p for p, derived, _ in dropped.get(key, ()) if not derived]
                     pending = [p for p in old.get("changed_pending", ()) if p not in gone]
                     tab_scans[key] = dict(job_hours.get(key, {}), scan=old["scan"], oldest=old["oldest"],
                                           query=r["query"], **({"margin": old["margin"]} if "margin" in old else {}),
@@ -4943,9 +4949,7 @@ def run(args, root, run_start, pool, deadline):
                      "; red builds in between may be missing" for key, r, floor, older, changed in gaps]
     # Each range this run stopped waiting for, but the one derived from a scan that a failed gap search
     # keeps: the next run derives it again.
-    warnings += [pending_dropped(key, p, "a config of the tab in force since that scan is still not known "
-                                         f"{GIVE_UP_DAYS} days later")
-                 for key, ranges in sorted(dropped.items()) for p, derived in ranges
+    warnings += [pending_dropped(key, p, why) for key, ranges in sorted(dropped.items()) for p, derived, why in ranges
                  if not (derived and key in failed_search)]
     tab_errors = [r for r in reports if r.get("error")]
     # tabs whose builds this run judges from GCS (a history gap, or watched builds) without any config
