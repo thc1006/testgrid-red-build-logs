@@ -19,6 +19,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
+import test_config_history as tch  # noqa: E402  (module imports: their tests are not collected here)
+import test_testgrid_config as ttc  # noqa: E402
 from test_integrity import DAY, HOUR, ArchiveWorld, obj, snowflake  # noqa: E402
 
 
@@ -234,6 +236,71 @@ class ComparedAgainAfterACutOff(ArchiveWorld):
         code, v = self.verify()
         day = self.noon // 86400
         self.assertEqual((code, v["outcome"], v["scope"]["sevenths"]), (0, "ok", sorted({day % 7, (day + 1) % 7})))
+
+
+# ------------------------------------------------------------------ builds a scan saw, kept while a config is not known
+
+RED_ON_TEST = (b'<testsuite name="kubetest"><testcase name="Test"><failure>x</failure></testcase>'
+               b'<testcase name="Up"/></testsuite>')
+
+
+class PendingRanges(ttc.ConfigWorld):
+    """A build made 6 h before a scan that saw it not red (tab t then hid its red rows: HIDE),
+    which has since scrolled off; the run of the upload job an hour after that scan has a config
+    not known yet (it shows every row). run() keeps the range "changed_pending", and drops it 14
+    days after the scan."""
+
+    history = tch.ConfigOverTime.history
+    judged = tch.ConfigOverTime.judged
+    tab = tch.ConfigOverTime.tab
+
+    def world(self, age):
+        s0 = self.now - age
+        made = s0 - 6 * HOUR
+        b = str(snowflake(made))
+        self.failed_in_gcs(b, self.now - made)
+        self.junit(b, RED_ON_TEST)
+        self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 60 * HOUR,
+                                        "changed_pending": [{"since": s0, "lo": made - HOUR, "hi": made + HOUR}]}})
+        unknown = self.judged((self.now - 40 * DAY, self.tab(ttc.entry(self.HIDE))), (s0 + HOUR, None))
+        return b, s0, made, unknown
+
+    def known(self, s0):
+        return self.judged((self.now - 40 * DAY, self.tab(ttc.entry(self.HIDE))), (s0 + HOUR, self.tab(ttc.entry(""))))
+
+    def test_control_a_range_is_judged_once_its_config_is_known(self):
+        b, s0, _, run = self.world(14 * DAY - 60)
+        self.assertEqual(self.state()["tabs"]["dash#t"]["changed_pending"][0]["since"], s0)
+        self.assertFalse(any(b in w or "seen not red by the scan" in w for w in run["warnings"]))
+        self.assertEqual(self.known(s0)["outcomes"], {"backfilled": [f"job/{b}"]})
+
+    def test_a_range_no_longer_judged_is_a_serious_warning(self):
+        """run() dropped a range 14 days after its scan while a config of its tab in force since
+        was still not known (fetch_red_logs.py:4545-4548), without a warning of its own: a build in
+        it that the config, known later, shows red was never judged, and no run said so."""
+        b, s0, made, run = self.world(14 * DAY + 60)
+        self.assertNotIn("changed_pending", self.state()["tabs"]["dash#t"])
+        self.assertIn(f"dash#t: the builds made from {frl.iso(made - HOUR)} to {frl.iso(made + HOUR)}, seen not red by "
+                      f"the scan of {frl.iso(s0)}, cannot be judged from GCS: a config of the tab in force since that "
+                      "scan is still not known 14 days later; no longer judged, though TestGrid may have shown them red",
+                      run["serious_warnings"])  # fails: not there
+        self.assertEqual(self.known(s0)["outcomes"], {})  # (dropped: not judged once the config is known)
+
+    def test_so_are_those_of_a_tab_forgotten(self):
+        """run() forgot a tab unlisted for 30 days (fetch_red_logs.py:4564-4566) with the ranges it
+        kept for want of a config, and said nothing of them (a tab not listed is not read, so they
+        are never judged)."""
+        s0 = self.now - 20 * DAY
+        pending = {"since": s0, "lo": s0 - 7 * HOUR, "hi": s0 - 5 * HOUR}
+        self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 60 * HOUR},
+                             "dash#gone": {"scan": s0, "oldest": s0 - 60 * HOUR, "missing_since": self.now - 31 * DAY,
+                                           "changed_pending": [pending]}})
+        run = self.judged((self.now - 40 * DAY, {"dash": {"t": ttc.entry(""), "gone": ttc.entry("")}}))
+        self.assertIn("dash#gone: unlisted for 30 days; forgetting it", run["warnings"])
+        self.assertIn(f"dash#gone: the builds made from {frl.iso(pending['lo'])} to {frl.iso(pending['hi'])}, seen not "
+                      f"red by the scan of {frl.iso(s0)}, cannot be judged from GCS: the tab is no longer listed, and is "
+                      "forgotten; no longer judged, though TestGrid may have shown them red",
+                      run["serious_warnings"])  # fails: not there
 
 
 if __name__ == "__main__":

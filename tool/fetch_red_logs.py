@@ -2875,6 +2875,14 @@ def config_changed(rule, since, newest=math.inf):
     return None if unknown else False
 
 
+def pending_dropped(key, p, why):
+    """The serious warning for a range of builds a scan saw (a tab's "changed_pending", see run())
+    that the archive stops waiting to judge."""
+    return (f"{key}: the builds made from {iso(p['lo'])} to {iso(p['hi'])}, seen not red by the scan of "
+            f"{iso(p['since'])}, cannot be judged from GCS: {why}; no longer judged, though TestGrid may have "
+            "shown them red")
+
+
 def first_listed(run):
     """When the archive first listed a run of the upload job (for one listed before it kept
     that: when the run ended, or began)."""
@@ -4585,6 +4593,9 @@ def run(args, root, run_start, pool, deadline):
                         changed.append((p["lo"], p["hi"], p["since"]))
                     elif status is None and run_start - p["since"] <= GIVE_UP_DAYS * 86400:
                         waiting.append(p)
+                    elif status is None:
+                        warnings.append(pending_dropped(key, p, "a config of the tab in force since that scan is "
+                                                                f"still not known {GIVE_UP_DAYS} days later"))
             if recent is not None or older or changed:
                 gaps.append((key, r, recent, older, changed))
         if r.get("oldest"):
@@ -4602,6 +4613,9 @@ def run(args, root, run_start, pool, deadline):
                 prev = dict(prev, missing_since=run_start)
             elif run_start - prev["missing_since"] > UNLISTED_DAYS * 86400:
                 warnings.append(f"{key}: unlisted for {UNLISTED_DAYS} days; forgetting it")
+                # (a tab not listed is not read, so the ranges it kept are never judged)
+                warnings += [pending_dropped(key, p, "the tab is no longer listed, and is forgotten")
+                             for p in prev.get("changed_pending") or ()]
                 continue
         elif key in listed and prev.get("missing_since"):  # (listed again, whether its table could be read or not)
             prev = {k: v for k, v in prev.items() if k != "missing_since"}
