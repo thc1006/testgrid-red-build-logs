@@ -1938,6 +1938,17 @@ class NamedAsADownload(ArchiveWorld):
         self.assertTrue(os.path.exists(os.path.join(self.folder, "build-log.txt")))  # fails: removed
         self.assertIn("2110000000000000007: its meta.json is a link; nothing in the folder is removed", " ".join(warnings))
 
+    def test_a_build_folder_whose_meta_json_is_a_folder_is_reported(self):
+        """The cleanup took it for one the index reports as unreadable, though the index reads only a file:
+        nothing said anything of it."""
+        os.makedirs(os.path.join(self.folder, "meta.json"))
+        with open(os.path.join(self.folder, "build-log.txt"), "w") as f:
+            f.write("a log\n")
+        self.assertEqual(self.fetch(), 0)
+        self.assertTrue(os.path.exists(os.path.join(self.folder, "build-log.txt")))
+        self.assertIn("2110000000000000007: its meta.json is not a file; nothing in the folder is removed",
+                      " ".join(self.runs()[-1]["warnings"]))  # fails: not there
+
     def test_a_link_its_meta_json_does_not_list_is_left_alone(self):
         """(a link named as a file a download writes, next to a meta.json that does not list it, was removed
         as what a copy cut off part-way left)"""

@@ -3584,6 +3584,10 @@ def clean_partial_builds(root, warnings):
                     warnings.append(f"{run_rel}/{job}/{build}: its meta.json is a link; nothing in the folder is removed")
                     continue
                 if os.path.exists(os.path.join(target, "meta.json")):
+                    if not os.path.isfile(os.path.join(target, "meta.json")):  # (the index reads only a file)
+                        warnings.append(f"{run_rel}/{job}/{build}: its meta.json is not a file; nothing in the folder "
+                                        "is removed")
+                        continue
                     try:
                         meta = read_json(os.path.join(target, "meta.json"))
                     except (ValueError, OSError):
