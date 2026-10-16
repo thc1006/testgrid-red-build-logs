@@ -117,7 +117,7 @@ from GCS.
    was archived. After that, it is compared at least once a week. The archive's
    builds are split into seven by a hash of their job and build. Each run
    compares the seventh for its UTC day, and those of the days since the last
-   run that finished its comparisons and passed its verification.
+   run that finished its comparisons and whose verification found no difference.
    `cross_check.py` compares the same ones.
 5. Rewrite the index and the charts, then run
    [`cross_check.py`](tool/cross_check.py). It checks the archive again on its

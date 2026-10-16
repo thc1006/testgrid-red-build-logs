@@ -31,8 +31,9 @@ archived, for one without a log or finished.json), and fetched again whenever
 GCS holds different content. After that (it is final), it is compared at least
 once a week: each run compares the seventh of the archive for its UTC day, and
 those of the days since the last run done with its own (it compared them all,
-and its verification ended ok: see gcs_sevenths), as cross_check.py does. So
-one a run cut off did not get to is compared by the next run. A copy taken
+and its verification found none differing: see gcs_sevenths), as
+cross_check.py does. So one a run cut off did not get to is compared by the
+next run. A copy taken
 less than SETTLE_HOURS after the build finished, or before
 it finished at all, is marked as not settled.
 
@@ -3281,15 +3282,18 @@ def run_started(path):
 
 def sevenths_done(root, rel):
     """Whether the run in folder rel was done with its sevenths of the archive (see gcs_sevenths):
-    its fetch compared all it was due to with GCS ("gcs_compared" in its run.json) and its
-    verification ended ok (its verification.json)."""
+    its fetch compared all it was due to with GCS ("gcs_compared" in its run.json), and its
+    verification compared them too and found none differing ("differ" in its verification.json),
+    whatever else it found (a tab that cannot be read, say)."""
     try:
         run = read_json(os.path.join(root, rel, "run.json"))
         path = os.path.join(root, rel, "verification.json")
         v = None if os.path.islink(path) else read_json(path)  # (a link in the archive is never followed)
     except (OSError, ValueError):
         return False
-    return isinstance(run, dict) and run.get("gcs_compared") is True and isinstance(v, dict) and v.get("outcome") == "ok"
+    scope = v.get("scope") if isinstance(v, dict) else None
+    return isinstance(run, dict) and run.get("gcs_compared") is True and isinstance(scope, dict) \
+        and is_int(scope.get("differ")) and scope["differ"] == 0
 
 
 def gcs_sevenths(root, t0):
@@ -3298,7 +3302,7 @@ def gcs_sevenths(root, t0):
     that was done with its own (see sevenths_done) to the day of this one, and that run's day too
     if a run later that day was not; at least this day's, so all seven when no run of the week
     before was done with them. Each build is so compared, and verified, at least once a week, even
-    when a day has no run, or a run is cut off or its verification finds a problem. The first run
+    when a day has no run, or a run is cut off or its verification finds a difference. The first run
     (none before it) compares this day's only. cross_check.py compares the same ones when it
     verifies that run."""
     day = int(t0 // 86400)

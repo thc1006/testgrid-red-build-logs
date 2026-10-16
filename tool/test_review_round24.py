@@ -1162,7 +1162,7 @@ class Sevenths(unittest.TestCase):
                 rel = frl.new_run_dir(root, started)[1]
                 frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": started,
                                                                      "gcs_compared": True})
-                frl.write_json(os.path.join(root, rel, "verification.json"), {"outcome": "ok"})
+                frl.write_json(os.path.join(root, rel, "verification.json"), {"outcome": "ok", "scope": {"differ": 0}})
             rel = frl.new_run_dir(root, day - 86400)[1]  # (a report with a start no run can have: passed over)
             frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": 0})
             with mock.patch("time.time", return_value=day + 86400):
