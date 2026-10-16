@@ -141,7 +141,7 @@ UNLISTED_DAYS = 30  # forget a tab missing from its dashboard's summary after th
 SERIOUS = ("may be missing", "state.json", "no longer listed", "old layout",  # warnings that fail the run
            "cannot be judged from GCS", "TestGrid's config was last read", "TestGrid's config was never read",
            "the filters cannot be applied here", "does not match the tab", "still not known",
-           "lacks tabs TestGrid shows", "has not run since", "not compared with GCS before the run's deadline")
+           "lacks tabs TestGrid shows", "has not run since", "were not compared with GCS before the run")
 CONFIG_STALE_DAYS = 3  # TestGrid's config not read for this long is a serious warning
 CONFIG_KEEP_DAYS = HELD_DAYS + 17  # TestGrid's config over time is kept this long (a held build's days of results)
 BACKFILL_SLACK_HOURS = 6  # a build may start this long after its ID was made
@@ -5051,7 +5051,8 @@ def run(args, root, run_start, pool, deadline):
     errors.sort(key=lambda e: e["build"] or "")
     if uncompared:
         uncompared.sort()
-        warnings.append(f"{len(uncompared)} archived builds were not compared with GCS before the run's deadline "
+        warnings.append(f"{len(uncompared)} archived builds were not compared with GCS before the run "
+                        f"{'was interrupted' if interrupted else 'reached its deadline'} "
                         f"({', '.join(uncompared[:3])}{', ...' if len(uncompared) > 3 else ''}): the next run "
                         "compares them")
     recs = {f"{b['job']}/{b['build']}": b for b in selected + retry + running_gap + list(stalled.values()) + still_shown}

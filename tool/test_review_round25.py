@@ -89,9 +89,26 @@ class CutOffComparisons(ArchiveWorld):
                                            "already-archived": self.keys(self.other)})
         self.assertEqual(code, 1)  # fails: 0
         self.assertEqual(run["serious_warnings"], [
-            f"3 archived builds were not compared with GCS before the run's deadline ({', '.join(self.keys(self.mine))}): "
-            "the next run compares them"])
+            "3 archived builds were not compared with GCS before the run reached its deadline "
+            f"({', '.join(self.keys(self.mine))}): the next run compares them"])
         time.sleep(3.6)  # (the server's slow answers end before it closes)
+
+    def test_or_one_an_interrupt_cut_off(self):
+        for b in self.mine:
+            self.srv.route(f"/bucket/logs/job/{b}/build-log.txt", self.slow(b))
+        wait = frl.cf.wait
+
+        def interrupted(fs, *args, **kwargs):  # (as SIGINT while the run waits for its builds' workers)
+            if isinstance(fs, dict) and fs and all(isinstance(b, dict) and "build" in b for b in fs.values()):
+                raise KeyboardInterrupt
+            return wait(fs, *args, **kwargs)
+        with mock.patch.object(frl.cf, "wait", interrupted):
+            self.assertEqual(self.fetch(), 130)
+        run = self.runs()[-1]
+        self.assertEqual((run["interrupted"], run["outcomes"].get("not-checked")), (True, self.keys(self.mine)))
+        self.assertIn(f"3 archived builds were not compared with GCS before the run was interrupted "
+                      f"({', '.join(self.keys(self.mine))}): the next run compares them", run["serious_warnings"])
+        time.sleep(3.6)
 
 
 class SeventhsOfRunsNotDone(unittest.TestCase):
