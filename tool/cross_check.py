@@ -8,7 +8,7 @@ For one run (default: the latest):
              content it was taken from, checked for the builds of the last
              --hours and a seventh of the older ones for each day since the
              last run done with its own (so each at least once a week, even
-             when a run is cut off or its verification finds a problem; the
+             when a run is cut off or its verification finds a difference; the
              run's fetch compares the same ones, see
              fetch_red_logs.gcs_sevenths); a
              build archived without a log still has none in GCS. Then what

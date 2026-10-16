@@ -114,8 +114,8 @@ class CutOffComparisons(ArchiveWorld):
 class SeventhsOfRunsNotDone(unittest.TestCase):
     """gcs_sevenths: which sevenths of the archive a run compares with GCS again, final or not.
     4ace4f3 took the days since the run before, whatever that run did: a run cut off before it
-    compared its sevenths, or whose verification found a problem, counted as having compared them,
-    so the next run went on to the next day's seventh and left them for a week."""
+    compared its sevenths, or whose verification found a difference, counted as having compared
+    them, so the next run went on to the next day's seventh and left them for a week."""
 
     DAY = 20_000
 
@@ -123,15 +123,17 @@ class SeventhsOfRunsNotDone(unittest.TestCase):
         self.root = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.root)
 
-    def run_at(self, hours, compared=True, verified="ok"):
+    def run_at(self, hours, compared=True, verified="ok", differ=0):
         """A run folder started `hours` after 00:00 UTC of day DAY: whether its fetch compared all
-        it was due to, and its verification's outcome (None: no verification.json)."""
+        it was due to, its verification's outcome (None: no verification.json), and how many builds
+        the verification's comparisons with GCS found differing (None: it ended before they did)."""
         started = self.DAY * 86400 + hours * 3600
         rel = frl.new_run_dir(self.root, started)[1]
         frl.write_json(os.path.join(self.root, rel, "run.json"),
                        {"run": rel.rsplit("/", 1)[1], "started": started, "gcs_compared": compared})
         if verified is not None:
-            frl.write_json(os.path.join(self.root, rel, "verification.json"), {"outcome": verified})
+            frl.write_json(os.path.join(self.root, rel, "verification.json"),
+                           {"outcome": verified, "scope": {} if differ is None else {"sevenths": [], "differ": differ}})
 
     def sevenths(self, hours):
         with mock.patch("time.time", return_value=(self.DAY + 30) * 86400):
@@ -152,16 +154,27 @@ class SeventhsOfRunsNotDone(unittest.TestCase):
         self.run_at(6, compared=False)  # (its deadline came before it compared its seventh)
         self.assertEqual(self.sevenths(30), self.days(0, 1))  # fails: {DAY + 1} only
 
-    def test_so_does_one_whose_verification_found_a_problem(self):
+    def test_so_does_one_whose_verification_found_a_difference(self):
         self.run_at(-18)
-        self.run_at(6, verified="problems")  # (such as "GCS changed since it was archived")
+        self.run_at(6, verified="problems", differ=1)  # (such as "GCS changed since it was archived")
         self.assertEqual(self.sevenths(30), self.days(0, 1))  # fails: {DAY + 1} only
 
     def test_or_was_not_verified_to_the_end(self):
         self.run_at(-18)
         for i, outcome in enumerate(("timed out", "interrupted", "stopped", "incomplete", None)):
-            self.run_at(6 + i, verified=outcome)
+            self.run_at(6 + i, verified=outcome, differ=None)
         self.assertEqual(self.sevenths(30), self.days(0, 1))  # fails: {DAY + 1} only
+
+    def test_a_problem_of_another_kind_leaves_nothing_to_compare_again(self):
+        """A run whose verification compared its sevenths, finding none differing, but found a
+        problem of another kind (a tab it cannot read, say), was not done with them (d5bb3a8): while
+        such a problem lasted, each run compared all seven, the whole archive, and so did its
+        verification."""
+        for day in range(7):
+            self.run_at(6 - 24 * day, verified="problems")
+        self.assertEqual(self.sevenths(30), self.days(1))  # fails: all seven
+        self.run_at(10, verified="timed out")  # (cut off after its comparisons ended)
+        self.assertEqual(self.sevenths(30), self.days(1))
 
     def test_a_run_not_done_on_the_day_of_the_last_done_one(self):
         # (the run done that day compared its seventh, but the later one may have found GCS changed since)
@@ -171,7 +184,7 @@ class SeventhsOfRunsNotDone(unittest.TestCase):
 
     def test_no_run_done_in_the_week_before(self):
         self.run_at(-50, compared=False)
-        self.run_at(-20, verified="problems")
+        self.run_at(-20, verified="problems", differ=1)
         self.assertEqual(self.sevenths(6), set(range(7)))  # fails: {DAY} only
         self.run_at(-8 * 24)  # (one done more than a week before: all seven still)
         self.assertEqual(self.sevenths(6), set(range(7)))
