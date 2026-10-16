@@ -4624,6 +4624,9 @@ def run(args, root, run_start, pool, deadline):
             return 1
         if os.path.islink(path):
             warnings.append(f"{path} is a link: the run folders in it are not read")
+        elif os.path.lexists(path) and not os.path.isdir(path) and not args.list_only:  # (the run's folder goes in it)
+            print(f"ERROR {path} is not a folder: no run goes on until it is fixed", file=sys.stderr)
+            return 1
     timelines = Timelines(run_start)  # (each job's builds that TestGrid's reads of a judged build depend on)
     if not args.list_only:
         sweep_parts(root)
