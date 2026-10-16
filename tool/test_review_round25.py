@@ -1562,9 +1562,10 @@ class ArchiveLinks(ArchiveWorld):
                 os.remove(os.path.join(self.root, path))
                 shutil.move(target, os.path.join(self.root, path))
 
-    def test_an_older_month_folder_that_is_a_link_gets_nothing_of_the_old_layout(self):
-        """migrate_old_layout made a run folder, and moved a build of the old layout into it, where the
-        link from an older month's folder led: 7620f6d stops a run for runs/ and its own month's only."""
+    def old_layout(self, archived_by_run=None):
+        """A build of the old layout (logs/job/<build>/) and its run's report runs/<id>.json, from
+        2026-09-20, archived by that run, or naming its new folder (archived_by_run) as a migration
+        cut off before the move left it."""
         old, started = "20260920T120000.000000Z", frl.folder_time("2026-09-20T120000Z")
         build = snowflake(started - HOUR)
         frl.write_json(os.path.join(self.root, "runs", f"{old}.json"), dict(run_record(started, []), run=old, outcomes={}))
@@ -1577,13 +1578,38 @@ class ArchiveLinks(ArchiveWorld):
             "created": started - HOUR, "tabs": [{"dashboard": "dash", "tab": "t", "red_cells": []}],
             "log_url": f"https://gcs/bucket/logs/job/{build}/build-log.txt", "podinfo": None,
             "log": {"bytes": 4, "md5": frl.file_md5(os.path.join(d, "build-log.txt")), "file": "build-log.txt",
-                    "file_bytes": 4}, "archived_by_run": old})
+                    "file_bytes": 4}, "archived_by_run": archived_by_run or old,
+            **({"archived_at": started} if archived_by_run else {})})
+        return old, d
+
+    def test_an_older_month_folder_that_is_a_link_gets_nothing_of_the_old_layout(self):
+        """migrate_old_layout made a run folder, and moved a build of the old layout into it, where the
+        link from an older month's folder led: 7620f6d stops a run for runs/ and its own month's only."""
+        old, d = self.old_layout()
         os.symlink(self.elsewhere, os.path.join(self.root, "runs", "2026-09"))
         run = self.next_fetch()
         self.assertEqual(os.listdir(self.elsewhere), [])  # fails: ['2026-09-20T120000Z']
         self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))
         self.assertTrue(os.path.exists(os.path.join(self.root, "runs", f"{old}.json")))
         self.assertIn("old layout: runs/2026-09 is a link", " ".join(run["serious_warnings"]))
+
+    def moved_through(self, link):
+        """The migration of a build whose meta.json a migration cut off before the move rewrote to name
+        its run folder, with `link` (that folder, or its job folder) a link: what lands where it leads."""
+        _, d = self.old_layout("2026-09-20T120000Z")
+        os.makedirs(os.path.join(self.root, os.path.dirname(link)), exist_ok=True)
+        os.symlink(self.elsewhere, os.path.join(self.root, link))
+        run = self.next_fetch()
+        self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))  # fails: moved
+        self.assertIn(f"old layout: {link} is a link", " ".join(run["serious_warnings"]))
+        return os.listdir(self.elsewhere)
+
+    def test_a_run_folder_that_is_a_link_gets_nothing_of_the_old_layout(self):
+        """786501d checked runs/ and the month folders, not the run folders and job folders."""
+        self.assertEqual(self.moved_through("runs/2026-09/2026-09-20T120000Z"), [])
+
+    def test_a_job_folder_that_is_a_link_gets_nothing_of_the_old_layout(self):
+        self.assertEqual(self.moved_through("runs/2026-09/2026-09-20T120000Z/job"), [])
 
     def list_only(self):
         out, err = io.StringIO(), io.StringIO()
