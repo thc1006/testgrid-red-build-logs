@@ -8,7 +8,7 @@ The fetch takes red cells straight from TestGrid's tables. A build that scrolled
 off a tab before the archive saw it (a gap between runs) can only be judged
 from GCS, and is judged here by the rule TestGrid's updater applied when it
 read the build: readResult and convertResult in pkg/updater at the commit
-TestGrid production runs (tool/oracle/pinned.json names it, and the Go it is
+TestGrid's production manifests deploy (tool/oracle/pinned.json names it, and the Go it is
 built with), with the Go behaviour that rule rests on: encoding/json (the
 Decoder TestGrid reads started.json, finished.json and podinfo.json with),
 encoding/xml (junit), time.Parse and strconv, and the k8s.io/api and
