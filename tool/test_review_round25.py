@@ -1963,6 +1963,42 @@ class NamedAsADownload(ArchiveWorld):
         self.fetch()  # (and the run goes on)
         self.assertTrue(os.path.exists(os.path.join(self.bdir(), "build-log.txt")))
 
+    def logs(self):
+        return sorted(n for n in os.listdir(self.bdir()) if n.startswith("build-log"))
+
+    def test_nor_by_one_naming_its_log_otherwise_than_intact_reads_names(self):
+        """(no run writes such a meta.json: intact() takes the build for damaged)"""
+        meta = self.meta()
+        for name in (5, "notes.txt"):  # (a number is hashable: a set took it)
+            with self.subTest(name=name):
+                frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, log=dict(meta["log"], file=name)))
+                frl.clean_partial_builds(self.root, [])
+                self.assertEqual(self.logs(), ["build-log.txt"])  # fails: [] for "notes.txt"
+
+    def test_nor_by_one_naming_its_parts_otherwise_than_intact_reads_them(self):
+        """stray_files listed only the parts given as objects: the build's own parts, or its log, were
+        removed as strays."""
+        meta = self.meta()
+        for parts in (["build-log.txt.000", "build-log.txt.001"], [{"file": "build-log.txt.000", "bytes": 2}, "x"],
+                      [], [{"file": "build-log.txt.001", "bytes": 2}, {"file": "build-log.txt.000", "bytes": 2}]):
+            with self.subTest(parts=parts):
+                for n in ("build-log.txt.000", "build-log.txt.001"):
+                    with open(os.path.join(self.bdir(), n), "w") as f:
+                        f.write("lo")
+                frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, log=dict(meta["log"], parts=parts)))
+                frl.clean_partial_builds(self.root, [])
+                self.assertEqual(self.logs(), ["build-log.txt", "build-log.txt.000", "build-log.txt.001"])  # fails: removed
+
+    def test_control_parts_named_as_a_run_writes_them(self):
+        meta = self.meta()
+        for n in ("build-log.txt.000", "build-log.txt.001", "build-log.txt.002"):
+            with open(os.path.join(self.bdir(), n), "w") as f:
+                f.write("lo")
+        parts = [{"file": "build-log.txt.000", "bytes": 2}, {"file": "build-log.txt.001", "bytes": 2}]
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, log=dict(meta["log"], parts=parts)))
+        frl.clean_partial_builds(self.root, [])
+        self.assertEqual(self.logs(), ["build-log.txt.000", "build-log.txt.001"])
+
     def main(self, *args):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             return frl.main(list(args))

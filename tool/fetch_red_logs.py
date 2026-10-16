@@ -1521,17 +1521,23 @@ def save_log(base, target, compress, max_bytes):
 
 def stray_files(target, meta):
     """Stored-file names in a build folder that its meta.json does not list: what a copy
-    cut off part-way leaves (parts of a newer copy, or a copy in the other form). None if the
-    meta.json names a file otherwise than as text: it cannot say which are its own."""
+    cut off part-way leaves (parts of a newer copy, or a copy in the other form). None at all
+    if the meta.json names a file otherwise than intact() reads names: it cannot say which are its own."""
     listed = []
     for default, key in (("build-log.txt", "log"), ("podinfo.json", "podinfo")):
         info = meta.get(key)
         if info and isinstance(info, dict) and not info.get("omitted"):  # (as intact() reads it)
-            parts = info.get("parts")
-            listed += ([p.get("file") for p in parts if isinstance(p, dict)] if isinstance(parts, list)
-                       else [info.get("file", default)])
-    if not all(isinstance(n, str) for n in listed):
-        return []
+            name = info.get("file", default)
+            if not isinstance(name, str) or name not in LOG_FILES:
+                return []
+            if "parts" in info:  # (name.000, name.001, ..., as part_paths() reads them)
+                parts = info["parts"]
+                names = [p.get("file") if isinstance(p, dict) else None for p in parts] if isinstance(parts, list) else []
+                if not names or names != [f"{name}.{i:03d}" for i in range(len(names))]:
+                    return []
+                listed += names
+            else:
+                listed.append(name)
     return sorted(n for n in listdir(target) if (n in LOG_FILES or PART_RE.fullmatch(n)) and n not in set(listed))
 
 
