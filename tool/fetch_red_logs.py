@@ -2771,6 +2771,14 @@ class ConfigHistory:
         alone = all(a["finished"] is None or a["finished"] <= b["started"] for a, b in itertools.pairwise(self.runs))
         return self.runs[i + 1]["started"] if i + 1 < len(self.runs) and alone else math.inf
 
+    def uploaded(self):
+        """When the runs that began at each time uploaded their configs, at the latest: {start:
+        end} (see ended; of runs that began in the same second, the latest end)."""
+        out = {}
+        for i, r in enumerate(self.runs):
+            out[r["started"]] = max(out.get(r["started"], -math.inf), self.ended(i))
+        return out
+
     def replaced(self, after):
         """When the config in force at `after` was replaced at the latest: by the upload of a
         run that began then or later, by its finish (and PICKUP)."""
@@ -2917,7 +2925,7 @@ def history_rules(history, keys, now, lacking=None, queries=None, era_rule=None)
     last did}): of the configs that came into force before then, those after its last entry
     uploaded by then have it as not known (UNKNOWN). Tabs without eras are left out."""
     lacking, queries, era_rule = lacking or {}, queries or {}, era_rule or (lambda entry: entry)
-    uploaded = {r["started"]: history.ended(i) for i, r in enumerate(history.runs)}  # (at the latest)
+    uploaded = history.uploaded()
     out = {}
     for key in keys:
         eras = [(lo, hi, era_rule(entry)) for lo, hi, entry in history.eras(key, lacking.get(key))]
