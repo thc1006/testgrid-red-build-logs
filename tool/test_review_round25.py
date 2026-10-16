@@ -769,6 +769,12 @@ class TakenOut(ArchiveWorld):
         self.assertEqual(code, 1)
         self.assertIn("cannot use the archive's excluded.json", out)
 
+    def test_a_build_no_run_can_have_stops_the_run(self):
+        """A build named with a 0 first (no build of Prow's has one) can never be one archived: the
+        build meant stayed, and nothing said so."""
+        self.exclude(json.dumps({f"job/0{self.build}": {"reason": "it holds a token"}}))
+        self.assertEqual(self.fetch(), 1)  # fails: 0, the build still archived
+
     def test_whatever_is_in_its_folder(self):
         for name in ("notes", "old"):  # (folders a person left there: the fetch writes none)
             os.mkdir(os.path.join(self.bdir(), name))
