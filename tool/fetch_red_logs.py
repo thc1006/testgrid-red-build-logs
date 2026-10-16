@@ -3282,6 +3282,16 @@ def run_dirs(root):
     return sorted(out, key=lambda rel: run_key(rel.rsplit("/", 1)[1]))
 
 
+def read_report(root, rel):
+    """The report (run.json) of the run folder rel: None if it is missing, cannot be read, or is a
+    link (a link in the archive is never followed)."""
+    path = os.path.join(root, rel, "run.json")
+    try:
+        return None if os.path.islink(path) else read_json(path)
+    except (ValueError, OSError):
+        return None
+
+
 def run_started(path):
     """A run report's start time, None if it is unreadable or not a time it could have started at
     (or a link: a link in the archive is never followed)."""
@@ -3716,13 +3726,7 @@ def run_rows(root, first_day, current=None):
         name = rel.rsplit("/", 1)[1]
         if dt.date.fromisoformat(name[:10]) < first_day:
             break
-        if current and current.get("dir") == rel:
-            run = current
-        else:
-            try:
-                run = read_json(os.path.join(root, rel, "run.json"))
-            except (ValueError, OSError):
-                run = None
+        run = current if current and current.get("dir") == rel else read_report(root, rel)
         verified = "pending" if current and current.get("dir") == rel else verification_of(root, rel)
         if not isinstance(run, dict):
             result = "unreadable run report" if os.path.lexists(os.path.join(root, rel, "run.json")) else \
@@ -3963,11 +3967,7 @@ def write_index(root, now, current_run=None, missing=(), known=None):
         if current_run and current_run.get("dir") == rel:
             write_run_readme(root, rel, current_run, entries)
         elif folder_time(rel.rsplit("/", 1)[1]) >= horizon:
-            try:
-                run = read_json(os.path.join(root, rel, "run.json"))
-            except (ValueError, OSError):
-                run = None
-            write_run_readme(root, rel, run, entries)
+            write_run_readme(root, rel, read_report(root, rel), entries)
     return entries, bad
 
 
@@ -5226,11 +5226,7 @@ def run(args, root, run_start, pool, deadline):
         # (an older run folder's README links a build taken out no more: write_index rewrites recent ones
         # only, and the run that took it out may have been cut off before this, or a person removed it)
         for rel in sorted(linking(root, excluded) - {run_rel}):
-            try:
-                run = read_json(os.path.join(root, rel, "run.json"))
-            except (ValueError, OSError):
-                run = None
-            write_run_readme(root, rel, run, entries)
+            write_run_readme(root, rel, read_report(root, rel), entries)
 
     counts = [f"{k}={len(v)}" for k, v in sorted(outcomes.items())] + [f"errors={len(errors)}"]
     print(f"run {run_id}: {tabs_read_text(reports)}, {len(builds)} red builds on TestGrid, "

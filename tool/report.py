@@ -78,6 +78,8 @@ def load_runs(root, current_run=None):
     """Every readable run report (runs/<YYYY-MM>/<run>/run.json), plus the current run's."""
     runs = {}
     for path in glob.glob(os.path.join(glob.escape(root), "runs", "*", "*", "run.json")):
+        if os.path.islink(path):  # (a link in the archive is never followed)
+            continue
         try:
             with open(path, encoding="utf-8") as f:
                 run = json.load(f)
