@@ -76,6 +76,7 @@ import operator
 import os
 import random
 import re
+import shutil
 import signal
 import subprocess
 import sys
@@ -3993,11 +3994,12 @@ def load_excluded(root):
 
 
 def remove_build(target):
-    """Remove a build folder and the files in it (a build taken out, see load_excluded)."""
-    for name in listdir(target):
-        remove(os.path.join(target, name))
-    remove_if_empty(target)
-    remove_if_empty(os.path.dirname(target))  # (its job folder, if no other build is in it)
+    """Remove a build folder, whatever is in it (a build taken out, see load_excluded), and its job
+    folder if no other build is in it. Raises OSError if it cannot (rmtree never follows a link)."""
+    with context().write_lock:
+        refuse_if_abandoned(target)
+        shutil.rmtree(target)
+    remove_if_empty(os.path.dirname(target))
 
 
 def load_state(root, warnings):
@@ -4463,11 +4465,16 @@ def run(args, root, run_start, pool, deadline):
         state[name] = {k: v for k, v in state[name].items() if k not in excluded}
     known, duplicates = archived_builds(root)
     # builds taken out for good (excluded.json): their folders go, and they are never fetched again
-    taken_out = sorted(k for k in excluded if k in known)
+    taken_out, take_out_errors, taken_from = sorted(k for k in excluded if k in known), [], set()
     for key in taken_out:
         rel = known.pop(key)
+        taken_from.add(rel.rsplit("/", 2)[0])  # (the run folder that held it: its README lists it)
         if not args.list_only:
-            remove_build(os.path.join(root, rel))
+            try:
+                remove_build(os.path.join(root, rel))
+            except OSError as e:
+                take_out_errors.append({"build": key, "error": f"taking it out ({EXCLUDED}) failed: "
+                                                              f"{type(e).__name__}: {e}"})
     # the archived builds in this run's sevenths: compared with GCS even if final (cross_check.py
     # compares them too), see gcs_sevenths
     sevenths = gcs_sevenths(root, run_start)
@@ -4951,7 +4958,7 @@ def run(args, root, run_start, pool, deadline):
             r.update(config=tab_config[key], config_read=config_read.get(key))
         if key in mismatch_of:
             r["config_mismatch"] = mismatch_of[key]
-    outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors), 0, {}, {}
+    outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors) + take_out_errors, 0, {}, {}
     uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
     if taken_out or shown_out:  # (taken out of the archive now, or shown red by TestGrid and left out)
         outcomes["excluded"] = sorted(set(taken_out) | shown_out)
@@ -5159,6 +5166,13 @@ def run(args, root, run_start, pool, deadline):
     write_json(run_json, final)
     if entries is not None:
         write_run_readme(root, run_rel, final, entries)
+        # (an older run folder a build was taken out of lists it no more: write_index rewrites recent ones only)
+        for rel in sorted(taken_from - {run_rel}):
+            try:
+                run = read_json(os.path.join(root, rel, "run.json"))
+            except (ValueError, OSError):
+                run = None
+            write_run_readme(root, rel, run, entries)
 
     counts = [f"{k}={len(v)}" for k, v in sorted(outcomes.items())] + [f"errors={len(errors)}"]
     print(f"run {run_id}: {tabs_read_text(reports)}, {len(builds)} red builds on TestGrid, "

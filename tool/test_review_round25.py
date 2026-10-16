@@ -589,11 +589,74 @@ class TakenOut(ArchiveWorld):
         self.assertEqual(code, 1)
         self.assertIn("cannot use the archive's excluded.json", out)
 
+    def test_whatever_is_in_its_folder(self):
+        for name in ("notes", "old"):  # (folders a person left there: the fetch writes none)
+            os.mkdir(os.path.join(self.bdir(), name))
+        self.exclude()
+        self.assertEqual(self.fetch(), 0)
+        self.assertIsNone(self.bdir())  # fails: still there
+
+    def test_a_folder_that_cannot_go_is_an_error_of_the_run(self):
+        self.exclude()
+        with mock.patch.object(frl, "remove_build", side_effect=PermissionError("not allowed")):
+            self.assertEqual(self.fetch(), 1)  # fails: 0
+        run = self.runs()[-1]
+        self.assertEqual(run["errors"], [{"build": self.key, "error": "taking it out (excluded.json) failed: "
+                                                                      "PermissionError: not allowed"}])
+        self.assertEqual(run["outcomes"], {"excluded": [self.key]})
+
     def test_cross_check_reports_one_still_archived(self):
         self.exclude()
         code, out = self.check()  # (before a run took it out)
         self.assertEqual(code, 1)  # fails: 0, not checked
         self.assertIn(f"{self.key}: taken out (excluded.json), but still archived", out)
+
+
+
+class TakenOutInTheWindow(ArchiveWorld):
+    """A red build made 5 h ago (inside cross_check.py's 48 h window), which GCS lists as it lists
+    every build, archived, then taken out."""
+
+    def setUp(self):
+        super().setUp()
+        self.build = snowflake(int(time.time()) - 5 * HOUR)
+        self.key, self.base = f"job/{self.build}", f"/bucket/logs/job/{self.build}"
+        self.show([self.build], {"job.Overall": ([12], ["boom"])}, start=int(time.time()) - 5 * HOUR)
+        self.finished(ago=3 * HOUR)
+        self.srv.route(self.base + "/build-log.txt", obj(b"a log that must not stay public\n"))
+        self.srv.gcs_listing("bucket", [f"logs/job/{self.build}/finished.json"])
+        self.assertEqual(self.fetch(), 0)
+
+    def test_it_is_not_missing(self):
+        """cross_check.py's look at GCS's failed builds of the window took one taken out for a missed
+        red build ("MISSED failed build"), and counted it as archived among TestGrid's red builds."""
+        with open(os.path.join(self.root, "excluded.json"), "w") as f:
+            json.dump({self.key: {"reason": "it holds a token"}}, f)
+        self.assertEqual(self.fetch(), 0)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = cc.main(["--archive", self.root, "--testgrid", self.srv.url, "--gcs", self.srv.url, "--hours", "48"])
+        self.assertEqual(code, 0, out.getvalue())  # fails: 1, MISSED
+        self.assertIn("1 red builds in window, 0 archived, 1 taken out (excluded.json), ", out.getvalue())
+
+
+class TakenOutOfAnOlderRun(ArchiveWorld):
+    """A red build a run archived 3.8 days ago, then taken out: INDEX.md rewrites the READMEs of
+    recent run folders only."""
+
+    def test_its_runs_readme_lists_it_no_more(self):
+        self.finished(ago=3.9 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"a log that must not stay public\n"))
+        real = time.time
+        with mock.patch("time.time", lambda: real() - 3.8 * DAY):
+            self.assertEqual(self.fetch(), 0)
+        rel = frl.run_dirs(self.root)[0]
+        with open(os.path.join(self.root, "excluded.json"), "w") as f:
+            json.dump({self.key: {"reason": "it holds a token"}}, f)
+        self.assertEqual(self.fetch(), 0)
+        self.assertIsNone(self.bdir())
+        with open(os.path.join(self.root, rel, "README.md")) as f:
+            self.assertNotIn(self.build, f.read())  # fails: its row, with a link to its log
 
 
 if __name__ == "__main__":
