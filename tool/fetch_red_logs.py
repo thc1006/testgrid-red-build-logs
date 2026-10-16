@@ -2792,7 +2792,8 @@ class ConfigHistory:
         TABULATE longer, see tab_verdict). Runs with the same entry make one era. A tab TestGrid
         listed while the latest config known lacked it (`lacked`: when it last did, see run()):
         the runs without it that began before then, after the last run with it that had uploaded
-        its config by then (ended), have it as not known."""
+        its config by then (ended), have it as not known, each in an era of its own (their
+        configs of it may differ)."""
         if not self.runs:
             return []
         known = [UNKNOWN if r["tabs"] is None else r["tabs"].get(key) for r in self.runs]
@@ -2802,12 +2803,13 @@ class ConfigHistory:
                        default=-1)
             entries = [UNKNOWN if e is None and i > last and r["started"] < lacked else e
                        for i, (r, e) in enumerate(zip(self.runs, known, strict=True))]
-        # (one taken as not known so stays apart from one not known yet: config_changed sees the change
-        # between them, as events has none for it)
+        # (one taken as not known so stays apart from the runs next to it, one not known yet or taken
+        # so too: config_changed sees a change from its config, or to it, between two eras, as events
+        # has none for it)
         out, was = [(-math.inf, self.replaced(-math.inf), UNKNOWN)], [UNKNOWN]
         for i, (r, entry, before) in enumerate(zip(self.runs, entries, known, strict=True)):
             end = self.replaced(self.ended(i))
-            if out[-1][2] == entry and was[-1] == before:
+            if out[-1][2] == entry and was[-1] == before and not (entry is UNKNOWN and before is None):
                 out[-1] = (out[-1][0], max(out[-1][1], end), entry)  # (one of them may end later than the last)
             else:
                 out.append((r["started"], end, entry))

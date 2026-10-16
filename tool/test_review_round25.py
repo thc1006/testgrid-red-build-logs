@@ -803,6 +803,45 @@ class ChangedAfterARecord(unittest.TestCase):
         rule = frl.history_rules(h, ["d#t"], S + 30000, {"d#t": S + 30000})["d#t"]
         self.assertIsNone(frl.config_changed(rule, S + 16000, S + 16000))  # fails: False
 
+    def test_from_one_config_the_record_makes_not_known_to_another(self):
+        """N1 (S+3600 to S+3900) and N2 (S+10800 to S+11400), known configs, both have no t, and the
+        record makes both not known. c729622 still made one era of the two: the change from N1's
+        config to N2's, which may be in force from S+11400, was gone for a scan at S+12000."""
+        S, entry = 1_790_000_000, ttc.entry("")
+        other = {"d#o": dict(entry, test_group="otherjob")}
+        h = frl.ConfigHistory()
+        h.runs = [dict(build=str(1000 + i), commit=f"{i:040x}", started=started, finished=finished, tabs=tabs,
+                       group_changes=None, listed=None, failed=None, recipe=None, built=None)
+                  for i, (started, finished, tabs) in enumerate([
+                      (S, S + 300, {"d#t": entry}), (S + 3600, S + 3900, other), (S + 10800, S + 11400, other)])]
+        rule = frl.history_rules(h, ["d#t"], S + 30000, {"d#t": S + 30000})["d#t"]
+        self.assertIsNone(frl.config_changed(rule, S + 12000, S + 12000))  # fails: False
+
+
+class RangesAfterARecord(ttc.ConfigWorld):
+    """TestGrid lists tab t now, and the latest config known, N2 (5 hours ago), has no t; neither has
+    the config before it (10 hours ago), N1 or, in the control, one not known yet. The last scan of
+    t, 5 hours ago, saw builds TestGrid no longer shows; N1's config was in force then."""
+
+    history = tch.ConfigOverTime.history
+    judged = tch.ConfigOverTime.judged
+
+    def ranges(self, n1):
+        e1, other = ttc.entry(""), ttc.entry("", name="otherjob", gcs_prefix="bucket/logs/otherjob")
+        self.put_state(tabs={"dash#t": {"scan": self.now - 5 * HOUR, "oldest": self.now - 60 * HOUR}})
+        run = self.judged((self.now - 30 * DAY, {"dash": {"t": e1}}),
+                          (self.now - 10 * HOUR, {"dash": {"other": other}} if n1 else None),
+                          (self.now - 5 * HOUR, {"dash": {"other": other}}))
+        return run["left_for_later"].get("config_ranges", {}).get("dash#t", {}).get("ranges")
+
+    def test_control_after_a_config_not_known_yet_the_range_waits(self):
+        self.assertEqual(self.ranges(False), 1)
+
+    def test_after_two_configs_without_the_tab_too(self):
+        """The record makes N1 and N2 not known: N2's config may show the builds otherwise. The
+        range was dropped with no warning, as nothing had changed since."""
+        self.assertEqual(self.ranges(True), 1)  # fails: None
+
 
 class UploadsThatOverlap(unittest.TestCase):
     def test_an_era_ends_when_the_last_of_its_configs_is_replaced(self):
