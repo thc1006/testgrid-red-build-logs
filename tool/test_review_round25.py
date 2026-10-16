@@ -648,6 +648,46 @@ class LackingRecordAndLaterConfigs(ttc.ConfigWorld):
         self.assertEqual(self.judged(*self.later())["outcomes"], {"held": [f"job/{self.b2}"]})  # fails: {}
 
 
+class LackingRecordInCrossCheck(ttc.ConfigWorld):
+    """C1 has t, C2 (2 days ago) has no t, C3 (5 hours ago) has t again; a build made 10 h ago,
+    red on t, whose reads ended under C2. A lacking_tabs record from a day ago."""
+
+    history = tch.ConfigOverTime.history
+
+    def setUp(self):
+        super().setUp()
+        self.earlier_run(self.now - 3 * DAY)
+        self.b2 = str(snowflake(self.now - 10 * HOUR))
+        self.failed_in_gcs(self.b2, 10 * HOUR)
+        # (its junit file written 50 minutes after it was made: TestGrid's reads of it ended under C2)
+        self.srv.route(f"/bucket/logs/job/{self.b2}/podinfo.json", (200, {}, {"pod": {"status": {"phase": "Failed"}}}))
+        name = f"logs/job/{self.b2}/artifacts/junit_01.xml"
+        self.srv.route(f"/bucket/{name}", (200, {}, RED_ON_TEST))
+        self.srv.gcs_listing("bucket", [f"logs/job/{x}/finished.json" for x in (self.visible, self.b2)],
+                             written={name: self.now - 10 * HOUR + 50 * 60})
+
+    def run_with(self, record):
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}},
+                       tab_configs={"dash#t": {"config": ttc.entry(""), "read": int(self.now - 3 * DAY)}},
+                       **({"lacking_tabs": {"dash#t": self.now - DAY}} if record else {}))
+        self.fetch_with(self.history((self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
+                                     (self.now - 2 * DAY, {"dash": {"other": ttc.entry("")}}),
+                                     (self.now - 5 * HOUR, {"dash": {"t": ttc.entry(""), "other": ttc.entry("")}})))
+        return self.runs()[-1]["outcomes"], self.check()
+
+    def test_control_without_a_record(self):
+        outcomes, (code, out) = self.run_with(record=False)
+        self.assertEqual((outcomes, code), ({"backfilled": [f"job/{self.b2}"]}, 0), out)
+
+    def test_cross_check_holds_it_as_the_fetch_does(self):
+        """cross_check.py took a tab's configs as not known only while TestGrid listed it, not as a
+        record keeps them: it called a build the fetch held (C2's config of t is not known) a missed
+        red build."""
+        outcomes, (code, out) = self.run_with(record=True)
+        self.assertEqual(outcomes, {"held": [f"job/{self.b2}"]})
+        self.assertNotIn("MISSED", out)  # fails: MISSED red build job/...
+
+
 class LackingRecordWhileAnUploadRan(ttc.ConfigWorld):
     """C1 (30 days ago) shows every row, C2 (2 days ago) has no t, and C3 has t, hiding the rows a
     build made 10 h ago is red on: C3's run of the upload job began 70 minutes ago and ended 40
