@@ -4503,13 +4503,15 @@ def main(argv=None):
                    help="TestGrid's config for the tabs, as testgrid_config.sh writes it: the rows each tab shows and "
                         "its test group's options, to judge builds TestGrid no longer shows (default, or when it "
                         "cannot be read: the config the last run read, kept in state.json)")
-    p.add_argument("--list-only", action="store_true", help="print the red builds without downloading")
-    p.add_argument("--show-verifications", action="store_true",
-                   help="only put each run's verification, as its verification.json records it, in INDEX.md's table "
-                        "of runs (the workflow does this once the run is verified)")
-    p.add_argument("--clean-partial", action="store_true",
-                   help="only remove what cut-off downloads left, as a run does (the workflow does this before it "
-                        "commits, for a fetch killed before it could)")
+    only = p.add_mutually_exclusive_group()  # (each does one thing, and no run)
+    only.add_argument("--list-only", action="store_true", help="print the red builds without downloading")
+    only.add_argument("--show-verifications", action="store_true",
+                      help="only put each run's verification, as its verification.json records it, in INDEX.md's "
+                           "table of runs (the workflow does this once the run is verified)")
+    only.add_argument("--clean-partial", action="store_true",
+                      help="only remove what cut-off downloads and killed runs left (temp files, build folders without "
+                           "meta.json, stored files their meta.json does not list), as a run does at its start (the "
+                           "workflow does this before it commits, for a fetch killed before its end)")
     p.add_argument("--testgrid", default=TESTGRID)
     p.add_argument("--gcs", default=GCS)
     args = p.parse_args(argv)
@@ -4518,6 +4520,9 @@ def main(argv=None):
     tool_version()  # (asked once, now: the run's report gives it)
     root = args.archive
     if args.show_verifications or args.clean_partial:
+        if not os.path.isdir(root):  # (not made here: there is nothing to change)
+            print(f"ERROR {root} is not a folder: no archive is there", file=sys.stderr)
+            return 1
         lock = lock_archive(root)
         if lock is None:
             print(f"ERROR another run holds {os.path.join(root, '.lock')}", file=sys.stderr)
@@ -4526,6 +4531,7 @@ def main(argv=None):
             if args.show_verifications:
                 print(f"INDEX.md: {show_verifications(root)} rows of runs show their verification anew")
             if args.clean_partial:
+                sweep_parts(root)
                 warnings = []
                 clean_partial_builds(root, warnings)
                 for w in warnings:
