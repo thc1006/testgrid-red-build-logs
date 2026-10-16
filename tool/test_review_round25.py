@@ -1423,11 +1423,15 @@ class CutOffRun(ArchiveWorld):
         def write_json(path, *args, **kwargs):
             if where == "state.json" and path.endswith("state.json"):
                 raise KeyboardInterrupt
-            return real_json(path, *args, **kwargs)
+            real_json(path, *args, **kwargs)
+            if where == "final" and path.endswith("run.json") and not frl.stopped(args[0]):
+                raise KeyboardInterrupt  # (just after its final report)
 
         def write_charts(*args, **kwargs):
             if where == "charts":
                 raise KeyboardInterrupt
+            if where == "final":
+                raise OSError(28, "No space left on device")
             return real_charts(*args, **kwargs)
         with mock.patch("time.time", lambda: real_time() - 4 * DAY), mock.patch.object(frl, "write_json", write_json), \
                 mock.patch.object(frl.report, "write_charts", write_charts):
@@ -1456,6 +1460,15 @@ class CutOffRun(ArchiveWorld):
         self.assertEqual(self.fetch(), 0)
         self.assertNotIn("cut off", self.readme())  # fails: This run was cut off before it wrote its report.
         self.assertIn(f"- {frl.STOPPED}", self.readme())
+
+    def test_one_that_could_not_write_its_index_keeps_no_readme_from_its_start(self):
+        """A run whose index could not be written removes the README from its start, which the next run
+        writes again; it wrote its final report first, so one cut off in between kept that README, which
+        said it was cut off, for good."""
+        self.cut_off("final")
+        self.assertEqual(self.fetch(), 0)
+        self.assertNotIn("cut off", self.readme())  # fails: This run was cut off before it ended. ...
+        self.assertIn(f"[job {self.build}]", self.readme())
 
 
 class ArchiveLinks(ArchiveWorld):
