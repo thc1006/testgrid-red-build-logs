@@ -178,28 +178,13 @@ jobs:
             echo "No archive/ to commit."
             exit 0
           fi
-          # A build folder without meta.json that holds only what a download writes
-          # (a log, podinfo.json, their parts, temp files) is a download that was cut
-          # off: leave it out; the build is retried by a later run. One that holds
-          # anything else stays, as the fetch leaves it (the run's report says so).
-          # (find follows no link, as the fetch follows none in the archive: one may
-          # lead outside it.)
-          if [ -d archive/runs ]; then
-            shopt -s nullglob dotglob
-            while IFS= read -r -d '' d; do
-              [ -e "$d/meta.json" ] && continue
-              other=
-              for f in "$d"/*; do
-                case ${f##*/} in
-                  build-log.txt | build-log.txt.gz | podinfo.json) ;;
-                  build-log.txt.[0-9][0-9][0-9] | build-log.txt.gz.[0-9][0-9][0-9] | podinfo.json.[0-9][0-9][0-9]) ;;
-                  .part | .*.part) ;;
-                  *) other=1 ;;
-                esac
-              done
-              [ -n "$other" ] || rm -rf -- "$d"
-            done < <(find archive/runs -mindepth 4 -maxdepth 4 -type d -print0)
-            shopt -u nullglob dotglob
+          # Leave out what cut-off downloads left, such as a build folder without
+          # meta.json: the fetch removes it by its own rule at its start and end, and
+          # this is that rule, for a fetch killed before its end. The builds are
+          # retried by a later run. (Without the tool installed, no fetch ran.)
+          if [ -x tool/.venv/bin/python ]; then
+            tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --clean-partial ||
+              echo "::warning::Could not remove what cut-off downloads left: it is committed, and the next run removes it."
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
