@@ -3340,15 +3340,17 @@ def gcs_sevenths(root, t0):
     day = int(t0 // 86400)
     earlier, after, first = False, None, day - 6  # (after: the day of the earliest run not done since)
     for rel in reversed(run_dirs(root)):
-        # (a run whose report is missing, as one killed before it wrote one, or cannot be read: by when
-        # its folder was made, not done)
-        started = run_started(os.path.join(root, rel, "run.json")) or folder_time(rel.rsplit("/", 1)[1])
+        # (a run whose report is missing, as one killed before it wrote one, cannot be read, or has no
+        # start a run can have: by when its folder was made, not done)
+        started = run_started(os.path.join(root, rel, "run.json"))
+        done = started is not None and sevenths_done(root, rel)
+        started = started or folder_time(rel.rsplit("/", 1)[1])
         if started is None or started >= t0:
             continue
         earlier = True
         if started < (day - 7) * 86400:
             break  # (an older one cannot add a day)
-        if sevenths_done(root, rel):
+        if done:
             first = int(started // 86400) + 1 if after is None else min(after, int(started // 86400) + 1)
             break
         after = int(started // 86400)
