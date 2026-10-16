@@ -176,6 +176,13 @@ class SeventhsOfRunsNotDone(unittest.TestCase):
         self.run_at(10, verified="timed out")  # (cut off after its comparisons ended)
         self.assertEqual(self.sevenths(30), self.days(1))
 
+    def test_or_was_killed_before_it_wrote_its_report(self):
+        """A run killed before it wrote run.json (as a step's timeout does, at last), whose folder
+        holds what it fetched, counted as no run."""
+        self.run_at(1)
+        frl.new_run_dir(self.root, self.DAY * 86400 + 5 * 3600)  # (its folder, without run.json)
+        self.assertEqual(self.sevenths(30), self.days(0, 1))  # fails: {DAY + 1} only
+
     def test_a_run_not_done_on_the_day_of_the_last_done_one(self):
         # (the run done that day compared its seventh, but the later one may have found GCS changed since)
         self.run_at(1)
