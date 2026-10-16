@@ -1593,6 +1593,22 @@ class ArchiveLinks(ArchiveWorld):
         self.assertTrue(os.path.exists(os.path.join(self.root, "runs", f"{old}.json")))
         self.assertIn("old layout: runs/2026-09 is a link", " ".join(run["serious_warnings"]))
 
+    def test_an_old_layout_folder_holding_more_than_a_download_is_left_in_place(self):
+        """The migration took a build folder of the old layout without meta.json for a download the old
+        code never finished, by the names in it: a folder named build-log.txt made os.remove raise
+        IsADirectoryError on every run, and a link of that name was removed with its folder."""
+        logs = os.path.join(self.root, "logs", "job")
+        os.makedirs(os.path.join(logs, "2110000000000000011", "build-log.txt"))
+        os.makedirs(os.path.join(logs, "2110000000000000012"))
+        with open(os.path.join(self.elsewhere, "log"), "w") as f:
+            f.write("outside\n")
+        os.symlink(os.path.join(self.elsewhere, "log"), os.path.join(logs, "2110000000000000012", "build-log.txt"))
+        run = self.next_fetch()  # fails: IsADirectoryError
+        self.assertTrue(os.path.isdir(os.path.join(logs, "2110000000000000011", "build-log.txt")))
+        self.assertTrue(os.path.islink(os.path.join(logs, "2110000000000000012", "build-log.txt")))
+        for build in ("2110000000000000011", "2110000000000000012"):
+            self.assertIn(f"old layout: logs/job/{build} has no usable meta.json; left in place", run["warnings"])
+
     def moved_through(self, link):
         """The migration of a build whose meta.json a migration cut off before the move rewrote to name
         its run folder, with `link` (that folder, or its job folder) a link: what lands where it leads."""
