@@ -3839,6 +3839,19 @@ def holdings(entries, waiting, current_run):
             + [f"| {md_cell(what)} | {n} |" for what, n in rows])
 
 
+def left_for_later(left):
+    """INDEX.md's list of what later runs still have to search or judge, from a run report's
+    "left_for_later" (see run()): none, if there is nothing."""
+    gaps = left.get("gap_parts") if isinstance(left, dict) and isinstance(left.get("gap_parts"), dict) else {}
+    ranges = left.get("config_ranges") if isinstance(left, dict) and isinstance(left.get("config_ranges"), dict) else {}
+    lines = [f"- {md_cell(key)}: the older part of its history gap, from {iso(lo)} to {iso(hi)}, is searched in GCS "
+             "by the next runs" for key, (lo, hi) in sorted(gaps.items())]
+    lines += [f"- {md_cell(key)}: {r['ranges']} range{'' if r['ranges'] == 1 else 's'} of builds a scan saw, waiting "
+              f"for a config of the tab not known yet (the oldest scan {iso(r['oldest_scan'])}); each is dropped "
+              f"{GIVE_UP_DAYS} days after its scan" for key, r in sorted(ranges.items())]
+    return ["## Left for later runs", ""] + lines + [""] if lines else []
+
+
 def write_index(root, now, current_run=None, missing=(), known=None):
     """Rewrite INDEX.md, the weekly pages, the charts and recent runs' READMEs.
 
@@ -3893,6 +3906,7 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     if waiting:
         lines += ["## Not archived yet", "", f"{len(waiting)} red builds without an intact local copy yet."]
         lines += build_rows(waiting, files=False) + [""]
+    lines += left_for_later((current_run or {}).get("left_for_later"))
     lines += [f"## Runs in the last {report.HEAT_DAYS} days", "",
               "Collection result is how the run's fetch went: ok, interrupted, its number of problems (errors, "
               "serious warnings, and the tabs and dashboard summaries it could not read, listed in the README of "
@@ -4995,6 +5009,12 @@ def run(args, root, run_start, pool, deadline):
     # retry list means builds may be missing without an error naming them.
     serious = [w for w in warnings if any(k in w for k in SERIOUS)]
     config_record = {"source": config_source, "read": run_start} if config_source else previous_read or None
+    # (what later runs still have to search or judge: the older parts of history gaps, and the ranges of
+    # builds a scan saw that wait for a config not known yet)
+    left = {"gap_parts": {k: t["unsearched"] for k, t in sorted(tab_scans.items()) if "unsearched" in t},
+            "config_ranges": {k: {"ranges": len(t["changed_pending"]),
+                                  "oldest_scan": min(p["since"] for p in t["changed_pending"])}
+                              for k, t in sorted(tab_scans.items()) if t.get("changed_pending")}}
     report_ = {"run": run_id, "dir": run_rel, "started": run_start, "tool": tool_version(), "github": github_run(),
                "since_hours": args.since_hours, "max_job_hours": args.max_job_hours, "testgrid_config": config_record,
                "tabs": reports, "red_builds_seen": len(builds),
@@ -5003,7 +5023,8 @@ def run(args, root, run_start, pool, deadline):
                "backfilled_from_gcs": len(outcomes.get("backfilled", [])), "outcomes": outcomes,
                "errors": errors, "warnings": warnings, "serious_warnings": serious, "interrupted": interrupted,
                # (whether it compared with GCS all the archived builds it was due to: see gcs_sevenths)
-               "gcs_compared": not (uncompared or recheck_failed or interrupted)}
+               "gcs_compared": not (uncompared or recheck_failed or interrupted),
+               "left_for_later": {k: v for k, v in left.items() if v}}
     run_json = os.path.join(root, run_rel, "run.json")
     # Save what the next run needs before drawing the pages and charts: a failure
     # there must not lose a build that is about to scroll off TestGrid.
