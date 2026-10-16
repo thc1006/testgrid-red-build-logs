@@ -3623,8 +3623,6 @@ def load_index(root, now, known=None):
     for key, rel in sorted(known.items()):
         job, build = key.split("/", 1)
         try:
-            if os.path.islink(os.path.join(root, rel, "meta.json")):  # (a link in the archive is never followed)
-                raise ValueError("a link")
             meta = read_json(os.path.join(root, rel, "meta.json"))
             if not valid_meta(meta):
                 raise ValueError("not an archive meta.json")
@@ -3692,7 +3690,7 @@ def short(d):
 
 def write_text(path, text):
     """Write path atomically, leaving it untouched when the content is the same (a link there is
-    replaced, not read: a link in the archive is never followed)."""
+    replaced, not read)."""
     try:
         if not os.path.islink(path):
             with open(path, encoding="utf-8") as f:

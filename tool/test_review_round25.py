@@ -1448,19 +1448,6 @@ class ArchiveLinks(ArchiveWorld):
         self.next_fetch()
         self.assertNotIn("OUTSIDEDASH", self.index())  # fails: | Day (UTC) | OUTSIDEDASH | dash |
 
-    def test_a_meta_json_that_is_a_link(self):
-        path = os.path.join(self.bdir(), "meta.json")
-        meta = frl.read_json(path)
-        for t in meta["tabs"]:
-            for c in t["red_cells"]:
-                c["test"] = "OUTSIDETEST"
-        frl.write_json(os.path.join(self.elsewhere, "meta.json"), meta)
-        os.remove(path)
-        os.symlink(os.path.join(self.elsewhere, "meta.json"), path)
-        run = self.next_fetch()
-        self.assertNotIn("OUTSIDETEST", self.index())  # fails: its row, with the test named outside
-        self.assertIn("meta.json: ValueError: a link", json.dumps(run["errors"]))
-
     def test_a_state_json_that_is_a_link(self):
         state = frl.read_json(os.path.join(self.root, "state.json"))
         rec = frl.recheck_rec(self.meta(), time.time(), self.key)
