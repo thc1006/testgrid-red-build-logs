@@ -856,6 +856,21 @@ class UploadsThatOverlap(unittest.TestCase):
                                                                  (3600, 3605, {"d#t": "B"})])]
         self.assertEqual(h.eras("d#t")[1:], [(0, math.inf, "A"), (3600, math.inf, "B")])  # fails: (0, 5195, "A")
 
+    def test_two_runs_not_known_yet_that_overlap_change_nothing_once_both_are_read(self):
+        """U1 (S+3600 to S+5400) and U2 (S+4200 to S+6000) have configs not known yet, and U2 began
+        before U1 ended: either config may be TestGrid's for good. They make one era, as events
+        says when an update may read their configs; an era each, the change between them would stay
+        not known for good, as neither is replaced (a mutant of 66f43f1's split)."""
+        S, entry = 1_790_000_000, ttc.entry("")
+        h = frl.ConfigHistory()
+        h.runs = [dict(build=str(1000 + i), commit=f"{i:040x}", started=started, finished=finished, tabs=tabs,
+                       group_changes=None, listed=None, failed=None, recipe=None, built=None)
+                  for i, (started, finished, tabs) in enumerate([
+                      (S, S + 300, {"d#t": entry}), (S + 3600, S + 5400, None), (S + 4200, S + 6000, None)])]
+        rule = frl.history_rules(h, ["d#t"], S + 50000)["d#t"]
+        self.assertIsNone(frl.config_changed(rule, S + 5000, S + 5000))
+        self.assertIs(frl.config_changed(rule, S + 40000, S + 40000), False)
+
 
 class TwoUploadsInOneSecond(unittest.TestCase):
     """history_rules: two runs of the upload job began in the same second, Ra with tab t (it ended
