@@ -3534,9 +3534,12 @@ def migrate_old_layout(root, warnings):
         if os.path.islink(dest):  # (a link in the archive is never followed)
             warnings.append(f"old layout: logs/{job}/{build}: {os.path.relpath(dest, root)} is a link; left in place")
             continue
-        if f"{job}/{build}" in known or os.path.lexists(dest):
-            where = known.get(f"{job}/{build}") or os.path.relpath(dest, root)
-            warnings.append(f"old layout: logs/{job}/{build} is also archived at {where}; left in place")
+        if f"{job}/{build}" in known:
+            warnings.append(f"old layout: logs/{job}/{build} is also archived at {known[f'{job}/{build}']}; left in place")
+            continue
+        if os.path.lexists(dest):  # (no archived copy: not a folder, or one without a meta.json)
+            warnings.append(f"old layout: logs/{job}/{build}: {os.path.relpath(dest, root)} is taken by what is not an "
+                            "archived copy of it; left in place")
             continue
         # meta.json first, then the move: a migration cut off in between finds the build
         # still under logs/, already naming its folder, and moves it on the next run

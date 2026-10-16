@@ -211,7 +211,7 @@ class Migration(unittest.TestCase):
         open(os.path.join(dest, "notes.txt"), "w").close()
         warnings = self.migrate()
         self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))
-        self.assertTrue(any("is also archived at" in w for w in warnings), warnings)
+        self.assertTrue(any("is taken by what is not an archived copy of it" in w for w in warnings), warnings)
 
     def test_MG13_MG14_a_moved_build_keeps_its_times_and_run_links(self):
         self.old_report()
