@@ -1846,6 +1846,36 @@ class NamedAsADownload(ArchiveWorld):
         self.assertTrue(os.path.islink(os.path.join(self.folder, "build-log.txt")))  # fails: removed, with its folder
         self.assertIn("unexpected files ['build-log.txt']", self.unexpected())
 
+    def test_a_build_folder_whose_meta_json_is_a_link_is_left_alone(self):
+        """clean_partial_builds read a meta.json through its link, and removed the files it does not list:
+        one that says the build has no log made it remove the build's own log."""
+        os.makedirs(self.folder)
+        with open(os.path.join(self.folder, "build-log.txt"), "w") as f:
+            f.write("the build's log\\n")
+        outside = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, outside)
+        frl.write_json(os.path.join(outside, "meta.json"),
+                       {"job": "job", "build": "2110000000000000007", "tabs": [], "log": {"omitted": True}})
+        os.symlink(os.path.join(outside, "meta.json"), os.path.join(self.folder, "meta.json"))
+        warnings = []
+        frl.clean_partial_builds(self.root, warnings)
+        self.assertTrue(os.path.exists(os.path.join(self.folder, "build-log.txt")))  # fails: removed
+        self.assertIn("2110000000000000007: its meta.json is a link; nothing in the folder is removed", " ".join(warnings))
+
+    def test_a_link_its_meta_json_does_not_list_is_left_alone(self):
+        """(a link named as a file a download writes, next to a meta.json that does not list it, was removed
+        as what a copy cut off part-way left)"""
+        outside = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, outside)
+        with open(os.path.join(outside, "podinfo.json"), "w") as f:
+            f.write("{}\\n")
+        self.assertIsNone(self.meta().get("podinfo"))
+        os.symlink(os.path.join(outside, "podinfo.json"), os.path.join(self.bdir(), "podinfo.json"))
+        warnings = []
+        frl.clean_partial_builds(self.root, warnings)
+        self.assertTrue(os.path.islink(os.path.join(self.bdir(), "podinfo.json")))  # fails: removed
+        self.assertIn("podinfo.json: not listed in its meta.json, and not a file a download writes", " ".join(warnings))
+
     def test_control_what_a_download_left_is_removed(self):
         os.makedirs(self.folder)
         for name in ("build-log.txt", ".build-log.txt.x1y2.part"):
