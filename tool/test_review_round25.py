@@ -1627,6 +1627,38 @@ class ArchiveLinks(ArchiveWorld):
     def test_a_job_folder_that_is_a_link_gets_nothing_of_the_old_layout(self):
         self.assertEqual(self.moved_through("runs/2026-09/2026-09-20T120000Z/job"), [])
 
+    def file_in_place_of(self, path):
+        """The serious warnings of a run migrating a build named as above, with a file where `path`, its
+        run folder or job folder, would be."""
+        _, d = self.old_layout("2026-09-20T120000Z")
+        os.makedirs(os.path.join(self.root, os.path.dirname(path)), exist_ok=True)
+        with open(os.path.join(self.root, path), "w") as f:
+            f.write("a file\n")
+        run = self.next_fetch()  # fails: NotADirectoryError (a run folder), or FileExistsError (a job folder)
+        self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))
+        return " ".join(run["serious_warnings"])
+
+    def test_a_file_in_place_of_a_run_folder_gets_nothing_of_the_old_layout(self):
+        """(os.makedirs raised on every run: 35fe346 refused links only)"""
+        self.assertIn("old layout: runs/2026-09/2026-09-20T120000Z is not a folder",
+                      self.file_in_place_of("runs/2026-09/2026-09-20T120000Z"))
+
+    def test_a_file_in_place_of_a_job_folder_gets_nothing_of_the_old_layout(self):
+        self.assertIn("old layout: runs/2026-09/2026-09-20T120000Z/job is not a folder",
+                      self.file_in_place_of("runs/2026-09/2026-09-20T120000Z/job"))
+
+    def test_a_link_in_place_of_the_build_folder_is_named_as_one(self):
+        """A link leading nowhere where the build would go: 35fe346 left the build in place, as one also
+        archived there, though nothing is (before it, os.rename raised on every run)."""
+        _, d = self.old_layout("2026-09-20T120000Z")
+        dest = f"runs/2026-09/2026-09-20T120000Z/job/{os.path.basename(d)}"
+        os.makedirs(os.path.join(self.root, os.path.dirname(dest)))
+        os.symlink(os.path.join(self.elsewhere, "nowhere"), os.path.join(self.root, dest))
+        run = self.next_fetch()
+        self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))
+        self.assertIn(f"old layout: logs/job/{os.path.basename(d)}: {dest} is a link; left in place",
+                      run["warnings"])  # fails: "is also archived at"
+
     def list_only(self):
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
