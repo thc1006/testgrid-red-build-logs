@@ -275,7 +275,7 @@ class PendingRanges(ttc.ConfigWorld):
     judged = tch.ConfigOverTime.judged
     tab = tch.ConfigOverTime.tab
 
-    def world(self, age):
+    def world(self, age, then=lambda: None):
         s0 = self.now - age
         made = s0 - 6 * HOUR
         b = str(snowflake(made))
@@ -283,6 +283,7 @@ class PendingRanges(ttc.ConfigWorld):
         self.junit(b, RED_ON_TEST)
         self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 60 * HOUR,
                                         "changed_pending": [{"since": s0, "lo": made - HOUR, "hi": made + HOUR}]}})
+        then()
         unknown = self.judged((self.now - 40 * DAY, self.tab(ttc.entry(self.HIDE))), (s0 + HOUR, None))
         return b, s0, made, unknown
 
@@ -306,6 +307,27 @@ class PendingRanges(ttc.ConfigWorld):
                       "scan is still not known 14 days later; no longer judged, though TestGrid may have shown them red",
                       run["serious_warnings"])  # fails: not there
         self.assertEqual(self.known(s0)["outcomes"], {})  # (dropped: not judged once the config is known)
+
+    def test_once_though_the_gap_search_fails(self):
+        # (a run whose gap search fails keeps the tab's ranges for the next run: not the one it dropped)
+        b, s0, made, run = self.world(14 * DAY + 60, then=self.listing_fails)
+        self.assertEqual(sum("seen not red by the scan" in w for w in run["serious_warnings"]), 1)  # fails: 0
+        run = self.judged((self.now - 40 * DAY, self.tab(ttc.entry(self.HIDE))), (s0 + HOUR, None))
+        self.assertEqual(sum("seen not red by the scan" in w for w in run["serious_warnings"]), 0)
+        self.assertNotIn("changed_pending", self.state()["tabs"]["dash#t"])
+
+    def test_so_is_the_unsearched_part_of_a_tab_forgotten(self):
+        """run() forgot a tab unlisted for 30 days with the older part of its history gap still to
+        search, and said nothing of it (a tab not listed is not read, so it is never searched)."""
+        s0 = self.now - 20 * DAY
+        part = [s0 - 50 * DAY, s0 - 14 * DAY]
+        self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 60 * HOUR},
+                             "dash#gone": {"scan": s0, "oldest": s0 - 60 * HOUR, "missing_since": self.now - 31 * DAY,
+                                           "unsearched": part}})
+        run = self.judged((self.now - 40 * DAY, {"dash": {"t": ttc.entry(""), "gone": ttc.entry("")}}))
+        self.assertIn(f"dash#gone: the older part of its history gap, from {frl.iso(part[0])} to {frl.iso(part[1])}, "
+                      "cannot be searched in GCS: the tab is no longer listed, and is forgotten; red builds in it may be "
+                      "missing", run["serious_warnings"])  # fails: not there
 
     def test_so_are_those_of_a_tab_forgotten(self):
         """run() forgot a tab unlisted for 30 days (fetch_red_logs.py:4564-4566) with the ranges it
