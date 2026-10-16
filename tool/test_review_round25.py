@@ -1495,6 +1495,64 @@ class ArchiveLinks(ArchiveWorld):
                 self.assertFalse(os.path.islink(os.path.join(self.root, name)))
 
 
+class OldReadmes(ArchiveWorld):
+    """A run 3.5 days ago (older than the runs whose READMEs INDEX.md rewrites) archived a red build;
+    then a run now."""
+
+    def archived(self, fail=False):
+        self.finished(ago=3.6 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        real_time, real_charts = time.time, frl.report.write_charts
+
+        def write_charts(*args, **kwargs):
+            if fail:
+                raise OSError(28, "No space left on device")
+            return real_charts(*args, **kwargs)
+        with mock.patch("time.time", lambda: real_time() - 3.5 * DAY), \
+                mock.patch.object(frl.report, "write_charts", write_charts):
+            self.fetch()
+        self.rel = frl.run_dirs(self.root)[0]
+        self.path = os.path.join(self.root, self.rel, "README.md")
+
+    def readme(self):
+        with open(self.path) as f:
+            return f.read()
+
+    def damaged_since(self, damage):
+        self.archived()
+        before = self.readme()
+        report = os.path.join(self.root, self.rel, "run.json")
+        if damage == "a link":
+            elsewhere = tempfile.mkdtemp()
+            self.addCleanup(shutil.rmtree, elsewhere)
+            shutil.move(report, os.path.join(elsewhere, "run.json"))
+            os.symlink(os.path.join(elsewhere, "run.json"), report)
+        else:
+            with open(report, "w") as f:
+                f.write('{"run": ')
+        self.assertEqual(self.fetch(), 0)
+        return before
+
+    def test_one_whose_report_is_damaged_since_keeps_its_readme(self):
+        """5a7248b wrote again the README of a run whose report cannot be read, as of one cut off:
+        its account of the run went, for "Its report cannot be read"."""
+        before = self.damaged_since("not JSON")
+        self.assertEqual(self.readme(), before)  # fails: Its report, [run.json](run.json), cannot be read.
+
+    def test_one_whose_report_is_a_link_since_keeps_its_readme(self):
+        before = self.damaged_since("a link")
+        self.assertEqual(self.readme(), before)  # fails: Its report, [run.json](run.json), cannot be read.
+
+    def test_one_whose_index_could_not_be_written_gets_a_readme(self):
+        """Its README from the start went, for the next run to write (6f48f77), but the next run
+        writes the READMEs of recent runs, and of runs cut off, only: it ended, so it had none for good."""
+        self.archived(fail=True)
+        self.assertFalse(os.path.exists(self.path))
+        self.assertEqual(self.fetch(), 0)
+        self.assertTrue(os.path.exists(self.path))  # fails: no README
+        self.assertIn(f"[job {self.build}]", self.readme())
+
+
 class NotDoneWithItsComparisons(ArchiveWorld):
     """A red build archived 3 h after it finished: each run compares it with GCS."""
 
