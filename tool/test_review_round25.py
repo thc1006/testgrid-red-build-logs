@@ -1780,6 +1780,24 @@ class CommitStepAndLinks(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
         self.assertTrue(os.path.exists(os.path.join(cut_off, "build-log.txt")))  # fails: removed
 
+    def test_a_build_folder_with_more_than_a_download_stays_as_the_fetch_leaves_it(self):
+        """The step removed every build folder without meta.json, though the fetch leaves one that holds
+        anything a download does not write, and says so in the run's report: here, a file a person put
+        there, or a meta.json that is a link leading nowhere."""
+        run = "archive/runs/2026-10/2026-10-15T000000Z/job"
+        for name in ("build-log.txt", "build-log.txt.gz", "podinfo.json", "build-log.txt.000", "build-log.txt.gz.001",
+                     "podinfo.json.002", ".podinfo.json.x1y2.part", ".part"):  # (all a download writes)
+            self.write(f"{run}/2110000000000000001/{name}", b"a download cut off")
+        self.write(f"{run}/2110000000000000002/build-log.txt", b"a log")
+        self.write(f"{run}/2110000000000000002/notes.txt", b"a person's")
+        self.write(f"{run}/2110000000000000003/build-log.txt", b"a log")
+        os.symlink(os.path.join(self.tmp, "nowhere"), os.path.join(self.repo, run, "2110000000000000003", "meta.json"))
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertFalse(os.path.lexists(os.path.join(self.repo, run, "2110000000000000001")))
+        self.assertTrue(os.path.exists(os.path.join(self.repo, run, "2110000000000000002", "notes.txt")))  # fails: removed
+        self.assertTrue(os.path.islink(os.path.join(self.repo, run, "2110000000000000003", "meta.json")))  # fails: removed
+
 
 if __name__ == "__main__":
     unittest.main()
