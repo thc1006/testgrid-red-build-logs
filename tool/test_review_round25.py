@@ -1846,9 +1846,23 @@ class NamedAsADownload(ArchiveWorld):
 # ------------------------------------------------------------------ the workflow's commit step and the archive's links
 
 class CommitStepAndLinks(unittest.TestCase):
-    """The archive job's commit step, run as GitHub runs it (see test_review_round24.CommitStep)."""
+    """The archive job's commit step, run as GitHub runs it (see test_review_round24.CommitStep), with
+    the tool installed: it removes what cut-off downloads left by the fetch's own rule. A download cut
+    off in a run's folder is there too, which the step removes."""
 
-    setUp, git, write, commit = r24.CommitStep.setUp, r24.CommitStep.git, r24.CommitStep.write, r24.CommitStep.commit
+    git, write, commit = r24.CommitStep.git, r24.CommitStep.write, r24.CommitStep.commit
+    RUN = "archive/runs/2026-10/2026-10-15T000000Z/job"
+
+    def setUp(self):
+        r24.CommitStep.setUp(self)
+        os.symlink(HERE, os.path.join(self.repo, "tool"))
+        self.write(f"{self.RUN}/2110000000000000009/build-log.txt", b"a download cut off")
+
+    def committed(self):
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertFalse(os.path.lexists(os.path.join(self.repo, self.RUN, "2110000000000000009")))
+        return done
 
     def test_a_month_folder_that_is_a_link_is_not_followed(self):
         """The step removed the build folders without meta.json where a link from a month's folder led
@@ -1858,15 +1872,14 @@ class CommitStepAndLinks(unittest.TestCase):
         with open(os.path.join(cut_off, "build-log.txt"), "wb") as f:
             f.write(b"a download cut off")
         os.symlink(os.path.join(self.tmp, "outside"), os.path.join(self.repo, "archive", "runs", "2026-09"))
-        done = self.commit()
-        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.committed()
         self.assertTrue(os.path.exists(os.path.join(cut_off, "build-log.txt")))  # fails: removed
 
     def test_a_build_folder_with_more_than_a_download_stays_as_the_fetch_leaves_it(self):
         """The step removed every build folder without meta.json, though the fetch leaves one that holds
         anything a download does not write, and says so in the run's report: here, a file a person put
-        there, or a meta.json that is a link leading nowhere."""
-        run = "archive/runs/2026-10/2026-10-15T000000Z/job"
+        there, a meta.json that is a link leading nowhere, or a folder named as a log."""
+        run = self.RUN
         for name in ("build-log.txt", "build-log.txt.gz", "podinfo.json", "build-log.txt.000", "build-log.txt.gz.001",
                      "podinfo.json.002", ".podinfo.json.x1y2.part", ".part"):  # (all a download writes)
             self.write(f"{run}/2110000000000000001/{name}", b"a download cut off")
@@ -1874,12 +1887,34 @@ class CommitStepAndLinks(unittest.TestCase):
         self.write(f"{run}/2110000000000000002/notes.txt", b"a person's")
         self.write(f"{run}/2110000000000000003/build-log.txt", b"a log")
         os.symlink(os.path.join(self.tmp, "nowhere"), os.path.join(self.repo, run, "2110000000000000003", "meta.json"))
-        done = self.commit()
-        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.write(f"{run}/2110000000000000004/build-log.txt/notes.txt", b"a person's")
+        self.committed()
         self.assertFalse(os.path.lexists(os.path.join(self.repo, run, "2110000000000000001")))
         self.assertTrue(os.path.exists(os.path.join(self.repo, run, "2110000000000000002", "notes.txt")))  # fails: removed
         self.assertTrue(os.path.islink(os.path.join(self.repo, run, "2110000000000000003", "meta.json")))  # fails: removed
+        named = os.path.join(self.repo, run, "2110000000000000004", "build-log.txt")
+        self.assertTrue(os.path.exists(os.path.join(named, "notes.txt")))  # fails: removed
 
+    def test_only_the_folders_of_runs_are_cleaned(self):
+        """The fetch reads only run folders (run_dirs), and leaves alone a build folder elsewhere, as in a
+        hidden copy of a run's folder or one not named as a run's. 6c4dc03 removed those, if a download
+        could have written all they hold (the glob before it passed over hidden names)."""
+        elsewhere = ("archive/runs/2026-10/.2026-10-15T000000Z/job/2110000000000000001",
+                     "archive/runs/2026-10/notes/job/2110000000000000001")
+        for rel in elsewhere:
+            self.write(f"{rel}/build-log.txt", b"a log")
+        self.committed()
+        for rel in elsewhere:
+            self.assertTrue(os.path.exists(os.path.join(self.repo, rel, "build-log.txt")), rel)  # fails: removed
+
+    def test_when_the_archive_is_locked_it_commits_and_warns(self):
+        """(a fetch still holding the archive's lock: the next run removes what it left)"""
+        lock = frl.lock_archive(os.path.join(self.repo, "archive"))
+        self.addCleanup(lock.close)
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertIn("::warning::Could not remove what cut-off downloads left", done.stdout)
+        self.assertTrue(os.path.exists(os.path.join(self.repo, self.RUN, "2110000000000000009", "build-log.txt")))
 
 if __name__ == "__main__":
     unittest.main()

@@ -545,7 +545,8 @@ class CommitStep(unittest.TestCase):
         self.assertEqual(self.pushed()[f"{NEW}/build-log.txt.gz"], LIMIT)
 
     def test_control_a_build_folder_without_meta_json_is_left_out(self):
-        # (a download cut off part-way: removed first, so its size stops nothing)
+        # (a download cut off part-way: removed first, by the fetch's rule, so its size stops nothing)
+        os.symlink(HERE, os.path.join(self.repo, "tool"))  # (the tool installed, as when a fetch ran)
         cut = NEW[:-1] + "1"
         self.write(f"{cut}/build-log.txt.gz", size=LIMIT + 1)
         self.write(f"{NEW}/build-log.txt.gz", b"a new log")

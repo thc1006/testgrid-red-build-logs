@@ -4485,6 +4485,9 @@ def main(argv=None):
     p.add_argument("--show-verifications", action="store_true",
                    help="only put each run's verification, as its verification.json records it, in INDEX.md's table "
                         "of runs (the workflow does this once the run is verified)")
+    p.add_argument("--clean-partial", action="store_true",
+                   help="only remove what cut-off downloads left, as a run does (the workflow does this before it "
+                        "commits, for a fetch killed before it could)")
     p.add_argument("--testgrid", default=TESTGRID)
     p.add_argument("--gcs", default=GCS)
     args = p.parse_args(argv)
@@ -4492,13 +4495,19 @@ def main(argv=None):
     run_start = time.time()
     tool_version()  # (asked once, now: the run's report gives it)
     root = args.archive
-    if args.show_verifications:
+    if args.show_verifications or args.clean_partial:
         lock = lock_archive(root)
         if lock is None:
             print(f"ERROR another run holds {os.path.join(root, '.lock')}", file=sys.stderr)
             return 2
         with lock:
-            print(f"INDEX.md: {show_verifications(root)} rows of runs show their verification anew")
+            if args.show_verifications:
+                print(f"INDEX.md: {show_verifications(root)} rows of runs show their verification anew")
+            if args.clean_partial:
+                warnings = []
+                clean_partial_builds(root, warnings)
+                for w in warnings:
+                    print("WARNING", w, file=sys.stderr)
         return 0
     lock = None
     if not args.list_only:
