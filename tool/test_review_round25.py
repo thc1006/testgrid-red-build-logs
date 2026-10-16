@@ -529,6 +529,53 @@ class LackingRecordAndLaterConfigs(ttc.ConfigWorld):
         self.assertEqual(self.judged(*self.later())["outcomes"], {"held": [f"job/{self.b2}"]})  # fails: {}
 
 
+class LackingRecordWhileAnUploadRan(ttc.ConfigWorld):
+    """C1 (30 days ago) shows every row, C2 (2 days ago) has no t, and C3 has t, hiding the rows a
+    build made 10 h ago is red on: C3's run of the upload job began 70 minutes ago and ended 40
+    minutes ago. A lacking_tabs record says a run saw TestGrid list t while C2 was the latest
+    config known."""
+
+    def history(self, *configs):
+        """As ConfigOverTime.history, each config (started, finished, dashboards)."""
+        runs, built = [], {}
+        for i, (started, finished, dashboards) in enumerate(configs):
+            commit = f"{i + 1:040x}"
+            runs.append({"build": str(snowflake(started)), "commit": commit, "started": int(started),
+                         "finished": int(finished)})
+            built[commit] = ({f"{d}#{t}": e for d, tabs in dashboards.items() for t, e in tabs.items()},
+                             {"test_infra": commit})
+        h = frl.ConfigHistory()
+        h.merge(tch.loaded(runs, built))
+        uploads, entries = h.encode()
+        frl.write_json(os.path.join(self.root, "state.json"),
+                       dict(self.state(), config_uploads=uploads, config_entries=entries))
+        return ttc.write_config(os.path.join(self.dir, "now.json"), [runs[-1]], {
+            runs[-1]["commit"]: {"committed": runs[-1]["started"] - 60, "image": "img", "dashboards": configs[-1][2]}})
+
+    def judged(self, ago):
+        b2 = str(snowflake(self.now - 10 * HOUR))
+        self.failed_in_gcs(b2, 10 * HOUR)
+        self.junit(b2, RED_ON_TEST)
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}},
+                       lacking_tabs={"dash#t": self.now - ago})
+        self.fetch_with(self.history(
+            (self.now - 30 * DAY - 5, self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
+            (self.now - 2 * DAY - 5, self.now - 2 * DAY, {"dash": {"other": ttc.entry("")}}),
+            (self.now - 70 * 60, self.now - 40 * 60, {"dash": {"t": ttc.entry(self.HIDE), "other": ttc.entry("")}})))
+        return self.runs()[-1]["outcomes"], f"job/{b2}"
+
+    def test_control_a_record_after_c3_was_uploaded(self):
+        outcomes, _ = self.judged(30 * 60)
+        self.assertEqual(outcomes, {})  # (TestGrid may have had C3 then, which has t: not red by it)
+
+    def test_a_record_while_c3_ran(self):
+        """C3's run had not uploaded it when the record was made: TestGrid did not have it, and
+        showed t under a config not known. C3 counted as t's last entry before the record, by its
+        run's start."""
+        outcomes, b2 = self.judged(60 * 60)
+        self.assertEqual(outcomes, {"held": [b2]})  # fails: {}
+
+
 # ------------------------------------------------------------------ INDEX.md shows the run's verification
 
 class VerificationInTheIndex(ArchiveWorld):
