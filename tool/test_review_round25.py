@@ -1695,6 +1695,7 @@ class ArchiveLinks(ArchiveWorld):
         before = sorted(os.listdir(target))
         code, out, err = self.list_only()
         self.assertEqual(code, 0)
+        self.assertIn(f"job {self.build}", out)  # (listed: a mutant that stopped here with 0 printed nothing)
         self.assertIn(f"runs/{month} is a link: the run folders in it are not read", err)
         self.assertEqual(sorted(os.listdir(target)), before)
 
@@ -1894,6 +1895,18 @@ class NamedAsADownload(ArchiveWorld):
         self.assertTrue(os.path.islink(os.path.join(self.folder, "build-log.txt")))  # fails: removed, with its folder
         self.assertIn("unexpected files ['build-log.txt']", self.unexpected())
 
+    def test_a_link_to_a_file_named_as_a_log_is_reported_not_removed(self):
+        """(a link that leads to a file: one leading nowhere is no file anyway)"""
+        outside = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, outside)
+        with open(os.path.join(outside, "log"), "w") as f:
+            f.write("outside\n")
+        os.makedirs(self.folder)
+        os.symlink(os.path.join(outside, "log"), os.path.join(self.folder, "build-log.txt"))
+        self.assertEqual(self.fetch(), 0)
+        self.assertTrue(os.path.islink(os.path.join(self.folder, "build-log.txt")))
+        self.assertIn("unexpected files ['build-log.txt']", self.unexpected())
+
     def test_a_build_folder_whose_meta_json_is_a_link_is_left_alone(self):
         """clean_partial_builds read a meta.json through its link, and removed the files it does not list:
         one that says the build has no log made it remove the build's own log."""
@@ -1970,6 +1983,8 @@ class NamedAsADownload(ArchiveWorld):
 
 # ------------------------------------------------------------------ the workflow's commit step and the archive's links
 
+@unittest.skipUnless(os.path.exists(os.path.join(HERE, ".venv", "bin", "python")),
+                     "the commit step runs tool/.venv/bin/python, and there is none (uv run makes it)")
 class CommitStepAndLinks(unittest.TestCase):
     """The archive job's commit step, run as GitHub runs it (see test_review_round24.CommitStep), with
     the tool installed: it removes what cut-off downloads left by the fetch's own rule. A download cut
