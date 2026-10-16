@@ -1461,6 +1461,24 @@ class ArchiveLinks(ArchiveWorld):
         self.assertNotIn("OUTSIDESTATE", self.index())  # fails: the build only the outside state names, listed
         self.assertIn("state.json is a link; starting without it", run["serious_warnings"])
 
+    def test_no_step_reads_a_state_json_that_is_a_link(self):
+        """The fetch did not read a state.json that is a link (14b088c), but the step before it
+        (testgrid_config.sh's plan of the upload job's runs to list) and cross_check.py did: the
+        fetch then judged by no config history, and warned that the upload job had not run."""
+        import testgrid_config as tgc
+        state = frl.read_json(os.path.join(self.root, "state.json"))
+        state["watch"] = {"job/1": {"marker": "OUTSIDE"}}
+        frl.write_json(os.path.join(self.elsewhere, "state.json"), state)
+        link = os.path.join(self.root, "state.json")
+        os.remove(link)
+        os.symlink(os.path.join(self.elsewhere, "state.json"), link)
+        planned = []
+        with mock.patch.object(tgc, "plan", lambda state, now: planned.append(state) or {}), \
+                contextlib.redirect_stdout(io.StringIO()):
+            tgc.main(["uploads", "--state", link])
+        self.assertEqual(planned, [{}])  # fails: the state the link leads to
+        self.assertNotIn("1 watched", self.check()[1])
+
     def test_a_weeks_or_charts_folder_that_is_a_link(self):
         """The week pages and the charts were written into the folder the link led to, and an older
         week page there was removed."""
