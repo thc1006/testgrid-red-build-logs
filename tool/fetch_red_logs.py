@@ -3311,7 +3311,9 @@ def gcs_sevenths(root, t0):
     day = int(t0 // 86400)
     earlier, after, first = False, None, day - 6  # (after: the day of the earliest run not done since)
     for rel in reversed(run_dirs(root)):
-        started = run_started(os.path.join(root, rel, "run.json"))
+        report = os.path.join(root, rel, "run.json")
+        # (a run killed before it wrote its report, by a step's timeout say, by when its folder was made)
+        started = run_started(report) if os.path.lexists(report) else folder_time(rel.rsplit("/", 1)[1])
         if started is None or started >= t0:
             continue
         earlier = True
