@@ -4002,6 +4002,20 @@ def remove_build(target):
     remove_if_empty(os.path.dirname(target))
 
 
+def linking(root, keys):
+    """The run folders whose README.md links the folder of a build of `keys` ("job/build")."""
+    out = set()
+    for rel in run_dirs(root) if keys else ():
+        try:
+            with open(os.path.join(root, rel, "README.md"), encoding="utf-8") as f:
+                text = f.read()
+        except (OSError, UnicodeDecodeError):
+            continue
+        if any(f"/{key}/" in text for key in keys):
+            out.add(rel)
+    return out
+
+
 def load_state(root, warnings):
     try:
         state = read_json(os.path.join(root, "state.json"))
@@ -4465,10 +4479,9 @@ def run(args, root, run_start, pool, deadline):
         state[name] = {k: v for k, v in state[name].items() if k not in excluded}
     known, duplicates = archived_builds(root)
     # builds taken out for good (excluded.json): their folders go, and they are never fetched again
-    taken_out, take_out_errors, taken_from = sorted(k for k in excluded if k in known), [], set()
+    taken_out, take_out_errors = sorted(k for k in excluded if k in known), []
     for key in taken_out:
         rel = known.pop(key)
-        taken_from.add(rel.rsplit("/", 2)[0])  # (the run folder that held it: its README lists it)
         if not args.list_only:
             try:
                 remove_build(os.path.join(root, rel))
@@ -5166,8 +5179,9 @@ def run(args, root, run_start, pool, deadline):
     write_json(run_json, final)
     if entries is not None:
         write_run_readme(root, run_rel, final, entries)
-        # (an older run folder a build was taken out of lists it no more: write_index rewrites recent ones only)
-        for rel in sorted(taken_from - {run_rel}):
+        # (an older run folder's README links a build taken out no more: write_index rewrites recent ones
+        # only, and the run that took it out may have been cut off before this, or a person removed it)
+        for rel in sorted(linking(root, excluded) - {run_rel}):
             try:
                 run = read_json(os.path.join(root, rel, "run.json"))
             except (ValueError, OSError):
