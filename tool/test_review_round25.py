@@ -1935,6 +1935,30 @@ class NamedAsADownload(ArchiveWorld):
         self.fetch()  # (and the run goes on)
         self.assertTrue(os.path.exists(os.path.join(self.bdir(), "build-log.txt")))
 
+    def main(self, *args):
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            return frl.main(list(args))
+
+    def test_clean_partial_removes_temp_files_as_a_run_does(self):
+        """(--clean-partial left the temp files a killed run leaves, which a run removes at its start)"""
+        temp = os.path.join(self.root, ".state.json.a1b2c3.part")
+        with open(temp, "w") as f:
+            f.write("cut off\\n")
+        self.assertEqual(self.main("--archive", self.root, "--clean-partial"), 0)
+        self.assertFalse(os.path.exists(temp))  # fails: still there
+
+    def test_no_archive_is_made_to_clean_or_show_verifications_in(self):
+        missing = os.path.join(self.root, "no-archive")
+        for flag in ("--clean-partial", "--show-verifications"):
+            self.assertEqual(self.main("--archive", missing, flag), 1, flag)  # fails: 0
+            self.assertFalse(os.path.exists(missing), flag)  # (lock_archive made it, with its .lock)
+
+    def test_clean_partial_is_not_taken_with_list_only(self):
+        """(--list-only fetches and writes nothing, but with --clean-partial the cleanup ran)"""
+        with self.assertRaises(SystemExit) as raised:
+            self.main("--archive", self.root, "--clean-partial", "--list-only")  # fails: returned 0
+        self.assertEqual(raised.exception.code, 2)
+
     def test_control_what_a_download_left_is_removed(self):
         os.makedirs(self.folder)
         for name in ("build-log.txt", ".build-log.txt.x1y2.part"):
