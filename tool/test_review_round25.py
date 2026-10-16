@@ -1,6 +1,7 @@
 """Review of 2026-10-16: an outside review of 4ace4f3, and what testing it found. Each test
-fails on 4ace4f3 for the reason its docstring gives; a test named test_control_* passes there
-and shows the scenario works otherwise.
+fails, for the reason its docstring gives, on the code before the fix it tests (4ace4f3 for the
+first ones); a test named test_control_* passes there and shows the scenario works otherwise.
+Those marked "(kills a mutant)" pin what a fix does, where mutation testing found it untested.
 
 Run: cd tool && uv run --frozen python -m unittest test_review_round25 -v
 """
@@ -24,6 +25,7 @@ import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 import test_config_history as tch  # noqa: E402  (module imports: their tests are not collected here)
 import test_testgrid_config as ttc  # noqa: E402
+from test_fetch_red_logs import send  # noqa: E402
 from test_fetch_red_logs import table as fetch_table  # noqa: E402
 from test_integrity import DAY, HOUR, ArchiveWorld, obj, snowflake  # noqa: E402
 
@@ -164,6 +166,30 @@ class SeventhsOfRunsNotDone(unittest.TestCase):
         for i, outcome in enumerate(("timed out", "interrupted", "stopped", "incomplete", None)):
             self.run_at(6 + i, verified=outcome, differ=None)
         self.assertEqual(self.sevenths(30), self.days(0, 1))  # fails: {DAY + 1} only
+
+    def test_none_done_by_files_that_do_not_say_so(self):  # (kills a mutant)
+        # (a run.json from before "gcs_compared", a "differ" that is not a count, a verification.json that is a link)
+        ok = {"outcome": "ok", "scope": {"sevenths": [], "differ": 0}}
+
+        def no_gcs_compared(rel):
+            run = frl.read_json(os.path.join(self.root, rel, "run.json"))
+            frl.write_json(os.path.join(self.root, rel, "run.json"), {k: v for k, v in run.items() if k != "gcs_compared"})
+
+        def a_link(rel):
+            path = os.path.join(self.root, rel, "verification.json")
+            os.remove(path)
+            frl.write_json(os.path.join(self.root, "elsewhere.json"), ok)
+            os.symlink(os.path.join(self.root, "elsewhere.json"), path)
+        for name, differ, damage in (("no gcs_compared", 0, no_gcs_compared), ("differ false", False, None),
+                                     ("differ 0.0", 0.0, None), ("a link", 0, a_link)):
+            with self.subTest(name):
+                self.root = tempfile.mkdtemp()
+                self.addCleanup(shutil.rmtree, self.root)
+                self.run_at(-18)
+                self.run_at(6, differ=differ)
+                if damage:
+                    damage(frl.run_dirs(self.root)[-1])
+                self.assertEqual(self.sevenths(30), self.days(0, 1))
 
     def test_a_problem_of_another_kind_leaves_nothing_to_compare_again(self):
         """A run whose verification compared its sevenths, finding none differing, but found a
@@ -354,6 +380,15 @@ class PendingRanges(ttc.ConfigWorld):
         self.assertEqual(sum("seen not red by the scan" in w for w in run["serious_warnings"]), 0)
         self.assertNotIn("changed_pending", self.state()["tabs"]["dash#t"])
 
+    def test_one_the_next_run_derives_again_is_not_warned_of_yet(self):  # (kills a mutant)
+        # (a gap search that failed keeps the tab's last scan: the next run derives the range from it again)
+        s0 = self.now - 15 * DAY
+        self.put_state(tabs={"dash#t": {"scan": s0, "oldest": s0 - DAY}})
+        self.listing_fails()
+        run = self.judged((self.now - 40 * DAY, self.tab(ttc.entry(self.HIDE))), (s0 + HOUR, None))
+        self.assertIn("looking them up in GCS failed", " ".join(run["warnings"]))
+        self.assertFalse(any(f"seen not red by the scan of {frl.iso(s0)}" in w for w in run["warnings"]))
+
     def test_so_is_the_unsearched_part_of_a_tab_forgotten(self):
         """run() forgot a tab unlisted for 30 days with the older part of its history gap still to
         search, and said nothing of it (a tab not listed is not read, so it is never searched)."""
@@ -441,6 +476,40 @@ class LackingThenUnlisted(ttc.ConfigWorld):
         self.assertNotIn("lacking_tabs", self.state())
         self.unlist()
         self.assertEqual(self.judged(*configs)["outcomes"], {"not-red": [f"job/{self.b2}"]})
+
+    def test_still_held_days_later(self):  # (kills a mutant)
+        self.unlist()
+        real = time.time
+        with mock.patch("time.time", lambda: real() + 2 * DAY):
+            self.assertEqual(self.judged(*self.configs)["outcomes"], {"held": [f"job/{self.b2}"]})
+
+    def test_a_record_is_kept_a_day_past_the_longest_hold(self):  # (kills a mutant)
+        # (a build made up to a day after the record may still be held for it, HELD_DAYS after it was made)
+        self.unlist()
+        for days, kept in ((60.5, True), (61.5, False)):
+            self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}},
+                           lacking_tabs={"dash#t": self.now - days * DAY})
+            self.judged(*self.configs)
+            self.assertEqual("dash#t" in self.state().get("lacking_tabs", {}), kept, days)
+
+    def test_a_config_just_uploaded_is_said_not_taken_yet(self):  # (kills a mutant)
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
+        run = self.judged((self.now - 30 * DAY, {"dash": {"t": ttc.entry(self.HIDE)}}),
+                          (self.now - 600, {"dash": {"other": ttc.entry("")}}))
+        self.assertIn("has no tab dash#t, which TestGrid may not have taken yet", " ".join(run["warnings"]))
+        self.assertFalse(any("lacks tabs TestGrid shows" in w for w in run["serious_warnings"]))
+
+    def test_so_is_one_uploaded_an_hour_ago(self):  # (kills a mutant)
+        # (past PICKUP; TestGrid's summary may list the tab an hour longer)
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
+        self.judged((self.now - 30 * DAY, {"dash": {"t": ttc.entry(self.HIDE)}}),
+                    (self.now - 3600, {"dash": {"other": ttc.entry("")}}))
+        self.assertNotIn("lacking_tabs", self.state())
+
+    def test_a_config_not_known_yet_does_not_explain_the_tab(self):  # (kills a mutant)
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
+        self.judged(*self.configs, (self.now - 600, None))
+        self.assertIn("dash#t", self.state().get("lacking_tabs", {}))
 
     def test_the_record_of_such_tabs(self):
         # (new: state.json keeps when TestGrid last listed each; a malformed record is dropped)
@@ -782,6 +851,14 @@ class TakenOut(ArchiveWorld):
         self.exclude(json.dumps({f"job/0{self.build}": {"reason": "it holds a token"}}))
         self.assertEqual(self.fetch(), 1)  # fails: 0, the build still archived
 
+    def test_a_list_that_is_a_link_stops_the_run(self):  # (kills a mutant)
+        elsewhere = os.path.join(self.root, "elsewhere.json")
+        with open(elsewhere, "w") as f:
+            json.dump({self.key: {"reason": "it holds a token"}}, f)
+        os.symlink(elsewhere, os.path.join(self.root, "excluded.json"))
+        self.assertEqual(self.fetch(), 1)
+        self.assertIsNotNone(self.bdir())
+
     def test_whatever_is_in_its_folder(self):
         for name in ("notes", "old"):  # (folders a person left there: the fetch writes none)
             os.mkdir(os.path.join(self.bdir(), name))
@@ -964,6 +1041,81 @@ class ATabTheConfigDropped(ttc.ConfigWorld):
                           (self.now - 3.5 * DAY, {"dash": {"other": other}}))
         self.assertEqual(run["outcomes"], {"not-red": [f"job/{b}"]})  # (t had no tab while it ran)
         self.assertEqual(run["serious_warnings"], [])  # fails: TestGrid's config was last read ...
+
+
+class TakenOutWhileRunning(ArchiveWorld):
+    """A build TestGrid shows running 10 h after it started, past its job's time: it is watched,
+    and judged from GCS once TestGrid no longer shows it."""
+
+    def setUp(self):
+        super().setUp()
+        self.b = snowflake(int(time.time()) - 10 * HOUR)
+        self.show([self.b], {"job.Overall": ([4], [""])}, start=int(time.time()) - 10 * HOUR)
+        self.srv.route(f"/bucket/logs/job/{self.b}/started.json", (200, {}, {"timestamp": int(time.time()) - 10 * HOUR}))
+
+    def watched(self):
+        return list(frl.read_json(os.path.join(self.root, "state.json"))["watch"])
+
+    def test_control_watched(self):
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.watched(), [f"job/{self.b}"])
+
+    def test_not_watched_once_taken_out(self):  # (kills a mutant)
+        with open(os.path.join(self.root, "excluded.json"), "w") as f:
+            json.dump({f"job/{self.b}": {"reason": "it holds a token"}}, f)
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.watched(), [])
+
+
+class TakenOutInAGap(ttc.ConfigWorld):
+    """A build red on a row the tab shows, in its history gap: taken from GCS. (The archive began
+    3 days ago, before it was made: cross_check.py judges it by TestGrid's rule too.)"""
+
+    def setUp(self):
+        super().setUp()
+        self.earlier_run(self.now - 3 * DAY)
+
+    def test_control_taken_from_gcs(self):
+        self.assertEqual(self.fetch_with(self.config("")), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"backfilled": [f"job/{self.b}"]})
+
+    def test_not_once_taken_out(self):  # (kills a mutant)
+        with open(os.path.join(self.root, "excluded.json"), "w") as f:
+            json.dump({f"job/{self.b}": {"reason": "it holds a token"}}, f)
+        self.fetch_with(self.config(""))
+        self.assertNotIn("backfilled", self.runs()[-1]["outcomes"])
+        code, out = self.check()  # (cross_check.py judges it by TestGrid's rule: red, but not missing)
+        self.assertEqual(code, 0, out)
+
+
+class NotDoneWithItsComparisons(ArchiveWorld):
+    """A red build archived 3 h after it finished: each run compares it with GCS."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * HOUR)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        self.assertIs(self.runs()[-1]["gcs_compared"], True)
+
+    def test_when_a_comparison_failed(self):  # (kills a mutant)
+        self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
+        self.assertEqual(self.fetch(), 1)
+        run = self.runs()[-1]
+        self.assertIn("comparing the archived copy with GCS failed", json.dumps(run["errors"]))
+        self.assertIs(run["gcs_compared"], False)
+
+    def test_when_the_deadline_came_during_the_scan(self):  # (kills a mutant)
+        def slow_summary(h):
+            time.sleep(1.5)
+            with contextlib.suppress(BrokenPipeError, ConnectionResetError):
+                send(h, 200, {}, json.dumps({"t": {"overall_status": "FAILING"}}).encode())
+        self.srv.route("/dash/summary", slow_summary)
+        self.fetch("--run-timeout-minutes", "0.01")
+        run = self.runs()[-1]
+        self.assertEqual(run["outcomes"], {"not-checked": [self.key]})
+        self.assertIs(run["gcs_compared"], False)
+        time.sleep(1.6)  # (the server's slow answer ends)
 
 
 if __name__ == "__main__":
