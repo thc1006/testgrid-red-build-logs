@@ -820,6 +820,33 @@ class VerificationInTheIndex(ArchiveWorld):
     def test_control_the_fetch_writes_pending(self):
         self.assertTrue(self.row().endswith(" | ok | pending |"), self.row())
 
+    def test_an_index_that_is_a_link_is_not_read(self):
+        """--show-verifications read an INDEX.md that is a link (one to /dev/zero made it read until
+        it ran out of memory), and wrote what it read there."""
+        self.assertEqual(self.verify(), 0)
+        elsewhere = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, elsewhere)
+        index = os.path.join(self.root, "INDEX.md")
+        shutil.move(index, os.path.join(elsewhere, "INDEX.md"))
+        os.symlink(os.path.join(elsewhere, "INDEX.md"), index)
+        self.assertEqual(self.show_verifications(), 0)
+        self.assertTrue(os.path.islink(index))  # fails: a file of what the link led to, its row of the run shown
+        self.assertEqual(self.fetch(), 0)
+        self.assertFalse(os.path.islink(index))  # (the next fetch writes INDEX.md)
+
+    def test_a_page_that_is_a_link_is_replaced_not_read(self):
+        """write_text read a page that is a link, to leave it as it was if it held the same text: a
+        README.md or INDEX.md that is a link to /dev/zero made every run read until it ran out of
+        memory."""
+        elsewhere = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, elsewhere)
+        readme = os.path.join(self.root, self.rel, "README.md")
+        shutil.copy(readme, os.path.join(elsewhere, "README.md"))
+        os.remove(readme)
+        os.symlink(os.path.join(elsewhere, "README.md"), readme)
+        self.assertEqual(self.fetch(), 0)  # (its README is written again: the same text)
+        self.assertFalse(os.path.islink(readme))  # fails: the link, read through
+
     def test_the_verification_is_shown_before_the_commit(self):
         """The workflow committed INDEX.md as the fetch wrote it: its row of the run said pending
         whatever the verification recorded (fetch_red_logs.py:3665, run_rows), until the next run's

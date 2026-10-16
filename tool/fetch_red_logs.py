@@ -3675,11 +3675,13 @@ def short(d):
 
 
 def write_text(path, text):
-    """Write path atomically, leaving it untouched when the content is the same."""
+    """Write path atomically, leaving it untouched when the content is the same (a link there is
+    replaced, not read: a link in the archive is never followed)."""
     try:
-        with open(path, encoding="utf-8") as f:
-            if f.read() == text:
-                return
+        if not os.path.islink(path):
+            with open(path, encoding="utf-8") as f:
+                if f.read() == text:
+                    return
     except (FileNotFoundError, UnicodeDecodeError):
         pass
     write_file(path, text)
@@ -3761,6 +3763,8 @@ def show_verifications(root):
     runs (the fetch writes the table before the run it makes is verified: "pending"), and change
     nothing else. Returns how many rows changed."""
     path = os.path.join(root, "INDEX.md")
+    if os.path.islink(path):  # (a link in the archive is never followed: the next fetch writes INDEX.md)
+        return 0
     try:
         with open(path, encoding="utf-8") as f:
             lines = f.read().split("\n")
