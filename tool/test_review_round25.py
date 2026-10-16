@@ -1951,7 +1951,7 @@ class CommitStepAndLinks(unittest.TestCase):
     the tool installed: it removes what cut-off downloads left by the fetch's own rule. A download cut
     off in a run's folder is there too, which the step removes."""
 
-    git, write, commit = r24.CommitStep.git, r24.CommitStep.write, r24.CommitStep.commit
+    git, write, commit, pushed = r24.CommitStep.git, r24.CommitStep.write, r24.CommitStep.commit, r24.CommitStep.pushed
     RUN = "archive/runs/2026-10/2026-10-15T000000Z/job"
 
     def setUp(self):
@@ -2010,12 +2010,32 @@ class CommitStepAndLinks(unittest.TestCase):
 
     def test_when_the_archive_is_locked_it_commits_and_warns(self):
         """(a fetch still holding the archive's lock: the next run removes what it left)"""
+        self.write(f"{r24.NEW}/build-log.txt.gz", b"a new log")
+        self.write(f"{r24.NEW}/meta.json", b'{"log": "new"}\n')
         lock = frl.lock_archive(os.path.join(self.repo, "archive"))
         self.addCleanup(lock.close)
         done = self.commit()
         self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
-        self.assertIn("::warning::Could not remove what cut-off downloads left", done.stdout)
+        self.assertIn("::warning::Could not remove what cut-off downloads left: the next run removes it.", done.stdout)
         self.assertTrue(os.path.exists(os.path.join(self.repo, self.RUN, "2110000000000000009", "build-log.txt")))
+        self.assertIn(f"{r24.NEW}/meta.json", self.pushed())  # (the rest is committed)
+
+    def test_the_cleanup_runs_without_the_token(self):
+        """(the push needs GITHUB_TOKEN, the tool's code does not: c6cd6d9 ran it with the token too)"""
+        fake = os.path.join(self.tmp, "fake-tool")
+        os.makedirs(os.path.join(fake, ".venv", "bin"))
+        python = os.path.join(fake, ".venv", "bin", "python")
+        with open(python, "w") as f:
+            f.write(f'#!/bin/sh\nenv > "{self.tmp}/the-cleanup-env"\n')
+        os.chmod(python, 0o755)
+        os.remove(os.path.join(self.repo, "tool"))
+        os.symlink(fake, os.path.join(self.repo, "tool"))
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        with open(os.path.join(self.tmp, "the-cleanup-env")) as f:
+            names = [line.split("=", 1)[0] for line in f.read().splitlines()]  # (no values in a failure's message)
+        self.assertNotIn("GITHUB_TOKEN", names)  # fails: there
+
 
 if __name__ == "__main__":
     unittest.main()
