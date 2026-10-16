@@ -1105,6 +1105,25 @@ class TakenOutOfAnOlderRun(ArchiveWorld):
         os.symlink(outside, readme)
         self.assertEqual(frl.linking(self.root, frozenset({self.key})), set())  # fails: the folder, by the file linked
 
+    def test_a_report_that_is_a_link_is_not_followed(self):
+        """A run folder's run.json that is a link was read through it, to write the folder's README
+        (and INDEX.md's table of runs, and the charts): for a recent folder by every run, for an
+        older one by the run taking a build of it out."""
+        for ago in (3.8 * DAY, 1 * DAY):
+            with self.subTest(ago=ago):
+                shutil.rmtree(self.root)
+                os.makedirs(self.root)
+                rel = self.archived(ago)
+                path = os.path.join(self.root, rel, "run.json")
+                elsewhere = tempfile.mkdtemp()
+                self.addCleanup(shutil.rmtree, elsewhere)
+                frl.write_json(os.path.join(elsewhere, "run.json"), dict(frl.read_json(path), red_builds_seen=4242))
+                os.remove(path)
+                os.symlink(os.path.join(elsewhere, "run.json"), path)
+                self.exclude()
+                self.assertEqual(self.fetch(), 0)
+                self.assertNotIn("4242", self.readme(rel))  # fails: 4242 red builds on TestGrid
+
     def test_its_runs_readme_lists_it_no_more(self):
         self.finished(ago=3.9 * DAY)
         self.srv.route(self.base + "/build-log.txt", obj(b"a log that must not stay public\n"))
