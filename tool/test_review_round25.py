@@ -8,6 +8,7 @@ Run: cd tool && uv run --frozen python -m unittest test_review_round25 -v
 import contextlib
 import io
 import json
+import math
 import os
 import shutil
 import sys
@@ -749,6 +750,19 @@ class LackingRecordWhileAnUploadRan(ttc.ConfigWorld):
         run's start."""
         outcomes, b2 = self.judged(60 * 60)
         self.assertEqual(outcomes, {"held": [b2]})  # fails: {}
+
+
+class UploadsThatOverlap(unittest.TestCase):
+    def test_an_era_ends_when_the_last_of_its_configs_is_replaced(self):
+        """ConfigHistory.eras: A1 (0 to 7200) and A2 (600 to 660) have entry A, B (3600 to 3605)
+        has B. A1's config may be in force until a run that began after it ended uploads, and none
+        did; the era of the two ended where A2 was replaced."""
+        h = frl.ConfigHistory()
+        h.runs = [dict(build=str(1000 + i), commit=f"{i:040x}", started=started, finished=finished, tabs=tabs,
+                       group_changes=None, listed=None, failed=None, recipe=None, built=None)
+                  for i, (started, finished, tabs) in enumerate([(0, 7200, {"d#t": "A"}), (600, 660, {"d#t": "A"}),
+                                                                 (3600, 3605, {"d#t": "B"})])]
+        self.assertEqual(h.eras("d#t")[1:], [(0, math.inf, "A"), (3600, math.inf, "B")])  # fails: (0, 5195, "A")
 
 
 class TwoUploadsInOneSecond(unittest.TestCase):
