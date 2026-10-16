@@ -425,5 +425,42 @@ class VerificationInTheIndex(ArchiveWorld):
         self.assertEqual(steps[show]["if"], "${{ !cancelled() }}")  # (after a failed or timed-out verification too)
 
 
+
+# ------------------------------------------------------------------ INDEX.md: what later runs still have to do
+
+class LeftForLater(ttc.ConfigWorld):
+    """A tab whose history gap reaches 40 days back (its older part is searched by the next runs),
+    with a range a scan saw 3 days ago kept for a config of the tab not known yet."""
+
+    history = tch.ConfigOverTime.history
+    judged = tch.ConfigOverTime.judged
+    tab = tch.ConfigOverTime.tab
+
+    def index(self):
+        with open(os.path.join(self.root, "INDEX.md")) as f:
+            return f.read()
+
+    def test_control_nothing_left(self):
+        self.judged((self.now - 60 * DAY, self.tab(ttc.entry(self.HIDE))))
+        self.assertNotIn("## Left for later runs", self.index())
+
+    def test_the_index_lists_what_later_runs_still_have_to_do(self):
+        """INDEX.md said nothing of either: they were only in state.json (and the run that found the
+        gap's older part warned of it)."""
+        pending = {"since": self.now - 3 * DAY, "lo": self.now - 9 * DAY, "hi": self.now - 8 * DAY}
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * DAY, "oldest": self.now - 45 * DAY,
+                                        "changed_pending": [pending]}})
+        run = self.judged((self.now - 60 * DAY, self.tab(ttc.entry(self.HIDE))), (self.now - 2 * DAY, None))
+        t = self.state()["tabs"]["dash#t"]
+        lo, hi = t["unsearched"]
+        self.assertEqual(run["left_for_later"], {"gap_parts": {"dash#t": [lo, hi]},  # fails: no left_for_later
+                                                 "config_ranges": {"dash#t": {"ranges": 1, "oldest_scan": pending["since"]}}})
+        self.assertIn("## Left for later runs\n\n"
+                      f"- dash#t: the older part of its history gap, from {frl.iso(lo)} to {frl.iso(hi)}, is searched "
+                      "in GCS by the next runs\n"
+                      f"- dash#t: 1 range of builds a scan saw, waiting for a config of the tab not known yet (the "
+                      f"oldest scan {frl.iso(pending['since'])}); each is dropped 14 days after its scan\n", self.index())
+
+
 if __name__ == "__main__":
     unittest.main()
