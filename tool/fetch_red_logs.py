@@ -4005,12 +4005,18 @@ def load_state(root, warnings):
                                          for k in ("committed", "uploaded"))):
         warnings.append("state.json: dropped a malformed testgrid_config record")
         read = None
+    # tabs TestGrid listed while the latest config known lacked them: when it last did (see run())
+    lacked = state.get("lacking_tabs")
+    if lacked is not None and not (isinstance(lacked, dict) and all(isinstance(k, str) and plausible_time(v, now)
+                                                                    for k, v in lacked.items())):
+        warnings.append("state.json: dropped a malformed lacking_tabs record")
+        lacked = None
     # Older archives also kept "no_log" here; the builds' own meta.json now says what to re-check.
     # (ConfigHistory checks the config history.)
     return {"tabs": tabs, "unresolved": entries("unresolved"), "given_up": entries("given_up"),
             "watch": entries("watch"), "tab_configs": configs, **({"testgrid_config": read} if read else {}),
             "config_uploads": state.get("config_uploads"), "config_entries": state.get("config_entries"),
-            "config_relist_after": state.get("config_relist_after")}
+            "config_relist_after": state.get("config_relist_after"), **({"lacking_tabs": lacked} if lacked else {})}
 
 
 def valid_rec(rec, now):
@@ -4446,11 +4452,15 @@ def run(args, root, run_start, pool, deadline):
     unread = {r["dashboard"] for r in reports} - summaries_ok
     shown = listed | {k for k, t in state["tabs"].items() if k.split("#", 1)[0] in unread and not t.get("missing_since")}
     lacking = sorted(k for k in shown if current is not None and k not in current)
+    # ... and one TestGrid listed so before: its config since its last entry is not known either, though
+    # TestGrid no longer lists it (it showed the tab then), for as long as a build held for it may wait
+    lacked = {k: t for k, t in (state.get("lacking_tabs") or {}).items() if run_start - t <= (HELD_DAYS + 1) * 86400}
+    lacked.update(dict.fromkeys(lacking, run_start))
     queries = {k: t["query"] for k, t in state["tabs"].items() if isinstance(t.get("query"), str)}
     queries.update((f"{r['dashboard']}#{r['tab']}", r["query"]) for r in reports
                    if r.get("tab") is not None and not r.get("error") and r.get("query"))
     for key, got in history_rules(history, sorted({k for r in history.runs if r["tabs"] for k in r["tabs"]} | set(tab_rules)),
-                                  run_start, lacking, queries, era_rule).items():
+                                  run_start, sorted(lacked), queries, era_rule).items():
         tab_rules[key] = dict(tab_rules.get(key, {}), **got)
     previous_read = state.get("testgrid_config") or {}
     source = config_source or previous_read.get("source") or {}
@@ -4976,6 +4986,7 @@ def run(args, root, run_start, pool, deadline):
     write_json(os.path.join(root, "state.json"),
                {"tabs": tab_scans, "unresolved": unresolved, "given_up": given_up, "watch": watch,
                 "tab_configs": tab_configs, **({"testgrid_config": config_record} if config_record else {}),
+                **({"lacking_tabs": lacked} if lacked else {}),
                 **({"config_uploads": uploads, "config_entries": entries} if uploads else {}),
                 **({"config_relist_after": history.relist_after} if history.relist_after is not None else {})})
     write_json(run_json, dict(report_, errors=errors + [{"build": None, "error": "the run stopped before it finished"}]))

@@ -21,6 +21,7 @@ import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 import test_config_history as tch  # noqa: E402  (module imports: their tests are not collected here)
 import test_testgrid_config as ttc  # noqa: E402
+from test_fetch_red_logs import table as fetch_table  # noqa: E402
 from test_integrity import DAY, HOUR, ArchiveWorld, obj, snowflake  # noqa: E402
 
 
@@ -301,6 +302,62 @@ class PendingRanges(ttc.ConfigWorld):
                       f"red by the scan of {frl.iso(s0)}, cannot be judged from GCS: the tab is no longer listed, and is "
                       "forgotten; no longer judged, though TestGrid may have shown them red",
                       run["serious_warnings"])  # fails: not there
+
+
+# ------------------------------------------------------------------ a tab the config lacks, then no longer listed
+
+class LackingThenUnlisted(ttc.ConfigWorld):
+    """TestGrid lists tab t; the latest config the archive knows (20 h ago) has no t. A build made
+    10 h ago, red on t's rows, is in t's history gap: its config then is not known, so it is held.
+    Then TestGrid stops listing t."""
+
+    history = tch.ConfigOverTime.history
+    judged = tch.ConfigOverTime.judged
+    tab = tch.ConfigOverTime.tab
+
+    def setUp(self):
+        super().setUp()
+        self.made = self.now - 10 * HOUR
+        self.b2 = str(snowflake(self.made))
+        self.failed_in_gcs(self.b2, 10 * HOUR)
+        self.junit(self.b2, RED_ON_TEST)
+        self.configs = [(self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
+                        (self.now - 20 * HOUR, {"dash": {"other": ttc.entry("")}})]
+        self.assertEqual(self.judged(*self.configs)["outcomes"], {"held": [f"job/{self.b2}"]})
+
+    def unlist(self):
+        self.srv.summary("dash", {"other": "PASSING"})
+        self.srv.table("dash", "other", fetch_table("bucket/logs/otherjob", [], {}))
+
+    def test_control_held_while_listed(self):
+        self.assertEqual(self.judged(*self.configs)["outcomes"], {"held": [f"job/{self.b2}"]})
+
+    def test_still_held_once_unlisted(self):
+        """history_rules took t's config since its last entry as not known only while TestGrid
+        listed t ("lacking", fetch_red_logs.py:4401): once it no longer did, the build was judged
+        as if t had been gone since that entry, not red, though run 1 saw TestGrid list t after the
+        build was made."""
+        self.unlist()
+        run = self.judged(*self.configs)
+        self.assertEqual(run["outcomes"], {"held": [f"job/{self.b2}"]})  # fails: {'not-red': [...]}
+        self.assertEqual(list(self.state()["watch"]), [f"job/{self.b2}"])
+
+    def test_judged_once_a_config_with_the_tab_is_known(self):
+        self.unlist()
+        self.judged(*self.configs)
+        # (the run of the upload job 20 h ago, built at last, kept t: TestGrid showed the build red there)
+        built = [self.configs[0], (self.now - 20 * HOUR, {"dash": {"t": ttc.entry(""), "other": ttc.entry("")}})]
+        self.assertEqual(self.judged(*built)["outcomes"], {"backfilled": [f"job/{self.b2}"]})  # fails: {}
+
+
+    def test_the_record_of_such_tabs(self):
+        # (new: state.json keeps when TestGrid last listed each; a malformed record is dropped)
+        self.assertEqual(set(self.state()["lacking_tabs"]), {"dash#t"})  # fails: no lacking_tabs
+        warnings = []
+        for bad in ([], {"dash#t": "yesterday"}, {"dash#t": -1.0}):
+            frl.write_json(os.path.join(self.root, "state.json"), dict(self.state(), lacking_tabs=bad))
+            self.assertNotIn("lacking_tabs", frl.load_state(self.root, warnings))
+        self.assertEqual(warnings, ["state.json: dropped a malformed lacking_tabs record"] * 3)
 
 
 if __name__ == "__main__":
