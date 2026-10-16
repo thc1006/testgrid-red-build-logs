@@ -1562,6 +1562,25 @@ class ArchiveLinks(ArchiveWorld):
                 os.remove(os.path.join(self.root, path))
                 shutil.move(target, os.path.join(self.root, path))
 
+    def test_so_does_a_file_in_place_of_either(self):
+        """(NotADirectoryError or FileExistsError stopped it, with no word of why)"""
+        month = time.strftime("%Y-%m", time.gmtime())
+        for path in ("runs", f"runs/{month}"):
+            with self.subTest(path):
+                target = os.path.join(self.elsewhere, path.replace("/", "-"))
+                shutil.move(os.path.join(self.root, path), target)
+                with open(os.path.join(self.root, path), "w") as f:
+                    f.write("a file\n")
+                err = io.StringIO()
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+                    code = frl.main(["--archive", self.root, "--dashboard", "dash", "--testgrid", self.srv.url,
+                                     "--gcs", self.srv.url])
+                self.assertEqual(code, 1)  # fails: raised
+                self.assertIn(f"{os.path.join(self.root, path)} is not a folder: no run goes on until it is fixed",
+                              err.getvalue())
+                os.remove(os.path.join(self.root, path))
+                shutil.move(target, os.path.join(self.root, path))
+
     def old_layout(self, archived_by_run=None):
         """A build of the old layout (logs/job/<build>/) and its run's report runs/<id>.json, from
         2026-09-20, archived by that run, or naming its new folder (archived_by_run) as a migration
