@@ -2047,6 +2047,20 @@ class NamedAsADownload(ArchiveWorld):
             self.assertEqual(self.main("--archive", missing, flag), 1, flag)  # fails: 0
             self.assertFalse(os.path.exists(missing), flag)  # (lock_archive made it, with its .lock)
 
+    def test_nor_does_a_run_go_where_a_file_is(self):
+        """(a run, or --list-only, given a file or a link leading nowhere as --archive raised
+        FileExistsError or NotADirectoryError)"""
+        a_file, dangling = os.path.join(self.root, "a-file"), os.path.join(self.root, "dangling")
+        with open(a_file, "w") as f:
+            f.write("a file\n")
+        os.symlink(os.path.join(self.root, "nowhere"), dangling)
+        for path in (a_file, dangling):
+            for extra in ([], ["--list-only"]):
+                with self.subTest(path=os.path.basename(path), extra=extra):
+                    self.assertEqual(self.main("--archive", path, "--dashboard", "dash", "--testgrid", self.srv.url,
+                                               "--gcs", self.srv.url, *extra), 1)  # fails: raised (0 for the link, listed)
+        self.assertFalse(os.path.lexists(os.path.join(self.root, "nowhere")))
+
     def test_clean_partial_is_not_taken_with_list_only(self):
         """(--list-only fetches and writes nothing, but with --clean-partial the cleanup ran)"""
         with self.assertRaises(SystemExit) as raised:
