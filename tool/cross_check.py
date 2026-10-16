@@ -439,8 +439,9 @@ def inventory(archived, root):
             count("still compared with GCS on every run")
         if m.get("backfilled"):
             count("taken from GCS, judged by TestGrid's rule")
-    try:
-        state = frl.read_json(os.path.join(root, "state.json"))
+    try:  # (one that is a link is not read, as the fetch does not read it)
+        path = os.path.join(root, "state.json")
+        state = {} if os.path.islink(path) else frl.read_json(path)
     except (OSError, ValueError):
         state = {}
     for key, what in (("unresolved", "waiting to be archived"), ("given_up", "given up on"), ("watch", "watched")):
@@ -695,8 +696,9 @@ def check(args, problems, notes, record):
                 and created(b) >= archive_start and q not in unread and q in oldest_shown and created(b) < oldest_shown[q]]
 
     # ... and over time, as the archive learned it (its state.json: frl.ConfigHistory), as the fetch judges by it
-    try:
-        state = frl.read_json(os.path.join(root, "state.json"))
+    try:  # (one that is a link is not read, as the fetch does not read it)
+        path = os.path.join(root, "state.json")
+        state = {} if os.path.islink(path) else frl.read_json(path)
     except (OSError, ValueError):
         state = {}
     state = state if isinstance(state, dict) else {}

@@ -965,7 +965,8 @@ def main(argv=None):
     args = p.parse_args(argv)
     if args.cmd == "uploads":
         state = {}
-        if args.state and os.path.exists(args.state):
+        # (a state.json that is a link is not read, as the fetch does not read it)
+        if args.state and os.path.exists(args.state) and not os.path.islink(args.state):
             with open(args.state, encoding="utf-8") as f:
                 state = json.load(f)
         json.dump(plan(state, time.time()), sys.stdout, indent=1)
