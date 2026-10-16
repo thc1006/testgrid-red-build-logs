@@ -392,6 +392,18 @@ class LackingThenUnlisted(ttc.ConfigWorld):
         self.assertEqual(self.judged(*built)["outcomes"], {"backfilled": [f"job/{self.b2}"]})  # fails: {}
 
 
+    def test_control_a_config_just_uploaded_explains_the_tab(self):
+        # (TestGrid may not have taken the config that dropped t yet, an upload 10 minutes ago: it lists t
+        # under the config before, which hid the build's red row. Once it no longer lists t, the build is
+        # not red, and nothing waits for t: no 60-day hold, ended by a warning that a config is not known.)
+        configs = [(self.now - 30 * DAY, {"dash": {"t": ttc.entry(self.HIDE)}}),
+                   (self.now - 600, {"dash": {"other": ttc.entry("")}})]
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
+        self.assertEqual(self.judged(*configs)["outcomes"], {"held": [f"job/{self.b2}"]})
+        self.assertNotIn("lacking_tabs", self.state())
+        self.unlist()
+        self.assertEqual(self.judged(*configs)["outcomes"], {"not-red": [f"job/{self.b2}"]})
+
     def test_the_record_of_such_tabs(self):
         # (new: state.json keeps when TestGrid last listed each; a malformed record is dropped)
         self.assertEqual(set(self.state()["lacking_tabs"]), {"dash#t"})  # fails: no lacking_tabs

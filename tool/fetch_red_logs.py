@@ -4560,15 +4560,18 @@ def run(args, root, run_start, pool, deadline):
     unread = {r["dashboard"] for r in reports} - summaries_ok
     shown = listed | {k for k, t in state["tabs"].items() if k.split("#", 1)[0] in unread and not t.get("missing_since")}
     lacking = sorted(k for k in shown if current is not None and k not in current)
-    # ... and one TestGrid listed so before: its config since its last entry is not known either, though
-    # TestGrid no longer lists it (it showed the tab then), for as long as a build held for it may wait
+    # (a config uploaded this recently may not be TestGrid's yet: TestGrid then lists the tabs it dropped,
+    # under the configs before, as ConfigHistory.eras takes them)
+    fresh = bool(lacking) and current_run["finished"] is not None and run_start - current_run["finished"] <= PICKUP + 3600
+    # ... and one TestGrid listed so before, past that: its config since its last entry is not known either,
+    # though TestGrid no longer lists it (it showed the tab then), for as long as a build held for it may wait
     lacked = {k: t for k, t in (state.get("lacking_tabs") or {}).items() if run_start - t <= (HELD_DAYS + 1) * 86400}
-    lacked.update(dict.fromkeys(lacking, run_start))
+    lacked.update(dict.fromkeys([] if fresh else lacking, run_start))
     queries = {k: t["query"] for k, t in state["tabs"].items() if isinstance(t.get("query"), str)}
     queries.update((f"{r['dashboard']}#{r['tab']}", r["query"]) for r in reports
                    if r.get("tab") is not None and not r.get("error") and r.get("query"))
     for key, got in history_rules(history, sorted({k for r in history.runs if r["tabs"] for k in r["tabs"]} | set(tab_rules)),
-                                  run_start, sorted(lacked), queries, era_rule).items():
+                                  run_start, sorted(set(lacked) | set(lacking)), queries, era_rule).items():
         tab_rules[key] = dict(tab_rules.get(key, {}), **got)
     previous_read = state.get("testgrid_config") or {}
     source = config_source or previous_read.get("source") or {}
@@ -4577,7 +4580,6 @@ def run(args, root, run_start, pool, deadline):
     # of tabs TestGrid shows that the latest known one lacks)
     awaited = [r for r in later_unknown if run_start - first_listed(r) <= CONFIG_STALE_DAYS * 86400]
     if lacking:
-        fresh = current_run["finished"] is not None and run_start - current_run["finished"] <= PICKUP + 3600
         warnings.append(f"TestGrid's config ({about}) has no tab {', '.join(lacking[:3])}"
                         f"{', ...' if len(lacking) > 3 else ''}"
                         + (", which TestGrid may not have taken yet" if fresh else
