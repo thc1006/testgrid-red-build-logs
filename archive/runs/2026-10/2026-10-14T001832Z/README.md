@@ -3,7 +3,7 @@
 46 tabs read (0 failed), 450 red builds on TestGrid. This run archived 7 new builds.
 TestGrid's config: test-infra 528e0fbf0b38 of 2026-10-13T22:20:52Z, uploaded 2026-10-13T22:21:09Z, read by this run.
 
-[run.json](run.json) has the details; [INDEX.md](../../../INDEX.md) lists every build. A file marked provisional was taken before Prow finished uploading and is re-checked against GCS on every run until it settles.
+[run.json](run.json) has the details; [INDEX.md](../../../INDEX.md) lists the archived builds of the last 14 days, and links a page per week for older ones. A file marked provisional was taken before Prow finished uploading and is re-checked against GCS on every run until it settles.
 
 ## Builds archived by this run (7)
 

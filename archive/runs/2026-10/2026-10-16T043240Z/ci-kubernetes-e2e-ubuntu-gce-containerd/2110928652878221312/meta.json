@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2110928652878221312",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1792119585,
+  "created": 1792119584,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] Aggregator Should be able to support the 1.17 Sample API Server using the current Aggregator [LinuxOnly] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] listing flunders using dynamic client: the server is currentl...netes/test/e2e/apimachinery/aggregator.go:530 @ 10/16/26 03:17:46.241\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792121968,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312/build-log.txt",
+  "log": {
+    "bytes": 176860,
+    "md5": "4b7ffd12360030bdd7e25e6b9e9d27f2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24330,
+    "gcs": {
+      "generation": "1792121983301861",
+      "md5": "4b7ffd12360030bdd7e25e6b9e9d27f2",
+      "crc32c": "7e892ca0",
+      "bytes": 176860,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-16T043240Z",
+  "archived_at": 1792125160.0,
+  "settled": false,
+  "final": false
+}

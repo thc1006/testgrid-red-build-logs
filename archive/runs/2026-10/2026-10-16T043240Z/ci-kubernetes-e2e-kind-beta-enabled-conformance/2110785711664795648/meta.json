@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled-conformance",
+  "build": "2110785711664795648",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled-conformance",
+  "started": 1792085534,
+  "created": 1792085504,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pods Extended (pod generation) Pod Generation pod generation should start at 1 and increment per update [MinimumKubeletVersion:1.34] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 20.001s.\nexpected pod generation to be 5, got...: k8s.io/kubernetes/test/e2e/node/pods.go:534 @ 10/15/26 17:38:45.233\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792086316,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled-conformance/2110785711664795648",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled-conformance/2110785711664795648/build-log.txt",
+  "log": {
+    "bytes": 110869,
+    "md5": "ae940b94b846ec00ad27e0b88197ece9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 18251,
+    "gcs": {
+      "generation": "1792086319123319",
+      "md5": "ae940b94b846ec00ad27e0b88197ece9",
+      "crc32c": "4a15fc85",
+      "bytes": 110869,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-16T043240Z",
+  "archived_at": 1792125160.0,
+  "settled": true,
+  "final": false
+}
