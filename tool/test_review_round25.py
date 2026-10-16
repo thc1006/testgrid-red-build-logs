@@ -2023,6 +2023,19 @@ class NamedAsADownload(ArchiveWorld):
             self.main("--archive", self.root, "--clean-partial", "--list-only")  # fails: returned 0
         self.assertEqual(raised.exception.code, 2)
 
+    def test_a_folder_named_as_no_download_names_one_is_left_alone(self):
+        """clean_partial_builds took any folder in a job's folder for a build's: a person's copy of one,
+        named as no download names one, was removed if it held only files a download writes."""
+        run = os.path.dirname(os.path.dirname(self.folder))
+        rels = ("job/2110000000000000007.bak", "job/copy of 2110000000000000007", ".job/2110000000000000007")
+        for rel in rels:
+            os.makedirs(os.path.join(run, rel))
+            with open(os.path.join(run, rel, "build-log.txt"), "w") as f:
+                f.write("a person's copy\n")
+        self.assertEqual(self.fetch(), 0)
+        for rel in rels:
+            self.assertTrue(os.path.exists(os.path.join(run, rel, "build-log.txt")), rel)  # fails: removed
+
     def test_control_what_a_download_left_is_removed(self):
         os.makedirs(self.folder)
         for name in ("build-log.txt", ".build-log.txt.x1y2.part"):
