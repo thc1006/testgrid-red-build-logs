@@ -78,9 +78,7 @@ from GCS.
   test group sets such an option now, the run fails rather than guess.
 - TestGrid can show a tab missing from the latest config the archive knows. A
   build TestGrid may have shown there after the tab's last config was replaced
-  waits as above. If TestGrid stops listing the tab first, the build is judged
-  as if the tab had been gone since then. So it is not red, though TestGrid may
-  have shown it red meanwhile.
+  waits as above, even once TestGrid stops listing the tab.
 - A build can scroll off after a run read its tab and saw it, not red. If the
   tab's config changed after the last such run, the build is judged from GCS.
   If a config the archive does not know yet was in force since, the build waits
