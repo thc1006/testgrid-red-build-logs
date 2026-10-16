@@ -139,7 +139,7 @@ UNLISTED_DAYS = 30  # forget a tab missing from its dashboard's summary after th
 SERIOUS = ("may be missing", "state.json", "no longer listed", "old layout",  # warnings that fail the run
            "cannot be judged from GCS", "TestGrid's config was last read", "TestGrid's config was never read",
            "the filters cannot be applied here", "does not match the tab", "still not known",
-           "lacks tabs TestGrid shows", "has not run since")
+           "lacks tabs TestGrid shows", "has not run since", "not compared with GCS before the run's deadline")
 CONFIG_STALE_DAYS = 3  # TestGrid's config not read for this long is a serious warning
 CONFIG_KEEP_DAYS = HELD_DAYS + 17  # TestGrid's config over time is kept this long (a held build's days of results)
 BACKFILL_SLACK_HOURS = 6  # a build may start this long after its ID was made
@@ -4055,6 +4055,16 @@ def add_sightings(target, rec, run_id):
     return "already-archived"
 
 
+def due_in_gcs(target, sampled):
+    """Whether an archived build is due to be compared with GCS (see recheck): until it is
+    final, or when it is in the run's sevenths (sampled)."""
+    try:
+        meta = read_json(os.path.join(target, "meta.json"))
+    except (ValueError, OSError):
+        return False  # (reported as unreadable by the index)
+    return isinstance(meta, dict) and (not meta.get("final") or sampled)
+
+
 def recheck_rec(meta, now, key):
     """The build record of an archived meta.json, so it can be re-checked after TestGrid drops
     it; None unless it is an archive record of the build `key` ("job/build") names."""
@@ -4758,6 +4768,7 @@ def run(args, root, run_start, pool, deadline):
         if key in mismatch_of:
             r["config_mismatch"] = mismatch_of[key]
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors), 0, {}, {}
+    uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
     # judged by the gap search just now and still running, overdue on TestGrid, or watched and still
     # shown by TestGrid: watched without a look now, for as long as a build is ever watched
     for w in running_gap + list(stalled.values()) + still_shown:
@@ -4791,6 +4802,8 @@ def run(args, root, run_start, pool, deadline):
             key = f"{b['job']}/{b['build']}"
             if key in known:
                 outcomes.setdefault("not-checked", []).append(key)
+                if due_in_gcs(os.path.join(root, known[key]), key in resampled):
+                    uncompared.append(key)
             elif b.get("watch"):
                 watch[key] = {"rec": b, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
             else:
@@ -4822,10 +4835,15 @@ def run(args, root, run_start, pool, deadline):
         try:
             if fut in not_done:
                 if archived_intact(target_of(b), deep=True):
-                    # Finished just as the run gave up, or already on disk; one
-                    # that is not final yet is compared with GCS next run, and a final
+                    # Finished just as the run gave up, or already on disk. One due to be
+                    # compared with GCS that this run did not update was not compared to the end
+                    # ("not-checked"): one that is not final yet is compared next run, and a final
                     # one by the next run that compares its seventh.
-                    outcomes.setdefault(add_sightings(target_of(b), b, run_id), []).append(key)
+                    outcome = add_sightings(target_of(b), b, run_id)
+                    if outcome == "already-archived" and due_in_gcs(target_of(b), key in resampled):
+                        outcome = "not-checked"
+                        uncompared.append(key)
+                    outcomes.setdefault(outcome, []).append(key)
                     continue
                 cause = "interrupted" if interrupted else "run timeout reached"
                 raise TimeoutError(f"{cause} before this build was done")
@@ -4866,6 +4884,11 @@ def run(args, root, run_start, pool, deadline):
     for names in outcomes.values():
         names.sort()
     errors.sort(key=lambda e: e["build"] or "")
+    if uncompared:
+        uncompared.sort()
+        warnings.append(f"{len(uncompared)} archived builds were not compared with GCS before the run's deadline "
+                        f"({', '.join(uncompared[:3])}{', ...' if len(uncompared) > 3 else ''}): those not final yet "
+                        "are compared next run, the final ones by the next run that compares their seventh")
     recs = {f"{b['job']}/{b['build']}": b for b in selected + retry + running_gap + list(stalled.values()) + still_shown}
     warnings += [f"{key}: still not decided {GIVE_UP_DAYS} days after it was made (not finished, or TestGrid still "
                  "shows it running, or it has no usable start time, so TestGrid never paints it red); no longer watched"
