@@ -5008,13 +5008,11 @@ def run(args, root, run_start, pool, deadline):
             r.update(config=tab_config[key], config_read=config_read.get(key))
         if key in mismatch_of:
             r["config_mismatch"] = mismatch_of[key]
-    # A report from the start, that the run stopped before it finished, as one killed before it writes
-    # its own leaves it (a step's timeout kills it at last): later runs see a run not done with its
-    # sevenths (see gcs_sevenths), and its folder stays, though what it fetches again is stored in older ones.
-    write_json(os.path.join(root, run_rel, "run.json"),
-               {"run": run_id, "dir": run_rel, "started": run_start, "tool": tool_version(), "github": github_run(),
-                "tabs": reports, "red_builds_seen": len(builds), "outcomes": {}, "warnings": list(warnings),
-                "errors": [{"build": None, "error": "the run stopped before it finished"}], "gcs_compared": False})
+    # A README from the start, that the run was cut off before it wrote its report, as one killed before
+    # it writes run.json leaves it (a step's timeout kills it at last): its folder stays, though what it
+    # fetches again is stored in older ones, and later runs see a run not done with its sevenths (see
+    # gcs_sevenths). The run writes it again once it has its report.
+    write_run_readme(root, run_rel, None, [])
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors) + take_out_errors, 0, {}, {}
     uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
     if taken_out or shown_out:  # (taken out of the archive now, or shown red by TestGrid and left out)
@@ -5227,6 +5225,9 @@ def run(args, root, run_start, pool, deadline):
         # only, and the run that took it out may have been cut off before this, or a person removed it)
         for rel in sorted(linking(root, excluded) - {run_rel}):
             write_run_readme(root, rel, read_report(root, rel), entries)
+    else:  # (not the README from the start, that says the run was cut off: the next run writes it)
+        with contextlib.suppress(OSError):
+            os.remove(os.path.join(root, run_rel, "README.md"))
 
     counts = [f"{k}={len(v)}" for k, v in sorted(outcomes.items())] + [f"errors={len(errors)}"]
     print(f"run {run_id}: {tabs_read_text(reports)}, {len(builds)} red builds on TestGrid, "

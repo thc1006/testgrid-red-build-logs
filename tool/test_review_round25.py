@@ -1245,23 +1245,32 @@ class NotDoneWithItsComparisons(ArchiveWorld):
         self.assertIn("comparing the archived copy with GCS failed", json.dumps(run["errors"]))
         self.assertIs(run["gcs_compared"], False)
 
-    def test_a_run_killed_during_its_downloads_leaves_a_report(self):
-        """A run wrote run.json once its downloads ended: one killed before (a step's timeout kills
-        it at last) left a folder without it, empty if all it fetched went to older folders, and
-        empty folders are removed. Later runs took no such run to have been, so not one that was not
-        done with its sevenths."""
+    def test_a_run_killed_during_its_downloads_leaves_its_folder(self):
+        """A run wrote nothing in its folder before its downloads ended, and what it fetches again
+        goes to older folders: one killed before (a step's timeout kills it at last) could leave an
+        empty folder, which the next run removed, and later runs took no such run to have been, not
+        one not done with its sevenths. Its report from the start (eb09be1) made the pages count no
+        build of it, and the charts count it as a run."""
         seen = []
         real = frl.archive
 
         def archive(*args, **kwargs):
-            seen.append(frl.read_json(os.path.join(self.root, frl.run_dirs(self.root)[-1], "run.json")))
+            folder = os.path.join(self.root, frl.run_dirs(self.root)[-1])
+            seen.append(sorted(os.listdir(folder)))
+            if os.path.exists(os.path.join(folder, "README.md")):
+                with open(os.path.join(folder, "README.md")) as f:
+                    seen.append(f.read())
             return real(*args, **kwargs)
         with mock.patch.object(frl, "archive", archive):
             self.assertEqual(self.fetch(), 0)
-        self.assertIsNotNone(seen[0])  # fails: None, no run.json yet
-        self.assertEqual((seen[0]["started"], seen[0]["gcs_compared"], seen[0]["errors"]),
-                         (self.runs()[-1]["started"], False,
-                          [{"build": None, "error": "the run stopped before it finished"}]))
+        self.assertEqual(seen[0], ["README.md"])  # fails: ["run.json"] (eb09be1; [] before)
+        self.assertIn("This run was cut off before it wrote its report.", seen[1])
+        # (a folder a run killed then leaves stays, and counts as a run not done)
+        killed = frl.new_run_dir(self.root, time.time() - 30)[1]
+        frl.write_run_readme(self.root, killed, None, [])
+        self.assertEqual(self.fetch(), 0)
+        self.assertIn(killed, frl.run_dirs(self.root))
+        self.assertFalse(frl.sevenths_done(self.root, killed))
 
     def test_when_the_deadline_came_during_the_scan(self):  # (kills a mutant)
         def slow_summary(h):
