@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2110947528802308096",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1792124085,
+  "created": 1792124085,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] AdmissionWebhook [Privileged:ClusterAdmin] should honor timeout [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Internal error occurred: failed calling webhook \"allow-config...bernetes/test/e2e/apimachinery/webhook.go:2570 @ 10/16/26 04:41:06.66\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792126418,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2110947528802308096",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2110947528802308096/build-log.txt",
+  "log": {
+    "bytes": 217335,
+    "md5": "8f729605e4dcae3ea54a949416cf0b00",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 30261,
+    "gcs": {
+      "generation": "1792126433880648",
+      "md5": "8f729605e4dcae3ea54a949416cf0b00",
+      "crc32c": "d9b5590e",
+      "bytes": 217335,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-16T164227Z",
+  "archived_at": 1792168947.0,
+  "settled": true,
+  "final": false
+}

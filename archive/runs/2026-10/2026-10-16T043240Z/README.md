@@ -11,7 +11,7 @@ TestGrid's config: test-infra f1b1ce3c6fb9 of 2026-10-15T22:06:09Z, uploaded 202
 
 | Time | Tab | Build | Red tests | Files |
 |---|---|---|---|---|
-| 02:59 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2110928652878221312](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312) | Kubernetes e2e suite.\[It\] \[sig-api-machinery\] Aggregator Should be able to support the 1.1 (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312/build-log.txt.gz) (provisional) |
+| 02:59 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2110928652878221312](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312) | Kubernetes e2e suite.\[It\] \[sig-api-machinery\] Aggregator Should be able to support the 1.1 (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312/build-log.txt.gz) |
 | 01:31 | blocking#gce-device-plugin-gpu-master | [ci-kubernetes-e2e-gce-device-plugin-gpu 2110906257270378496](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2110906257270378496) | Kubernetes e2e suite.\[It\] \[sig-node\] \[Feature:GPUDevicePlugin\] Sanity test using nvidia-sm (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110906257270378496/build-log.txt.gz) |
 
 ### 2026-10-15

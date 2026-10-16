@@ -1,0 +1,23 @@
+# Run 2026-10-16 16:42:27 UTC
+
+46 tabs read (0 failed), 373 red builds on TestGrid. This run archived 10 new builds.
+TestGrid's config: test-infra 45ab237d7181 of 2026-10-16T14:30:25Z, uploaded 2026-10-16T14:31:02Z, read by this run.
+
+[run.json](run.json) has the details; [INDEX.md](../../../INDEX.md) lists the archived builds of the last 14 days, and links a page per week for older ones. A file marked provisional was taken before Prow finished uploading and is re-checked against GCS on every run until it settles.
+
+## Builds archived by this run (10)
+
+### 2026-10-16
+
+| Time | Tab | Build | Red tests | Files |
+|---|---|---|---|---|
+| 15:55 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2111123691956867072](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2111123691956867072) | \[sig-node\] k8s.io/kubernetes/pkg/kubelet.volumemanager (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-unit/2111123691956867072/build-log.txt.gz) (provisional) |
+| 14:27 | informing#gce-cos-slow-master | [ci-kubernetes-e2e-gce-cos-slow-master 2111101543884263424](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2111101543884263424) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-slow-master/2111101543884263424/build-log.txt.gz) (provisional) |
+| 13:39 | blocking#kind-master | [ci-kubernetes-e2e-kind 2111089464754311168](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2111089464754311168) | ci-kubernetes-e2e-kind.Overall | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind/2111089464754311168/build-log.txt.gz) |
+| 12:56 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2111078894445531136](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2111078894445531136) | Kubernetes e2e suite.\[It\] \[sig-storage\] Volume metrics Ephemeral should create prometheus (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2111078894445531136/build-log.txt.gz) |
+| 12:37 | blocking#integration-master | [ci-kubernetes-integration-master 2111073861746298880](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2111073861746298880) | \[sig-apps\] k8s.io/kubernetes/test/integration.job (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-integration-master/2111073861746298880/build-log.txt.gz) |
+| 10:33 | informing#capz-windows-master | [ci-kubernetes-e2e-capz-master-windows 2111042907073941504](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2111042907073941504) | ci-kubernetes-e2e-capz-master-windows.Overall | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-capz-master-windows/2111042907073941504/build-log.txt.gz) |
+| 07:52 | informing#kind-master-alpha-beta-enabled | [ci-kubernetes-e2e-kind-alpha-beta-enabled 2111002139915456512](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111002139915456512) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS with Single PV - PVC pairs c (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111002139915456512/build-log.txt.gz) |
+| 06:59 | blocking#kind-master-beta-features | [ci-kubernetes-e2e-kind-beta-features 2110988550005592064](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2110988550005592064) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS with Single PV - PVC pairs c (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-beta-features/2110988550005592064/build-log.txt.gz) |
+| 06:57 | blocking#gce-cos-alphafeatures-master | [ci-kubernetes-e2e-gce-cos-alphafeatures-master 2110988297089060864](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110988297089060864) | kubetest.TearDown (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110988297089060864/build-log.txt.gz) |
+| 04:14 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2110947528802308096](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2110947528802308096) | Kubernetes e2e suite.\[It\] \[sig-api-machinery\] AdmissionWebhook \[Privileged:ClusterAdmin\] s (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2110947528802308096/build-log.txt.gz) |
