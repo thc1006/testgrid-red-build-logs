@@ -181,10 +181,11 @@ jobs:
           # Leave out what cut-off downloads left, such as a build folder without
           # meta.json: the fetch removes it by its own rule at its start and end, and
           # this is that rule, for a fetch killed before its end. The builds are
-          # retried by a later run. (Without the tool installed, no fetch ran.)
+          # retried by a later run. (Without the tool installed, no fetch ran.) It
+          # runs without the token, which only the push needs.
           if [ -x tool/.venv/bin/python ]; then
-            tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --clean-partial ||
-              echo "::warning::Could not remove what cut-off downloads left: it is committed, and the next run removes it."
+            env -u GITHUB_TOKEN tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --clean-partial ||
+              echo "::warning::Could not remove what cut-off downloads left: the next run removes it."
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
