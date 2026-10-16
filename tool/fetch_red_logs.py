@@ -2772,13 +2772,11 @@ class ConfigHistory:
         alone = all(a["finished"] is None or a["finished"] <= b["started"] for a, b in itertools.pairwise(self.runs))
         return self.runs[i + 1]["started"] if i + 1 < len(self.runs) and alone else math.inf
 
-    def uploaded(self):
-        """When the runs that began at each time uploaded their configs, at the latest: {start:
-        end} (see ended; of runs that began in the same second, the latest end)."""
-        out = {}
-        for i, r in enumerate(self.runs):
-            out[r["started"]] = max(out.get(r["started"], -math.inf), self.ended(i))
-        return out
+    def taken(self, key, at, slack=0):
+        """Whether a config with the tab may be TestGrid's at `at` (or until `slack` after it was
+        replaced): one whose run had uploaded it by then (ended), not replaced before then."""
+        return any(r["tabs"] is not None and r["tabs"].get(key) is not None
+                   and self.ended(i) < at <= self.replaced(self.ended(i)) + slack for i, r in enumerate(self.runs))
 
     def replaced(self, after):
         """When the config in force at `after` was replaced at the latest: by the upload of a
@@ -2786,20 +2784,27 @@ class ConfigHistory:
         return min((r["finished"] + PICKUP for r in self.runs if r["finished"] is not None and r["started"] >= after),
                    default=math.inf)
 
-    def eras(self, key, split=None):
+    def eras(self, key, lacked=None):
         """The tab's entry over time, as [(from, to, entry)]: entry None while TestGrid had no
         such tab, UNKNOWN while the archive does not know it; a run's entry from its start
         until a run that began after it ended uploaded its config (and PICKUP: either may be
         in force then; and the tabulator may show the columns read before by its filters
-        TABULATE longer, see tab_verdict). Runs with the same entry make one era; but a run
-        without the tab that began at `split` or later begins one of its own."""
+        TABULATE longer, see tab_verdict). Runs with the same entry make one era. A tab TestGrid
+        listed while the latest config known lacked it (`lacked`: when it last did, see run()):
+        the runs without it that began before then, after the last run with it that had uploaded
+        its config by then (ended), have it as not known."""
         if not self.runs:
             return []
+        entries = [UNKNOWN if r["tabs"] is None else r["tabs"].get(key) for r in self.runs]
+        if lacked is not None:
+            last = max((i for i, e in enumerate(entries) if e is not None and e is not UNKNOWN and self.ended(i) < lacked),
+                       default=-1)
+            entries = [UNKNOWN if e is None and i > last and r["started"] < lacked else e
+                       for i, (r, e) in enumerate(zip(self.runs, entries, strict=True))]
         out = [(-math.inf, self.replaced(-math.inf), UNKNOWN)]
-        for i, r in enumerate(self.runs):
-            entry = UNKNOWN if r["tabs"] is None else r["tabs"].get(key)
+        for i, (r, entry) in enumerate(zip(self.runs, entries, strict=True)):
             end = self.replaced(self.ended(i))
-            if out[-1][2] == entry and not (entry is None and split is not None and out[-1][0] < split <= r["started"]):
+            if out[-1][2] == entry:
                 out[-1] = (out[-1][0], max(out[-1][1], end), entry)  # (one of them may end later than the last)
             else:
                 out.append((r["started"], end, entry))
@@ -2923,18 +2928,12 @@ def history_rules(history, keys, now, lacking=None, queries=None, era_rule=None)
     entry's rule), "events": the updates that read its columns again (see
     ConfigHistory.events: of the test groups it showed that read its job, queries[key])}.
     A tab TestGrid showed while the latest config known lacked it (`lacking`: {key: when it
-    last did}): of the configs that came into force before then, those after its last entry
-    uploaded by then have it as not known (UNKNOWN). Tabs without eras are left out."""
+    last did}): its configs then are not known, as ConfigHistory.eras takes them. Tabs without
+    eras are left out."""
     lacking, queries, era_rule = lacking or {}, queries or {}, era_rule or (lambda entry: entry)
-    uploaded = history.uploaded()
     out = {}
     for key in keys:
         eras = [(lo, hi, era_rule(entry)) for lo, hi, entry in history.eras(key, lacking.get(key))]
-        if key in lacking:
-            seen = lacking[key]
-            last = max((i for i, (lo, _, e) in enumerate(eras) if uploaded.get(lo, math.inf) < seen
-                        and e is not None and e is not UNKNOWN), default=-1)
-            eras = [(lo, hi, UNKNOWN if e is None and i > last and lo < seen else e) for i, (lo, hi, e) in enumerate(eras)]
         if eras:
             out[key] = {"eras": eras, "events": history.events(key, now, queries.get(key))}
     return out
@@ -4634,9 +4633,7 @@ def run(args, root, run_start, pool, deadline):
     # (but one a config with the tab may still be in force for, as ConfigHistory.eras takes them, and an
     # hour more, once its run has uploaded it: the latest config may not be TestGrid's yet, and TestGrid
     # then lists the tabs it dropped)
-    uploaded = history.uploaded()
-    untaken = {k for k in lacking if any(lo <= run_start <= hi + 3600 and uploaded.get(lo, math.inf) < run_start
-                                         and e is not None and e is not UNKNOWN for lo, hi, e in history.eras(k))}
+    untaken = {k for k in lacking if history.taken(k, run_start, 3600)}
     # ... and one TestGrid listed so before, past that: its config since its last entry before then is not
     # known either, in the configs that came into force before then, though TestGrid no longer lists it (it
     # showed the tab then), for as long as a build held for it may wait
