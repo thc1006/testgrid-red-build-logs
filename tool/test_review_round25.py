@@ -644,6 +644,57 @@ class TakenOutOfAnOlderRun(ArchiveWorld):
     """A red build a run archived 3.8 days ago, then taken out: INDEX.md rewrites the READMEs of
     recent run folders only."""
 
+    def archived(self, ago):
+        """Its run folder, of a run `ago` seconds ago."""
+        self.finished(ago=ago + 0.1 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"a log that must not stay public\n"))
+        real = time.time
+        with mock.patch("time.time", lambda: real() - ago):
+            self.assertEqual(self.fetch(), 0)
+        return frl.run_dirs(self.root)[0]
+
+    def exclude(self):
+        with open(os.path.join(self.root, "excluded.json"), "w") as f:
+            json.dump({self.key: {"reason": "it holds a token"}}, f)
+
+    def readme(self, rel):
+        with open(os.path.join(self.root, rel, "README.md")) as f:
+            return f.read()
+
+    def test_once_the_run_that_took_it_out_was_cut_off(self):
+        """Only a run that removed a build's folder rewrote the README of the run that archived it,
+        and only as it ended: one cut off before (by a signal, as a step's timeout or a cancel sends)
+        left the row, with its link, for good."""
+        rel = self.archived(3.8 * DAY)
+        self.exclude()
+        with mock.patch.object(frl, "scan", side_effect=KeyboardInterrupt):
+            self.assertEqual(self.fetch(), 130)
+        self.assertIsNone(self.bdir())  # (taken out before the scan)
+        self.assertEqual(self.fetch(), 0)
+        self.assertNotIn(self.build, self.readme(rel))  # fails: its row, with a link to its log
+
+    def test_once_a_person_removed_its_folder_too(self):
+        rel = self.archived(3.8 * DAY)
+        shutil.rmtree(self.bdir())
+        self.exclude()
+        self.assertEqual(self.fetch(), 0)
+        self.assertNotIn(self.build, self.readme(rel))  # fails: its row, with a link to its log
+
+    def test_the_readme_of_a_run_that_fetched_it_again(self):
+        # (GCS replaced its log: a run 4 days ago fetched it again, into the folder of the run before)
+        rel = self.archived(4.8 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"a log replaced, that must not stay public\n", "2"))
+        real = time.time
+        with mock.patch("time.time", lambda: real() - 4 * DAY):
+            self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"refreshed": [self.key]})
+        later = frl.run_dirs(self.root)[1]
+        self.exclude()
+        self.assertEqual(self.fetch(), 0)
+        self.assertNotIn(self.build, self.readme(rel))
+        self.assertNotIn(f"/{self.key}/", self.readme(later))  # fails: "- refreshed: [job/…](…/job/…/)"
+        self.assertIn(f"- refreshed: {self.key}\n", self.readme(later))  # (as its run.json says)
+
     def test_its_runs_readme_lists_it_no_more(self):
         self.finished(ago=3.9 * DAY)
         self.srv.route(self.base + "/build-log.txt", obj(b"a log that must not stay public\n"))
