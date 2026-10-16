@@ -140,6 +140,7 @@ HELD_DAYS = 60  # watch a build only its tab's unfollowed config keeps undecided
 SETTLE_HOURS = 2
 RECHECK_HOURS = 48  # compare an archived build with GCS on every run until this long after it finished
 UNLISTED_DAYS = 30  # forget a tab missing from its dashboard's summary after this long
+STOPPED = "the run stopped before it finished"  # the error of a run's report until the run ends (see run())
 PENDING_KEPT = 60  # ranges of builds a scan saw that a tab keeps waiting for a config, at most (see run())
 SERIOUS = ("may be missing", "state.json", "no longer listed", "old layout",  # warnings that fail the run
            "cannot be judged from GCS", "TestGrid's config was last read", "TestGrid's config was never read",
@@ -3292,6 +3293,14 @@ def read_report(root, rel):
         return None
 
 
+def ended(run):
+    """Whether a run report (see read_report) is that of a run that ended: not none (cut off before it
+    wrote one), nor one with the error it has until the run ends (STOPPED)."""
+    errors = run.get("errors") if isinstance(run, dict) else None
+    return isinstance(run, dict) and not any(isinstance(e, dict) and e.get("error") == STOPPED
+                                             for e in (errors if isinstance(errors, list) else ()))
+
+
 def run_started(path):
     """A run report's start time, None if it is unreadable or not a time it could have started at
     (or a link: a link in the archive is never followed)."""
@@ -3331,8 +3340,8 @@ def gcs_sevenths(root, t0):
     day = int(t0 // 86400)
     earlier, after, first = False, None, day - 6  # (after: the day of the earliest run not done since)
     for rel in reversed(run_dirs(root)):
-        # (a run whose report is missing, as one killed before code that writes it from the start did,
-        # or cannot be read: by when its folder was made, not done)
+        # (a run whose report is missing, as one killed before it wrote one, or cannot be read: by when
+        # its folder was made, not done)
         started = run_started(os.path.join(root, rel, "run.json")) or folder_time(rel.rsplit("/", 1)[1])
         if started is None or started >= t0:
             continue
@@ -3965,13 +3974,16 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     lines += [f"- [{w['week']}]({w['page']}): {short(dt.date.fromisoformat(w['from']))} – "
               f"{short(dt.date.fromisoformat(w['to']))}, {w['builds']} builds" for w in listing]
     write_text(os.path.join(root, "INDEX.md"), "\n".join(lines) + "\n")
-    # Recent runs' READMEs show their builds' current state (a provisional file can settle later).
+    # Recent runs' READMEs show their builds' current state (a provisional file can settle later), and
+    # those of runs that did not end, whatever their age, what they archived (see run()).
     horizon = now - RECHECK_HOURS * 3600 - 86400
     for rel in run_dirs(root):
         if current_run and current_run.get("dir") == rel:
             write_run_readme(root, rel, current_run, entries)
-        elif folder_time(rel.rsplit("/", 1)[1]) >= horizon:
-            write_run_readme(root, rel, read_report(root, rel), entries)
+        else:
+            run = read_report(root, rel)
+            if folder_time(rel.rsplit("/", 1)[1]) >= horizon or not ended(run):
+                write_run_readme(root, rel, run, entries)
     return entries, bad
 
 
@@ -5012,11 +5024,13 @@ def run(args, root, run_start, pool, deadline):
             r.update(config=tab_config[key], config_read=config_read.get(key))
         if key in mismatch_of:
             r["config_mismatch"] = mismatch_of[key]
-    # A README from the start, that the run was cut off before it wrote its report, as one killed before
-    # it writes run.json leaves it (a step's timeout kills it at last): its folder stays, though what it
-    # fetches again is stored in older ones, and later runs see a run not done with its sevenths (see
-    # gcs_sevenths). The run writes it again once it has its report.
-    write_run_readme(root, run_rel, None, [])
+    # A README from the start, that the run was cut off, as one killed before it ends leaves it (a step's
+    # timeout kills it at last): its folder stays, though what it fetches again is stored in older ones,
+    # and later runs see a run not done with its sevenths (see gcs_sevenths). The run writes it again once
+    # it has its report; each later run does for a run that did not end (see write_index).
+    write_text(os.path.join(root, run_rel, "README.md"),
+               f"# Run {run_title(run_id)} UTC\n\nThis run was cut off before it ended. The next run lists the builds it "
+               "archived here.\n")
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors) + take_out_errors, 0, {}, {}
     uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
     if taken_out or shown_out:  # (taken out of the archive now, or shown red by TestGrid and left out)
@@ -5198,7 +5212,7 @@ def run(args, root, run_start, pool, deadline):
                 **({"lacking_tabs": lacked} if lacked else {}),
                 **({"config_uploads": uploads, "config_entries": entries} if uploads else {}),
                 **({"config_relist_after": history.relist_after} if history.relist_after is not None else {})})
-    write_json(run_json, dict(report_, errors=errors + [{"build": None, "error": "the run stopped before it finished"}]))
+    write_json(run_json, dict(report_, errors=errors + [{"build": None, "error": STOPPED}]))
     # What failed or cut-off downloads left (a build folder without meta.json, stored files
     # a meta.json does not list, an empty job folder) goes now, so it is not committed;
     # those builds are fetched again. Abandoned workers can no longer write (see abandon()).
