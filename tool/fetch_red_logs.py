@@ -2799,7 +2799,7 @@ class ConfigHistory:
             entry = UNKNOWN if r["tabs"] is None else r["tabs"].get(key)
             end = self.replaced(self.ended(i))
             if out[-1][2] == entry and not (entry is None and split is not None and out[-1][0] < split <= r["started"]):
-                out[-1] = (out[-1][0], end, entry)
+                out[-1] = (out[-1][0], max(out[-1][1], end), entry)  # (one of them may end later than the last)
             else:
                 out.append((r["started"], end, entry))
         return out
