@@ -708,8 +708,9 @@ def check(args, problems, notes, record):
     rule_of = {}  # per "dashboard#tab", the tab's rule as the fetch takes it (frl.tab_verdict)
     current, _ = history.current()
     keys = [f"{t['dashboard']}#{t['tab']}" for t in tabs]
-    over_time = frl.history_rules(history, keys, t0, [k for k in keys if current is not None and k not in current],
-                                  {f"{t['dashboard']}#{t['tab']}": t["query"] for t in tabs}, era_rule)
+    lacking = dict.fromkeys([k for k in keys if current is not None and k not in current], t0)
+    over_time = frl.history_rules(history, keys, t0, lacking, {f"{t['dashboard']}#{t['tab']}": t["query"] for t in tabs},
+                                  era_rule)
     for t in tabs:
         key, rule = f"{t['dashboard']}#{t['tab']}", rules.get((t["dashboard"], t["tab"]))
         rule_of[key] = {"rows": rows_of.get((t["dashboard"], t["tab"]))}

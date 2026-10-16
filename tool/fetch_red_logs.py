@@ -2905,20 +2905,23 @@ def judged_since(state, now):
     return min(times)
 
 
-def history_rules(history, keys, now, lacking=(), queries=None, era_rule=None):
+def history_rules(history, keys, now, lacking=None, queries=None, era_rule=None):
     """Per tab ("dashboard#tab", of `keys`), what its config over time (a ConfigHistory) says
     for tab_verdict: {"eras": its configs (see ConfigHistory.eras; era_rule(entry) makes each
     entry's rule), "events": the updates that read its columns again (see
     ConfigHistory.events: of the test groups it showed that read its job, queries[key])}.
-    A tab TestGrid shows now that the latest config known lacks (in `lacking`): its config
-    since its last entry is not known (UNKNOWN). Tabs without eras are left out."""
-    queries, era_rule = queries or {}, era_rule or (lambda entry: entry)
+    A tab TestGrid showed while the latest config known lacked it (`lacking`: {key: when it
+    last did}): of the configs that came into force before then, those after its last entry
+    have it as not known (UNKNOWN). Tabs without eras are left out."""
+    lacking, queries, era_rule = lacking or {}, queries or {}, era_rule or (lambda entry: entry)
     out = {}
     for key in keys:
         eras = [(lo, hi, era_rule(entry)) for lo, hi, entry in history.eras(key)]
         if key in lacking:
-            last = max((i for i, (_, _, e) in enumerate(eras) if e is not None and e is not UNKNOWN), default=-1)
-            eras = [(lo, hi, UNKNOWN if e is None and i > last else e) for i, (lo, hi, e) in enumerate(eras)]
+            seen = lacking[key]
+            last = max((i for i, (lo, _, e) in enumerate(eras) if lo < seen and e is not None and e is not UNKNOWN),
+                       default=-1)
+            eras = [(lo, hi, UNKNOWN if e is None and i > last and lo < seen else e) for i, (lo, hi, e) in enumerate(eras)]
         if eras:
             out[key] = {"eras": eras, "events": history.events(key, now, queries.get(key))}
     return out
@@ -4589,15 +4592,16 @@ def run(args, root, run_start, pool, deadline):
     # (a config uploaded this recently may not be TestGrid's yet: TestGrid then lists the tabs it dropped,
     # under the configs before, as ConfigHistory.eras takes them)
     fresh = bool(lacking) and current_run["finished"] is not None and run_start - current_run["finished"] <= PICKUP + 3600
-    # ... and one TestGrid listed so before, past that: its config since its last entry is not known either,
-    # though TestGrid no longer lists it (it showed the tab then), for as long as a build held for it may wait
+    # ... and one TestGrid listed so before, past that: its config since its last entry before then is not
+    # known either, in the configs that came into force before then, though TestGrid no longer lists it (it
+    # showed the tab then), for as long as a build held for it may wait
     lacked = {k: t for k, t in (state.get("lacking_tabs") or {}).items() if run_start - t <= (HELD_DAYS + 1) * 86400}
     lacked.update(dict.fromkeys([] if fresh else lacking, run_start))
     queries = {k: t["query"] for k, t in state["tabs"].items() if isinstance(t.get("query"), str)}
     queries.update((f"{r['dashboard']}#{r['tab']}", r["query"]) for r in reports
                    if r.get("tab") is not None and not r.get("error") and r.get("query"))
     for key, got in history_rules(history, sorted({k for r in history.runs if r["tabs"] for k in r["tabs"]} | set(tab_rules)),
-                                  run_start, sorted(set(lacked) | set(lacking)), queries, era_rule).items():
+                                  run_start, {**lacked, **dict.fromkeys(lacking, run_start)}, queries, era_rule).items():
         tab_rules[key] = dict(tab_rules.get(key, {}), **got)
     previous_read = state.get("testgrid_config") or {}
     source = config_source or previous_read.get("source") or {}
