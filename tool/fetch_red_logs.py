@@ -3995,8 +3995,8 @@ def load_excluded(root):
 
     def usable(k, v):
         job, _, build = k.partition("/") if isinstance(k, str) else ("", "", "")
-        return JOB_RE.fullmatch(job) and BUILD_RE.fullmatch(build) and isinstance(v, dict) \
-            and is_text(v.get("reason"), 1000) and v["reason"].strip()
+        return JOB_RE.fullmatch(job) and BUILD_RE.fullmatch(build) and not build.startswith("0") \
+            and isinstance(v, dict) and is_text(v.get("reason"), 1000) and v["reason"].strip()  # (no build has a 0 first)
     bad = [str(k)[:80] for k, v in data.items() if not usable(k, v)] if isinstance(data, dict) else ["(not an object)"]
     if bad:
         raise ExcludedUnreadable(f'{path}: not {{"job/build": {{"reason": "why"}}}} for {", ".join(bad[:3])}')
