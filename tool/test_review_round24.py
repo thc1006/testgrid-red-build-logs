@@ -546,6 +546,8 @@ class CommitStep(unittest.TestCase):
 
     def test_control_a_build_folder_without_meta_json_is_left_out(self):
         # (a download cut off part-way: removed first, by the fetch's rule, so its size stops nothing)
+        if not os.path.exists(os.path.join(HERE, ".venv", "bin", "python")):
+            self.skipTest("the commit step runs tool/.venv/bin/python, and there is none (uv run makes it)")
         os.symlink(HERE, os.path.join(self.repo, "tool"))  # (the tool installed, as when a fetch ran)
         cut = NEW[:-1] + "1"
         self.write(f"{cut}/build-log.txt.gz", size=LIMIT + 1)
