@@ -1255,6 +1255,54 @@ class TakenOutInAGap(ttc.ConfigWorld):
         self.assertEqual(code, 0, out)
 
 
+class CutOffRun(ArchiveWorld):
+    """A run 4 days ago (older than the runs whose READMEs INDEX.md rewrites) archived a red build in
+    its folder, and was cut off before it ended (here: by an interrupt where it saves state.json, or
+    as it draws the charts, after its report)."""
+
+    def cut_off(self, where):
+        self.finished(ago=4.2 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        real_time, real_json, real_charts = time.time, frl.write_json, frl.report.write_charts
+
+        def write_json(path, *args, **kwargs):
+            if where == "state.json" and path.endswith("state.json"):
+                raise KeyboardInterrupt
+            return real_json(path, *args, **kwargs)
+
+        def write_charts(*args, **kwargs):
+            if where == "charts":
+                raise KeyboardInterrupt
+            return real_charts(*args, **kwargs)
+        with mock.patch("time.time", lambda: real_time() - 4 * DAY), mock.patch.object(frl, "write_json", write_json), \
+                mock.patch.object(frl.report, "write_charts", write_charts):
+            self.assertEqual(self.fetch(), 130)
+        self.rel = frl.run_dirs(self.root)[0]
+
+    def readme(self):
+        with open(os.path.join(self.root, self.rel, "README.md")) as f:
+            return f.read()
+
+    def test_its_readme_says_no_count_of_builds(self):
+        """The README a run writes as it makes its folder (6f48f77) said it archived no build, which
+        the workflow commits."""
+        self.cut_off("state.json")
+        self.assertEqual(sorted(os.listdir(os.path.join(self.root, self.rel))), ["README.md", "job"])
+        self.assertNotIn("Builds archived by this run (0)", self.readme())  # fails: "(0)", then "None."
+
+    def test_the_next_run_lists_its_builds_whatever_its_age(self):
+        self.cut_off("state.json")
+        self.assertEqual(self.fetch(), 0)
+        self.assertIn(f"[job {self.build}]", self.readme())  # fails: "(0)", then "None.", for good
+
+    def test_the_next_run_writes_the_readme_of_one_cut_off_after_its_report(self):
+        self.cut_off("charts")
+        self.assertTrue(os.path.exists(os.path.join(self.root, self.rel, "run.json")))
+        self.assertEqual(self.fetch(), 0)
+        self.assertNotIn("cut off", self.readme())  # fails: This run was cut off before it wrote its report.
+        self.assertIn(f"- {frl.STOPPED}", self.readme())
+
+
 class NotDoneWithItsComparisons(ArchiveWorld):
     """A red build archived 3 h after it finished: each run compares it with GCS."""
 
@@ -1291,10 +1339,11 @@ class NotDoneWithItsComparisons(ArchiveWorld):
         with mock.patch.object(frl, "archive", archive):
             self.assertEqual(self.fetch(), 0)
         self.assertEqual(seen[0], ["README.md"])  # fails: ["run.json"] (eb09be1; [] before)
-        self.assertIn("This run was cut off before it wrote its report.", seen[1])
+        self.assertIn("This run was cut off before it ended.", seen[1])
         # (a folder a run killed then leaves stays, and counts as a run not done)
         killed = frl.new_run_dir(self.root, time.time() - 30)[1]
-        frl.write_run_readme(self.root, killed, None, [])
+        with open(os.path.join(self.root, killed, "README.md"), "w") as f:
+            f.write(seen[1])
         self.assertEqual(self.fetch(), 0)
         self.assertIn(killed, frl.run_dirs(self.root))
         self.assertFalse(frl.sevenths_done(self.root, killed))
