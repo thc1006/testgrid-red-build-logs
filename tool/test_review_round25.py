@@ -25,6 +25,7 @@ sys.path.insert(0, HERE)
 import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 import test_config_history as tch  # noqa: E402  (module imports: their tests are not collected here)
+import test_review_round24 as r24  # noqa: E402
 import test_testgrid_config as ttc  # noqa: E402
 from test_fetch_red_logs import run_record, send  # noqa: E402
 from test_fetch_red_logs import table as fetch_table  # noqa: E402
@@ -1758,6 +1759,26 @@ class NotDoneWithItsComparisons(ArchiveWorld):
         self.assertEqual(run["outcomes"], {"not-checked": [self.key]})
         self.assertIs(run["gcs_compared"], False)
         time.sleep(1.6)  # (the server's slow answer ends)
+
+
+# ------------------------------------------------------------------ the workflow's commit step and the archive's links
+
+class CommitStepAndLinks(unittest.TestCase):
+    """The archive job's commit step, run as GitHub runs it (see test_review_round24.CommitStep)."""
+
+    setUp, git, write, commit = r24.CommitStep.setUp, r24.CommitStep.git, r24.CommitStep.write, r24.CommitStep.commit
+
+    def test_a_month_folder_that_is_a_link_is_not_followed(self):
+        """The step removed the build folders without meta.json where a link from a month's folder led
+        too, outside the archive, though the fetch stops then and touches nothing (7620f6d)."""
+        cut_off = os.path.join(self.tmp, "outside", "2026-09-20T120000Z", "job", "2110000000000000001")
+        os.makedirs(cut_off)
+        with open(os.path.join(cut_off, "build-log.txt"), "wb") as f:
+            f.write(b"a download cut off")
+        os.symlink(os.path.join(self.tmp, "outside"), os.path.join(self.repo, "archive", "runs", "2026-09"))
+        done = self.commit()
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertTrue(os.path.exists(os.path.join(cut_off, "build-log.txt")))  # fails: removed
 
 
 if __name__ == "__main__":
