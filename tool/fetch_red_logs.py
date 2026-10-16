@@ -4660,6 +4660,8 @@ def run(args, root, run_start, pool, deadline):
                             f"{', ...' if len(never) > 3 else ''}) is not known yet: their builds are decided once a "
                             "run has read it")
     read_ok, gaps = {}, []
+    # per tab, the ranges this run stops waiting for: (range, whether it is the one derived from the last scan)
+    dropped, failed_search = {}, set()
     for r in reports:
         if r.get("tab") is None or r.get("error"):
             continue
@@ -4701,7 +4703,8 @@ def run(args, root, run_start, pool, deadline):
             # in the tab's state until then, GIVE_UP_DAYS at most).
             changed, waiting = [], []
             if not first and prev.get("oldest") is not None:
-                seen = list(prev.get("changed_pending") or ())
+                kept = list(prev.get("changed_pending") or ())
+                seen = list(kept)
                 top = min(floor, r["oldest"])
                 if prev["oldest"] < top:
                     seen.append({"since": prev["scan"], "lo": prev["oldest"], "hi": top})
@@ -4712,8 +4715,7 @@ def run(args, root, run_start, pool, deadline):
                     elif status is None and run_start - p["since"] <= GIVE_UP_DAYS * 86400:
                         waiting.append(p)
                     elif status is None:
-                        warnings.append(pending_dropped(key, p, "a config of the tab in force since that scan is "
-                                                                f"still not known {GIVE_UP_DAYS} days later"))
+                        dropped.setdefault(key, []).append((p, p not in kept))
             if recent is not None or older or changed:
                 gaps.append((key, r, recent, older, changed))
         if r.get("oldest"):
@@ -4734,6 +4736,10 @@ def run(args, root, run_start, pool, deadline):
                 # (a tab not listed is not read, so the ranges it kept are never judged)
                 warnings += [pending_dropped(key, p, "the tab is no longer listed, and is forgotten")
                              for p in prev.get("changed_pending") or ()]
+                if "unsearched" in prev:
+                    warnings.append(f"{key}: the older part of its history gap, from {iso(prev['unsearched'][0])} to "
+                                    f"{iso(prev['unsearched'][1])}, cannot be searched in GCS: the tab is no longer "
+                                    "listed, and is forgotten; red builds in it may be missing")
                 continue
         elif key in listed and prev.get("missing_since"):  # (listed again, whether its table could be read or not)
             prev = {k: v for k, v in prev.items() if k != "missing_since"}
@@ -4867,14 +4873,17 @@ def run(args, root, run_start, pool, deadline):
                 # older gap, so the next run searches them again.
                 if key in state["tabs"]:
                     old = state["tabs"][key]
+                    # (but not a range this run stopped waiting for: it is dropped, and said so below)
+                    gone = [p for p, derived in dropped.get(key, ()) if not derived]
+                    pending = [p for p in old.get("changed_pending", ()) if p not in gone]
                     tab_scans[key] = dict(job_hours.get(key, {}), scan=old["scan"], oldest=old["oldest"],
                                           query=r["query"], **({"margin": old["margin"]} if "margin" in old else {}),
                                           **({"rows": r["rows"]} if known_rows(r.get("rows")) else {}),
                                           **({"unsearched": old["unsearched"]} if "unsearched" in old else {}),
-                                          **({"changed_pending": old["changed_pending"]}
-                                             if "changed_pending" in old else {}))
+                                          **({"changed_pending": pending} if pending else {}))
                 else:
                     tab_scans.pop(key, None)
+                failed_search.add(key)
                 warnings.append(f"{key}: {'; '.join(what)}; red builds in between may be missing; looking them up "
                                 "in GCS failed; the next run tries again")
                 continue
@@ -4896,6 +4905,12 @@ def run(args, root, run_start, pool, deadline):
                      f"({iso(last_scan(key))}) needed them from "
                      f"{iso(floor if floor is not None else older[0] if older else min(c[0] for c in changed))}"
                      "; red builds in between may be missing" for key, r, floor, older, changed in gaps]
+    # Each range this run stopped waiting for, but the one derived from a scan that a failed gap search
+    # keeps: the next run derives it again.
+    warnings += [pending_dropped(key, p, "a config of the tab in force since that scan is still not known "
+                                         f"{GIVE_UP_DAYS} days later")
+                 for key, ranges in sorted(dropped.items()) for p, derived in ranges
+                 if not (derived and key in failed_search)]
     tab_errors = [r for r in reports if r.get("error")]
     # tabs whose builds this run judges from GCS (a history gap, or watched builds) without any config
     # of theirs: neither one read nor their configs over time (by which tab_verdict judges them otherwise)
