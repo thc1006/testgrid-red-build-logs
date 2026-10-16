@@ -1961,6 +1961,26 @@ class NamedAsADownload(ArchiveWorld):
         self.assertTrue(os.path.exists(os.path.join(self.folder, "build-log.txt")))
         self.assertIn("2110000000000000007: no meta.json but unexpected files ['build-log.txt']", self.unexpected())
 
+    @unittest.skipIf(os.geteuid() == 0, "root can list what the folder's mode forbids")
+    def test_so_is_a_build_folder_that_cannot_be_listed(self):
+        """(one that cannot be listed still stopped every run with PermissionError)"""
+        os.makedirs(self.folder)
+        with open(os.path.join(self.folder, "build-log.txt"), "w") as f:
+            f.write("a log\n")
+        for mode in (0o300, 0o000):
+            with self.subTest(mode=oct(mode)):
+                os.chmod(self.folder, mode)
+                try:
+                    warnings = []
+                    frl.clean_partial_builds(self.root, warnings)  # fails: PermissionError
+                    if mode == 0o000:
+                        self.assertEqual(self.fetch(), 0)
+                finally:
+                    os.chmod(self.folder, 0o755)
+                self.assertTrue(os.path.exists(os.path.join(self.folder, "build-log.txt")))
+                self.assertIn("2110000000000000007: cannot be listed (PermissionError); nothing in the folder is removed",
+                              " ".join(warnings))
+
     def test_a_build_folder_whose_meta_json_is_a_link_is_left_alone(self):
         """clean_partial_builds read a meta.json through its link, and removed the files it does not list:
         one that says the build has no log made it remove the build's own log."""
