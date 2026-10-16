@@ -26,7 +26,7 @@ import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 import test_config_history as tch  # noqa: E402  (module imports: their tests are not collected here)
 import test_testgrid_config as ttc  # noqa: E402
-from test_fetch_red_logs import send  # noqa: E402
+from test_fetch_red_logs import run_record, send  # noqa: E402
 from test_fetch_red_logs import table as fetch_table  # noqa: E402
 from test_integrity import DAY, HOUR, ArchiveWorld, obj, snowflake  # noqa: E402
 
@@ -1513,6 +1513,29 @@ class ArchiveLinks(ArchiveWorld):
                 self.assertEqual(sorted(os.listdir(target)), before)
                 os.remove(os.path.join(self.root, path))
                 shutil.move(target, os.path.join(self.root, path))
+
+    def test_an_older_month_folder_that_is_a_link_gets_nothing_of_the_old_layout(self):
+        """migrate_old_layout made a run folder, and moved a build of the old layout into it, where the
+        link from an older month's folder led: 7620f6d stops a run for runs/ and its own month's only."""
+        old, started = "20260920T120000.000000Z", frl.folder_time("2026-09-20T120000Z")
+        build = snowflake(started - HOUR)
+        frl.write_json(os.path.join(self.root, "runs", f"{old}.json"), dict(run_record(started, []), run=old, outcomes={}))
+        d = os.path.join(self.root, "logs", "job", build)
+        os.makedirs(d)
+        with open(os.path.join(d, "build-log.txt"), "wb") as f:
+            f.write(b"log\n")
+        frl.write_json(os.path.join(d, "meta.json"), {
+            "job": "job", "build": build, "query": "bucket/logs/job", "started": started - HOUR,
+            "created": started - HOUR, "tabs": [{"dashboard": "dash", "tab": "t", "red_cells": []}],
+            "log_url": f"https://gcs/bucket/logs/job/{build}/build-log.txt", "podinfo": None,
+            "log": {"bytes": 4, "md5": frl.file_md5(os.path.join(d, "build-log.txt")), "file": "build-log.txt",
+                    "file_bytes": 4}, "archived_by_run": old})
+        os.symlink(self.elsewhere, os.path.join(self.root, "runs", "2026-09"))
+        run = self.next_fetch()
+        self.assertEqual(os.listdir(self.elsewhere), [])  # fails: ['2026-09-20T120000Z']
+        self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))
+        self.assertTrue(os.path.exists(os.path.join(self.root, "runs", f"{old}.json")))
+        self.assertIn("old layout: runs/2026-09 is a link", " ".join(run["serious_warnings"]))
 
     def list_only(self):
         out, err = io.StringIO(), io.StringIO()
