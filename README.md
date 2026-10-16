@@ -151,6 +151,19 @@ GitHub disables the schedule of a public repository after 60 days without
 activity. If that happens, enable the workflow again from the Actions tab, or
 with `gh workflow enable red-build-logs.yml`.
 
+## Taking a build out
+
+To take a build out for good, such as a log that must not stay public, add it
+to `archive/excluded.json`:
+
+```json
+{"ci-kubernetes-unit/2110090875689242624": {"reason": "the log holds a token"}}
+```
+
+The next run removes its folder and never fetches it again, and
+`cross_check.py` does not count it as missing. Its files stay in the git
+history until that is rewritten. A run stops if the file cannot be read.
+
 ## Running it locally
 
 ```sh
