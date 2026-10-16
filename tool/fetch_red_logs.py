@@ -3585,6 +3585,14 @@ def clean_partial_builds(root, warnings):
                 target = os.path.join(job_abs, build)
                 if not BUILD_RE.fullmatch(build) or not real_dir(target):
                     continue
+                try:
+                    os.listdir(target)
+                except (FileNotFoundError, NotADirectoryError):
+                    continue
+                except OSError as e:  # (what is in it cannot be told)
+                    warnings.append(f"{run_rel}/{job}/{build}: cannot be listed ({type(e).__name__}); nothing in the "
+                                    "folder is removed")
+                    continue
                 if os.path.islink(os.path.join(target, "meta.json")):  # (a link in the archive is never followed)
                     warnings.append(f"{run_rel}/{job}/{build}: its meta.json is a link; nothing in the folder is removed")
                     continue
