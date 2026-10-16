@@ -1638,6 +1638,18 @@ class ArchiveLinks(ArchiveWorld):
         self.assertEqual(code, 0)  # fails: 1
         self.assertIn("the builds it takes out are listed too", err)
 
+    def test_list_only_goes_on_where_a_month_folder_is_a_link(self):
+        """(45bd962's other case: a mutant that still stopped --list-only for it passed the test above)"""
+        month = time.strftime("%Y-%m", time.gmtime())
+        target = os.path.join(self.elsewhere, month)
+        shutil.move(os.path.join(self.root, "runs", month), target)
+        os.symlink(target, os.path.join(self.root, "runs", month))
+        before = sorted(os.listdir(target))
+        code, out, err = self.list_only()
+        self.assertEqual(code, 0)
+        self.assertIn(f"runs/{month} is a link: the run folders in it are not read", err)
+        self.assertEqual(sorted(os.listdir(target)), before)
+
     def test_the_charts_read_the_run_folders_run_dirs_lists_only(self):
         """report.load_runs read every runs/*/*/run.json: one in a folder that is not a run's (named
         otherwise, or in another month's folder) showed in INDEX.md's table of days."""
