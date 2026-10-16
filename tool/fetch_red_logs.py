@@ -3955,7 +3955,7 @@ def write_index(root, now, current_run=None, missing=(), known=None):
              "(../README.md#limits)); times are UTC. Each run's downloads are in its own folder under "
              "[runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is "
              "compared with GCS on every run and fetched again if GCS changes.", ""]
-    lines += report.write_charts(root, counted, now, current_run)
+    lines += report.write_charts(root, counted, now, current_run, run_dirs(root))
     if waiting:
         lines += ["## Not archived yet", "", f"{len(waiting)} red builds without an intact local copy yet."]
         lines += build_rows(waiting, files=False) + [""]
@@ -4530,6 +4530,13 @@ def run(args, root, run_start, pool, deadline):
     except ExcludedUnreadable as e:
         print(f"ERROR {e}: no run goes on until it is fixed, as it could fetch a build taken out", file=sys.stderr)
         return 1
+    # (a link in the archive is never followed: the run's folder would be made where it leads)
+    month = dt.datetime.fromtimestamp(run_start, dt.UTC).strftime("%Y-%m")
+    for path in (os.path.join(root, "runs"), os.path.join(root, "runs", month)):
+        if os.path.islink(path):
+            print(f"ERROR {path} is a link: no run goes on until it is fixed, as it would write where it leads",
+                  file=sys.stderr)
+            return 1
     timelines = Timelines(run_start)  # (each job's builds that TestGrid's reads of a judged build depend on)
     warnings = []
     if not args.list_only:
