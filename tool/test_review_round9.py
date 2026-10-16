@@ -819,11 +819,12 @@ class ConfiguredRun(ttc.ConfigWorld):
         self.assertNotIn("was last read", " ".join(self.runs()[-1]["warnings"]))
 
     def test_an_old_config_of_an_unlisted_tab_judging_a_build_is_stale(self):  # N241
+        # (when no config is read now; one read now without the tab says the tab is gone)
         w = snowflake(self.now - 5 * DAY)
         self.failed_in_gcs(w, 5 * DAY)
         rec = dict(self.watched(w), tabs=[{"dashboard": "dash", "tab": "gone", "tab_status": "FAILING", "red_cells": []}])
         self.gone_tab(10 * DAY, watch={f"job/{w}": {"rec": rec, "first_seen": self.now - 5 * DAY}})
-        self.fetch_with(self.config(self.HIDE))
+        self.fetch_with(os.path.join(self.dir, "missing.json"))
         self.assertIn("was last read", " ".join(self.runs()[-1]["serious_warnings"]))
 
     def test_a_config_without_a_read_time_is_stale(self):  # N242

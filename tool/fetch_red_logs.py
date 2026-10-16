@@ -4676,8 +4676,11 @@ def run(args, root, run_start, pool, deadline):
             if m and m["until"] is None:
                 warnings.append(f"{key}: TestGrid's config ({about}) does not match the tab since {iso(m['since'])}: "
                                 f"{m['detail']}; builds it no longer shows are judged by the rows its table shows too")
-        stale = [k for k in sorted(involved & set(tab_config)) if not (plausible_time(config_read.get(k), run_start)
-                                                                    and run_start - config_read[k] <= CONFIG_STALE_DAYS * 86400)]
+        # (not one the latest config known dropped: no config of it is left to read, and its builds are
+        # judged by its configs over time)
+        stale = [k for k in sorted(involved & set(tab_config)) if (current is None or k in current)
+                 and not (plausible_time(config_read.get(k), run_start)
+                          and run_start - config_read[k] <= CONFIG_STALE_DAYS * 86400)]
         if stale:
             last = min((config_read[k] for k in stale if plausible_time(config_read.get(k), run_start)), default=None)
             warnings.append(f"TestGrid's config was last read {iso(last) if last else 'at an unknown time'} for "

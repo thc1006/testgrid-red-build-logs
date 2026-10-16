@@ -812,5 +812,33 @@ class TakenOutOfAnOlderRun(ArchiveWorld):
             self.assertNotIn(self.build, f.read())  # fails: its row, with a link to its log
 
 
+# ------------------------------------------------------------------ a tab the latest config dropped, with a build watched
+
+class ATabTheConfigDropped(ttc.ConfigWorld):
+    """The latest config, uploaded 3.5 days ago, dropped tab t, and TestGrid no longer lists t; a
+    run 4 days ago read t's config last. A build of t made 10 h ago, still running, is watched."""
+
+    history = tch.ConfigOverTime.history
+    judged = tch.ConfigOverTime.judged
+
+    def test_no_config_of_it_is_left_to_read(self):
+        """The run that judged the build warned "TestGrid's config was last read ... for 1 tabs
+        (dash#t): changes to their filters or test groups since then are not followed", a serious
+        warning, though it read the latest config, which has no t."""
+        b = snowflake(self.now - 10 * HOUR)
+        self.srv.route(f"/bucket/logs/job/{b}/started.json", (200, {}, {"timestamp": int(self.now - 10 * HOUR)}))
+        self.srv.summary("dash", {"other": "PASSING"})
+        self.srv.table("dash", "other", fetch_table("bucket/logs/otherjob", [], {}))
+        self.put_state(tabs={"dash#t": {"scan": self.now - 3.5 * DAY, "oldest": self.now - 4 * DAY,
+                                        "missing_since": self.now - 3.4 * DAY}},
+                       tab_configs={"dash#t": {"config": ttc.entry(""), "read": self.now - 4 * DAY}},
+                       watch={f"job/{b}": {"rec": self.watched(b), "first_seen": self.now - 9 * HOUR}})
+        other = ttc.entry("", name="otherjob", gcs_prefix="bucket/logs/otherjob")
+        run = self.judged((self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
+                          (self.now - 3.5 * DAY, {"dash": {"other": other}}))
+        self.assertEqual(run["outcomes"], {"not-red": [f"job/{b}"]})  # (t had no tab while it ran)
+        self.assertEqual(run["serious_warnings"], [])  # fails: TestGrid's config was last read ...
+
+
 if __name__ == "__main__":
     unittest.main()
