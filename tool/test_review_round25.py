@@ -1802,6 +1802,47 @@ class NotDoneWithItsComparisons(ArchiveWorld):
         time.sleep(1.6)  # (the server's slow answer ends)
 
 
+# ------------------------------------------------------------------ what a cut-off download left, and what it did not
+
+class NamedAsADownload(ArchiveWorld):
+    """A build folder without meta.json in a run's folder, holding something named as a file a download
+    writes that is not one: clean_partial_builds removes a folder only if a download wrote all of it."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        self.folder = os.path.join(self.root, frl.run_dirs(self.root)[-1], "job", "2110000000000000007")
+
+    def unexpected(self):
+        return " ".join(w for w in self.runs()[-1]["warnings"] if "no meta.json but unexpected files" in w)
+
+    def test_a_folder_named_as_a_log_is_reported_not_removed(self):
+        """It was taken for a log: os.remove raised IsADirectoryError, and no run could start."""
+        os.makedirs(os.path.join(self.folder, "build-log.txt"))
+        with open(os.path.join(self.folder, "build-log.txt", "notes.txt"), "w") as f:
+            f.write("a person's notes\n")
+        self.assertEqual(self.fetch(), 0)  # fails: IsADirectoryError
+        self.assertTrue(os.path.exists(os.path.join(self.folder, "build-log.txt", "notes.txt")))
+        self.assertIn("2110000000000000007: no meta.json but unexpected files ['build-log.txt']", self.unexpected())
+
+    def test_a_link_named_as_a_log_is_reported_not_removed(self):
+        os.makedirs(self.folder)
+        os.symlink(os.path.join(self.root, "nowhere"), os.path.join(self.folder, "build-log.txt"))
+        self.assertEqual(self.fetch(), 0)
+        self.assertTrue(os.path.islink(os.path.join(self.folder, "build-log.txt")))  # fails: removed, with its folder
+        self.assertIn("unexpected files ['build-log.txt']", self.unexpected())
+
+    def test_control_what_a_download_left_is_removed(self):
+        os.makedirs(self.folder)
+        for name in ("build-log.txt", ".build-log.txt.x1y2.part"):
+            with open(os.path.join(self.folder, name), "w") as f:
+                f.write("cut off\n")
+        self.assertEqual(self.fetch(), 0)
+        self.assertFalse(os.path.lexists(self.folder))
+
+
 # ------------------------------------------------------------------ the workflow's commit step and the archive's links
 
 class CommitStepAndLinks(unittest.TestCase):
