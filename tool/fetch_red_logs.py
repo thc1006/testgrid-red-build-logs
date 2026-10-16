@@ -5281,6 +5281,11 @@ def run(args, root, run_start, pool, deadline):
     concurrency = {"cpus": cpu_count(), "start": args.start_concurrency, "ceiling": ctx.limit.ceiling, **ctx.stats()}
     final = dict(report_, errors=errors, finished=time.time(), bytes_downloaded=downloaded, concurrency=concurrency,
                  timings=timings, cpu_seconds=round(cpu.user + cpu.system, 2))
+    if entries is None:
+        # (the index could not be written: the README from the start, that says the run was cut off, goes,
+        # and the next run writes one; before the final report, so no run that ended keeps it)
+        with contextlib.suppress(OSError):
+            os.remove(os.path.join(root, run_rel, "README.md"))
     write_json(run_json, final)
     if entries is not None:
         write_run_readme(root, run_rel, final, entries)
@@ -5288,9 +5293,6 @@ def run(args, root, run_start, pool, deadline):
         # only, and the run that took it out may have been cut off before this, or a person removed it)
         for rel in sorted(linking(root, excluded) - {run_rel}):
             write_run_readme(root, rel, read_report(root, rel), entries)
-    else:  # (not the README from the start, that says the run was cut off: the next run writes it)
-        with contextlib.suppress(OSError):
-            os.remove(os.path.join(root, run_rel, "README.md"))
 
     counts = [f"{k}={len(v)}" for k, v in sorted(outcomes.items())] + [f"errors={len(errors)}"]
     print(f"run {run_id}: {tabs_read_text(reports)}, {len(builds)} red builds on TestGrid, "
