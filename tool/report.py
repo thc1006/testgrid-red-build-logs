@@ -74,10 +74,13 @@ def day_start(d):
     return dt.datetime(d.year, d.month, d.day, tzinfo=dt.UTC).timestamp()
 
 
-def load_runs(root, current_run=None):
-    """Every readable run report (runs/<YYYY-MM>/<run>/run.json), plus the current run's."""
+def load_runs(root, current_run=None, rels=None):
+    """Every readable run report (runs/<YYYY-MM>/<run>/run.json), plus the current run's: of the run
+    folders `rels` (relative to root, as fetch_red_logs.run_dirs lists them), if given."""
     runs = {}
-    for path in glob.glob(os.path.join(glob.escape(root), "runs", "*", "*", "run.json")):
+    paths = [os.path.join(root, rel, "run.json") for rel in rels] if rels is not None else \
+        glob.glob(os.path.join(glob.escape(root), "runs", "*", "*", "run.json"))
+    for path in paths:
         folder = os.path.dirname(path)  # (a link in the archive is never followed: the report, or a folder of it)
         if any(os.path.islink(p) for p in (path, folder, os.path.dirname(folder), os.path.join(root, "runs"))):
             continue
@@ -527,9 +530,10 @@ def picture(name, alt):
             f'  <img alt="{escape(" ".join(alt.split()), {chr(34): "&quot;"})}" src="charts/{name}-light.svg">\n</picture>')
 
 
-def write_charts(root, entries, now, current_run=None):
-    """Write charts/*.svg and return the Markdown that shows them."""
-    s = summarize(entries, load_runs(root, current_run), now)
+def write_charts(root, entries, now, current_run=None, rels=None):
+    """Write charts/*.svg and return the Markdown that shows them (of the runs in folders `rels`, if
+    given, see load_runs)."""
+    s = summarize(entries, load_runs(root, current_run, rels), now)
     if os.path.islink(os.path.join(root, "charts")):  # (a link in the archive is never followed: a folder replaces it)
         os.remove(os.path.join(root, "charts"))
     os.makedirs(os.path.join(root, "charts"), exist_ok=True)

@@ -1461,6 +1461,34 @@ class ArchiveLinks(ArchiveWorld):
         self.assertNotIn("OUTSIDESTATE", self.index())  # fails: the build only the outside state names, listed
         self.assertIn("state.json is a link; starting without it", run["serious_warnings"])
 
+    def test_a_runs_or_month_folder_that_is_a_link_stops_the_run(self):
+        """A run made its folder where the link led, and wrote there, outside the archive."""
+        month = time.strftime("%Y-%m", time.gmtime())
+        for path in ("runs", f"runs/{month}"):
+            with self.subTest(path):
+                target = os.path.join(self.elsewhere, path.replace("/", "-"))
+                shutil.move(os.path.join(self.root, path), target)
+                os.symlink(target, os.path.join(self.root, path))
+                before = sorted(os.listdir(target))
+                self.assertEqual(self.fetch(), 1)  # fails: 0
+                self.assertEqual(sorted(os.listdir(target)), before)
+                os.remove(os.path.join(self.root, path))
+                shutil.move(target, os.path.join(self.root, path))
+
+    def test_the_charts_read_the_run_folders_run_dirs_lists_only(self):
+        """report.load_runs read every runs/*/*/run.json: one in a folder that is not a run's (named
+        otherwise, or in another month's folder) showed in INDEX.md's table of days."""
+        name = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime(time.time() - DAY))
+        for month, folder in ((time.strftime("%Y-%m"), "notes"), ("2020-01", name)):
+            with self.subTest(folder):
+                os.makedirs(os.path.join(self.root, "runs", month), exist_ok=True)
+                self.outside_run(os.path.join(self.root, "runs", month), name)
+                if folder != name:
+                    os.rename(os.path.join(self.root, "runs", month, name), os.path.join(self.root, "runs", month, folder))
+                self.next_fetch()
+                self.assertNotIn("OUTSIDEDASH", self.index())  # fails: | Day (UTC) | OUTSIDEDASH | dash |
+                shutil.rmtree(os.path.join(self.root, "runs", month, folder))
+
     def test_no_step_reads_a_state_json_that_is_a_link(self):
         """The fetch did not read a state.json that is a link (14b088c), but the step before it
         (testgrid_config.sh's plan of the upload job's runs to list) and cross_check.py did: the
