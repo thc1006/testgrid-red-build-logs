@@ -4036,6 +4036,14 @@ def load_excluded(root):
     return frozenset(data)
 
 
+def write_cut_off_readme(root, rel):
+    """The README of the folder of a run cut off before it ended, as the run writes it from its start
+    (see run()): every later run writes it again, with what the run archived (see write_index)."""
+    write_text(os.path.join(root, rel, "README.md"),
+               f"# Run {run_title(rel.rsplit('/', 1)[1])} UTC\n\nThis run was cut off before it ended. The next run "
+               "lists the builds it archived here.\n")
+
+
 def remove_build(target):
     """Remove a build folder, whatever is in it (a build taken out, see load_excluded), and its job
     folder if no other build is in it. Raises OSError if it cannot (rmtree never follows a link)."""
@@ -4536,6 +4544,11 @@ def run(args, root, run_start, pool, deadline):
         if not args.list_only:
             try:
                 remove_build(os.path.join(root, rel))
+                # (the last build of the folder of a run cut off before its report, left by code before the
+                # README from the start: the folder stays, as such a run's does, see gcs_sevenths)
+                folder = rel.rsplit("/", 2)[0]
+                if not os.path.lexists(os.path.join(root, folder, "run.json")) and not listdir(os.path.join(root, folder)):
+                    write_cut_off_readme(root, folder)
             except OSError as e:
                 take_out_errors.append({"build": key, "error": f"taking it out ({EXCLUDED}) failed: "
                                                               f"{type(e).__name__}: {e}"})
@@ -5034,9 +5047,7 @@ def run(args, root, run_start, pool, deadline):
     # timeout kills it at last): its folder stays, though what it fetches again is stored in older ones,
     # and later runs see a run not done with its sevenths (see gcs_sevenths). The run writes it again once
     # it has its report; each later run does for a run that did not end (see write_index).
-    write_text(os.path.join(root, run_rel, "README.md"),
-               f"# Run {run_title(run_id)} UTC\n\nThis run was cut off before it ended. The next run lists the builds it "
-               "archived here.\n")
+    write_cut_off_readme(root, run_rel)
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors) + take_out_errors, 0, {}, {}
     uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
     if taken_out or shown_out:  # (taken out of the archive now, or shown red by TestGrid and left out)

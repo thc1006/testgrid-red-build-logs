@@ -1066,6 +1066,48 @@ class TakenOut(ArchiveWorld):
 
 
 
+class TakenOutOfACutOffRun(ArchiveWorld):
+    """D0, yesterday 01:00, was done with its sevenths; K, at 02:00, archived a red build in its folder
+    and was cut off before its report, as code before the README from the start left it (no run.json,
+    no README.md). Then the build is taken out."""
+
+    def setUp(self):
+        super().setUp()
+        self.today = int(time.time() // 86400)
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"a log that must not stay public\n"))
+        d0 = (self.today - 1) * 86400 + 3600
+        rel = frl.new_run_dir(self.root, d0)[1]
+        frl.write_json(os.path.join(self.root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": d0,
+                                                                  "gcs_compared": True})
+        frl.write_json(os.path.join(self.root, rel, "verification.json"),
+                       {"outcome": "ok", "scope": {"sevenths": [], "differ": 0}})
+        with mock.patch("time.time", lambda: (self.today - 1) * 86400 + 7230):
+            self.fetch()
+        self.k_rel = frl.run_dirs(self.root)[-1]
+        for name in ("run.json", "README.md"):
+            os.remove(os.path.join(self.root, self.k_rel, name))
+        with open(os.path.join(self.root, "excluded.json"), "w") as f:
+            json.dump({self.key: {"reason": "it holds a token"}}, f)
+
+    def test_the_fetch_and_its_verification_compare_the_same_sevenths(self):
+        """Taking the build out emptied K's folder, which the fetch removed as it ended: its
+        verification, after it, did not count K, and compared fewer sevenths."""
+        seen, real = [], frl.gcs_sevenths
+
+        def gcs_sevenths(root, t0):
+            seen.append(sorted(real(root, t0)))
+            return real(root, t0)
+        with mock.patch.object(frl, "gcs_sevenths", gcs_sevenths):
+            self.fetch()
+            with contextlib.redirect_stdout(io.StringIO()):
+                cc.main(["--archive", self.root, "--testgrid", self.srv.url, "--gcs", self.srv.url, "--hours", "48",
+                         "--record"])
+        self.assertEqual(seen[0], sorted({(self.today - 1) % 7, self.today % 7}))
+        self.assertEqual(seen[1], seen[0])  # fails: today's only
+        self.assertTrue(os.path.isdir(os.path.join(self.root, self.k_rel)))
+
+
 class TakenOutInTheWindow(ArchiveWorld):
     """A red build made 5 h ago (inside cross_check.py's 48 h window), which GCS lists as it lists
     every build, archived, then taken out."""
