@@ -2795,19 +2795,23 @@ class ConfigHistory:
         its config by then (ended), have it as not known."""
         if not self.runs:
             return []
-        entries = [UNKNOWN if r["tabs"] is None else r["tabs"].get(key) for r in self.runs]
+        known = [UNKNOWN if r["tabs"] is None else r["tabs"].get(key) for r in self.runs]
+        entries = known
         if lacked is not None:
-            last = max((i for i, e in enumerate(entries) if e is not None and e is not UNKNOWN and self.ended(i) < lacked),
+            last = max((i for i, e in enumerate(known) if e is not None and e is not UNKNOWN and self.ended(i) < lacked),
                        default=-1)
             entries = [UNKNOWN if e is None and i > last and r["started"] < lacked else e
-                       for i, (r, e) in enumerate(zip(self.runs, entries, strict=True))]
-        out = [(-math.inf, self.replaced(-math.inf), UNKNOWN)]
-        for i, (r, entry) in enumerate(zip(self.runs, entries, strict=True)):
+                       for i, (r, e) in enumerate(zip(self.runs, known, strict=True))]
+        # (one taken as not known so stays apart from one not known yet: config_changed sees the change
+        # between them, as events has none for it)
+        out, was = [(-math.inf, self.replaced(-math.inf), UNKNOWN)], [UNKNOWN]
+        for i, (r, entry, before) in enumerate(zip(self.runs, entries, known, strict=True)):
             end = self.replaced(self.ended(i))
-            if out[-1][2] == entry:
+            if out[-1][2] == entry and was[-1] == before:
                 out[-1] = (out[-1][0], max(out[-1][1], end), entry)  # (one of them may end later than the last)
             else:
                 out.append((r["started"], end, entry))
+                was.append(before)
         return out
 
     @staticmethod
