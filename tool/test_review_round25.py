@@ -784,6 +784,26 @@ class LackingRecordWhileAnUploadRan(ttc.ConfigWorld):
         self.assertEqual(outcomes, {"held": [b2]})  # fails: {}
 
 
+class ChangedAfterARecord(unittest.TestCase):
+    """A (S to S+300) has tab t, U (S+3600 to S+3900) has a config not known, N (S+10800 to S+11400),
+    the latest config known, has no t. TestGrid lists t now (S+30000): a record from now. A scan of t
+    at S+16000 saw builds the tab no longer shows."""
+
+    def test_whether_the_config_changed_since_is_not_known(self):
+        """65567c1 took N's config as not known run by run, then made one era of it and U's: the
+        change from U's config to N's, not known, which config_changed sees between two eras, was
+        gone, and the scan's range was dropped with no warning, as nothing changed since."""
+        S, entry = 1_790_000_000, ttc.entry("")
+        h = frl.ConfigHistory()
+        h.runs = [dict(build=str(1000 + i), commit=f"{i:040x}", started=started, finished=finished, tabs=tabs,
+                       group_changes=None, listed=None, failed=None, recipe=None, built=None)
+                  for i, (started, finished, tabs) in enumerate([
+                      (S, S + 300, {"d#t": entry}), (S + 3600, S + 3900, None),
+                      (S + 10800, S + 11400, {"d#o": dict(entry, test_group="otherjob")})])]
+        rule = frl.history_rules(h, ["d#t"], S + 30000, {"d#t": S + 30000})["d#t"]
+        self.assertIsNone(frl.config_changed(rule, S + 16000, S + 16000))  # fails: False
+
+
 class UploadsThatOverlap(unittest.TestCase):
     def test_an_era_ends_when_the_last_of_its_configs_is_replaced(self):
         """ConfigHistory.eras: A1 (0 to 7200) and A2 (600 to 660) have entry A, B (3600 to 3605)
