@@ -212,6 +212,19 @@ class SeventhsOfRunsNotDone(unittest.TestCase):
         frl.write_json(os.path.join(self.root, rel, "job", "1", "meta.json"), {"job": "job", "build": "1"})
         self.assertEqual(self.sevenths(30), self.days(0, 1))  # fails: {DAY + 1} only
 
+    def test_or_its_report_has_no_start_a_run_can_have(self):
+        """A report that says the run was done with its sevenths, but with a start no run can have:
+        6cd36da took the folder's time for it, and the report for done."""
+        for started in (0, "05:00"):
+            with self.subTest(started=started):
+                self.root = tempfile.mkdtemp()
+                self.addCleanup(shutil.rmtree, self.root)
+                self.run_at(-42)
+                self.run_at(5)
+                path = os.path.join(self.root, frl.run_dirs(self.root)[-1], "run.json")
+                frl.write_json(path, dict(frl.read_json(path), started=started))
+                self.assertEqual(self.sevenths(30), self.days(-1, 0, 1))  # fails: {DAY + 1} only
+
     def test_or_its_report_cannot_be_read(self):
         """(a report not JSON, a folder, a link, or with a start no run can have): passed over, as no run."""
         def damage(path, how):
