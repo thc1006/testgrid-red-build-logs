@@ -1678,6 +1678,26 @@ class ArchiveLinks(ArchiveWorld):
         self.assertIn(f"old layout: logs/job/{os.path.basename(d)}: {dest} is a link; left in place",
                       run["warnings"])  # fails: "is also archived at"
 
+    def test_so_is_a_file_in_place_of_the_build_folder(self):
+        """(8a3d36c named a link as one, but a file there was still a copy also archived there)"""
+        _, d = self.old_layout("2026-09-20T120000Z")
+        dest = f"runs/2026-09/2026-09-20T120000Z/job/{os.path.basename(d)}"
+        os.makedirs(os.path.join(self.root, os.path.dirname(dest)))
+        with open(os.path.join(self.root, dest), "w") as f:
+            f.write("a file\n")
+        run = self.next_fetch()
+        self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))
+        self.assertIn(f"old layout: logs/job/{os.path.basename(d)}: {dest} is taken by what is not an archived copy of "
+                      "it; left in place", run["warnings"])  # fails: "is also archived at"
+
+    def test_control_a_copy_archived_there(self):
+        _, d = self.old_layout("2026-09-20T120000Z")
+        dest = f"runs/2026-09/2026-09-20T120000Z/job/{os.path.basename(d)}"
+        shutil.copytree(d, os.path.join(self.root, dest))
+        run = self.next_fetch()
+        self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))
+        self.assertIn(f"old layout: logs/job/{os.path.basename(d)} is also archived at {dest}; left in place", run["warnings"])
+
     def list_only(self):
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
