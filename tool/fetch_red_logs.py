@@ -4538,10 +4538,11 @@ def main(argv=None):
     run_start = time.time()
     tool_version()  # (asked once, now: the run's report gives it)
     root = args.archive
+    # (a run makes the archive where nothing is; --show-verifications and --clean-partial have nothing to change)
+    if not os.path.isdir(root) and (os.path.lexists(root) or args.show_verifications or args.clean_partial):
+        print(f"ERROR {root} is not a folder: no archive is there", file=sys.stderr)
+        return 1
     if args.show_verifications or args.clean_partial:
-        if not os.path.isdir(root):  # (not made here: there is nothing to change)
-            print(f"ERROR {root} is not a folder: no archive is there", file=sys.stderr)
-            return 1
         lock = lock_archive(root)
         if lock is None:
             print(f"ERROR another run holds {os.path.join(root, '.lock')}", file=sys.stderr)
