@@ -1578,6 +1578,9 @@ class ArchiveLinks(ArchiveWorld):
                 self.assertEqual(code, 1)  # fails: raised
                 self.assertIn(f"{os.path.join(self.root, path)} is not a folder: no run goes on until it is fixed",
                               err.getvalue())
+                code, out, _ = self.list_only()  # (it makes no folder: it goes on)
+                self.assertEqual(code, 0)
+                self.assertIn(self.build, out)
                 os.remove(os.path.join(self.root, path))
                 shutil.move(target, os.path.join(self.root, path))
 
@@ -1697,6 +1700,15 @@ class ArchiveLinks(ArchiveWorld):
         run = self.next_fetch()
         self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))
         self.assertIn(f"old layout: logs/job/{os.path.basename(d)} is also archived at {dest}; left in place", run["warnings"])
+
+    def test_control_a_copy_archived_elsewhere(self):  # (kills a mutant: the place named is where the copy is)
+        _, d = self.old_layout("2026-09-20T120000Z")
+        elsewhere = f"runs/2026-10/2026-10-01T000000Z/job/{os.path.basename(d)}"
+        shutil.copytree(d, os.path.join(self.root, elsewhere))
+        run = self.next_fetch()
+        self.assertTrue(os.path.exists(os.path.join(d, "meta.json")))
+        self.assertIn(f"old layout: logs/job/{os.path.basename(d)} is also archived at {elsewhere}; left in place",
+                      run["warnings"])
 
     def list_only(self):
         out, err = io.StringIO(), io.StringIO()
@@ -2134,7 +2146,8 @@ class NamedAsADownload(ArchiveWorld):
         """clean_partial_builds took any folder in a job's folder for a build's: a person's copy of one,
         named as no download names one, was removed if it held only files a download writes."""
         run = os.path.dirname(os.path.dirname(self.folder))
-        rels = ("job/2110000000000000007.bak", "job/copy of 2110000000000000007", ".job/2110000000000000007")
+        rels = ("job/2110000000000000007.bak", "job/copy of 2110000000000000007", ".job/2110000000000000007",
+                "job copy/2110000000000000007")  # (the last kills a mutant: a name only starting as a job's)
         for rel in rels:
             os.makedirs(os.path.join(run, rel))
             with open(os.path.join(run, rel, "build-log.txt"), "w") as f:
