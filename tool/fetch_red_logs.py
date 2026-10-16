@@ -5006,6 +5006,13 @@ def run(args, root, run_start, pool, deadline):
             r.update(config=tab_config[key], config_read=config_read.get(key))
         if key in mismatch_of:
             r["config_mismatch"] = mismatch_of[key]
+    # A report from the start, that the run stopped before it finished, as one killed before it writes
+    # its own leaves it (a step's timeout kills it at last): later runs see a run not done with its
+    # sevenths (see gcs_sevenths), and its folder stays, though what it fetches again is stored in older ones.
+    write_json(os.path.join(root, run_rel, "run.json"),
+               {"run": run_id, "dir": run_rel, "started": run_start, "tool": tool_version(), "github": github_run(),
+                "tabs": reports, "red_builds_seen": len(builds), "outcomes": {}, "warnings": list(warnings),
+                "errors": [{"build": None, "error": "the run stopped before it finished"}], "gcs_compared": False})
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors) + take_out_errors, 0, {}, {}
     uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
     if taken_out or shown_out:  # (taken out of the archive now, or shown red by TestGrid and left out)
