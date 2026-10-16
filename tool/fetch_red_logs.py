@@ -2777,19 +2777,20 @@ class ConfigHistory:
         return min((r["finished"] + PICKUP for r in self.runs if r["finished"] is not None and r["started"] >= after),
                    default=math.inf)
 
-    def eras(self, key):
+    def eras(self, key, split=None):
         """The tab's entry over time, as [(from, to, entry)]: entry None while TestGrid had no
         such tab, UNKNOWN while the archive does not know it; a run's entry from its start
         until a run that began after it ended uploaded its config (and PICKUP: either may be
         in force then; and the tabulator may show the columns read before by its filters
-        TABULATE longer, see tab_verdict)."""
+        TABULATE longer, see tab_verdict). Runs with the same entry make one era; but a run
+        without the tab that began at `split` or later begins one of its own."""
         if not self.runs:
             return []
         out = [(-math.inf, self.replaced(-math.inf), UNKNOWN)]
         for i, r in enumerate(self.runs):
             entry = UNKNOWN if r["tabs"] is None else r["tabs"].get(key)
             end = self.replaced(self.ended(i))
-            if out[-1][2] == entry:
+            if out[-1][2] == entry and not (entry is None and split is not None and out[-1][0] < split <= r["started"]):
                 out[-1] = (out[-1][0], end, entry)
             else:
                 out.append((r["started"], end, entry))
@@ -2918,7 +2919,7 @@ def history_rules(history, keys, now, lacking=None, queries=None, era_rule=None)
     lacking, queries, era_rule = lacking or {}, queries or {}, era_rule or (lambda entry: entry)
     out = {}
     for key in keys:
-        eras = [(lo, hi, era_rule(entry)) for lo, hi, entry in history.eras(key)]
+        eras = [(lo, hi, era_rule(entry)) for lo, hi, entry in history.eras(key, lacking.get(key))]
         if key in lacking:
             seen = lacking[key]
             last = max((i for i, (lo, _, e) in enumerate(eras) if lo < seen and e is not None and e is not UNKNOWN),
