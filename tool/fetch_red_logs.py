@@ -3728,6 +3728,31 @@ def verification_of(root, rel):
     return f"[{outcome}]({rel}/verification.json)"
 
 
+def show_verifications(root):
+    """Put each run's verification, as its verification.json records it now, in INDEX.md's table of
+    runs (the fetch writes the table before the run it makes is verified: "pending"), and change
+    nothing else. Returns how many rows changed."""
+    path = os.path.join(root, "INDEX.md")
+    try:
+        with open(path, encoding="utf-8") as f:
+            lines = f.read().split("\n")
+    except FileNotFoundError:
+        return 0
+    changed, table = 0, False
+    for i, line in enumerate(lines):
+        if line.startswith("## "):
+            table = line.startswith("## Runs in the last ")
+        m = re.match(r"\| \[[^\]]*\]\((runs/[0-9]{4}-[0-9]{2}/[^/)]+)/\) \| ", line) if table else None
+        cut = line.rfind(" | ", 0, len(line) - 2)
+        if m and line.endswith(" |") and cut > m.end() - 4:
+            new = line[:cut + 3] + verification_of(root, m.group(1)) + " |"
+            if new != line:
+                lines[i], changed = new, changed + 1
+    if changed:
+        write_text(path, "\n".join(lines))
+    return changed
+
+
 def write_run_readme(root, rel, run, entries):
     """README.md of a run folder: what the run did, and the builds it archived, with links."""
     name = rel.rsplit("/", 1)[1]
@@ -3876,7 +3901,8 @@ def write_index(root, now, current_run=None, missing=(), known=None):
               "follows the fetch ([cross_check.py](../tool/cross_check.py)).", "",
               "Verification is the outcome that verification recorded in the run's verification.json: ok, its "
               "number of problems, timed out, interrupted, stopped (by an error), or incomplete (it ended "
-              "without recording one). It is pending for the run that wrote this page (it is verified after); not "
+              "without recording one). It is pending for the run that wrote this page until its verification ends, when "
+              "the workflow puts the outcome here; not "
               "recorded when the run has no verification.json (it ran before verifications were recorded, was not "
               "verified, or none could be written); and unreadable when the file is damaged.", "",
               "| Run (UTC) | New builds | Updated | Collection result | Verification |", "|---|---:|---:|---|---|"]
@@ -4293,6 +4319,9 @@ def main(argv=None):
                         "its test group's options, to judge builds TestGrid no longer shows (default, or when it "
                         "cannot be read: the config the last run read, kept in state.json)")
     p.add_argument("--list-only", action="store_true", help="print the red builds without downloading")
+    p.add_argument("--show-verifications", action="store_true",
+                   help="only put each run's verification, as its verification.json records it, in INDEX.md's table "
+                        "of runs (the workflow does this once the run is verified)")
     p.add_argument("--testgrid", default=TESTGRID)
     p.add_argument("--gcs", default=GCS)
     args = p.parse_args(argv)
@@ -4300,6 +4329,14 @@ def main(argv=None):
     run_start = time.time()
     tool_version()  # (asked once, now: the run's report gives it)
     root = args.archive
+    if args.show_verifications:
+        lock = lock_archive(root)
+        if lock is None:
+            print(f"ERROR another run holds {os.path.join(root, '.lock')}", file=sys.stderr)
+            return 2
+        with lock:
+            print(f"INDEX.md: {show_verifications(root)} rows of runs show their verification anew")
+        return 0
     lock = None
     if not args.list_only:
         lock = lock_archive(root)
