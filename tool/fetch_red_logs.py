@@ -3488,7 +3488,16 @@ def migrate_old_layout(root, warnings):
         name = m["archived_by_run"]
         if RUN_RE.fullmatch(name) and folder_time(name) is not None:  # rewritten by a migration cut off before the move
             folder_of.setdefault(name, name)
-    for old in sorted({m["archived_by_run"] for *_, m in builds} | set(reports), key=lambda o: started_of(o) or 0):
+    olds = {m["archived_by_run"] for *_, m in builds} | set(reports)
+    # (a link in the archive is never followed: nothing moves while a folder it would move into is one)
+    months = {folder_of[old][:7] if old in folder_of else dt.datetime.fromtimestamp(started_of(old), dt.UTC).strftime("%Y-%m")
+              for old in olds if old in folder_of or started_of(old) is not None}
+    linked = [p for p in ["runs", *(f"runs/{m}" for m in sorted(months))] if os.path.islink(os.path.join(root, p))]
+    if linked:
+        warnings.append(f"old layout: {linked[0]} is a link, so nothing is moved into run folders until it is fixed, as "
+                        "it would be moved where the link leads")
+        return
+    for old in sorted(olds, key=lambda o: started_of(o) or 0):
         if old not in folder_of and started_of(old) is not None:
             folder_of[old] = folder_for(old)
     known, _ = archived_builds(root)
