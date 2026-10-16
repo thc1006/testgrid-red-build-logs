@@ -4612,9 +4612,11 @@ def run(args, root, run_start, pool, deadline):
     shown = listed | {k for k, t in state["tabs"].items() if k.split("#", 1)[0] in unread and not t.get("missing_since")}
     lacking = sorted(k for k in shown if current is not None and k not in current)
     # (but one a config with the tab may still be in force for, as ConfigHistory.eras takes them, and an
-    # hour more: the latest config may not be TestGrid's yet, and TestGrid then lists the tabs it dropped)
-    untaken = {k for k in lacking if any(lo <= run_start <= hi + 3600 and e is not None and e is not UNKNOWN
-                                         for lo, hi, e in history.eras(k))}
+    # hour more, once its run has uploaded it: the latest config may not be TestGrid's yet, and TestGrid
+    # then lists the tabs it dropped)
+    uploaded = history.uploaded()
+    untaken = {k for k in lacking if any(lo <= run_start <= hi + 3600 and uploaded.get(lo, math.inf) < run_start
+                                         and e is not None and e is not UNKNOWN for lo, hi, e in history.eras(k))}
     # ... and one TestGrid listed so before, past that: its config since its last entry before then is not
     # known either, in the configs that came into force before then, though TestGrid no longer lists it (it
     # showed the tab then), for as long as a build held for it may wait

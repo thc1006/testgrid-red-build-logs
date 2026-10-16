@@ -630,12 +630,12 @@ class LackingRecordWhileAnUploadRan(ttc.ConfigWorld):
     config known."""
 
     def history(self, *configs):
-        """As ConfigOverTime.history, each config (started, finished, dashboards)."""
+        """As ConfigOverTime.history, each config (started, finished: None while it runs, dashboards)."""
         runs, built = [], {}
         for i, (started, finished, dashboards) in enumerate(configs):
             commit = f"{i + 1:040x}"
             runs.append({"build": str(snowflake(started)), "commit": commit, "started": int(started),
-                         "finished": int(finished)})
+                         "finished": None if finished is None else int(finished)})
             built[commit] = ({f"{d}#{t}": e for d, tabs in dashboards.items() for t, e in tabs.items()},
                              {"test_infra": commit})
         h = frl.ConfigHistory()
@@ -661,6 +661,22 @@ class LackingRecordWhileAnUploadRan(ttc.ConfigWorld):
     def test_control_a_record_after_c3_was_uploaded(self):
         outcomes, _ = self.judged(30 * 60)
         self.assertEqual(outcomes, {})  # (TestGrid may have had C3 then, which has t: not red by it)
+
+    def test_a_config_whose_run_still_runs_explains_no_listing(self):
+        """8b8a3c5 took the tab as not taken yet by C3 while its run still ran (its era begins at its
+        start), so it kept no record, and warned only that TestGrid may not have taken the latest
+        config: once TestGrid no longer listed t, a build it may have shown red there was judged
+        not red."""
+        b2 = str(snowflake(self.now - 10 * HOUR))
+        self.failed_in_gcs(b2, 10 * HOUR)
+        self.junit(b2, RED_ON_TEST)
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}})
+        self.fetch_with(self.history(
+            (self.now - 30 * DAY - 5, self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
+            (self.now - 2 * DAY - 5, self.now - 2 * DAY, {"dash": {"other": ttc.entry("")}}),
+            (self.now - 600, None, {"dash": {"t": ttc.entry(self.HIDE), "other": ttc.entry("")}})))
+        self.assertIn("dash#t", self.state().get("lacking_tabs", {}))  # fails: no record
+        self.assertIn("it lacks tabs TestGrid shows", " ".join(self.runs()[-1]["serious_warnings"]))
 
     def test_a_record_while_c3_ran(self):
         """C3's run had not uploaded it when the record was made: TestGrid did not have it, and
