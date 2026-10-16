@@ -7,8 +7,10 @@ For one run (default: the latest):
              no other stored file sits next to it; and GCS still holds the
              content it was taken from, checked for the builds of the last
              --hours and a seventh of the older ones for each day since the
-             run before (so each at least once a week; the run's fetch
-             compares the same ones, see fetch_red_logs.gcs_sevenths); a
+             last run done with its own (so each at least once a week, even
+             when a run is cut off or its verification finds a problem; the
+             run's fetch compares the same ones, see
+             fetch_red_logs.gcs_sevenths); a
              build archived without a log still has none in GCS. Then what
              the archive holds, by kind.
   testgrid   every column TestGrid paints red now, whose build finished well
@@ -540,9 +542,10 @@ def check(args, problems, notes, record):
 
     # 1. integrity: every archived file on disk, whatever its age; and what GCS holds
     # now for the builds of the window, and for a seventh of the older ones per day
-    # since the run before this one (a different seventh each day, so each is
-    # compared again at least once a week, even when a day has no run; the run's
-    # fetch compared the same ones, final or not)
+    # since the last run done with its own (a different seventh each day, so each is
+    # compared again at least once a week, even when a day has no run or a run is
+    # cut off; the run's fetch compared the same ones, final or not: see
+    # fetch_red_logs.gcs_sevenths)
     sevenths = frl.gcs_sevenths(root, t0)
 
     def compare_with_gcs(m):
@@ -588,8 +591,8 @@ def check(args, problems, notes, record):
                 problems.append(p)
     compared = sum(1 for _, m in items if compare_with_gcs(m))
     print(f"  integrity: {len(items)} builds' files checked on disk, {compared} of them compared with GCS (those "
-          f"from the window, and {len(sevenths)}/7 of the rest, one seventh per day since the run before): {bad} differ, "
-          f"{len(unsettled)} not settled yet")
+          f"from the window, and {len(sevenths)}/7 of the rest, one seventh per day since the last run done with its "
+          f"own): {bad} differ, {len(unsettled)} not settled yet")
     print("  inventory: " + inventory(archived, root))
     record.scope(compared_with_gcs=compared, sevenths=sorted(sevenths), differ=bad, not_settled=len(unsettled))
 

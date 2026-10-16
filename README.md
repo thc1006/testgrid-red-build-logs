@@ -117,9 +117,9 @@ from GCS.
    without a log or without `finished.json` is compared until 14 days after it
    was archived. After that, it is compared at least once a week. The archive's
    builds are split into seven by a hash of their job and build. Each run
-   compares the seventh for its UTC day, and those of any days since the run
-   before, as `cross_check.py` does. A run cut off before it got to a build
-   leaves it to the next run that compares its seventh.
+   compares the seventh for its UTC day, and those of the days since the last
+   run that finished its comparisons and passed its verification.
+   `cross_check.py` compares the same ones.
 5. Rewrite the index and the charts, then run
    [`cross_check.py`](tool/cross_check.py). It checks the archive again on its
    own, and fails the run if a red build is missing or a stored file changed.
