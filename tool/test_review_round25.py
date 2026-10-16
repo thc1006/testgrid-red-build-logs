@@ -496,6 +496,19 @@ class LackingRecordAndLaterConfigs(ttc.ConfigWorld):
         self.assertEqual(self.judged(*self.configs)["outcomes"], {"held": [f"job/{self.b2}"]})
         self.assertEqual(self.unlisted(), {"not-red": [f"job/{self.b2}"]})  # fails: held
 
+    def test_a_record_between_two_configs_without_the_tab(self):
+        """C2 and C3 have no t, and a record from 2.5 days ago falls between them. The record held
+        the build for C3 too, which came into force after it (31a580f): the two runs made one era
+        in ConfigHistory.eras, which began before the record. The hold ended 60 days after the
+        build was made, in a warning that a config of t was not known."""
+        configs = [(self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
+                   (self.now - 3 * DAY, {"dash": {"other": ttc.entry("")}}),
+                   (self.now - 2 * DAY, {"dash": {"other": ttc.entry("")}}),
+                   (self.now - 5 * HOUR, {"dash": {"t": ttc.entry(self.HIDE), "other": ttc.entry("")}})]
+        self.record(2.5 * DAY)
+        self.assertEqual(self.judged(*configs)["outcomes"], {})  # fails: held
+        self.assertEqual(self.state()["watch"], {})  # (judged: not red, by C3 without t and C4 hiding its row)
+
     def later(self):
         """C2 (20 hours ago) has no t, C3 (5 hours ago) has t, hiding the build's red row."""
         return [(self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
