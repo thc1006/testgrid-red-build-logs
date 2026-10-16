@@ -2117,9 +2117,9 @@ class NamedAsADownload(ArchiveWorld):
         with open(a_file, "w") as f:
             f.write("a file\n")
         os.symlink(os.path.join(self.root, "nowhere"), dangling)
-        for path in (a_file, dangling):
+        for path in (a_file, dangling, a_file + "/", dangling + "/"):  # (the last two: fails: raised, or 0)
             for extra in ([], ["--list-only"]):
-                with self.subTest(path=os.path.basename(path), extra=extra):
+                with self.subTest(path=path[len(self.root) + 1:], extra=extra):
                     self.assertEqual(self.main("--archive", path, "--dashboard", "dash", "--testgrid", self.srv.url,
                                                "--gcs", self.srv.url, *extra), 1)  # fails: raised (0 for the link, listed)
         self.assertFalse(os.path.lexists(os.path.join(self.root, "nowhere")))
