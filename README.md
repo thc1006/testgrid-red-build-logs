@@ -162,7 +162,7 @@ to `archive/excluded.json`:
 
 The next run removes its folder and never fetches it again, and
 `cross_check.py` does not count it as missing. Its files stay in the git
-history until that is rewritten. A run stops if the file cannot be read.
+history until that is rewritten. A run stops if it cannot use the file.
 
 ## Running it locally
 
