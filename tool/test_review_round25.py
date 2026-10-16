@@ -743,6 +743,23 @@ class LackingRecordWhileAnUploadRan(ttc.ConfigWorld):
         outcomes, _ = self.judged(30 * 60)
         self.assertEqual(outcomes, {})  # (TestGrid may have had C3 then, which has t: not red by it)
 
+    def test_a_config_uploaded_in_the_second_another_run_began(self):
+        """Two runs of the upload job began in the same second: R1, whose config has t (it ended 5
+        seconds later), and R2, without t, whose finished.json was never written. 0f2c190 looked up
+        when a config's run ended by the run's start, and took R2's end (not known) for R1's too: R1
+        counted as not uploaded, and t, which TestGrid lists under it and which the latest config
+        drops, as a tab no config TestGrid may have has (a serious warning, and a record kept)."""
+        start = int(self.now - 2 * HOUR)
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}},
+                       tab_configs={"dash#t": {"config": ttc.entry(""), "read": self.now - DAY}})
+        self.fetch_with(self.history(
+            (self.now - 30 * DAY - 5, self.now - 30 * DAY, {"dash": {"t": ttc.entry(self.HIDE)}}),
+            (start, start + 5, {"dash": {"t": ttc.entry(""), "other": ttc.entry("")}}),
+            (start + 0.5, None, {"dash": {"other": ttc.entry("")}}),  # (the same second, another build)
+            (self.now - 75 * 60, self.now - 70 * 60, {"dash": {"other": ttc.entry("")}})))
+        self.assertNotIn("lacking_tabs", self.state())  # fails: dash#t kept
+        self.assertFalse(any("lacks tabs TestGrid shows" in w for w in self.runs()[-1]["serious_warnings"]))
+
     def test_a_config_whose_run_still_runs_explains_no_listing(self):
         """8b8a3c5 took the tab as not taken yet by C3 while its run still ran (its era begins at its
         start), so it kept no record, and warned only that TestGrid may not have taken the latest
@@ -786,10 +803,10 @@ class TwoUploadsInOneSecond(unittest.TestCase):
     began. 13c666e took one run's end for both, the last listed: in one order, Ra's config, not
     uploaded yet then, explained the record."""
 
-    def eras_of_r1(self, first):
+    def eras_of_r1(self, first, ra_ends=1800, rb_ends=5):
         S, entry = 1_790_000_000, ttc.entry("")
         runs = [(S - 30 * DAY, S - 30 * DAY + 5, {"d#t": entry}), (S - 5 * DAY, S - 5 * DAY + 5, {}),
-                (S, S + 1800, {"d#t": entry}), (S, S + 5, {})]
+                (S, S + ra_ends, {"d#t": entry}), (S, S + rb_ends, {})]
         if first == "Rb":
             runs[2], runs[3] = runs[3], runs[2]
         h = frl.ConfigHistory()
@@ -802,6 +819,11 @@ class TwoUploadsInOneSecond(unittest.TestCase):
     def test_in_either_order(self):
         self.assertEqual(self.eras_of_r1("Rb"), [frl.UNKNOWN])
         self.assertEqual(self.eras_of_r1("Ra"), [frl.UNKNOWN])  # fails: [None]
+
+    def test_ra_uploaded_before_the_record_explains_it_in_either_order(self):
+        """(Ra ends 5 seconds after it began, Rb 30 minutes after: 0f2c190 took the later end for both)"""
+        for first in ("Ra", "Rb"):
+            self.assertEqual(self.eras_of_r1(first, ra_ends=5, rb_ends=1800), [None], first)  # fails: [UNKNOWN]
 
 
 # ------------------------------------------------------------------ INDEX.md shows the run's verification
