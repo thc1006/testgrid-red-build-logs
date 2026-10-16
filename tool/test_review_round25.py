@@ -414,6 +414,77 @@ class LackingThenUnlisted(ttc.ConfigWorld):
         self.assertEqual(warnings, ["state.json: dropped a malformed lacking_tabs record"] * 3)
 
 
+class LackingRecordAndLaterConfigs(ttc.ConfigWorld):
+    """state.json records that a run saw TestGrid list tab t while the latest config the archive
+    knew had no t (lacking_tabs), and configs are known since. A build made 10 h ago, red only on
+    the rows HIDE hides, is in t's history gap. The record held t's configs after its last entry
+    as not known, those that came into force after the record too (8c15963)."""
+
+    history = tch.ConfigOverTime.history
+    judged = tch.ConfigOverTime.judged
+
+    def setUp(self):
+        super().setUp()
+        self.b2 = str(snowflake(self.now - 10 * HOUR))
+        self.failed_in_gcs(self.b2, 10 * HOUR)
+        self.junit(self.b2, RED_ON_TEST)
+        # C1 hides the build's red row, C2 has no t, C3 has t again, C4 (10 minutes ago) has no t
+        self.configs = [(self.now - 30 * DAY, {"dash": {"t": ttc.entry(self.HIDE)}}),
+                        (self.now - 25 * DAY, {"dash": {"other": ttc.entry("")}}),
+                        (self.now - 15 * DAY, {"dash": {"t": ttc.entry(self.HIDE), "other": ttc.entry("")}}),
+                        (self.now - 600, {"dash": {"other": ttc.entry("")}})]
+
+    def record(self, ago):
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * HOUR, "oldest": self.now - 60 * HOUR}},
+                       **({"lacking_tabs": {"dash#t": self.now - ago}} if ago is not None else {}))
+
+    def unlisted(self):
+        """TestGrid takes C4 and stops listing t: the outcomes of the next run."""
+        self.srv.summary("dash", {"other": "PASSING"})
+        self.srv.table("dash", "other", fetch_table("bucket/logs/otherjob", [], {}))
+        return self.judged(*self.configs)["outcomes"]
+
+    def test_control_without_a_record(self):
+        self.record(None)
+        # (TestGrid lists t, C4 not taken yet: t's config since C3 is not known)
+        self.assertEqual(self.judged(*self.configs)["outcomes"], {"held": [f"job/{self.b2}"]})
+        self.assertEqual(self.unlisted(), {"not-red": [f"job/{self.b2}"]})
+
+    def test_a_record_from_before_c3(self):
+        """A record from 20 days ago held the build for C4, which came into force long after it,
+        for 61 days."""
+        self.record(20 * DAY)
+        self.assertEqual(self.judged(*self.configs)["outcomes"], {"held": [f"job/{self.b2}"]})
+        self.assertEqual(self.unlisted(), {"not-red": [f"job/{self.b2}"]})  # fails: held
+
+    def test_a_record_c3_explains(self):
+        """C3 was built late: 20 hours ago C2 was the latest config the archive knew, while TestGrid
+        listed t. The build stayed held 60 days, then the run failed with a warning that a config of
+        t was not known, though all were."""
+        self.record(20 * HOUR)
+        self.assertEqual(self.judged(*self.configs)["outcomes"], {"held": [f"job/{self.b2}"]})
+        self.assertEqual(self.unlisted(), {"not-red": [f"job/{self.b2}"]})  # fails: held
+
+    def later(self):
+        """C2 (20 hours ago) has no t, C3 (5 hours ago) has t, hiding the build's red row."""
+        return [(self.now - 30 * DAY, {"dash": {"t": ttc.entry("")}}),
+                (self.now - 20 * HOUR, {"dash": {"other": ttc.entry("")}}),
+                (self.now - 5 * HOUR, {"dash": {"t": ttc.entry(self.HIDE), "other": ttc.entry("")}})]
+
+    def test_control_without_a_record_c3_hides_it(self):
+        self.record(None)
+        self.assertEqual(self.judged(*self.later())["outcomes"], {})
+        self.assertEqual(self.state()["watch"], {})  # (judged: not red)
+
+    def test_a_record_a_later_config_does_not_explain(self):
+        """8 hours ago, after the build was made, a run saw TestGrid list t under a config the
+        archive does not know (C2, the latest it knew, had no t): TestGrid may have shown the build
+        red then. Once C3 was known, a config with t from after that, the record counted for
+        nothing."""
+        self.record(8 * HOUR)
+        self.assertEqual(self.judged(*self.later())["outcomes"], {"held": [f"job/{self.b2}"]})  # fails: {}
+
+
 # ------------------------------------------------------------------ INDEX.md shows the run's verification
 
 class VerificationInTheIndex(ArchiveWorld):
