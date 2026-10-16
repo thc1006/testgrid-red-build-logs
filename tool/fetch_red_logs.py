@@ -1526,7 +1526,9 @@ def stray_files(target, meta):
     listed = []
     for default, key in (("build-log.txt", "log"), ("podinfo.json", "podinfo")):
         info = meta.get(key)
-        if info and isinstance(info, dict) and not info.get("omitted"):  # (as intact() reads it)
+        if info and not isinstance(info, dict):  # (one intact() cannot read)
+            return []
+        if info and not info.get("omitted"):  # (as intact() reads it)
             name = info.get("file", default)
             if not isinstance(name, str) or name not in LOG_FILES:
                 return []

@@ -2039,6 +2039,29 @@ class NamedAsADownload(ArchiveWorld):
                 frl.clean_partial_builds(self.root, [])
                 self.assertEqual(self.logs(), ["build-log.txt", "build-log.txt.000", "build-log.txt.001"])  # fails: removed
 
+    def test_nor_by_one_naming_its_log_or_podinfo_otherwise_than_as_an_object(self):
+        """(stray_files took such an entry for no file, so the build's own file for a stray)"""
+        meta = self.meta()
+        for log in ("build-log.txt", ["build-log.txt"], True):
+            with self.subTest(log=log):
+                frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, log=log))
+                frl.clean_partial_builds(self.root, [])
+                self.assertEqual(self.logs(), ["build-log.txt"])  # fails: removed
+        with open(os.path.join(self.bdir(), "podinfo.json"), "w") as f:
+            f.write("{}\n")
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, podinfo="podinfo.json"))
+        frl.clean_partial_builds(self.root, [])
+        self.assertTrue(os.path.exists(os.path.join(self.bdir(), "podinfo.json")))  # fails: removed
+
+    def test_or_parts_that_are_null(self):  # (kills a mutant)
+        meta = self.meta()
+        for n in ("build-log.txt.000", "build-log.txt.001"):
+            with open(os.path.join(self.bdir(), n), "w") as f:
+                f.write("lo")
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, log=dict(meta["log"], parts=None)))
+        frl.clean_partial_builds(self.root, [])
+        self.assertEqual(self.logs(), ["build-log.txt", "build-log.txt.000", "build-log.txt.001"])
+
     def test_control_parts_named_as_a_run_writes_them(self):
         meta = self.meta()
         for n in ("build-log.txt.000", "build-log.txt.001", "build-log.txt.002"):
