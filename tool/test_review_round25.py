@@ -211,6 +211,29 @@ class SeventhsOfRunsNotDone(unittest.TestCase):
         frl.write_json(os.path.join(self.root, rel, "job", "1", "meta.json"), {"job": "job", "build": "1"})
         self.assertEqual(self.sevenths(30), self.days(0, 1))  # fails: {DAY + 1} only
 
+    def test_or_its_report_cannot_be_read(self):
+        """(a report not JSON, a folder, a link, or with a start no run can have): passed over, as no run."""
+        def damage(path, how):
+            os.remove(path)
+            if how == "not JSON":
+                with open(path, "w") as f:
+                    f.write('{"started": ')
+            elif how == "a folder":
+                os.mkdir(path)
+            elif how == "a link":
+                os.symlink(os.path.join(self.root, "elsewhere.json"), path)
+            else:
+                frl.write_json(path, {"started": 0})
+        for how in ("not JSON", "a folder", "a link", "started 0"):
+            with self.subTest(how):
+                self.root = tempfile.mkdtemp()
+                self.addCleanup(shutil.rmtree, self.root)
+                self.run_at(1)
+                self.run_at(5, compared=False)
+                frl.write_json(os.path.join(self.root, "elsewhere.json"), {"started": 0})  # (read through the link)
+                damage(os.path.join(self.root, frl.run_dirs(self.root)[-1], "run.json"), how)
+                self.assertEqual(self.sevenths(30), self.days(0, 1))  # fails: {DAY + 1} only
+
     def test_a_run_not_done_on_the_day_of_the_last_done_one(self):
         # (the run done that day compared its seventh, but the later one may have found GCS changed since)
         self.run_at(1)
