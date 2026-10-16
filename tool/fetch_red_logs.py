@@ -30,9 +30,10 @@ every run until RECHECK_HOURS after it finished (GIVE_UP_DAYS after it was
 archived, for one without a log or finished.json), and fetched again whenever
 GCS holds different content. After that (it is final), it is compared at least
 once a week: each run compares the seventh of the archive for its UTC day, and
-those of the days since the run before (see gcs_sevenths), as cross_check.py
-does. One a run cut off did not get to waits for the next run that compares its
-seventh. A copy taken less than SETTLE_HOURS after the build finished, or before
+those of the days since the last run done with its own (it compared them all,
+and its verification ended ok: see gcs_sevenths), as cross_check.py does. So
+one a run cut off did not get to is compared by the next run. A copy taken
+less than SETTLE_HOURS after the build finished, or before
 it finished at all, is marked as not settled.
 
 Each run gets its own folder; a build is stored in the folder of the run that
@@ -1526,8 +1527,8 @@ def stray_files(target, meta):
 
 
 class RecheckError(Exception):
-    """Comparing an intact archived build with GCS failed; its copy stays and is compared again by a
-    later run (a final one, by the next run that compares its seventh: see gcs_sevenths)."""
+    """Comparing an intact archived build with GCS failed; its copy stays and is compared again by the
+    next run (the run is not done with its sevenths: see gcs_sevenths)."""
 
 
 def read_finished(base):
@@ -3265,16 +3266,44 @@ def run_started(path):
     return started if plausible_time(started, time.time()) else None
 
 
+def sevenths_done(root, rel):
+    """Whether the run in folder rel was done with its sevenths of the archive (see gcs_sevenths):
+    its fetch compared all it was due to with GCS ("gcs_compared" in its run.json) and its
+    verification ended ok (its verification.json)."""
+    try:
+        run = read_json(os.path.join(root, rel, "run.json"))
+        path = os.path.join(root, rel, "verification.json")
+        v = None if os.path.islink(path) else read_json(path)  # (a link in the archive is never followed)
+    except (OSError, ValueError):
+        return False
+    return isinstance(run, dict) and run.get("gcs_compared") is True and isinstance(v, dict) and v.get("outcome") == "ok"
+
+
 def gcs_sevenths(root, t0):
     """The sevenths of the archived builds (see sampled()) that the run started at t0 compares
-    with GCS again, final or not: one for each UTC day from the day after the run before it
-    to the day of this one, at least this day's, so all seven after a week without a run.
-    Each build is compared at least once a week, even when a day has no run. cross_check.py
-    compares the same ones when it verifies that run."""
+    with GCS again, final or not: one for each UTC day from the day after the last run before it
+    that was done with its own (see sevenths_done) to the day of this one, and that run's day too
+    if a run later that day was not; at least this day's, so all seven when no run of the week
+    before was done with them. Each build is so compared, and verified, at least once a week, even
+    when a day has no run, or a run is cut off or its verification finds a problem. The first run
+    (none before it) compares this day's only. cross_check.py compares the same ones when it
+    verifies that run."""
     day = int(t0 // 86400)
-    previous = next((s for s in (run_started(os.path.join(root, rel, "run.json")) for rel in reversed(run_dirs(root)))
-                     if s is not None and s < t0), None)
-    first = max(min(int(previous // 86400) + 1, day), day - 6) if previous is not None else day
+    earlier, after, first = False, None, day - 6  # (after: the day of the earliest run not done since)
+    for rel in reversed(run_dirs(root)):
+        started = run_started(os.path.join(root, rel, "run.json"))
+        if started is None or started >= t0:
+            continue
+        earlier = True
+        if started < (day - 7) * 86400:
+            break  # (an older one cannot add a day)
+        if sevenths_done(root, rel):
+            first = int(started // 86400) + 1 if after is None else min(after, int(started // 86400) + 1)
+            break
+        after = int(started // 86400)
+    if not earlier:
+        first = day
+    first = max(min(first, day), day - 6)
     return {d % 7 for d in range(first, day + 1)}
 
 
@@ -4769,6 +4798,7 @@ def run(args, root, run_start, pool, deadline):
             r["config_mismatch"] = mismatch_of[key]
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors), 0, {}, {}
     uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
+    recheck_failed = False  # (a comparison with GCS failed)
     # judged by the gap search just now and still running, overdue on TestGrid, or watched and still
     # shown by TestGrid: watched without a look now, for as long as a build is ever watched
     for w in running_gap + list(stalled.values()) + still_shown:
@@ -4837,8 +4867,8 @@ def run(args, root, run_start, pool, deadline):
                 if archived_intact(target_of(b), deep=True):
                     # Finished just as the run gave up, or already on disk. One due to be
                     # compared with GCS that this run did not update was not compared to the end
-                    # ("not-checked"): one that is not final yet is compared next run, and a final
-                    # one by the next run that compares its seventh.
+                    # ("not-checked"): the next run compares it (the run is not done with its
+                    # sevenths, see gcs_sevenths).
                     outcome = add_sightings(target_of(b), b, run_id)
                     if outcome == "already-archived" and due_in_gcs(target_of(b), key in resampled):
                         outcome = "not-checked"
@@ -4858,9 +4888,10 @@ def run(args, root, run_start, pool, deadline):
             elif outcome in ("watching", "held"):
                 watch[key] = {"rec": b, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
         except RecheckError as e:
-            # The archived copy stays as it is, and a later run compares it again (a final one, the next
-            # run that compares its seventh).
+            # The archived copy stays as it is, and the next run compares it again (the run is not done
+            # with its sevenths, see gcs_sevenths).
             errors.append({"build": key, "error": str(e)})
+            recheck_failed = True
         except Exception as e:
             message = f"{type(e).__name__}: {e}"
             if b.get("watch") and not getattr(e, "red_rec", None):
@@ -4887,8 +4918,8 @@ def run(args, root, run_start, pool, deadline):
     if uncompared:
         uncompared.sort()
         warnings.append(f"{len(uncompared)} archived builds were not compared with GCS before the run's deadline "
-                        f"({', '.join(uncompared[:3])}{', ...' if len(uncompared) > 3 else ''}): those not final yet "
-                        "are compared next run, the final ones by the next run that compares their seventh")
+                        f"({', '.join(uncompared[:3])}{', ...' if len(uncompared) > 3 else ''}): the next run "
+                        "compares them")
     recs = {f"{b['job']}/{b['build']}": b for b in selected + retry + running_gap + list(stalled.values()) + still_shown}
     warnings += [f"{key}: still not decided {GIVE_UP_DAYS} days after it was made (not finished, or TestGrid still "
                  "shows it running, or it has no usable start time, so TestGrid never paints it red); no longer watched"
@@ -4909,7 +4940,9 @@ def run(args, root, run_start, pool, deadline):
                "retried_from_state": len(retry) - rechecks - backfilled - (len(new_watch) - len(running_gap)),
                "rechecked": rechecks, "watched": len(watch),
                "backfilled_from_gcs": len(outcomes.get("backfilled", [])), "outcomes": outcomes,
-               "errors": errors, "warnings": warnings, "serious_warnings": serious, "interrupted": interrupted}
+               "errors": errors, "warnings": warnings, "serious_warnings": serious, "interrupted": interrupted,
+               # (whether it compared with GCS all the archived builds it was due to: see gcs_sevenths)
+               "gcs_compared": not (uncompared or recheck_failed or interrupted)}
     run_json = os.path.join(root, run_rel, "run.json")
     # Save what the next run needs before drawing the pages and charts: a failure
     # there must not lose a build that is about to scroll off TestGrid.

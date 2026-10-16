@@ -1158,9 +1158,11 @@ class Sevenths(unittest.TestCase):
         """(cab048a computed them inside cross_check.check: it has no frl.gcs_sevenths)"""
         with tempfile.TemporaryDirectory() as root:
             day = 20_000 * 86400
-            for started in (day - 10 * 86400, day - 3 * 86400 + 5, day + 7200):
+            for started in (day - 10 * 86400, day - 3 * 86400 + 5, day + 7200):  # (each done with its sevenths)
                 rel = frl.new_run_dir(root, started)[1]
-                frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": started})
+                frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": started,
+                                                                     "gcs_compared": True})
+                frl.write_json(os.path.join(root, rel, "verification.json"), {"outcome": "ok"})
             rel = frl.new_run_dir(root, day - 86400)[1]  # (a report with a start no run can have: passed over)
             frl.write_json(os.path.join(root, rel, "run.json"), {"run": rel.rsplit("/", 1)[1], "started": 0})
             with mock.patch("time.time", return_value=day + 86400):
