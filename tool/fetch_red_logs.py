@@ -4552,7 +4552,9 @@ def main(argv=None):
     tool_version()  # (asked once, now: the run's report gives it)
     root = args.archive
     # (a run makes the archive where nothing is; --show-verifications and --clean-partial have nothing to change)
-    if not os.path.isdir(root) and (os.path.lexists(root) or args.show_verifications or args.clean_partial):
+    # ("x/" would make lexists follow a link, and deny a file)
+    if not os.path.isdir(root) and (os.path.lexists(root.rstrip(os.sep) or os.sep) or args.show_verifications
+                                    or args.clean_partial):
         print(f"ERROR {root} is not a folder: no archive is there", file=sys.stderr)
         return 1
     if args.show_verifications or args.clean_partial:
