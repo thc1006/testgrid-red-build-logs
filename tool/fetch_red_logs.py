@@ -4656,7 +4656,7 @@ def run(args, root, run_start, pool, deadline):
     taken_out, take_out_errors = sorted(k for k in excluded if k in known), []
     for key in taken_out:
         rel = known.pop(key)
-        if not args.list_only:
+        while rel is not None and not args.list_only:  # (each copy: two run folders can hold one build)
             try:
                 remove_build(os.path.join(root, rel))
                 # (the last build of the folder of a run cut off before its report, left by code before the
@@ -4667,6 +4667,10 @@ def run(args, root, run_start, pool, deadline):
             except OSError as e:
                 take_out_errors.append({"build": key, "error": f"taking it out ({EXCLUDED}) failed: "
                                                               f"{type(e).__name__}: {e}"})
+                break
+            rel = archived_builds(root)[0].get(key)
+    if taken_out and not args.list_only:
+        duplicates = archived_builds(root)[1]  # (as left: a copy taken out is no longer one of two)
     # the archived builds in this run's sevenths: compared with GCS even if final (cross_check.py
     # compares them too), see gcs_sevenths
     sevenths = gcs_sevenths(root, run_start)

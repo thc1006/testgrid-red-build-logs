@@ -1182,6 +1182,18 @@ class TakenOut(ArchiveWorld):
         self.assertEqual(code, 1)  # fails: 0, not checked
         self.assertIn(f"{self.key}: taken out (excluded.json), but still archived", out)
 
+    def test_every_copy_of_it(self):
+        """A build in two run folders (as merging the bundle of a run that could not push can leave):
+        the run that took it out removed the copy the index reads, and failed with two copies of it;
+        the other stayed, linked from INDEX.md, until the next run."""
+        self.assertEqual(self.fetch(), 0)
+        shutil.copytree(self.bdir(), os.path.join(self.root, frl.run_dirs(self.root)[-1], "job", self.build))
+        self.exclude()
+        self.assertEqual(self.fetch(), 0)  # fails: 1, "duplicate copies"
+        self.assertEqual([rel for rel in frl.run_dirs(self.root)
+                          if os.path.lexists(os.path.join(self.root, rel, "job", self.build))], [])
+        self.assertEqual(self.runs()[-1]["outcomes"], {"excluded": [self.key]})
+
 
 
 class TakenOutOfACutOffRun(ArchiveWorld):
