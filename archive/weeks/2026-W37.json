@@ -14,10 +14,11 @@
     "dir": "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2098094429171617792",
     "run": "2026-10-08T192522Z",
     "files": [
-      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2098094429171617792/build-log.txt.gz"
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2098094429171617792/build-log.txt.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-scale-correctness/2098094429171617792/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 54734,
+    "bytes": 162299,
     "settled": true,
     "final": true,
     "backfilled": false,

@@ -1,5 +1,180 @@
 [
   {
+    "time": 1792270386,
+    "job": "ci-kubernetes-e2e-kind",
+    "build": "2111560607110008832",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master"
+    ],
+    "red_tests": [
+      "ci-kubernetes-e2e-kind.Overall"
+    ],
+    "red_test_count": 1,
+    "dir": "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-kind/2111560607110008832",
+    "run": "2026-10-17T233055Z",
+    "files": [
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-kind/2111560607110008832/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-kind/2111560607110008832/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 125375,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2111560607110008832"
+  },
+  {
+    "time": 1792263268,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2111531162366119936",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.openapi",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-integration-arm64-master/2111531162366119936",
+    "run": "2026-10-17T233055Z",
+    "files": [
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-integration-arm64-master/2111531162366119936/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-integration-arm64-master/2111531162366119936/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 298266,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2111531162366119936"
+  },
+  {
+    "time": 1792261794,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2111525123147173888",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] Aggregator Should be able to support the 1.17 Sample API Server using the current Aggregator [LinuxOnly] [Conformance]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111525123147173888",
+    "run": "2026-10-17T233055Z",
+    "files": [
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111525123147173888/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111525123147173888/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 228348,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2111525123147173888"
+  },
+  {
+    "time": 1792254962,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2111496434397220864",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 1,
+    "dir": "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-capz-master-windows/2111496434397220864",
+    "run": "2026-10-17T233055Z",
+    "files": [
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-capz-master-windows/2111496434397220864/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-capz-master-windows/2111496434397220864/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 102803,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2111496434397220864"
+  },
+  {
+    "time": 1792250063,
+    "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+    "build": "2111475798085996544",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-alphafeatures-master"
+    ],
+    "red_tests": [
+      "kubetest.TearDown",
+      "kubetest.Timeout",
+      "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2111475798085996544",
+    "run": "2026-10-17T233055Z",
+    "files": [
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2111475798085996544/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2111475798085996544/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 130969,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2111475798085996544"
+  },
+  {
+    "time": 1792249735,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2111474538666528768",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should work for type=LoadBalancer [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-gci-gce-slow/2111474538666528768",
+    "run": "2026-10-17T233055Z",
+    "files": [
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-gci-gce-slow/2111474538666528768/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T233055Z/ci-kubernetes-e2e-gci-gce-slow/2111474538666528768/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 220372,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2111474538666528768"
+  },
+  {
     "time": 1792245743,
     "job": "ci-kubernetes-unit",
     "build": "2111457677577031680",
@@ -15,11 +190,12 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-unit/2111457677577031680",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-unit/2111457677577031680/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-unit/2111457677577031680/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-unit/2111457677577031680/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 284482,
-    "settled": false,
+    "bytes": 375200,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -44,11 +220,12 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111456670709190656",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111456670709190656/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111456670709190656/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111456670709190656/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 142962,
-    "settled": false,
+    "bytes": 228877,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -73,10 +250,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111406809678876672",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111406809678876672/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111406809678876672/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111406809678876672/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 280249,
+    "bytes": 367389,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -102,10 +280,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gci-gce/2111393973837762560",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gci-gce/2111393973837762560/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gci-gce/2111393973837762560/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gci-gce/2111393973837762560/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 257797,
+    "bytes": 343945,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -131,10 +310,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2111353457741926400",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2111353457741926400/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2111353457741926400/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2111353457741926400/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 60068,
+    "bytes": 130396,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -159,10 +339,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-unit/2111351191676915712",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-unit/2111351191676915712/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-unit/2111351191676915712/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-unit/2111351191676915712/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 323293,
+    "bytes": 413801,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -187,10 +368,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-kind/2111317217827098624",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-kind/2111317217827098624/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-kind/2111317217827098624/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-kind/2111317217827098624/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 118363,
+    "bytes": 227974,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -215,10 +397,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-integration-master/2111316715580166144",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-integration-master/2111316715580166144/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-integration-master/2111316715580166144/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-integration-master/2111316715580166144/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 207519,
+    "bytes": 302407,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -242,10 +425,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-capz-master-windows/2111314952856801280",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-capz-master-windows/2111314952856801280/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-capz-master-windows/2111314952856801280/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-capz-master-windows/2111314952856801280/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 8553,
+    "bytes": 102287,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -270,10 +454,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111305390900645888",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111305390900645888/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111305390900645888/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111305390900645888/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 149148,
+    "bytes": 244851,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -298,10 +483,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-integration-master/2111301615171407872",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-integration-master/2111301615171407872/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-integration-master/2111301615171407872/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-integration-master/2111301615171407872/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 202540,
+    "bytes": 297684,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -326,10 +512,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111299600974352384",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111299600974352384/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111299600974352384/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111299600974352384/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 51519,
+    "bytes": 138087,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -355,10 +542,11 @@
     "dir": "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2111298847031431168",
     "run": "2026-10-17T153420Z",
     "files": [
-      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2111298847031431168/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2111298847031431168/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T153420Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2111298847031431168/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 155131,
+    "bytes": 252187,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -384,10 +572,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111273931934535680",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111273931934535680/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111273931934535680/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111273931934535680/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 143697,
+    "bytes": 229930,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -412,10 +601,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-integration-master/2111271415364718592",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-integration-master/2111271415364718592/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-integration-master/2111271415364718592/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-integration-master/2111271415364718592/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 204010,
+    "bytes": 300814,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -440,10 +630,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-integration-master/2111241215893573632",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-integration-master/2111241215893573632/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-integration-master/2111241215893573632/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-integration-master/2111241215893573632/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 199986,
+    "bytes": 297497,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -468,10 +659,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-capz-master-windows/2111224356355969024",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-capz-master-windows/2111224356355969024/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-capz-master-windows/2111224356355969024/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-capz-master-windows/2111224356355969024/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 293920,
+    "bytes": 358242,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -496,10 +688,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-node-e2e-containerd/2111206991861911552",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-node-e2e-containerd/2111206991861911552/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-node-e2e-containerd/2111206991861911552/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-node-e2e-containerd/2111206991861911552/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 2890388,
+    "bytes": 2987160,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -525,10 +718,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111200717229264896",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111200717229264896/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111200717229264896/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111200717229264896/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 143621,
+    "bytes": 229009,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -554,10 +748,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-serial/2111184845274091520",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-serial/2111184845274091520/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-serial/2111184845274091520/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-serial/2111184845274091520/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 124510,
+    "bytes": 188386,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -582,10 +777,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111184592277868544",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111184592277868544/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111184592277868544/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111184592277868544/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 144162,
+    "bytes": 239069,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -611,10 +807,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111180314368806912",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111180314368806912/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111180314368806912/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111180314368806912/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 212567,
+    "bytes": 299139,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -638,10 +835,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-capz-master-windows/2111179055700119552",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-capz-master-windows/2111179055700119552/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-capz-master-windows/2111179055700119552/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-capz-master-windows/2111179055700119552/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 8553,
+    "bytes": 103109,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -667,10 +865,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111161943979986944",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111161943979986944/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111161943979986944/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111161943979986944/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 139344,
+    "bytes": 203878,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -696,10 +895,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gce-cos-slow-master/2111131995307249664",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gce-cos-slow-master/2111131995307249664/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gce-cos-slow-master/2111131995307249664/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gce-cos-slow-master/2111131995307249664/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 131578,
+    "bytes": 227099,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -724,10 +924,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-unit/2111123691956867072",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-unit/2111123691956867072/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-unit/2111123691956867072/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-unit/2111123691956867072/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 323322,
+    "bytes": 425979,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -752,10 +953,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-slow-master/2111101543884263424",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-slow-master/2111101543884263424/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-slow-master/2111101543884263424/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-slow-master/2111101543884263424/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 40044,
+    "bytes": 134740,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -781,10 +983,11 @@
     "dir": "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gce-cos-serial-master/2111097015109685248",
     "run": "2026-10-17T042534Z",
     "files": [
-      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gce-cos-serial-master/2111097015109685248/build-log.txt.gz"
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gce-cos-serial-master/2111097015109685248/build-log.txt.gz",
+      "runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gce-cos-serial-master/2111097015109685248/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 408378,
+    "bytes": 477904,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -808,10 +1011,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind/2111089464754311168",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind/2111089464754311168/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind/2111089464754311168/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind/2111089464754311168/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 6568,
+    "bytes": 101502,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -837,10 +1041,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2111078894445531136",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2111078894445531136/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2111078894445531136/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2111078894445531136/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 183666,
+    "bytes": 248256,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -865,10 +1070,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-integration-master/2111073861746298880",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-integration-master/2111073861746298880/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-integration-master/2111073861746298880/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-integration-master/2111073861746298880/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 216348,
+    "bytes": 313148,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -892,10 +1098,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-capz-master-windows/2111042907073941504",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-capz-master-windows/2111042907073941504/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-capz-master-windows/2111042907073941504/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-capz-master-windows/2111042907073941504/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 8474,
+    "bytes": 99226,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -920,10 +1127,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111002139915456512",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111002139915456512/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111002139915456512/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111002139915456512/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 144774,
+    "bytes": 248078,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -948,10 +1156,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-beta-features/2110988550005592064",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-beta-features/2110988550005592064/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-beta-features/2110988550005592064/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-kind-beta-features/2110988550005592064/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 119505,
+    "bytes": 237964,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -977,10 +1186,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110988297089060864",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110988297089060864/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110988297089060864/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110988297089060864/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 63802,
+    "bytes": 134148,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -1006,10 +1216,11 @@
     "dir": "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2110947528802308096",
     "run": "2026-10-16T164227Z",
     "files": [
-      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2110947528802308096/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2110947528802308096/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T164227Z/ci-kubernetes-e2e-gci-gce/2110947528802308096/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 217335,
+    "bytes": 302420,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -1035,10 +1246,11 @@
     "dir": "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312",
     "run": "2026-10-16T043240Z",
     "files": [
-      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110928652878221312/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 176860,
+    "bytes": 264976,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -1064,10 +1276,11 @@
     "dir": "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110906257270378496",
     "run": "2026-10-16T043240Z",
     "files": [
-      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110906257270378496/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110906257270378496/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110906257270378496/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 156748,
+    "bytes": 255075,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -1092,10 +1305,11 @@
     "dir": "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-node-e2e-containerd/2110873288556154880",
     "run": "2026-10-16T043240Z",
     "files": [
-      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-node-e2e-containerd/2110873288556154880/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-node-e2e-containerd/2110873288556154880/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-node-e2e-containerd/2110873288556154880/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 2888759,
+    "bytes": 2991230,
     "settled": true,
     "final": false,
     "backfilled": false,
@@ -1120,12 +1334,13 @@
     "dir": "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-node-e2e-containerd/2110812890255593472",
     "run": "2026-10-16T043240Z",
     "files": [
-      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-node-e2e-containerd/2110812890255593472/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-node-e2e-containerd/2110812890255593472/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-node-e2e-containerd/2110812890255593472/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 2899537,
+    "bytes": 2996300,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1148,12 +1363,13 @@
     "dir": "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-kind-beta-enabled-conformance/2110785711664795648",
     "run": "2026-10-16T043240Z",
     "files": [
-      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-kind-beta-enabled-conformance/2110785711664795648/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-kind-beta-enabled-conformance/2110785711664795648/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-kind-beta-enabled-conformance/2110785711664795648/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 110869,
+    "bytes": 205188,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1176,12 +1392,13 @@
     "dir": "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640",
     "run": "2026-10-16T043240Z",
     "files": [
-      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 86243,
+    "bytes": 151271,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1205,12 +1422,13 @@
     "dir": "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-slow/2110763313607479296",
     "run": "2026-10-16T043240Z",
     "files": [
-      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-slow/2110763313607479296/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-slow/2110763313607479296/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-slow/2110763313607479296/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 139153,
+    "bytes": 203453,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1233,12 +1451,13 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110757273419649024",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110757273419649024/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110757273419649024/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110757273419649024/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158197,
+    "bytes": 252448,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1261,12 +1480,13 @@
     "dir": "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110753499535904768",
     "run": "2026-10-16T043240Z",
     "files": [
-      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110753499535904768/build-log.txt.gz"
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110753499535904768/build-log.txt.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110753499535904768/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 86222,
+    "bytes": 151250,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1289,10 +1509,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110734371739668480",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110734371739668480/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110734371739668480/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110734371739668480/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 86235,
+    "bytes": 151721,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1318,10 +1539,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110717259256172544",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110717259256172544/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110717259256172544/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110717259256172544/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 103059,
+    "bytes": 168102,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1346,10 +1568,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110715509509984256",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110715509509984256/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110715509509984256/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110715509509984256/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 86284,
+    "bytes": 151107,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1373,10 +1596,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-conformance-kind-ga-only/2110714490021482496",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-conformance-kind-ga-only/2110714490021482496/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-conformance-kind-ga-only/2110714490021482496/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-conformance-kind-ga-only/2110714490021482496/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 6036,
+    "bytes": 99800,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1401,10 +1625,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110696119129346048",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110696119129346048/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110696119129346048/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110696119129346048/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158886,
+    "bytes": 253137,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1429,10 +1654,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 86246,
+    "bytes": 151734,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1457,10 +1683,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110680767389503488",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110680767389503488/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110680767389503488/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110680767389503488/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158198,
+    "bytes": 252596,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1485,10 +1712,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110679257247125504",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110679257247125504/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110679257247125504/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110679257247125504/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 165934,
+    "bytes": 262242,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1513,10 +1741,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110677245319188480",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110677245319188480/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110677245319188480/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110677245319188480/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 86114,
+    "bytes": 152093,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1541,10 +1770,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gce-cos-serial-master/2110667179165749248",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gce-cos-serial-master/2110667179165749248/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gce-cos-serial-master/2110667179165749248/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gce-cos-serial-master/2110667179165749248/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 54337,
+    "bytes": 124036,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1569,10 +1799,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110665417482571776",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110665417482571776/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110665417482571776/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110665417482571776/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158753,
+    "bytes": 253000,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1597,10 +1828,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110663906283229184",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110663906283229184/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110663906283229184/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110663906283229184/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 202823,
+    "bytes": 297967,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1625,10 +1857,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110658118705745920",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110658118705745920/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110658118705745920/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110658118705745920/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 79720,
+    "bytes": 145271,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1654,10 +1887,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-slow/2110657616064548864",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-slow/2110657616064548864/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-slow/2110657616064548864/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-slow/2110657616064548864/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 140361,
+    "bytes": 226599,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1683,10 +1917,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110640753683206144",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110640753683206144/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110640753683206144/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110640753683206144/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 284300,
+    "bytes": 369688,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1711,10 +1946,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110639243733766144",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110639243733766144/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110639243733766144/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110639243733766144/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 86290,
+    "bytes": 152267,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1739,10 +1975,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110604514078756864",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110604514078756864/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110604514078756864/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-arm64-master/2110604514078756864/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158207,
+    "bytes": 252459,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1767,10 +2004,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110587652611772416",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110587652611772416/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110587652611772416/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-integration-master/2110587652611772416/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 157943,
+    "bytes": 260476,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1796,10 +2034,11 @@
     "dir": "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110585640142770176",
     "run": "2026-10-15T170240Z",
     "files": [
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110585640142770176/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110585640142770176/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce/2110585640142770176/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 275959,
+    "bytes": 361133,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1824,10 +2063,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110558713260544000",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110558713260544000/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110558713260544000/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110558713260544000/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158285,
+    "bytes": 252533,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1852,10 +2092,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110557454025625600",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110557454025625600/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110557454025625600/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110557454025625600/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 161678,
+    "bytes": 257696,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1881,10 +2122,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110545627107561473",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110545627107561473/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110545627107561473/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110545627107561473/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 171963,
+    "bytes": 259100,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1909,10 +2151,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110543612268777472",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110543612268777472/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110543612268777472/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110543612268777472/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158197,
+    "bytes": 252598,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1938,10 +2181,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110531784528629760",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110531784528629760/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110531784528629760/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110531784528629760/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 50939,
+    "bytes": 121234,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1967,10 +2211,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110529771002662912",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110529771002662912/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110529771002662912/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110529771002662912/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 188284,
+    "bytes": 253637,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -1996,10 +2241,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-default-master/2110501836451483648",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-default-master/2110501836451483648/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-default-master/2110501836451483648/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-default-master/2110501836451483648/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 312777,
+    "bytes": 408899,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2025,10 +2271,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110501334678507520",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110501334678507520/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110501334678507520/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110501334678507520/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 300456,
+    "bytes": 386565,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2053,10 +2300,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110499321580359680",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110499321580359680/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110499321580359680/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110499321580359680/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 284831,
+    "bytes": 375576,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2081,10 +2329,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-scale-performance-100/2110489255221399552",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-scale-performance-100/2110489255221399552/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-scale-performance-100/2110489255221399552/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-scale-performance-100/2110489255221399552/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 325564,
+    "bytes": 428873,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2109,10 +2358,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gci-gce-slow/2110472140603002880",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gci-gce-slow/2110472140603002880/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gci-gce-slow/2110472140603002880/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gci-gce-slow/2110472140603002880/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 64326,
+    "bytes": 150537,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2138,10 +2388,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110471385766694912",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110471385766694912/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110471385766694912/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110471385766694912/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 300888,
+    "bytes": 387638,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2166,10 +2417,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110466352199241728",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110466352199241728/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110466352199241728/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110466352199241728/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158523,
+    "bytes": 255266,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2196,10 +2448,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-slow-master/2110466101858013184",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-slow-master/2110466101858013184/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-slow-master/2110466101858013184/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-gce-cos-slow-master/2110466101858013184/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 223267,
+    "bytes": 319104,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2224,10 +2477,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-kind-ipv6/2110456789211287552",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-kind-ipv6/2110456789211287552/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-kind-ipv6/2110456789211287552/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-kind-ipv6/2110456789211287552/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 140436,
+    "bytes": 235306,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2252,10 +2506,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110452762679447552",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110452762679447552/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110452762679447552/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-arm64-master/2110452762679447552/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 157791,
+    "bytes": 252463,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2280,10 +2535,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110451253749223424",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110451253749223424/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110451253749223424/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110451253749223424/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 157912,
+    "bytes": 255124,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2308,10 +2564,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110423318816362496",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110423318816362496/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110423318816362496/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110423318816362496/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 289228,
+    "bytes": 380021,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2336,10 +2593,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-kind-ipv6/2110411491537588224",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-kind-ipv6/2110411491537588224/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-kind-ipv6/2110411491537588224/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-e2e-kind-ipv6/2110411491537588224/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 141215,
+    "bytes": 238451,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2364,10 +2622,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110405953953206272",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110405953953206272/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110405953953206272/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-integration-master/2110405953953206272/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 157493,
+    "bytes": 253952,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2392,10 +2651,11 @@
     "dir": "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110378021654368256",
     "run": "2026-10-15T043740Z",
     "files": [
-      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110378021654368256/build-log.txt.gz"
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110378021654368256/build-log.txt.gz",
+      "runs/2026-10/2026-10-15T043740Z/ci-kubernetes-unit/2110378021654368256/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 328330,
+    "bytes": 422040,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2420,10 +2680,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110362671231537152",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110362671231537152/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110362671231537152/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110362671231537152/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 67802,
+    "bytes": 154064,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2448,10 +2709,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-integration-arm64-master/2110362166300250112",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-integration-arm64-master/2110362166300250112/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-integration-arm64-master/2110362166300250112/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-integration-arm64-master/2110362166300250112/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158255,
+    "bytes": 252523,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2477,10 +2739,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce/2110343544509042688",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce/2110343544509042688/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce/2110343544509042688/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce/2110343544509042688/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 204410,
+    "bytes": 290223,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2506,10 +2769,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110334481951887360",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110334481951887360/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110334481951887360/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110334481951887360/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 131937,
+    "bytes": 218175,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2534,10 +2798,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-beta-enabled/2110331463990775808",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-beta-enabled/2110331463990775808/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-beta-enabled/2110331463990775808/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-beta-enabled/2110331463990775808/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 119797,
+    "bytes": 241924,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2562,10 +2827,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gce-cos-default-master/2110320640887099392",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gce-cos-default-master/2110320640887099392/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gce-cos-default-master/2110320640887099392/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gce-cos-default-master/2110320640887099392/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 35578,
+    "bytes": 130963,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2591,10 +2857,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110319382365212672",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110319382365212672/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110319382365212672/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2110319382365212672/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 56571,
+    "bytes": 127781,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2619,10 +2886,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-beta-features/2110244137394507776",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-beta-features/2110244137394507776/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-beta-features/2110244137394507776/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-beta-features/2110244137394507776/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 129334,
+    "bytes": 223727,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2647,10 +2915,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-unit/2110240865749307392",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-unit/2110240865749307392/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-unit/2110240865749307392/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-unit/2110240865749307392/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 279455,
+    "bytes": 370975,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2675,10 +2944,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-integration-master/2110238599315197952",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-integration-master/2110238599315197952/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-integration-master/2110238599315197952/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-integration-master/2110238599315197952/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 158384,
+    "bytes": 257795,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2703,10 +2973,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 83016,
+    "bytes": 148925,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2731,10 +3002,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-alpha-beta-conformance/2110222242691420160",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-alpha-beta-conformance/2110222242691420160/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-alpha-beta-conformance/2110222242691420160/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-alpha-beta-conformance/2110222242691420160/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 123279,
+    "bytes": 219422,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2759,10 +3031,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 86216,
+    "bytes": 150885,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2787,10 +3060,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 86863,
+    "bytes": 172283,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2816,10 +3090,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-gce-conformance-latest/2110180213873709056",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-gce-conformance-latest/2110180213873709056/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-gce-conformance-latest/2110180213873709056/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-gce-conformance-latest/2110180213873709056/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 159095,
+    "bytes": 232332,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2844,10 +3119,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110175937118081024",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110175937118081024/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110175937118081024/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110175937118081024/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 79701,
+    "bytes": 144784,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2872,10 +3148,11 @@
     "dir": "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-alpha-beta-features/2110161340738834432",
     "run": "2026-10-14T143159Z",
     "files": [
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-alpha-beta-features/2110161340738834432/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-alpha-beta-features/2110161340738834432/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-kind-alpha-beta-features/2110161340738834432/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 151123,
+    "bytes": 261109,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2901,10 +3178,11 @@
     "dir": "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-cos-slow-master/2110132649858174976",
     "run": "2026-10-14T001832Z",
     "files": [
-      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-cos-slow-master/2110132649858174976/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-cos-slow-master/2110132649858174976/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-cos-slow-master/2110132649858174976/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 140138,
+    "bytes": 236482,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2930,10 +3208,11 @@
     "dir": "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110119061407928320",
     "run": "2026-10-14T001832Z",
     "files": [
-      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110119061407928320/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110119061407928320/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110119061407928320/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 143729,
+    "bytes": 230942,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2958,10 +3237,11 @@
     "dir": "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-integration-arm64-master/2110118808931799040",
     "run": "2026-10-14T001832Z",
     "files": [
-      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-integration-arm64-master/2110118808931799040/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-integration-arm64-master/2110118808931799040/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-integration-arm64-master/2110118808931799040/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 207874,
+    "bytes": 302494,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -2986,10 +3266,11 @@
     "dir": "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110102199139831808",
     "run": "2026-10-14T001832Z",
     "files": [
-      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110102199139831808/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110102199139831808/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2110102199139831808/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 37383,
+    "bytes": 124515,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3016,10 +3297,11 @@
     "dir": "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-scale-performance-100/2110096663317057536",
     "run": "2026-10-14T001832Z",
     "files": [
-      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-scale-performance-100/2110096663317057536/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-scale-performance-100/2110096663317057536/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-scale-performance-100/2110096663317057536/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 1546921,
+    "bytes": 1649963,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3045,10 +3327,11 @@
     "dir": "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110090875689242624",
     "run": "2026-10-14T001832Z",
     "files": [
-      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110090875689242624/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110090875689242624/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110090875689242624/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 153686,
+    "bytes": 250719,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3073,10 +3356,11 @@
     "dir": "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gci-gce-serial/2110089616043282432",
     "run": "2026-10-14T001832Z",
     "files": [
-      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gci-gce-serial/2110089616043282432/build-log.txt.gz"
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gci-gce-serial/2110089616043282432/build-log.txt.gz",
+      "runs/2026-10/2026-10-14T001832Z/ci-kubernetes-e2e-gci-gce-serial/2110089616043282432/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 81308,
+    "bytes": 146099,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3101,10 +3385,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110030475891314688",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110030475891314688/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110030475891314688/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2110030475891314688/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 49450,
+    "bytes": 146440,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3131,10 +3416,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-scale-performance-100/2110004556405411840",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-scale-performance-100/2110004556405411840/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-scale-performance-100/2110004556405411840/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-scale-performance-100/2110004556405411840/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 1585754,
+    "bytes": 1688521,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3162,10 +3448,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-scale-performance-100/2109994238321102848",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-scale-performance-100/2109994238321102848/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-scale-performance-100/2109994238321102848/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-scale-performance-100/2109994238321102848/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 1588850,
+    "bytes": 1692487,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3190,10 +3477,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kind/2109992980109594624",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kind/2109992980109594624/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kind/2109992980109594624/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kind/2109992980109594624/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 153798,
+    "bytes": 249247,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3218,10 +3506,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109965799027380224",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109965799027380224/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109965799027380224/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109965799027380224/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 287666,
+    "bytes": 383582,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3247,10 +3536,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2109939878568398848",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2109939878568398848/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2109939878568398848/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2109939878568398848/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 140938,
+    "bytes": 237974,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3275,10 +3565,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109935600789360640",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109935600789360640/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109935600789360640/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109935600789360640/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 157682,
+    "bytes": 252640,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3304,10 +3595,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37/2109926791849185280",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37/2109926791849185280/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37/2109926791849185280/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37/2109926791849185280/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 332887,
+    "bytes": 414090,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3332,10 +3624,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-unit/2109907665915219968",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-unit/2109907665915219968/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-unit/2109907665915219968/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-unit/2109907665915219968/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 278815,
+    "bytes": 369889,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3361,10 +3654,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-cos-slow-master/2109891055489912832",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-cos-slow-master/2109891055489912832/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-cos-slow-master/2109891055489912832/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-cos-slow-master/2109891055489912832/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 145273,
+    "bytes": 241217,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3390,10 +3684,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gci-gce-slow/2109878472728907776",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gci-gce-slow/2109878472728907776/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gci-gce-slow/2109878472728907776/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gci-gce-slow/2109878472728907776/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 141472,
+    "bytes": 226190,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3418,10 +3713,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109874949341581312",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109874949341581312/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109874949341581312/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-master/2109874949341581312/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 205961,
+    "bytes": 314783,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3446,10 +3742,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kind-alpha-beta-features/2109858843587514368",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kind-alpha-beta-features/2109858843587514368/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kind-alpha-beta-features/2109858843587514368/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-kind-alpha-beta-features/2109858843587514368/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 154773,
+    "bytes": 259191,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3475,10 +3772,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109834432901812224",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109834432901812224/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109834432901812224/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109834432901812224/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 58886,
+    "bytes": 129603,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3503,10 +3801,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-arm64-master/2109830909506097152",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-arm64-master/2109830909506097152/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-arm64-master/2109830909506097152/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-integration-arm64-master/2109830909506097152/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 291216,
+    "bytes": 397268,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3533,10 +3832,11 @@
     "dir": "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gci-gce-slow/2109823863138291712",
     "run": "2026-10-13T191916Z",
     "files": [
-      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gci-gce-slow/2109823863138291712/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gci-gce-slow/2109823863138291712/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T191916Z/ci-kubernetes-e2e-gci-gce-slow/2109823863138291712/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 205502,
+    "bytes": 289874,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3561,10 +3861,11 @@
     "dir": "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-cmd-master/2109788126321840128",
     "run": "2026-10-13T004423Z",
     "files": [
-      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-cmd-master/2109788126321840128/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-cmd-master/2109788126321840128/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-cmd-master/2109788126321840128/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 1115080,
+    "bytes": 1204521,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3589,10 +3890,11 @@
     "dir": "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-kind/2109779570453385216",
     "run": "2026-10-13T004423Z",
     "files": [
-      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-kind/2109779570453385216/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-kind/2109779570453385216/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-kind/2109779570453385216/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 154077,
+    "bytes": 248086,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3618,10 +3920,11 @@
     "dir": "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109743079454937088",
     "run": "2026-10-13T004423Z",
     "files": [
-      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109743079454937088/build-log.txt.gz"
+      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109743079454937088/build-log.txt.gz",
+      "runs/2026-10/2026-10-13T004423Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109743079454937088/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 53950,
+    "bytes": 124888,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3646,10 +3949,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-slow-master/2109739053791318016",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-slow-master/2109739053791318016/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-slow-master/2109739053791318016/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-slow-master/2109739053791318016/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 34847,
+    "bytes": 132024,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3674,10 +3978,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gci-gce/2109738549086523392",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gci-gce/2109738549086523392/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gci-gce/2109738549086523392/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gci-gce/2109738549086523392/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 34821,
+    "bytes": 120128,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3703,10 +4008,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109735277764284416",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109735277764284416/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109735277764284416/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109735277764284416/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 313819,
+    "bytes": 400881,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3732,10 +4038,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gci-gce-slow/2109731503310114816",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gci-gce-slow/2109731503310114816/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gci-gce-slow/2109731503310114816/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gci-gce-slow/2109731503310114816/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 142891,
+    "bytes": 228041,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3760,10 +4067,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-capz-master-windows/2109726469872685056",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-capz-master-windows/2109726469872685056/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-capz-master-windows/2109726469872685056/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-capz-master-windows/2109726469872685056/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 296200,
+    "bytes": 360857,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3788,10 +4096,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109717662123692032",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109717662123692032/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109717662123692032/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109717662123692032/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 37593,
+    "bytes": 124725,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3816,10 +4125,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-node-e2e-containerd-2-1-ubuntu-dra/2109708853191905280",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-node-e2e-containerd-2-1-ubuntu-dra/2109708853191905280/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-node-e2e-containerd-2-1-ubuntu-dra/2109708853191905280/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-node-e2e-containerd-2-1-ubuntu-dra/2109708853191905280/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 47010,
+    "bytes": 145229,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3845,10 +4155,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-default-master/2109685196960829440",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-default-master/2109685196960829440/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-default-master/2109685196960829440/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-default-master/2109685196960829440/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 314898,
+    "bytes": 410559,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3874,10 +4185,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109681674110373888",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109681674110373888/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109681674110373888/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2109681674110373888/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 60917,
+    "bytes": 131293,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3902,10 +4214,11 @@
     "dir": "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-integration-master/2109662044419526656",
     "run": "2026-10-12T215102Z",
     "files": [
-      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-integration-master/2109662044419526656/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-integration-master/2109662044419526656/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T215102Z/ci-kubernetes-integration-master/2109662044419526656/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 305501,
+    "bytes": 402308,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3930,10 +4243,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109661290002649088",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109661290002649088/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109661290002649088/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109661290002649088/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 37594,
+    "bytes": 124299,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3958,10 +4272,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-master/2109646945063538688",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-master/2109646945063538688/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-master/2109646945063538688/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-master/2109646945063538688/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 204518,
+    "bytes": 299659,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -3987,10 +4302,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109640401877995520",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109640401877995520/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109640401877995520/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109640401877995520/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 156831,
+    "bytes": 241334,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4015,10 +4331,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109614480756314112",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109614480756314112/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109614480756314112/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109614480756314112/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 38633,
+    "bytes": 125687,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4043,10 +4360,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-gce-conformance-latest/2109590824076447744",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-gce-conformance-latest/2109590824076447744/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-gce-conformance-latest/2109590824076447744/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-gce-conformance-latest/2109590824076447744/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 31583,
+    "bytes": 131370,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4072,10 +4390,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109576479556767744",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109576479556767744/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109576479556767744/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce/2109576479556767744/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 217739,
+    "bytes": 304027,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4100,10 +4419,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind/2109567672818601984",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind/2109567672818601984/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind/2109567672818601984/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind/2109567672818601984/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 131818,
+    "bytes": 225444,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4129,10 +4449,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109565658344722432",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109565658344722432/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109565658344722432/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109565658344722432/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 313691,
+    "bytes": 399421,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4157,10 +4478,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109537975527280640",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109537975527280640/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109537975527280640/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2109537975527280640/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 26164,
+    "bytes": 112352,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4186,10 +4508,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-slow/2109530678298152960",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-slow/2109530678298152960/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-slow/2109530678298152960/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-slow/2109530678298152960/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 186371,
+    "bytes": 273019,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4214,10 +4537,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gce-cos-slow-master/2109527657535246336",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gce-cos-slow-master/2109527657535246336/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gce-cos-slow-master/2109527657535246336/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gce-cos-slow-master/2109527657535246336/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 40216,
+    "bytes": 135604,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4242,10 +4566,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind/2109522373383294976",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind/2109522373383294976/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind/2109522373383294976/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind/2109522373383294976/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 147315,
+    "bytes": 242548,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4270,10 +4595,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-arm64-master/2109482611414929408",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-arm64-master/2109482611414929408/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-arm64-master/2109482611414929408/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-integration-arm64-master/2109482611414929408/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 207207,
+    "bytes": 301825,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4298,10 +4624,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-node-e2e-containerd/2109479349513097216",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-node-e2e-containerd/2109479349513097216/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-node-e2e-containerd/2109479349513097216/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-node-e2e-containerd/2109479349513097216/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 2934424,
+    "bytes": 3071078,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4327,10 +4654,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-slow/2109478835358535680",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-slow/2109478835358535680/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-slow/2109478835358535680/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-slow/2109478835358535680/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 144434,
+    "bytes": 229694,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4355,10 +4683,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind-alpha-beta-features/2109465497387929600",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind-alpha-beta-features/2109465497387929600/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind-alpha-beta-features/2109465497387929600/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-kind-alpha-beta-features/2109465497387929600/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 135792,
+    "bytes": 282262,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4384,10 +4713,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-serial/2109442092777345024",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-serial/2109442092777345024/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-serial/2109442092777345024/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gci-gce-serial/2109442092777345024/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 122916,
+    "bytes": 187705,
     "settled": true,
     "final": true,
     "backfilled": false,
@@ -4413,10 +4743,11 @@
     "dir": "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gce-cos-slow-master/2109436807786532864",
     "run": "2026-10-12T152236Z",
     "files": [
-      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gce-cos-slow-master/2109436807786532864/build-log.txt.gz"
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gce-cos-slow-master/2109436807786532864/build-log.txt.gz",
+      "runs/2026-10/2026-10-12T152236Z/ci-kubernetes-e2e-gce-cos-slow-master/2109436807786532864/podinfo.json.gz"
     ],
     "remote": [],
-    "bytes": 135809,
+    "bytes": 231610,
     "settled": true,
     "final": true,
     "backfilled": false,

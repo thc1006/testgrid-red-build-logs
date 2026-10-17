@@ -41,9 +41,26 @@
       "encoding": "identity"
     }
   },
-  "podinfo": null,
+  "podinfo": {
+    "bytes": 69941,
+    "md5": "dba7127abdf0cb3ddc55315c8d2029cc",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12101,
+    "gcs": {
+      "generation": "1791513636869649",
+      "md5": "dba7127abdf0cb3ddc55315c8d2029cc",
+      "crc32c": "fd1da913",
+      "bytes": 69941,
+      "encoding": "identity"
+    }
+  },
   "archived_by_run": "2026-10-09T031554Z",
   "archived_at": 1791515754.0,
   "settled": true,
-  "final": true
+  "final": true,
+  "refreshed_by_run": "2026-10-17T233055Z",
+  "refreshed": [
+    "podinfo.json"
+  ]
 }
