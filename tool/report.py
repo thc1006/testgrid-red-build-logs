@@ -548,9 +548,9 @@ def write_charts(root, entries, now, current_run=None, rels=None):
     for p in s["panels"]:
         _, wt = week_text(p["week"])
         headline.append(f"{LABELS.get(p['dashboard'], p['dashboard'])}: {wt}")
-    busiest = sorted(s["rows"], key=lambda r: -r["last7"])[:5]
-    tabs_alt = (f"Red builds per tab, {HEAT_DAYS} days to {as_of(s)}. Busiest over the last 7 of them: "
-                + ", ".join(f"{r['tab']} {r['last7']}" for r in busiest if r["last7"]) + ".")
+    busiest = ", ".join(f"{r['tab']} {r['last7']}" for r in sorted(s["rows"], key=lambda r: -r["last7"])[:5] if r["last7"])
+    tabs_alt = (f"Red builds per tab, {HEAT_DAYS} days to {as_of(s)}."
+                + (f" Busiest over the last 7 of them: {busiest}." if busiest else ""))
     lines = [picture("trend", f"Red builds per day, data to {as_of(s)}. " + "; ".join(headline)), "",
              picture("tabs", tabs_alt), "",
              "<details><summary>Red builds per tab (table)</summary>", "",

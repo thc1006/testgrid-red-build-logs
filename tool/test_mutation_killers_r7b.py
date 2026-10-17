@@ -333,6 +333,11 @@ class Charts(unittest.TestCase):
         self.assertIn('alt="Red builds per day, data to Oct 10 17:20 UTC. ', md)
         self.assertIn('alt="Red builds per tab, 14 days to Oct 10 17:20 UTC. ', md)  # fails: "to Oct 10 to 17:20 UTC"
 
+    def test_the_tabs_alt_text_names_no_busiest_tab_when_none_was_red_in_7_days(self):
+        md = "\n".join(report.write_charts(tempdir(self), [{"time": self.NOW - k * DAY, "tabs": ["d#t"]} for k in (8, 9)],
+                                           self.NOW))
+        self.assertIn('alt="Red builds per tab, 14 days to Oct 10 17:20 UTC."', md)  # fails: "... of them: ."
+
 
 if __name__ == "__main__":
     unittest.main()
