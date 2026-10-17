@@ -1293,5 +1293,31 @@ class CrossCheckRobustnessTest(ArchiveWorld):
         self.assertNotIn("Traceback", out)
 
 
+class BytesDownloadedTest(ArchiveWorld):
+    """A run's bytes_downloaded counted every file of a build it fetched a file of again."""
+
+    def test_only_what_a_run_fetched_again(self):
+        # (archived with only its podinfo.json, as a pod that never ran is; the log comes later)
+        self.finished(ago=3 * HOUR)
+        pod = b'{"pod": {"status": {"phase": "Failed"}}}'
+        self.srv.route(self.base + "/podinfo.json", obj(pod))
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.runs()[-1]["bytes_downloaded"], len(pod))
+        changed = pod.replace(b"Failed", b"Unknown")
+        self.srv.route(self.base + "/podinfo.json", obj(changed, "2"))
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"refreshed": [self.key]})
+        self.assertEqual(self.runs()[-1]["bytes_downloaded"], len(changed))
+        self.srv.route(self.base + "/build-log.txt", obj(b"late log\n"))
+        self.assertEqual(self.fetch(), 0)  # (podinfo.json is the same: its "refreshed" is the run's before)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"log-recovered": [self.key]})
+        self.assertEqual(self.runs()[-1]["bytes_downloaded"], len(b"late log\n"))  # fails: and podinfo.json's
+        self.srv.route(self.base + "/build-log.txt", obj(b"later log\n", "2"))
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"refreshed": [self.key]})
+        self.assertEqual(self.runs()[-1]["bytes_downloaded"], len(b"later log\n"))
+        self.assertEqual(self.check()[0], 0)
+
+
 if __name__ == "__main__":
     unittest.main()

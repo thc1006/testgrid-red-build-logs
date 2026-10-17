@@ -5266,8 +5266,13 @@ def run(args, root, run_start, pool, deadline):
             if outcome in ("archived", "archived-without-log") and meta.get("backfilled"):
                 outcome = "backfilled"
             outcomes.setdefault(outcome, []).append(key)
-            if outcome in ("archived", "archived-without-log", "backfilled", "repaired", "log-recovered", "refreshed"):
+            if outcome in ("archived", "archived-without-log", "backfilled", "repaired"):
                 downloaded += sum(meta[k]["bytes"] for k in ("log", "podinfo") if meta.get(k))
+            elif outcome in ("log-recovered", "refreshed"):  # (only the files it refreshed, and the log it found)
+                again = set(meta.get("refreshed") or ()) if meta.get("refreshed_by_run") == run_id else set()
+                again |= {"build-log.txt"} if outcome == "log-recovered" else set()
+                downloaded += sum(meta[k]["bytes"] for k, name in (("log", "build-log.txt"), ("podinfo", "podinfo.json"))
+                                  if meta.get(k) and name in again)
             if outcome == "pending":  # (a watched build found red is queued as red from now on)
                 unresolved[key] = {"rec": meta, "first_seen": previous.get("first_seen", run_start), "last_error": None}
             elif outcome in ("watching", "held"):
