@@ -84,10 +84,14 @@ from GCS.
   If a config the archive does not know yet was in force since, the build waits
   for it, at most 14 days after that run. If it is still not known then, the
   build is dropped, and the run fails with a warning that TestGrid may have
-  shown it red.
+  shown it red. A tab TestGrid no longer lists is not read, so such a build
+  waits until the tab is listed again, or is dropped this way once the tab has
+  been unlisted for 30 days.
 - Red builds in a long gap in TestGrid's history can be missing for several
   runs. GCS is searched newest first: up to 28 days back in the run that finds
-  the gap, then 14 days more in each later run.
+  the gap, then 14 days more in each later run. A tab TestGrid no longer lists
+  is not searched; once it has been unlisted for 30 days, the run fails with a
+  warning that red builds in the rest of its gap may be missing.
 
 ### Builds taken from GCS that may never have shown red
 
