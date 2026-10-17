@@ -689,6 +689,49 @@ class LackingRecordAndLaterConfigs(ttc.ConfigWorld):
         self.assertEqual(self.judged(*self.later())["outcomes"], {"held": [f"job/{self.b2}"]})  # fails: {}
 
 
+class CutOffComparisonOfOneNotFinal(ArchiveWorld):
+    """A red build that finished a day ago, so not final: each run compares it with GCS, whatever
+    the run's sevenths (none here)."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=DAY)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.sevenths = mock.patch.object(frl, "gcs_sevenths", return_value=set())
+        self.sevenths.start()
+        self.addCleanup(self.sevenths.stop)
+        self.assertEqual(self.fetch(), 0)
+
+    def test_the_deadline_cut_off_is_not_checked(self):  # (kills a mutant)
+        fast = obj(b"log\n")
+
+        def slow(h):
+            time.sleep(3.5)
+            with contextlib.suppress(BrokenPipeError, ConnectionResetError):
+                fast(h)
+        self.srv.route(self.base + "/build-log.txt", slow)
+        self.assertEqual(self.fetch("--run-timeout-minutes", "0.03"), 1)
+        run = self.runs()[-1]
+        self.assertEqual((run["outcomes"], run["gcs_compared"]), ({"not-checked": [self.key]}, False))
+        time.sleep(3.6)  # (the server's slow answer ends before it closes)
+
+    def test_but_one_the_run_archived_as_it_gave_up_is_archived(self):  # (kills a mutant)
+        # (its worker ended just as the run gave up on it: this run's copy is not a comparison cut off)
+        shutil.rmtree(self.bdir())
+        wait = frl.cf.wait
+
+        def gave_up(fs, *args, **kwargs):
+            done, not_done = wait(fs, *args, **kwargs)
+            if isinstance(fs, dict) and fs and all(isinstance(b, dict) and "build" in b for b in fs.values()):
+                return set(), set(fs)
+            return done, not_done
+        with mock.patch.object(frl.cf, "wait", gave_up):
+            self.assertEqual(self.fetch(), 0)
+        run = self.runs()[-1]
+        self.assertEqual((run["outcomes"], run["gcs_compared"], run["serious_warnings"]),
+                         ({"archived": [self.key]}, True, []))
+
+
 class LackingRecordInCrossCheck(ttc.ConfigWorld):
     """C1 has t, C2 (2 days ago) has no t, C3 (5 hours ago) has t again; a build made 10 h ago,
     red on t, whose reads ended under C2. A lacking_tabs record from a day ago."""
@@ -727,6 +770,12 @@ class LackingRecordInCrossCheck(ttc.ConfigWorld):
         outcomes, (code, out) = self.run_with(record=True)
         self.assertEqual(outcomes, {"held": [f"job/{self.b2}"]})
         self.assertNotIn("MISSED", out)  # fails: MISSED red build job/...
+
+
+class LackingKept(unittest.TestCase):
+    def test_a_record_counts_as_long_as_a_held_build_may_wait_and_a_day_more(self):  # (kills a mutant)
+        now, limit = 2_000_000_000, (frl.HELD_DAYS + 1) * DAY
+        self.assertEqual(frl.lacking_kept({"d#a": now - limit, "d#b": now - limit - 1}, now), {"d#a": now - limit})
 
 
 class LackingRecordWhileAnUploadRan(ttc.ConfigWorld):
@@ -1077,6 +1126,22 @@ class LeftForLater(ttc.ConfigWorld):
                       "- dash#gone: 1 range of builds a scan saw, waiting for a config of the tab not known yet (the "
                       f"oldest scan {frl.iso(s0)}); looked at again if TestGrid lists the tab again by {by}\n",
                       self.index())  # fails: no such list
+
+    def test_one_no_longer_listed_with_only_ranges(self):  # (kills a mutant)
+        s0, gone = self.now - 20 * DAY, self.now - 5 * DAY
+        self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 60 * HOUR},
+                             "dash#gone": {"scan": s0, "oldest": s0 - 60 * HOUR, "missing_since": gone,
+                                           "changed_pending": [{"since": s0, "lo": s0 - 7 * HOUR, "hi": s0 - 5 * HOUR}]}})
+        self.judged((self.now - 40 * DAY, {"dash": {"t": ttc.entry(""), "gone": ttc.entry("")}}))
+        self.assertIn(f"looked at again if TestGrid lists the tab again by {frl.iso(gone + 30 * DAY)}\n", self.index())
+
+    def test_the_oldest_scan_of_several_ranges(self):  # (kills a mutant)
+        ranges = [{"since": self.now - k * DAY, "lo": self.now - (k + 6) * DAY, "hi": self.now - (k + 5) * DAY}
+                  for k in (3, 2.5)]
+        self.put_state(tabs={"dash#t": {"scan": self.now - 40 * DAY, "oldest": self.now - 45 * DAY,
+                                        "changed_pending": ranges}})
+        run = self.judged((self.now - 60 * DAY, self.tab(ttc.entry(self.HIDE))), (self.now - 2 * DAY, None))
+        self.assertEqual(run["left_for_later"]["config_ranges"]["dash#t"]["oldest_scan"], ranges[0]["since"])
 
     def test_the_index_lists_what_later_runs_still_have_to_do(self):
         """INDEX.md said nothing of either: they were only in state.json (and the run that found the
