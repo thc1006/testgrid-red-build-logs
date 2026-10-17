@@ -87,8 +87,8 @@ jobs:
       group: red-build-logs-archive-${{ github.ref }}
       cancel-in-progress: false
     runs-on: ubuntu-24.04
-    # More than the step timeouts below (5 + 2 + 34 + 50 + 20 + 2 + 10) plus checkout and
-    # setup-uv, so the commit step always gets to run.
+    # More than the step timeouts below (5 + 2 + 34 + 50 + 2 + 20 + 2 + 10) plus checkout
+    # and setup-uv, so the commit step always gets to run.
     timeout-minutes: 132
     permissions:
       contents: write # push the archive back to the branch
@@ -148,6 +148,14 @@ jobs:
         timeout-minutes: 50
         run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --gzip --testgrid-config "$RUNNER_TEMP/testgrid-config.json"
 
+      # A fetch killed outright (at its step's timeout, say) does not remove what its
+      # cut-off downloads left, as it does at its start and end: its rule does it here,
+      # so the verification does not report what the commit then leaves out.
+      - name: Remove what a cut-off fetch left
+        continue-on-error: true
+        timeout-minutes: 2
+        run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --clean-partial
+
       - name: Verify the archive against TestGrid and GCS
         id: verify
         continue-on-error: true
@@ -181,9 +189,10 @@ jobs:
           fi
           # Leave out what cut-off downloads left, such as a build folder without
           # meta.json: the fetch removes it by its own rule at its start and end, and
-          # this is that rule, for a fetch killed before its end. The builds are
-          # retried by a later run. (Without the tool installed, no fetch ran.) It
-          # runs without the token, which only the push needs.
+          # this is that rule, for a fetch killed before its end (run after the fetch
+          # too, before the verification). The builds are retried by a later run.
+          # (Without the tool installed, no fetch ran.) It runs without the token,
+          # which only the push needs.
           if [ -x tool/.venv/bin/python ]; then
             env -u GITHUB_TOKEN tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --clean-partial ||
               echo "::warning::Could not remove what cut-off downloads left: the next run removes it."

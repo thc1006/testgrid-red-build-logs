@@ -1092,6 +1092,18 @@ class VerificationInTheIndex(ArchiveWorld):
         self.assertLess(show, names.index("Commit the archive"))
         self.assertEqual(steps[show]["if"], "${{ !cancelled() }}")  # (after a failed or timed-out verification too)
 
+    def test_what_a_cut_off_fetch_left_goes_before_the_verification(self):
+        """The workflow verified the archive before the commit step removed what a fetch killed outright
+        left: the verification reported files the commit then left out."""
+        with open(os.path.join(HERE, "..", ".github", "workflows", "red-build-logs.yml")) as f:
+            steps = yaml.safe_load(f)["jobs"]["archive"]["steps"]
+        names = [s.get("name") for s in steps]
+        clean = next(i for i, s in enumerate(steps)
+                     if "--clean-partial" in s.get("run", "") and s.get("name") != "Commit the archive")  # fails: none
+        self.assertLess(names.index("Fetch the build logs behind red TestGrid cells"), clean)
+        self.assertLess(clean, names.index("Verify the archive against TestGrid and GCS"))
+        self.assertIs(steps[clean]["continue-on-error"], True)
+
 
 
 # ------------------------------------------------------------------ INDEX.md: what later runs still have to do
