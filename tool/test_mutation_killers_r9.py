@@ -1539,23 +1539,38 @@ class ScriptRuns(unittest.TestCase):
                           b: ("gcr.io/x/configurator:v2", "sha256:" + "0" * 64)})
 
     def test_no_build_begins_once_the_budget_is_spent(self):  # SS09
-        # (bash counts SECONDS in whole seconds of the clock, from where the environment sets it: the
-        # script starts just after a second begins, and its recipes step ends just after the third
-        # second after that begins, so the check before the first build reads SECONDS 3 more than it
-        # started at)
+        # (bash counts SECONDS in whole seconds of the clock, from where the environment sets it. The
+        # script starts just after a second begins; at the last step before the first check, a stand-in
+        # git waits until just after the third second after that begins, so the check reads SECONDS 3
+        # more than it started at. An attempt that does not keep to that timing, as on a machine slowed
+        # by other work, is run again: it once failed so.)
         self.listing([self.commit("width=1")])
-        python = os.path.join(self.tmp, "python")
-        with open(python, "w") as f:
-            f.write(f'#!/usr/bin/env bash\nif [ "$3" = recipes ]; then "{sys.executable}" -c '
-                    '"import os, time; time.sleep(max(0, float(os.environ[\'W5C_AT\']) - time.time()))"; fi\n'
-                    f'exec "{sys.executable}" "$@"\n')
-        os.chmod(python, 0o755)
+        times, python, git = (os.path.join(self.tmp, name) for name in ("times", "python", os.path.join("bin", "git")))
+        with open(python, "w") as f:  # (when the script first runs python: it began before that)
+            f.write(f'#!/usr/bin/env bash\nif [ "$3" = uploads ]; then "{sys.executable}" -c '
+                    f'"import time; print(time.time())" >> "{times}"; fi\nexec "{sys.executable}" "$@"\n')
+        with open(git, "w") as f:  # (when its last git step ended, and when its wait did)
+            f.write(f'#!/usr/bin/env bash\n"{shutil.which("git")}" "$@" || exit\nif [ "$3" = sparse-checkout ]; then '
+                    f'"{sys.executable}" -c "import os, time; t = time.time(); '
+                    'time.sleep(max(0, float(os.environ[\'W5C_AT\']) - t)); print(t, time.time())" '
+                    f'>> "{times}"; fi\n')
+        for path in (python, git):
+            os.chmod(path, 0o755)
         for start, built in ((996, 1), (997, 0)):  # (999 left one second; 1000, none)
-            while time.time() % 1 > 0.05:
-                time.sleep(0.005)
-            at = math.floor(time.time()) + 3.05
-            done = self.run_script(PYTHON=python, CONFIG_SECONDS="1000", SECONDS=str(start), W5C_AT=str(at))
-            self.assertEqual(done.returncode, 0, done.stderr)
+            for _ in range(5):
+                with open(times, "w"):
+                    pass
+                while time.time() % 1 > 0.05:
+                    time.sleep(0.005)
+                second = math.floor(time.time())
+                done = self.run_script(PYTHON=python, CONFIG_SECONDS="1000", SECONDS=str(start), W5C_AT=str(second + 3.05))
+                self.assertEqual(done.returncode, 0, done.stderr)
+                with open(times) as f:
+                    began, (ended, waited) = float(f.readline()), map(float, f.readline().split())
+                if math.floor(began) == second and ended < second + 3.05 and waited < second + 3.9:
+                    break
+            else:
+                self.skipTest("the machine was too slow to time the script's checks to the second")
             got = tgc.load(self.out)
             self.assertEqual((len(got["runs"]), len(got["configs"])), (1, built), start)
 
