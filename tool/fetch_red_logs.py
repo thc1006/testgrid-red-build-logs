@@ -4564,7 +4564,9 @@ def main(argv=None):
             return 2
         with lock:
             if args.show_verifications:
-                print(f"INDEX.md: {show_verifications(root)} rows of runs show their verification anew")
+                n = show_verifications(root)
+                print(f"INDEX.md: {n} " + ("row of runs shows its" if n == 1 else "rows of runs show their")
+                      + " verification anew")
             if args.clean_partial:
                 sweep_parts(root)
                 warnings = []
