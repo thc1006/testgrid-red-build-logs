@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "build": "2111184592277868544",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "started": 1792180634,
+  "created": 1792180605,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs should create a non-pre-bound PV and PVC: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-c7xjd\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 10/16/26 20:08:41.751\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792182094,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111184592277868544",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2111184592277868544/build-log.txt",
+  "log": {
+    "bytes": 144162,
+    "md5": "35e84b4c457d4099b20b74fbb36a5f51",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22137,
+    "gcs": {
+      "generation": "1792182111913508",
+      "md5": "35e84b4c457d4099b20b74fbb36a5f51",
+      "crc32c": "61cd38a2",
+      "bytes": 144162,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-17T042534Z",
+  "archived_at": 1792211134.0,
+  "settled": true,
+  "final": false
+}

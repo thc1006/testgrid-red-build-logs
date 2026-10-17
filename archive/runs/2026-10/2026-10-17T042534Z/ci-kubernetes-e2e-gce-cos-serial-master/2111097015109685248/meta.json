@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2111097015109685248",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1792159755,
+  "created": 1792159725,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (default fs)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] while cleaning up resource: persistent Volume pvc-6d3f2616-20...t/e2e/storage/testsuites/volume_stress.go:185 @ 10/16/26 15:02:48.722\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792175858,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2111097015109685248",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2111097015109685248/build-log.txt",
+  "log": {
+    "bytes": 408378,
+    "md5": "a2f4830d3ca87ce8240373c6ed222128",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 44568,
+    "gcs": {
+      "generation": "1792175886839522",
+      "md5": "a2f4830d3ca87ce8240373c6ed222128",
+      "crc32c": "21b51781",
+      "bytes": 408378,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-17T042534Z",
+  "archived_at": 1792211134.0,
+  "settled": true,
+  "final": false
+}

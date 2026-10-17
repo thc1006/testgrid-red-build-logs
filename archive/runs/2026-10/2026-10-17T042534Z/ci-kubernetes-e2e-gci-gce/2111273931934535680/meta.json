@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2111273931934535680",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1792201906,
+  "created": 1792201905,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS when invoking the Recycle reclaim policy should test that a PV becomes Available and is clean after the PVC is deleted.",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.000s.\nexpected pod to be Succeeded or Fai...es/test/e2e/storage/persistent_volumes.go:390 @ 10/17/26 02:10:28.927\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792204166,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2111273931934535680",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2111273931934535680/build-log.txt",
+  "log": {
+    "bytes": 143697,
+    "md5": "aafd11e1fbf743e0a56e9e6b80cae3b2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24706,
+    "gcs": {
+      "generation": "1792204183571327",
+      "md5": "aafd11e1fbf743e0a56e9e6b80cae3b2",
+      "crc32c": "671e1b60",
+      "bytes": 143697,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-17T042534Z",
+  "archived_at": 1792211134.0,
+  "settled": false,
+  "final": false
+}
