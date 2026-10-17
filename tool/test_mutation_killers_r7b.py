@@ -244,7 +244,8 @@ class RunSummaryLine(r4.World):
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
             frl.main(["--archive", self.root, "--dashboard", "dash", "--testgrid", self.srv.url, "--gcs", self.srv.url])
         self.assertEqual(self.runs()[-1]["outcomes"], {"backfilled": [f"job/{red}"], "watching": [f"job/{running}"]})
-        self.assertIn(" 0 selected, 0 retried, 0 re-compared with GCS, 1 taken from GCS", out.getvalue())
+        self.assertIn(" 0 selected, 0 retried, 0 archived builds not shown red now compared with GCS again, 1 taken from GCS",
+                      out.getvalue())
 
 
 class TabDays(r4.World):
