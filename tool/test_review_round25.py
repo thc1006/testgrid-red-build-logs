@@ -1014,6 +1014,16 @@ class VerificationInTheIndex(ArchiveWorld):
             after = f.read()
         self.assertEqual(after.replace(f" | [ok]({self.rel}/verification.json) |", " | pending |"), before)
 
+    def test_it_says_how_many_rows_changed(self):
+        self.assertEqual(self.verify(), 0)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            for _ in range(2):
+                self.assertEqual(frl.main(["--archive", self.root, "--show-verifications"]), 0)
+        self.assertEqual(out.getvalue().splitlines(), ["INDEX.md: 1 row of runs shows its verification anew",
+                                                       "INDEX.md: 0 rows of runs show their verification anew"])
+        # fails: "1 rows of runs show their verification anew"
+
     def test_so_are_its_problems(self):
         os.remove(os.path.join(self.bdir(), "build-log.txt"))
         self.assertEqual(self.verify(), 1)
