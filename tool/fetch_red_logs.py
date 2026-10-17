@@ -5338,13 +5338,15 @@ def run(args, root, run_start, pool, deadline):
             c["mismatch"] = mismatch_of[key]
         tab_configs[key] = c
     uploads, entries = history.encode()
+    # (the report first: a run killed once state.json no longer holds what it stopped waiting for still
+    # warns of it there, and one killed before leaves state.json as it was, for the next run to warn)
+    write_json(run_json, dict(report_, errors=errors + [{"build": None, "error": STOPPED}]))
     write_json(os.path.join(root, "state.json"),
                {"tabs": tab_scans, "unresolved": unresolved, "given_up": given_up, "watch": watch,
                 "tab_configs": tab_configs, **({"testgrid_config": config_record} if config_record else {}),
                 **({"lacking_tabs": lacked} if lacked else {}),
                 **({"config_uploads": uploads, "config_entries": entries} if uploads else {}),
                 **({"config_relist_after": history.relist_after} if history.relist_after is not None else {})})
-    write_json(run_json, dict(report_, errors=errors + [{"build": None, "error": STOPPED}]))
     # What failed or cut-off downloads left (a build folder without meta.json, stored files
     # a meta.json does not list, an empty job folder) goes now, so it is not committed;
     # those builds are fetched again. Abandoned workers can no longer write (see abandon()).
