@@ -880,6 +880,148 @@ class SelfReviewFixesTest(ArchiveWorld):
         self.assertEqual((m["archived_by_run"], m["repaired_by_run"]), (first["archived_by_run"], self.runs()[-1]["run"]))
         self.assertAlmostEqual(m["archived_at"], first["archived_at"], delta=1)
 
+    def unreadable_meta(self, *extra, log=b"log\n", podinfo=None, meta=None):
+        """A build archived with `extra` (its log, and a podinfo.json if `podinfo`), then its meta.json made
+        unreadable (or `meta`, if given: what it then holds): its folder, and the names in it. self.calls
+        records the requests for its log, and self.saved is the meta.json it had."""
+        self.calls = []
+        self.finished(ago=3 * DAY)
+        for name, data in (("build-log.txt", log), ("podinfo.json", podinfo)):  # (routes stay from a subtest before)
+            if data is None:
+                self.srv.httpd.routes.pop(f"{self.base}/{name}", None)
+            else:
+                self.srv.route(f"{self.base}/{name}", obj(data, calls=self.calls if name == "build-log.txt" else None))
+        self.assertEqual(self.fetch(*extra), 0)
+        folder = self.bdir()
+        self.saved = self.meta()
+        if meta:
+            frl.write_json(os.path.join(folder, "meta.json"), meta(self.meta()))
+        else:
+            with open(os.path.join(folder, "meta.json"), "w") as f:
+                f.write("{broken")
+        return folder, sorted(os.listdir(folder))
+
+    def head_only(self, data, status):
+        """An object GCS answers a HEAD for, and a GET of with `status`."""
+        def serve(h):
+            if h.command == "HEAD":
+                return obj(data)(h)
+            send(h, status, {}, b"")
+        return serve
+
+    def gone(self, *names):
+        for name in names:
+            del self.srv.httpd.routes[f"{self.base}/{name}"]
+
+    def assert_left_as_it_is(self, folder, held, error):
+        """The run's error of the build says `error`, and its folder holds what it held."""
+        run = self.runs()[-1]
+        self.assertIn(f"its meta.json cannot be read as this build's, and {error}", run["errors"][0]["error"])
+        self.assertEqual(sorted(os.listdir(folder)), held)
+        self.assertNotIn("removed", " ".join(run["warnings"]))
+
+    def test_nor_one_whose_log_gcs_no_longer_has(self):
+        """Its copies are the only ones left: not left out of a new meta.json, for the end of the run to
+        remove them. The folder stays as it is, for a person to give it its meta.json back (from git)."""
+        folder, held = self.unreadable_meta()
+        self.gone("build-log.txt", "finished.json")
+        self.assertEqual(self.fetch(), 1)  # fails: 0, its log then removed
+        self.assert_left_as_it_is(folder, held, "GCS no longer has build-log.txt")
+        self.assertEqual(self.read("build-log.txt"), b"log\n")
+        with open(os.path.join(folder, "meta.json")) as f:
+            self.assertEqual(f.read(), "{broken")
+
+    def test_nor_one_whose_podinfo_gcs_no_longer_has(self):
+        # (GCS still has its log, which is not downloaded again before)
+        folder, held = self.unreadable_meta("--gzip", podinfo=b'{"pod": {}}')
+        self.assertEqual(held, ["build-log.txt.gz", "meta.json", "podinfo.json.gz"])
+        self.gone("podinfo.json")
+        self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0, its podinfo.json then removed
+        self.assert_left_as_it_is(folder, held, "GCS no longer has podinfo.json")
+        self.assertEqual(self.calls, ["GET", "HEAD"])
+
+    def test_nor_one_whose_log_in_parts_gcs_no_longer_has(self):
+        for extra, log, first in ((("--max-file-mb", "0.00005"), b"log\n" * 40, "build-log.txt.000"),  # (52-byte parts)
+                                  (("--gzip", "--max-file-mb", "0.00005"), bytes(range(256)) * 2, "build-log.txt.gz.000")):
+            with self.subTest(first=first):
+                shutil.rmtree(os.path.join(self.root, "runs"), ignore_errors=True)
+                folder, held = self.unreadable_meta(*extra, log=log)
+                self.assertEqual(held[0], first)
+                self.gone("build-log.txt", "finished.json")
+                self.assertEqual(self.fetch(*extra), 1)  # fails: 0, its log then removed
+                self.assert_left_as_it_is(folder, held, "GCS no longer has build-log.txt")
+
+    def test_nor_one_whose_meta_json_is_another_build_s(self):
+        """As a hand edit can leave one: it cannot be read as this build's either. Not even one that lists
+        fewer files: the cleanup at the start of a run, and --clean-partial, take no such record for the
+        folder's own."""
+        for name, meta in (("the same files", lambda m: dict(m, build="1")),
+                           ("no podinfo.json", lambda m: dict(m, build="1", podinfo=None))):
+            with self.subTest(name):
+                shutil.rmtree(os.path.join(self.root, "runs"), ignore_errors=True)
+                folder, held = self.unreadable_meta("--gzip", podinfo=b'{"pod": {}}', meta=meta)
+                self.gone("podinfo.json")
+                self.assertEqual(self.fetch("--clean-partial"), 0)
+                self.assertEqual(sorted(os.listdir(folder)), held)  # fails: no podinfo.json.gz (removed)
+                self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0 (the same files), its podinfo.json then removed
+                self.assert_left_as_it_is(folder, held, "GCS no longer has podinfo.json")
+
+    def test_nor_one_gcs_cannot_serve_after_it_said_it_has_it(self):
+        # (asked first with a HEAD, then taken with a GET that fails: no new meta.json without it either)
+        pod = b'{"pod": {}}'
+        for name, data, status, log, error in (
+                ("podinfo.json", pod, 403, b"log\n", "GCS cannot serve (HTTPError: HTTP Error 403"),
+                ("podinfo.json", pod, 404, b"log\n", "GCS no longer has podinfo.json"),
+                ("build-log.txt", b"log\n", 404, b"log\n", "GCS no longer has build-log.txt")):
+            with self.subTest(name=name, status=status):
+                shutil.rmtree(os.path.join(self.root, "runs"), ignore_errors=True)
+                folder, held = self.unreadable_meta("--gzip", log=log, podinfo=pod)
+                self.srv.route(f"{self.base}/{name}", self.head_only(data, status))
+                self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0, its copy then removed
+                self.assert_left_as_it_is(folder, held, error)
+
+    def test_nor_one_whose_only_file_gcs_cannot_serve_after_it_said_it_has_it(self):
+        # (a podinfo.json without a log: the folder was kept before too, and the error said less)
+        folder, held = self.unreadable_meta("--gzip", log=None, podinfo=b'{"pod": {}}')
+        self.assertEqual(held, ["meta.json", "podinfo.json.gz"])
+        self.srv.route(self.base + "/podinfo.json", self.head_only(b'{"pod": {}}', 403))
+        self.assertEqual(self.fetch("--gzip"), 1)
+        self.assertIn("its meta.json cannot be read as this build's, and GCS cannot serve (HTTPError: HTTP Error 403",
+                      self.runs()[-1]["errors"][0]["error"])  # fails: HTTPError: HTTP Error 403: Forbidden
+        self.assertEqual(sorted(os.listdir(folder)), held)
+
+    def test_control_one_gcs_has_all_of_is_archived_again_in_the_format_it_is_taken(self):
+        # (archived as it came, then taken again gzipped: its copies as they came go, without a warning)
+        folder, held = self.unreadable_meta(podinfo=b'{"pod": {}}')
+        self.assertEqual(self.fetch("--gzip"), 0)
+        run = self.runs()[-1]
+        self.assertEqual((run["outcomes"], run["warnings"]), ({"repaired": [self.key]}, []))
+        self.assertEqual(sorted(os.listdir(folder)), ["build-log.txt.gz", "meta.json", "podinfo.json.gz"])
+
+    def test_nor_one_taken_again_in_another_form_before_that(self):
+        # (archived as it came, taken again gzipped, then podinfo.json cannot be taken: the copy as it came
+        # stays, so the folder holds what the meta.json a person gives it back names, though GCS then has
+        # none of it)
+        folder, held = self.unreadable_meta(podinfo=b'{"pod": {}}')
+        self.assertEqual(held, ["build-log.txt", "meta.json", "podinfo.json"])
+        self.srv.route(self.base + "/podinfo.json", self.head_only(b'{"pod": {}}', 403))
+        self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0, its podinfo.json then removed
+        self.assertIn("build-log.txt", os.listdir(folder))
+        frl.write_json(os.path.join(folder, "meta.json"), self.saved)  # (as from git)
+        self.gone("build-log.txt", "podinfo.json", "finished.json")
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual((self.read("build-log.txt"), self.read("podinfo.json")), (b"log\n", b'{"pod": {}}'))
+
+    def test_control_a_head_gcs_answers_with_an_error_is_no_answer(self):
+        # (not taken for one GCS no longer has: an error of the build all the same, and the folder kept)
+        folder, held = self.unreadable_meta()
+        self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
+        self.assertEqual(self.fetch(), 1)
+        error = self.runs()[-1]["errors"][0]["error"]
+        self.assertNotIn("GCS no longer has", error)
+        self.assertIn("500", error)
+        self.assertEqual(sorted(os.listdir(folder)), held)
+
     def test_a_failed_run_is_never_listed_as_ok(self):
         self.finished(ago=3 * DAY)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))

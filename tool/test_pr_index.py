@@ -500,6 +500,16 @@ class PullRequestJob(r4.World):
         self.assertEqual(run["gcs_compared"], False)
         self.assertIn("links a folder this archive does not read", run["errors"][0]["error"])
 
+    def test_control_one_whose_meta_json_cannot_be_read_is_archived_again_where_its_entry_links(self):
+        # (GCS is asked whether it still has its files there, not under the index)
+        self.finished(ago=3 * HOUR)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        with open(os.path.join(self.bdir(), "meta.json"), "w") as f:
+            f.write("{broken")
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual((self.runs()[-1]["outcomes"], self.meta()["gcs_path"]), ({"repaired": [self.key]}, self.folder))
+
     def test_a_watched_one_found_red_is_read_where_its_entry_links(self):
         # (still running when a run searched GCS for a gap, then found red by the next run)
         self.earlier_run(self.now - 20 * DAY)

@@ -1718,14 +1718,20 @@ def place(tmp, final, max_bytes=None):
     return parts
 
 
-def save_log(base, target, compress, max_bytes, name="build-log.txt"):
+def save_log(base, target, compress, max_bytes, name="build-log.txt", keep_other=False):
     """Download build-log.txt (or `name`, as podinfo.json), dropping a copy in the other format left by
-    an earlier run."""
+    an earlier run (unless keep_other: the caller drops it, once a meta.json lists this one)."""
     log = download(f"{base}/{name}", os.path.join(target, name), compress, max_bytes)
-    for stale in {name, name + ".gz"} - {log["file"]}:
+    if not keep_other:
+        drop_other_form(target, name, log)
+    return log
+
+
+def drop_other_form(target, name, info):
+    """Remove the copy of name in the other format (as it came, or gzipped) than info's, and its parts."""
+    for stale in {name, name + ".gz"} - {info["file"]}:
         remove(os.path.join(target, stale))
         remove_parts(target, stale)
-    return log
 
 
 def stray_files(target, meta):
@@ -3238,6 +3244,34 @@ def unchanged_in_gcs(url, info):
     return True
 
 
+def in_gcs(url):
+    """Whether GCS has an object (asked with a HEAD)."""
+    try:
+        request(url, consume=lambda r: r.headers, method="HEAD", headers={"Accept-Encoding": "gzip"})
+    except NotFound:
+        return False
+    return True
+
+
+def left_as_it_is(name, base, error=None):
+    """The error of a build whose folder's meta.json cannot be read as the build's (see store), and whose
+    copy of name it cannot take from GCS again."""
+    why = "GCS no longer has" if error is None or isinstance(error, NotFound) else \
+        f"GCS cannot serve ({type(error).__name__}: {error})"
+    return RuntimeError(f"its meta.json cannot be read as this build's, and {why} {name}, of which its folder holds "
+                        f"a copy: the copy and the meta.json are left as they are ({base})")
+
+
+def holds_copy(target, name):
+    """Whether a build folder holds a stored copy of name (build-log.txt or podinfo.json): as it came,
+    gzipped, or in parts."""
+    for n in listdir(target):
+        m = PART_RE.fullmatch(n)
+        if (m.group(1) if m else n) in (name, name + ".gz"):
+            return True
+    return False
+
+
 def settle_flags(meta, checked, now):
     """(settled, final) for an archived copy found equal to GCS at time `checked`.
 
@@ -3468,6 +3502,15 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     of its files in GCS, under base (see build_folder; else query/build)."""
     where = where or f"{rec['query']}/{rec['build']}"
     meta_path = os.path.join(target, "meta.json")
+    # A folder whose meta.json cannot be read as this build's (held: the copies it holds): no copy is known
+    # to be intact, and a new meta.json lists only what this run takes from GCS (the end of the run removes
+    # the rest). So a copy of a file it cannot take (GCS no longer has it, or cannot serve it) stays, and so
+    # does the meta.json. GCS is asked first (a HEAD), not to download the others for nothing.
+    held = {name for name in ("build-log.txt", "podinfo.json") if holds_copy(target, name)} if existed and not old \
+        else set()
+    for name in ("build-log.txt", "podinfo.json"):
+        if name in held and not in_gcs(f"{base}/{name}"):
+            raise left_as_it_is(name, base)
     os.makedirs(target, exist_ok=True)
     podinfo = note = None
     unread = False  # (its podinfo.json could not be read: the next run compares the build, and reads it again)
@@ -3481,11 +3524,14 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
             log = kept["log"]
         else:
             try:
-                log = save_log(base, target, compress, max_bytes)
+                # (one held stays as it is until a new meta.json lists the copy taken: see held)
+                log = save_log(base, target, compress, max_bytes, keep_other=bool(held))
                 taken.append("build-log.txt")
             except NotFound:
                 if kept["log"]:
                     raise RuntimeError(f"the archived log is damaged and GCS no longer has it ({base})") from None
+                if "build-log.txt" in held:
+                    raise left_as_it_is("build-log.txt", base) from None
                 log = None
         if log is None:
             age = now - (rec["started"] or rec["created"])
@@ -3504,13 +3550,15 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
             podinfo = kept["podinfo"]
         else:
             try:
-                podinfo = save_log(base, target, compress, max_bytes, "podinfo.json")
+                podinfo = save_log(base, target, compress, max_bytes, "podinfo.json", keep_other=bool(held))
                 taken.append("podinfo.json")
             except (Abandoned, LocalIOError):
                 raise
             except Exception as e:
                 if kept["podinfo"] and isinstance(e, NotFound):
                     raise RuntimeError(f"the archived podinfo.json is damaged and GCS no longer has it ({base})") from None
+                if "podinfo.json" in held:
+                    raise left_as_it_is("podinfo.json", base, e) from None
                 if log is None and not isinstance(e, NotFound):
                     raise  # (the build's only file: archived once it can be read)
                 unread = not isinstance(e, NotFound)
@@ -3541,6 +3589,9 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     if unread:
         meta["final"] = False  # (the next run compares it, and so reads its podinfo.json again)
     write_json(meta_path, meta)
+    for key, name in (("log", "build-log.txt"), ("podinfo", "podinfo.json")):
+        if held and name in taken:  # (the copy held in the other format goes, now that meta.json lists this one)
+            drop_other_form(target, name, meta[key])
     return ("archived" if log else "archived-without-log") if not existed else "repaired", meta
 
 
@@ -3870,7 +3921,10 @@ def clean_partial_builds(root, warnings):
                         meta = read_json(os.path.join(target, "meta.json"))
                     except (ValueError, OSError):
                         continue  # reported as unreadable by the index
-                    for n in stray_files(target, meta) if valid_meta(meta) else []:
+                    # (against this build's own record only: another build's says nothing of what the folder's
+                    # files are, as the index reports)
+                    own = valid_meta(meta) and meta.get("job") == job and meta.get("build") == build
+                    for n in stray_files(target, meta) if own else []:
                         if not file_or_gone(os.path.join(target, n)):  # (not what a copy cut off part-way leaves)
                             warnings.append(f"{run_rel}/{job}/{build}/{n}: not listed in its meta.json, and not a file "
                                             "a download writes; left alone")
