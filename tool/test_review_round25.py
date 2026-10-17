@@ -744,7 +744,8 @@ class LackingRecordInCrossCheck(ttc.ConfigWorld):
         self.b2 = str(snowflake(self.now - 10 * HOUR))
         self.failed_in_gcs(self.b2, 10 * HOUR)
         # (its junit file written 50 minutes after it was made: TestGrid's reads of it ended under C2)
-        self.srv.route(f"/bucket/logs/job/{self.b2}/podinfo.json", (200, {}, {"pod": {"status": {"phase": "Failed"}}}))
+        self.srv.route(f"/bucket/logs/job/{self.b2}/podinfo.json",
+                       obj(json.dumps({"pod": {"status": {"phase": "Failed"}}}).encode()))
         name = f"logs/job/{self.b2}/artifacts/junit_01.xml"
         self.srv.route(f"/bucket/{name}", (200, {}, RED_ON_TEST))
         self.srv.gcs_listing("bucket", [f"logs/job/{x}/finished.json" for x in (self.visible, self.b2)],

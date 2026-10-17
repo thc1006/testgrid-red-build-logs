@@ -323,14 +323,17 @@ class Archive(ArchiveWorld):
         self.fetch()
         self.assertEqual(self.meta()["log_recovered_by_run"], self.runs()[-1]["run"])
 
-    def test_RC03_podinfo_is_not_fetched_for_a_build_with_a_log(self):
+    def test_RC03_podinfo_is_kept_with_a_log_and_not_fetched_again_unchanged(self):
+        # (before, only a build without a log kept it)
         self.finished(ago=2 * HOUR)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
-        self.srv.route(self.base + "/podinfo.json", obj(b'{"pod": 1}'))
+        calls = []
+        self.srv.route(self.base + "/podinfo.json", obj(b'{"pod": 1}', calls=calls))
         self.fetch()
         self.fetch()
-        self.assertIsNone(self.meta()["podinfo"])
+        self.assertEqual(self.read("podinfo.json"), b'{"pod": 1}')
         self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
+        self.assertEqual(calls, ["GET", "HEAD"])  # (the later run compares it with GCS, and fetches nothing)
 
     def test_A03_a_young_red_build_with_nothing_in_gcs_is_pending(self):
         start = int(time.time()) - 7 * HOUR

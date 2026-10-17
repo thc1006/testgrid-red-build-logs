@@ -867,7 +867,7 @@ class EndToEndTest(unittest.TestCase):
             return out
         self.run_tool(*limit)
         for job, build, key, name, raw in (("job-a", "1004", "log", "build-log.txt.gz", b"log 1004\n"),
-                                           ("job-a", "1001", "podinfo", "podinfo.json", b'{"pod": "never started"}')):
+                                           ("job-a", "1001", "podinfo", "podinfo.json.gz", b'{"pod": "never started"}')):
             with self.subTest(build=build):
                 target = self.bdir(job, build)
                 info = frl.read_json(os.path.join(target, "meta.json"))[key]
