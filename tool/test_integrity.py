@@ -522,6 +522,46 @@ class ContentOverTimeTest(ArchiveWorld):
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.assertEqual(self.fetch(), 0)
 
+    def test_a_disk_error_while_comparing_is_a_failed_comparison(self):
+        """Not the error of a build to archive (state.json's unresolved): the copy stays, and the run
+        says it did not compare all it was due to."""
+        self.finished(ago=3 * HOUR)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.fetch()
+        self.srv.route(self.base + "/build-log.txt", obj(b"log, replaced\n", "2"))
+        real = os.replace
+
+        def full(src, dst):
+            if "build-log" in dst:
+                raise OSError(28, "No space left on device")
+            return real(src, dst)
+        with mock.patch.object(frl.os, "replace", side_effect=full):
+            self.assertEqual(self.fetch(), 1)
+        run = self.runs()[-1]
+        self.assertIn("comparing the archived copy with GCS failed: LocalIOError", run["errors"][0]["error"])
+        # fails: LocalIOError: ...
+        self.assertEqual((run["gcs_compared"], self.read("build-log.txt")), (False, b"log\n"))
+        self.assertNotIn(self.key, frl.read_json(os.path.join(self.root, "state.json"))["unresolved"])
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.read("build-log.txt"), b"log, replaced\n")
+
+    def test_nor_does_a_disk_error_make_the_run_stop_comparing_an_old_build(self):
+        # (one compared on every run until GIVE_UP_DAYS after it was archived, as one without finished.json
+        # is: past that, GCS's errors make the run stop comparing it, and a disk error is not GCS's)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.fetch()
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+        self.srv.route(self.base + "/build-log.txt", obj(b"log, replaced\n", "2"))
+        real = os.replace
+
+        def full(src, dst):
+            if "build-log" in dst:
+                raise OSError(28, "No space left on device")
+            return real(src, dst)
+        with mock.patch.object(frl.os, "replace", side_effect=full):
+            self.assertEqual(self.fetch(), 1)
+        self.assertEqual((self.meta()["final"], self.meta().get("note")), (False, None))
+
     def test_cross_check_notes_but_does_not_fail_on_an_unsettled_copy(self):
         self.finished(ago=60)
         self.srv.route(self.base + "/build-log.txt", obj(b"first\n"))

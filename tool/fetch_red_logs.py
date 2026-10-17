@@ -3093,8 +3093,10 @@ def recheck(old, rec, target, base, run_id, now, compress, max_bytes, compare_fi
                     changed.append("podinfo.json")
                 except NotFound:
                     pass
-        except (Abandoned, LocalIOError):
+        except Abandoned:
             raise
+        except LocalIOError as e:  # (not GCS's doing: no reason to stop comparing it, but not compared either)
+            raise RecheckError(f"comparing the archived copy with GCS failed: LocalIOError: {e}") from None
         except Exception as e:
             first = meta.get("archived_at") if plausible_time(meta.get("archived_at"), now) else meta["created"]
             # (a final one is compared again by the next run that compares its seventh)
