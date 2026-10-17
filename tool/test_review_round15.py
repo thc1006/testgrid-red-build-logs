@@ -58,10 +58,10 @@ class NeverBuildsBefore(unittest.TestCase):
     upload = tch.Uploads.upload
 
     def test_the_run_before_a_config_that_cannot_be_built_is_not_rebuilt_on_every_archive_run(self):
-        """README ("When something fails", TestGrid's config row): "A run whose config cannot be
-        built is tried again on every run, but the runs around it are not rebuilt to compare
-        with it until it is built" (e5df0fb's message: "remembered so its neighbours are not
-        rebuilt each run"). plan() skips the known run after it (testgrid_config.py:777-778),
+        """The README before cab048a ("When something fails", TestGrid's config row): "A run whose
+        config cannot be built is tried again on every run, but the runs around it are not rebuilt
+        to compare with it until it is built" (e5df0fb's message: "remembered so its neighbours are
+        not rebuilt each run"). plan() skips the known run after it (testgrid_config.py:777-778),
         but for the failing run itself it still adds the run before it (a, whose config is
         known) to the configs to build, to compare with (lines 779-785): every archive run
         rebuilds a's config (git fetch, checkout, configurator, extract: a config takes about
