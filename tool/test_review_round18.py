@@ -1,7 +1,7 @@
 """Review wave W7c, on 0734e94: the read model of fetch_red_logs against TestGrid's Go code at
-the commit production runs (testgrid@v0.0.177-0.20260902201319-f15bfa4808a4; paths below are
-relative to it). Each test asserts what TestGrid does and fails on 0734e94 for the reason its
-docstring gives.
+the commit TestGrid's production manifests deploy (testgrid@v0.0.177-0.20260902201319-f15bfa4808a4;
+paths below are relative to it). Each test asserts what TestGrid does and fails on 0734e94 for
+the reason its docstring gives.
 
 Run: cd tool && python -m unittest test_review_round18 -v
 """
