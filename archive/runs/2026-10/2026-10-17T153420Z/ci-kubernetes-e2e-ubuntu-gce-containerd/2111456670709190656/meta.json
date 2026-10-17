@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2111456670709190656",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1792245474,
+  "created": 1792245473,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should implement NodePort and HealthCheckNodePort correctly when ExternalTrafficPolicy changes",
+          "status": "FAIL",
+          "message": "[FAILED] updating ExternalTrafficPolicy and HealthCheckNodePort: faile...o/kubernetes/test/e2e/network/service.go:4036 @ 10/17/26 14:10:55.111\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792247674,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2111456670709190656",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2111456670709190656/build-log.txt",
+  "log": {
+    "bytes": 142962,
+    "md5": "c717697b7c8e42d80be5cc16da448961",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23522,
+    "gcs": {
+      "generation": "1792247688432650",
+      "md5": "c717697b7c8e42d80be5cc16da448961",
+      "crc32c": "dd351c4d",
+      "bytes": 142962,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-17T153420Z",
+  "archived_at": 1792251260.0,
+  "settled": false,
+  "final": false
+}

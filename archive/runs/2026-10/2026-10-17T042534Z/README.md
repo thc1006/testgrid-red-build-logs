@@ -11,8 +11,8 @@ TestGrid's config: test-infra 691b7d25c024 of 2026-10-16T23:06:11Z, uploaded 202
 
 | Time | Tab | Build | Red tests | Files |
 |---|---|---|---|---|
-| 03:33 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2111299600974352384](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2111299600974352384) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111299600974352384/build-log.txt.gz) (provisional) |
-| 01:51 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2111273931934535680](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2111273931934535680) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS when invoking the Recycle re (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111273931934535680/build-log.txt.gz) (provisional) |
+| 03:33 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2111299600974352384](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2111299600974352384) | kubetest.Up (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce-slow/2111299600974352384/build-log.txt.gz) |
+| 01:51 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2111273931934535680](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2111273931934535680) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS when invoking the Recycle re (+2) | [build-log.txt.gz](../../../runs/2026-10/2026-10-17T042534Z/ci-kubernetes-e2e-gci-gce/2111273931934535680/build-log.txt.gz) |
 | 01:42 | blocking#integration-master | [ci-kubernetes-integration-master 2111271415364718592](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2111271415364718592) | \[sig-api-machinery\] k8s.io/kubernetes/test/integration/apiserver.openapi (+1) | [build-log.txt.gz](../../../runs/2026-10/2026-10-17T042534Z/ci-kubernetes-integration-master/2111271415364718592/build-log.txt.gz) |
 
 ### 2026-10-16

@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2111298847031431168",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1792207881,
+  "created": 1792207845,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] [Feature:GPUDevicePlugin] Sanity test using nvidia-smi [Provider:aws,gce] should run nvidia-smi and cuda-demo-suite [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 1800.001s.\nexpected pod to be started or comp...at: k8s.io/kubernetes/test/e2e/node/gpu.go:158 @ 10/17/26 04:16:54.67\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792211197,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2111298847031431168",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2111298847031431168/build-log.txt",
+  "log": {
+    "bytes": 155131,
+    "md5": "ed06eefbe9872ce08d8d590a3b8ff919",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20768,
+    "gcs": {
+      "generation": "1792211199183088",
+      "md5": "ed06eefbe9872ce08d8d590a3b8ff919",
+      "crc32c": "98efb441",
+      "bytes": 155131,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-17T153420Z",
+  "archived_at": 1792251260.0,
+  "settled": true,
+  "final": false
+}

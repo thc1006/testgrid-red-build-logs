@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2111457677577031680",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1792245743,
+  "created": 1792245713,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-network] k8s.io/kubernetes/pkg/proxy.localnodeportproxy",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestShutdown\n    proxy_test.go:312: Expected 3 active listeners, got 2\n--- FAIL: TestShutdown (0.00s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792247079,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2111457677577031680",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2111457677577031680/build-log.txt",
+  "log": {
+    "bytes": 284482,
+    "md5": "ad5ba46a4fc47224127592760a7c6eee",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 35086,
+    "gcs": {
+      "generation": "1792247079345517",
+      "md5": "ad5ba46a4fc47224127592760a7c6eee",
+      "crc32c": "e961d088",
+      "bytes": 284482,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-17T153420Z",
+  "archived_at": 1792251260.0,
+  "settled": false,
+  "final": false
+}

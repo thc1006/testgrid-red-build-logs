@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2111406809678876672",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1792233586,
+  "created": 1792233586,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Deployment should not disrupt a cloud load-balancer's connectivity during rollout [Provider:aws,azure,gce]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 136.115.219.89:80 after ...ernetes/test/e2e/framework/service/util.go:49 @ 10/17/26 11:01:57.485\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792235770,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2111406809678876672",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2111406809678876672/build-log.txt",
+  "log": {
+    "bytes": 280249,
+    "md5": "78c9ec758228e2eb80353160543f8a1c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 36838,
+    "gcs": {
+      "generation": "1792235786029407",
+      "md5": "78c9ec758228e2eb80353160543f8a1c",
+      "crc32c": "db4bfc2b",
+      "bytes": 280249,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-17T153420Z",
+  "archived_at": 1792251260.0,
+  "settled": true,
+  "final": false
+}

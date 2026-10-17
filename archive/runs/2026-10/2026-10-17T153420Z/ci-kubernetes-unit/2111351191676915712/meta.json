@@ -1,0 +1,49 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2111351191676915712",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1792220355,
+  "created": 1792220325,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-node] k8s.io/kubernetes/pkg/kubelet.volumemanager",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestWaitForAllPodsUnmount/concurrent_unmount_-_multip...TestWaitForAllPodsUnmount\n--- FAIL: TestWaitForAllPodsUnmount (5.20s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792221704,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2111351191676915712",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2111351191676915712/build-log.txt",
+  "log": {
+    "bytes": 323293,
+    "md5": "137c357aea393c798f654ebb7a71c2fe",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 39328,
+    "gcs": {
+      "generation": "1792221705235748",
+      "md5": "137c357aea393c798f654ebb7a71c2fe",
+      "crc32c": "2579abe6",
+      "bytes": 323293,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-17T153420Z",
+  "archived_at": 1792251260.0,
+  "settled": true,
+  "final": false
+}

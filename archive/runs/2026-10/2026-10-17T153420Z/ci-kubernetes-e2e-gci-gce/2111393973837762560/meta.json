@@ -1,0 +1,54 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2111393973837762560",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1792230526,
+  "created": 1792230525,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Mock volume expansion Expansion with recovery should allow recovery if controller expansion fails with final error",
+          "status": "FAIL",
+          "message": "[FAILED] While waiting for PV resize to finish: error while waiting fo...e/storage/csimock/csi_volume_expansion.go:852 @ 10/17/26 10:07:36.937\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792232774,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2111393973837762560",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2111393973837762560/build-log.txt",
+  "log": {
+    "bytes": 257797,
+    "md5": "f175ec8b318754ef49bf21c769a854d6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 35165,
+    "gcs": {
+      "generation": "1792232789489633",
+      "md5": "f175ec8b318754ef49bf21c769a854d6",
+      "crc32c": "730321bb",
+      "bytes": 257797,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": null,
+  "archived_by_run": "2026-10-17T153420Z",
+  "archived_at": 1792251260.0,
+  "settled": true,
+  "final": false
+}
