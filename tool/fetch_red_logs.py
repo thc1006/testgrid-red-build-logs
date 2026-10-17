@@ -5157,7 +5157,7 @@ def run(args, root, run_start, pool, deadline):
         for b in sorted(selected + retry, key=lambda b: b["started"] or b["created"]):
             print(iso(b["started"] or b["created"]), b["job"], b["build"], json.dumps([t["tab"] for t in b["tabs"]]))
         print(f"{tabs_read_text(reports)}, {len(selected)} red builds, "
-              f"{len(retry) - rechecks} to retry, {rechecks} archived builds to compare with GCS again")
+              f"{len(retry) - rechecks} to retry, {rechecks} archived builds not shown red now to compare with GCS again")
         for r in tab_errors:
             print(*tab_error_words(r), r["error"], file=sys.stderr)
         for w in warnings:
@@ -5400,7 +5400,7 @@ def run(args, root, run_start, pool, deadline):
     counts = [f"{k}={len(v)}" for k, v in sorted(outcomes.items())] + [f"errors={len(errors)}"]
     print(f"run {run_id}: {tabs_read_text(reports)}, {len(builds)} red builds on TestGrid, "
           f"{len(selected)} selected, {len(retry) - rechecks - backfilled - (len(new_watch) - len(running_gap))} retried, "
-          f"{rechecks} re-compared with GCS, "
+          f"{rechecks} archived builds not shown red now compared with GCS again, "
           f"{len(outcomes.get('backfilled', []))} taken from GCS by TestGrid's rule: "
           f"{', '.join(counts)}; archive holds {len(entries) if entries is not None else '?'} builds")
     print(f"  {downloaded / 1e6:.1f} MB in {elapsed:.1f}s ({downloaded / 1e6 / max(elapsed, 1e-9):.1f} MB/s; scan "
