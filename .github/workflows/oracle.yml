@@ -97,6 +97,14 @@ jobs:
           export GOCHECK="$RUNNER_TEMP/oracle/gocheck"
           python3 -I oracle/fuzz/filterdiff.py "$GITHUB_RUN_ID" 20000
 
+      # The builds TestGrid takes from Prow's index of a pull request job: its ListBuilds against the fetch's
+      # (linkdiff imports the fetch, which needs its environment).
+      - name: Index links, edge cases then random
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          export GOCHECK="$RUNNER_TEMP/oracle/gocheck"
+          uv run --locked --no-dev python -I oracle/fuzz/linkdiff.py "$GITHUB_RUN_ID" 20000
+
       # (the cases a random seed found to differ, to replay them: run.py writes them to bad-<seed>.jsonl)
       - name: Keep the random builds that differ
         if: ${{ failure() && hashFiles('tool/bad-*.jsonl') != '' }}

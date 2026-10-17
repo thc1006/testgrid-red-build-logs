@@ -1,11 +1,12 @@
-# TestGrid's own code, to check `testgrid_rule.py` against
+# TestGrid's own code, to check the ports against
 
 `../testgrid_rule.py` ports the rule TestGrid paints a build's cells by. The fetch
 needs it for builds TestGrid no longer shows (a gap between runs) or showed running
 long past their time, and `cross_check.py` uses it to check that none of those was
 missed. This folder
 builds TestGrid's own code, at the commit TestGrid's production manifests deploy, to
-check the port against.
+check the port against, and the fetch's reading of Prow's index links
+(`fetch_red_logs.link_folder`).
 
 - `pinned.json`: that commit (TestGrid production's updater image tag in
   `cluster/prod/updater.yaml` ends in `-g<commit>`) and the Go version it is
@@ -19,8 +20,10 @@ check the port against.
 - `go/cmd/tgoracle`: judges builds held in memory, one JSON object per line.
 - `go/cmd/schemadump`: the Go types podinfo.json, started.json and finished.json
   decode into. `gotypes.py` turns its output into `../testgrid_types.json`.
-- `go/cmd/gocheck`: what Go's strconv, time.Parse and resource.ParseQuantity make
-  of strings, and the rows `filterGrid` keeps.
+- `go/cmd/gocheck`: what Go's strconv, time.Parse, resource.ParseQuantity and
+  fmt.Sprintf make of strings, the rows `filterGrid` keeps, and the builds
+  `util/gcs`'s `ListBuilds` takes from an entry of Prow's index of a pull request
+  job.
 - `fuzz/`:
   - `edge.py`: about 250 cases, one Go behaviour each.
   - `gen.py` and `run.py`: random builds.
@@ -35,6 +38,12 @@ check the port against.
     TestGrid rejects base options the port must not apply them; where it keeps
     rows the port must keep the same ones; patterns of the syntax the port
     follows must be applied.
+  - `linkdiff.py`: the fetch's `link_folder` against `ListBuilds`, for the link an
+    entry of Prow's index holds: about 100 edge cases, random links, and links a
+    few characters off ones Prow writes. Where TestGrid's listing fails the port
+    must fail it; where TestGrid takes a build the port must take the same one,
+    and read the files of exactly the builds the archive's own rule reads, where
+    TestGrid reads started.json.
 
 The workflow `.github/workflows/oracle.yml` runs daily, and on a change to the
 port. It does all of this:
@@ -46,6 +55,7 @@ port. It does all of this:
 - runs the filter's edge cases and 20,000 random ones;
 - runs Go's `fmt.Sprintf` against `gofmt.py` (a test group's `test_name_config`
   names its rows with it) on 20,000 random formats (`gocheck`'s "sprintf");
+- runs the index links' edge cases and 20,000 random ones (`gocheck`'s "link");
 - fails if TestGrid's production manifests (`cluster/prod/updater.yaml` and
   `tabulator.yaml`) no longer deploy the pinned commit of its updater or tabulator
   (`drift.sh`, checked even when another check failed; every archive run checks it
@@ -68,6 +78,7 @@ cd tool
 python3 -I oracle/fuzz/edge.py
 python3 -I oracle/fuzz/filterdiff.py 1 20000
 python3 -I oracle/fuzz/fmtdiff.py 1 20000
+uv run --locked --no-dev python -I oracle/fuzz/linkdiff.py 1 20000   # it imports the fetch
 python3 -I oracle/fuzz/run.py 1 5000     # seed, cases; mismatches go to bad-<seed>.jsonl
 uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 3   # the fetch's code and environment
 /tmp/oracle/schemadump | python3 -I oracle/gotypes.py | cmp - testgrid_types.json
@@ -81,7 +92,8 @@ port follows changed. When something did:
 
 1. Compare the new commit with the pinned one. The code that matters is in
    `pkg/updater` (`read.go`, `gcs.go`, `inflate.go`, `updater.go`), `util/gcs`
-   (`read.go`), `metadata` and `metadata/junit`, `pkg/tabulator` (`filter.go`,
+   (`read.go`, and `gcs.go`'s `Path.SetURL`, which `fetch_red_logs.link_folder`
+   follows), `metadata` and `metadata/junit`, `pkg/tabulator` (`filter.go`,
    and where `tabulate` calls it), plus `go.mod` (k8s.io/api is the Pod type, and
    the Go version decides encoding/json, encoding/xml, net/url, fmt and regexp).
    A TestGroup field the updater newly reads belongs in `testgrid_config.py`'s
