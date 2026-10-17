@@ -46,7 +46,8 @@ under --archive:
     verification.json               its verification: what was checked, and the outcome (cross_check.py)
     <job>/<build>/build-log.txt     raw log, length and md5 checked against GCS
                                     (build-log.txt.gz with --gzip; meta.json keeps the raw md5)
-    <job>/<build>/podinfo.json      only when the build has no log (pod never ran)
+    <job>/<build>/podinfo.json      Prow's record of the build's pod and node, when GCS has one
+                                    (podinfo.json.gz with --gzip)
     <job>/<build>/<file>.000, ...   a file larger than --max-file-mb, in numbered parts
     <job>/<build>/meta.json         tabs, red cells, TestGrid messages, result, GCS identity
   charts/*.svg                      trend charts shown in INDEX.md
@@ -111,9 +112,9 @@ JOB_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 BUILD_RE = re.compile(r"[0-9]{1,20}")
 # <bucket>/<path>/<job>: plain segments only, so it cannot step out of the bucket in a URL.
 QUERY_RE = re.compile(r"[a-z0-9][a-z0-9._-]*(?:/(?!\.\.?(?:/|$))[A-Za-z0-9._-]+)+")
-LOG_FILES = {"build-log.txt", "build-log.txt.gz", "podinfo.json"}
+LOG_FILES = {"build-log.txt", "build-log.txt.gz", "podinfo.json", "podinfo.json.gz"}
 # a stored file too large for one file in git is kept as numbered parts: <file>.000, <file>.001, ...
-PART_RE = re.compile(r"(build-log\.txt(?:\.gz)?|podinfo\.json)\.([0-9]{3})")
+PART_RE = re.compile(r"(build-log\.txt(?:\.gz)?|podinfo\.json(?:\.gz)?)\.([0-9]{3})")
 RUN_FILES = {"run.json", "README.md", "verification.json"}  # in a run folder, next to its job folders
 # verification.json's outcomes (cross_check.py --record): "incomplete" until the verification ends
 VERIFICATION_OUTCOMES = ("incomplete", "ok", "problems", "timed out", "interrupted", "stopped")
@@ -1510,10 +1511,11 @@ def place(tmp, final, max_bytes=None):
     return parts
 
 
-def save_log(base, target, compress, max_bytes):
-    """Download build-log.txt, dropping a copy in the other format left by an earlier run."""
-    log = download(base + "/build-log.txt", os.path.join(target, "build-log.txt"), compress, max_bytes)
-    for stale in {"build-log.txt", "build-log.txt.gz"} - {log["file"]}:
+def save_log(base, target, compress, max_bytes, name="build-log.txt"):
+    """Download build-log.txt (or `name`, as podinfo.json), dropping a copy in the other format left by
+    an earlier run."""
+    log = download(f"{base}/{name}", os.path.join(target, name), compress, max_bytes)
+    for stale in {name, name + ".gz"} - {log["file"]}:
         remove(os.path.join(target, stale))
         remove_parts(target, stale)
     return log
@@ -3080,17 +3082,20 @@ def recheck(old, rec, target, base, run_id, now, compress, max_bytes, compare_fi
                     write_json(os.path.join(target, "meta.json"), meta)  # the file on disk changed: say so now
                 except NotFound:
                     pass
+            # (one that cannot be read fails the comparison, as the log does: the next run compares it again)
             if meta.get("podinfo") and not unchanged_in_gcs(base + "/podinfo.json", meta["podinfo"]):
                 before = meta["podinfo"].get("md5")
-                meta["podinfo"] = download(base + "/podinfo.json", os.path.join(target, "podinfo.json"),
-                                           max_bytes=max_bytes)
+                meta["podinfo"] = save_log(base, target, compress, max_bytes, "podinfo.json")
                 if meta["podinfo"]["md5"] != before:
                     changed.append("podinfo.json")
-            elif not meta.get("log") and not meta.get("podinfo"):
-                try:  # Prow writes podinfo.json up to minutes after finished.json
-                    meta["podinfo"] = download(base + "/podinfo.json", os.path.join(target, "podinfo.json"),
-                                               max_bytes=max_bytes)
+                    meta.update(refreshed_by_run=run_id, refreshed=list(changed))
+                write_json(os.path.join(target, "meta.json"), meta)  # the file on disk changed: say so now
+            elif not meta.get("podinfo"):
+                try:  # (Prow writes it up to minutes after finished.json; code before kept it only without a log)
+                    meta["podinfo"] = save_log(base, target, compress, max_bytes, "podinfo.json")
                     changed.append("podinfo.json")
+                    meta.update(refreshed_by_run=run_id, refreshed=list(changed))
+                    write_json(os.path.join(target, "meta.json"), meta)  # the file on disk changed: say so now
                 except NotFound:
                     pass
         except Abandoned:
@@ -3240,12 +3245,24 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     meta_path = os.path.join(target, "meta.json")
     os.makedirs(target, exist_ok=True)
     podinfo = note = None
+    unread = False  # (its podinfo.json could not be read: the next run compares the build, and reads it again)
+    # A repair takes again only the files it has no intact copy of: one intact stays, unasked of GCS,
+    # which may have none now (it deletes old builds' files).
+    kept = {key: (old or {}).get(key) for key in ("log", "podinfo")}
+    whole = {key: bool(kept[key]) and intact(target, {key: kept[key]}, deep=True) for key in kept}
+    taken = []  # (what it took from GCS)
     try:
-        try:
-            log = save_log(base, target, compress, max_bytes)
-        except NotFound:
-            if old and old.get("log"):
-                raise RuntimeError(f"the archived log is damaged and GCS no longer has it ({base})") from None
+        if whole["log"]:
+            log = kept["log"]
+        else:
+            try:
+                log = save_log(base, target, compress, max_bytes)
+                taken.append("build-log.txt")
+            except NotFound:
+                if kept["log"]:
+                    raise RuntimeError(f"the archived log is damaged and GCS no longer has it ({base})") from None
+                log = None
+        if log is None:
             age = now - (rec["started"] or rec["created"])
             if finished is None and age <= 2 * max_job_hours * 3600:
                 remove_build_dir(target)
@@ -3254,13 +3271,24 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
             # status), or TestGrid gave up on it ("did not complete within 24
             # hours") and GCS has nothing. Either way keep the record; later runs
             # look for a late log for GIVE_UP_DAYS.
-            log = None
             if finished is None:
                 note = f"GCS had neither finished.json nor build-log.txt {age / 3600:.0f}h after the build started"
+        # Prow's record of the build's pod: its containers' ends (an OOMKilled, say) and its node. GCS may
+        # not have it yet (Prow writes it up to minutes after finished.json): later runs look again (recheck).
+        if whole["podinfo"]:
+            podinfo = kept["podinfo"]
+        else:
             try:
-                podinfo = download(base + "/podinfo.json", os.path.join(target, "podinfo.json"), max_bytes=max_bytes)
-            except NotFound:
-                pass
+                podinfo = save_log(base, target, compress, max_bytes, "podinfo.json")
+                taken.append("podinfo.json")
+            except (Abandoned, LocalIOError):
+                raise
+            except Exception as e:
+                if kept["podinfo"] and isinstance(e, NotFound):
+                    raise RuntimeError(f"the archived podinfo.json is damaged and GCS no longer has it ({base})") from None
+                if log is None and not isinstance(e, NotFound):
+                    raise  # (the build's only file: archived once it can be read)
+                unread = not isinstance(e, NotFound)
     except Exception:
         remove_build_dir(target)
         raise
@@ -3281,8 +3309,10 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     if note:
         meta["note"] = note
     if existed:
-        meta["repaired_by_run"] = run_id
+        meta.update(repaired_by_run=run_id, repaired=taken)
     meta["settled"], meta["final"] = settle_flags(meta, time.time(), now)
+    if unread:
+        meta["final"] = False  # (the next run compares it, and so reads its podinfo.json again)
     write_json(meta_path, meta)
     return ("archived" if log else "archived-without-log") if not existed else "repaired", meta
 
@@ -4056,7 +4086,9 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     write_text(os.path.join(root, "INDEX.md"), "\n".join(lines) + "\n")
     # Recent runs' READMEs show their builds' current state (a provisional file can settle later), and,
     # whatever their age, those of runs cut off (with no report, or the one a run has until it ends)
-    # what they archived (see run()); a run folder without one gets one.
+    # what they archived (see run()), and those whose builds now have other files than they link (a
+    # later run added a podinfo.json, or took a file again in another form: see recheck); a run folder
+    # without one gets one.
     horizon = now - RECHECK_HOURS * 3600 - 86400
     for rel in run_dirs(root):
         if current_run and current_run.get("dir") == rel:
@@ -4064,9 +4096,27 @@ def write_index(root, now, current_run=None, missing=(), known=None):
             continue
         run = read_report(root, rel)
         if folder_time(rel.rsplit("/", 1)[1]) >= horizon or not os.path.lexists(os.path.join(root, rel, "run.json")) \
-                or stopped(run) or not os.path.lexists(os.path.join(root, rel, "README.md")):
+                or stopped(run) or not os.path.lexists(os.path.join(root, rel, "README.md")) \
+                or links_other_files(root, rel, entries):
             write_run_readme(root, rel, run, entries)
     return entries, bad
+
+
+def links_other_files(root, rel, entries):
+    """Whether the README.md of a run folder links other files of its builds than they have (see
+    write_run_readme: the files of each, by its row). Not one that is a link, which is never followed
+    (as in linking()), nor one that cannot be read: those stay as they are."""
+    path = os.path.join(root, rel, "README.md")
+    try:
+        if os.path.islink(path):
+            return False
+        with open(path, "rb") as f:
+            text = f.read().decode("utf-8", "replace")
+    except OSError:
+        return False
+    linked = set(re.findall(re.escape(f"](../../../{rel}/") + r"([^()\s]*[^()\s/])\)", text))
+    return linked != {p.removeprefix(rel + "/") for e in entries if (e.get("dir") or "").startswith(rel + "/")
+                      for p in e["files"]}
 
 
 def lock_archive(root):
@@ -5266,11 +5316,12 @@ def run(args, root, run_start, pool, deadline):
             if outcome in ("archived", "archived-without-log") and meta.get("backfilled"):
                 outcome = "backfilled"
             outcomes.setdefault(outcome, []).append(key)
-            if outcome in ("archived", "archived-without-log", "backfilled", "repaired"):
+            if outcome in ("archived", "archived-without-log", "backfilled"):
                 downloaded += sum(meta[k]["bytes"] for k in ("log", "podinfo") if meta.get(k))
-            elif outcome in ("log-recovered", "refreshed"):  # (only the files it refreshed, and the log it found)
+            elif outcome in ("log-recovered", "refreshed", "repaired"):  # (only the files it took again)
                 again = set(meta.get("refreshed") or ()) if meta.get("refreshed_by_run") == run_id else set()
                 again |= {"build-log.txt"} if outcome == "log-recovered" else set()
+                again |= set(meta.get("repaired") or ()) if outcome == "repaired" else set()
                 downloaded += sum(meta[k]["bytes"] for k, name in (("log", "build-log.txt"), ("podinfo", "podinfo.json"))
                                   if meta.get(k) and name in again)
             if outcome == "pending":  # (a watched build found red is queued as red from now on)

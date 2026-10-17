@@ -43,7 +43,10 @@ archive/runs/<YYYY-MM>/<run>/<job>/<build>/
 - `build-log.txt.gz.000`, `.001` and so on: a log over 95 MiB after gzip, split
   because GitHub blocks files over 100 MiB. Read it with
   `cat build-log.txt.gz.* | gzip -dc | less`.
-- `podinfo.json`: kept when GCS had no log, as for a build whose pod never ran.
+- `podinfo.json.gz`: Prow's record of the build's pod, when GCS has one: how
+  each container ended (an `OOMKilled`, say), and the node it ran on. Read it
+  with `gzip -dc podinfo.json.gz`. Some builds archived earlier without a log
+  have it as `podinfo.json`.
 - `meta.json`: the tabs, the red tests (it says when some are left out),
   TestGrid's messages and the log's md5. A build GCS had no file for has only
   this.
