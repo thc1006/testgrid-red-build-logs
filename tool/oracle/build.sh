@@ -2,9 +2,10 @@
 # Build the oracle: TestGrid's own code at the pinned commit (pinned.json), with
 # go/pkg/updater/zz_oracle.go added to its updater package, and the commands in
 # go/cmd: tgoracle (judges builds as TestGrid does), schemadump (the Go types,
-# for ../testgrid_types.json), gocheck (strconv, time and quantity parsing, and
-# the tabulator's row filter, with go/pkg/tabulator/zz_oracle.go added to it) and
-# unidump (Go's unicode tables, for ../go_unicode.json.gz).
+# for ../testgrid_types.json), gocheck (strconv, time and quantity parsing,
+# fmt.Sprintf, the tabulator's row filter, with go/pkg/tabulator/zz_oracle.go
+# added to it, and the builds util/gcs's ListBuilds takes from an entry of Prow's
+# index) and unidump (Go's unicode tables, for ../go_unicode.json.gz).
 # Usage: build.sh OUTDIR [VERSION]: TestGrid's module at VERSION instead of the
 # pinned one (follow.sh does that). Needs Go and the network.
 set -euo pipefail
