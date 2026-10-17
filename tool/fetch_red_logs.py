@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-# Parts of this file follow TestGrid's pkg/updater (f15bfa4808a4; Copyright The Kubernetes Authors and
-# The TestGrid Authors), Apache License 2.0 (LICENSE). THIRD_PARTY_NOTICES.md lists what was ported.
+# Parts of this file follow TestGrid's pkg/updater and util/gcs (f15bfa4808a4; Copyright The Kubernetes
+# Authors and The TestGrid Authors), Apache License 2.0 (LICENSE), and Go's net/url, strings, path and
+# encoding/json (1.26.5; Copyright The Go Authors), BSD 3-Clause license in third_party/go/LICENSE.
+# THIRD_PARTY_NOTICES.md lists what was ported.
 """Archive the raw Prow build-log.txt behind the red cells on TestGrid dashboards.
 
 A cell counts as red exactly when TestGrid's own UI paints it red (#a00):
@@ -279,6 +281,7 @@ class RunContext:
         self.abandoned = threading.Event()
         self.write_lock = threading.RLock()  # held while checking `abandoned` and writing (see abandon())
         self.deadline = deadline  # time.monotonic() by which the run stops waiting
+        self.folders = {}  # (gcs, query, build) -> (its folder, or None and why it cannot be read): see build_folder
 
     def abandon(self):
         """Stop the workers: once this returns, none is in the middle of changing a file of
@@ -915,7 +918,7 @@ def prow_job_hours(gcs, query, build):
     """How long a build of this job can run, from Prow's decoration timeout plus
     its grace period and a quarter hour to upload; None if prowjob.json says nothing."""
     try:
-        job = get_json(f"{gcs}/{query}/{build}/prowjob.json")
+        job = get_json(f"{gcs}/{build_folder(gcs, query, build)}/prowjob.json")
         decoration = job["spec"]["decoration_config"]
         timeout, grace = go_duration(decoration.get("timeout")), go_duration(decoration.get("grace_period") or "0s")
     except Exception:  # missing or unexpected: fall back to --max-job-hours
@@ -925,32 +928,236 @@ def prow_job_hours(gcs, query, build):
     return round((timeout + grace) / 3600 + 0.25, 2)
 
 
+INDEX_RE = re.compile(r"(?:.*/)?pr-logs/directory/[^/]+")  # (the prefix of a query: see indexed)
+LINK_PART_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]*")  # a part of a folder a link of Prow's index names
+# what Go's strings.TrimSpace trims: Unicode's White_Space (str.strip() trims U+001C to U+001F too)
+GO_SPACE = "\t\n\v\f\r \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a" \
+           "\u2028\u2029\u202f\u205f\u3000"
+GO_HOST_CHARS = frozenset("!$&'()*+,;=:[]<>\"-_.~")  # (and letters and digits: net/url's shouldEscape, of a host)
+SURROGATE_RE = re.compile(f"[{chr(0xD800)}-{chr(0xDFFF)}]")  # (what json.loads leaves of a lone surrogate escape)
+
+
+def indexed(query):
+    """Whether a TestGrid group's GCS path ("bucket/prefix") is Prow's index of a pull request job's
+    builds, pr-logs/directory/<job>: an entry there per build, <build>.txt, links the build's folder
+    (pr-logs/pull/...), where its files are."""
+    return bool(INDEX_RE.fullmatch(query.partition("/")[2]))
+
+
+def go_unescape(s, host=False):
+    """s with its %XX escapes undone, as Go's net/url unescapes a URL's path (or host); None where
+    url.Parse fails: a % not followed by two hex digits, and in a host an escaped ASCII byte (but %25)
+    or an ASCII byte other than a letter, a digit or one of GO_HOST_CHARS (an @ too: url.Parse takes
+    what comes before it for a user, which Path.SetURL refuses)."""
+    raw, out, i = s.encode("utf-8", "surrogatepass"), bytearray(), 0
+    while i < len(raw):
+        if raw[i] == 0x25:  # "%"
+            pair = raw[i + 1:i + 3].decode("ascii", "replace")
+            if len(pair) < 2 or not all(c in "0123456789abcdefABCDEF" for c in pair) \
+                    or host and int(pair[0], 16) < 8 and pair != "25":
+                return None
+            out.append(int(pair, 16))
+            i += 3
+            continue
+        if host and raw[i] < 0x80 and not chr(raw[i]).isalnum() and chr(raw[i]) not in GO_HOST_CHARS:
+            return None
+        out.append(raw[i])
+        i += 1
+    return out.decode("utf-8", "surrogateescape")
+
+
+def testgrid_link(link):
+    """How TestGrid's ListBuilds (util/gcs/read.go) takes a link of Prow's index (see readLink): None
+    for "" (no link); "fails" for one its listing fails on, as Go's url.Parse or TestGrid's
+    Path.SetURL (util/gcs/gcs.go) refuses it; else (scheme, bucket, path) of the folder it lists a
+    build at: path as url.Parse decodes it, ending in "/"."""
+    if link == "":
+        return None
+    link = link.strip(GO_SPACE)  # (strings.TrimSpace: "links created by bootstrap.py have a space")
+    rest, _, fragment = link.partition("#")
+    if fragment or any(ord(c) < 0x20 or ord(c) == 0x7F for c in link):
+        return "fails"  # (Path.SetURL takes no #fragment; url.Parse no control character)
+    m = re.match(r"([A-Za-z][A-Za-z0-9+.-]*):", rest)
+    scheme, rest = (m[1].lower(), rest[m.end():]) if m else ("", rest)
+    rest, _, query = rest.partition("?")
+    if query or scheme not in ("gs", "file", ""):
+        return "fails"  # (Path.SetURL: no ?query, and gs://, file:// or a local path only)
+    if not rest.startswith("/"):
+        if scheme:  # (an opaque URL: Path.SetURL refuses it, unless it is empty)
+            return "fails" if rest else (scheme, "", "/")
+        if ":" in rest.partition("/")[0]:  # (also one that starts with ":", a missing protocol scheme)
+            return "fails"  # (url.Parse: first path segment in URL cannot contain colon)
+    bucket = ""
+    if (scheme or not rest.startswith("///")) and rest.startswith("//"):
+        authority, slash, path = rest[2:].partition("/")
+        rest = slash + path
+        bucket = go_unescape(authority, host=True) if ":" not in authority and "[" not in authority else None
+        if bucket is None:  # (Path.SetURL takes no :port or [IPv6], nor user@, which go_unescape refuses)
+            return "fails"
+    path = go_unescape(rest)
+    if path is None:
+        return "fails"
+    return scheme, bucket, path if path.endswith("/") else path + "/"
+
+
+def link_folder(metadata):
+    """The build an entry of Prow's index links, as TestGrid's ListBuilds reads its x-goog-meta-link
+    metadata, else its link (see testgrid_link): None for an entry that links nothing; else (build,
+    folder): the build TestGrid takes (the folder's last part), and its folder ("bucket/path"), or None
+    for one this archive does not read: one TestGrid reads outside GCS (not gs://, or no bucket), and
+    one with a %XX, or a part that is empty, "." or "..", or not a letter, a digit or "_" followed by
+    letters, digits, ".", "_" and "-" (TestGrid decodes a %XX and resolves "." and ".." away; this
+    archive reads a folder by its link as written, and puts no other character in a URL). Raises
+    IntegrityError for a link TestGrid's listing fails on."""
+    if not isinstance(metadata, dict):
+        return None
+    link = metadata["x-goog-meta-link"] if "x-goog-meta-link" in metadata else metadata.get("link")
+    if isinstance(link, str):  # (a lone surrogate escape in GCS's JSON: Go's encoding/json reads U+FFFD)
+        link = SURROGATE_RE.sub(chr(0xFFFD), link)
+    taken = testgrid_link(link) if isinstance(link, str) else None if link is None else "fails"
+    if taken == "fails":
+        raise IntegrityError(f"a link in Prow's index that TestGrid cannot list: {str(link)[:200]!r}")
+    if taken is None:
+        return None
+    scheme, bucket, path = taken
+    obj = path.encode("utf-8", "surrogateescape")[1:-1]  # (TestGrid's Build.object(), of Go's bytes)
+    base = obj.rstrip(b"/").rsplit(b"/", 1)[-1] if obj.rstrip(b"/") else b"/" if obj else b"."  # (path.Base)
+    build, obj = base.decode("utf-8", "surrogateescape"), obj.decode("utf-8", "surrogateescape")
+    # (no %XX: TestGrid decodes it, and for a link that ends in "/" resolves started.json against it as it came)
+    readable = scheme == "gs" and "%" not in link and LINK_PART_RE.fullmatch(bucket) and path.startswith("/") \
+        and all(LINK_PART_RE.fullmatch(part) for part in obj.split("/"))
+    return build, f"{bucket}/{obj}" if readable else None
+
+
+def remember_folder(gcs, query, build, folder, error=None):
+    """Keep, for the rest of the run, where a build of Prow's index keeps its files (see build_folder),
+    or why it cannot be read (error: the IntegrityError build_folder raises)."""
+    ctx = context()
+    with ctx._lock:
+        ctx.folders[(gcs, query, build)] = (folder, error)
+
+
+class NoSuchBuild(IntegrityError):
+    """GCS holds neither an entry <build>.txt of Prow's index that links a folder, nor a folder <build>/
+    under the index (see build_folder): for a build archived from there, GCS no longer has it, unless
+    another entry links it."""
+
+
+def build_folder(gcs, query, build):
+    """Where a build of a TestGrid group (query: its GCS path) keeps its files, as "bucket/path":
+    query/build, or, in Prow's index of a pull request job (see indexed), the folder its entry
+    <build>.txt links (see link_folder), where TestGrid reads its files. Without an entry, or with one
+    that links nothing, query/build, where TestGrid lists a folder as a build too, if GCS holds one.
+    Raises IntegrityError for an entry that links another build (TestGrid takes the build from the
+    link: that column is not this build's), or a folder this archive does not read, or a link TestGrid
+    cannot list, and NoSuchBuild for a build with neither (TestGrid takes it from another entry's link,
+    which only a listing of the index finds, or GCS no longer has it)."""
+    if not indexed(query):
+        return f"{query}/{build}"
+    ctx = context()
+    with ctx._lock:
+        known = ctx.folders.get((gcs, query, build))
+    if known is None:
+        bucket, _, prefix = query.partition("/")
+        try:
+            entry = get_json(f"{gcs}/storage/v1/b/{quote(bucket)}/o/{quote(f'{prefix}/{build}.txt')}?fields=metadata")
+        except NotFound:
+            entry = None
+        try:
+            linked = link_folder(entry.get("metadata") if isinstance(entry, dict) else None)
+            if linked and linked[0] != build:
+                raise IntegrityError(f"gs://{query}/{build}.txt links build {linked[0][:40]!r}, another build")
+            if linked and linked[1] is None:
+                raise IntegrityError(f"gs://{query}/{build}.txt links a folder this archive does not read")
+            if not linked and not holds_objects(gcs, bucket, f"{prefix}/{build}/"):
+                raise NoSuchBuild(f"gs://{query}/ has neither an entry {build}.txt that links a folder, nor "
+                                  f"a folder {build}/ (another entry may link it: a listing of the index says)")
+            known = (linked[1] if linked else f"{query}/{build}", None)
+        except IntegrityError as e:
+            known = (None, e)
+        remember_folder(gcs, query, build, *known)
+    if known[1] is not None:
+        raise type(known[1])(*known[1].args)  # (a new one each time: other threads may raise it too)
+    return known[0]
+
+
+def holds_objects(gcs, bucket, folder):
+    """Whether GCS holds an object under gs://bucket/folder (one listed is enough)."""
+    params = {"prefix": folder, "maxResults": "1", "fields": "items(name)"}
+    try:
+        page = get_json(f"{gcs}/storage/v1/b/{quote(bucket)}/o?{urllib.parse.urlencode(params)}")
+    except NotFound:
+        return False
+    items = page.get("items", []) if isinstance(page, dict) else None
+    if not isinstance(items, list):
+        raise IntegrityError(f"unexpected GCS listing for gs://{bucket}/{folder}")
+    return bool(items)
+
+
+def stored_folder(meta):
+    """The folder a build's meta.json records it was read from in Prow's index (gcs_path), if it is
+    one build_folder could give for that build; else None."""
+    path = meta.get("gcs_path") if isinstance(meta, dict) else None
+    parts = path.split("/") if isinstance(path, str) else []
+    return path if len(parts) >= 2 and all(LINK_PART_RE.fullmatch(part) for part in parts) \
+        and parts[-1] == meta.get("build") else None
+
+
+def listed_builds(page, prefix, query):
+    """{build ID: its folder ("bucket/path"), or None} in a page of a GCS listing of gs://<query>/ by
+    "/": its folders, and, in Prow's index of a pull request job (see indexed), the builds its entries
+    link (see link_folder; None: a folder this archive does not read). Raises IntegrityError for a
+    page that is not a listing, or an entry with a link TestGrid's listing fails on."""
+    prefixes = page.get("prefixes", []) if isinstance(page, dict) else None
+    items = page.get("items", []) if isinstance(page, dict) else None
+    if not isinstance(prefixes, list) or not isinstance(items, list):
+        raise IntegrityError(f"unexpected GCS listing for gs://{query}/")
+    bucket, out = query.partition("/")[0], {}
+    for p in prefixes:
+        build = p[len(prefix):].rstrip("/") if isinstance(p, str) and p.startswith(prefix) else ""
+        if build:
+            out[build] = f"{bucket}/{prefix}{build}"
+    for item in items if indexed(query) else ():
+        linked = link_folder(item.get("metadata") if isinstance(item, dict) else None)
+        if linked is not None:
+            out[linked[0]] = linked[1]
+    return out
+
+
+def remember_listed(gcs, query, build, folder):
+    """Keep where a listing said a build of Prow's index keeps its files (see listed_builds)."""
+    if indexed(query):
+        remember_folder(gcs, query, build, folder, None if folder else
+                        IntegrityError(f"Prow's index links build {build} at a folder this archive does not read"))
+
+
 def list_build_ids(gcs, query, lo, hi):
-    """Build IDs under gs://<query>/ whose IDs say they were created in [lo, hi] (seconds)."""
+    """Build IDs under gs://<query>/ whose IDs say they were created in [lo, hi] (seconds): its folders,
+    and in Prow's index of a pull request job, its entries' (see listed_builds)."""
     if lo > hi:
         return []  # nothing to search: TestGrid still shows everything since the earliest searchable time
     bucket, _, prefix = query.partition("/")
     prefix += "/"
     first = (max(0, int(lo * 1000) - PROW_EPOCH_MS)) << 22
     last = (max(0, int(hi * 1000) + 1001 - PROW_EPOCH_MS)) << 22  # (IDs of the next second on: past hi)
-    ids, token = [], None
+    ids, seen, token = [], set(), None
     for _ in range(MAX_LIST_PAGES):
         # (names are compared as strings, which orders IDs only among those of as many digits: with
         # first and last of as many, every ID in between is in the range, and the check below keeps
-        # [lo, hi] exactly; else, before 2018-05-25 or around 2086, every build is listed)
-        params = {"prefix": prefix, "delimiter": "/", "fields": "prefixes,nextPageToken"}
+        # [lo, hi] exactly; else, before 2018-05-25 or around 2086, every build is listed. An entry of
+        # Prow's index, <build>.txt, sorts as its build does.)
+        params = {"prefix": prefix, "delimiter": "/",
+                  "fields": "prefixes,items(name,metadata),nextPageToken" if indexed(query) else "prefixes,nextPageToken"}
         if len(str(first)) == len(str(last)):
             params.update(startOffset=f"{prefix}{first}", endOffset=f"{prefix}{last}")
         if token:
             params["pageToken"] = token
         page = get_json(f"{gcs}/storage/v1/b/{quote(bucket)}/o?{urllib.parse.urlencode(params)}")
-        prefixes = page.get("prefixes", []) if isinstance(page, dict) else None
-        if not isinstance(prefixes, list):
-            raise IntegrityError(f"unexpected GCS listing for gs://{query}/")
-        for p in prefixes:
-            build = p[len(prefix):].rstrip("/") if isinstance(p, str) and p.startswith(prefix) else ""
-            if BUILD_RE.fullmatch(build) and lo <= created(build) <= hi:
+        for build, folder in listed_builds(page, prefix, query).items():
+            if BUILD_RE.fullmatch(build) and lo <= created(build) <= hi and build not in seen:
                 ids.append(build)
+                seen.add(build)
+                remember_listed(gcs, query, build, folder)
         token = page.get("nextPageToken")
         if not token:
             return ids
@@ -2061,8 +2268,8 @@ class Timeline:
             if mine:
                 fut = self._files[build] = cf.Future()
         if mine:
-            base = f"{self.gcs}/{self.query}/{build}"
             try:
+                base = f"{self.gcs}/{build_folder(self.gcs, self.query, build)}"
                 started = read_artifact(f"{base}/started.json", MAX_JSON_BYTES)
                 finished, finished_at = read_artifact(f"{base}/finished.json", MAX_JSON_BYTES, when=True)
                 podinfo, podinfo_at = read_artifact(f"{base}/podinfo.json", MAX_JSON_BYTES, when=True)
@@ -2356,7 +2563,8 @@ def read_build(gcs, query, build, stop, now):
     column without junit files as of now (a stop of `stop`, for its start), and, for a
     build with a start TestGrid takes, the junit files it reads, as (object it opens,
     size, data, when written, name as listed), or why they cannot be read."""
-    base = f"{gcs}/{query}/{build}"
+    where = build_folder(gcs, query, build)
+    base = f"{gcs}/{where}"
     job = query.rsplit("/", 1)[-1]
     started = read_artifact(f"{base}/started.json", MAX_JSON_BYTES)
     finished, finished_at = read_artifact(f"{base}/finished.json", MAX_JSON_BYTES, when=True)
@@ -2365,8 +2573,8 @@ def read_build(gcs, query, build, stop, now):
     s = probe.started if probe.started and not {"ancient", "started"} & set(probe.errors) else None
     partial, junits, folder = None, [], ""
     if s:  # (TestGrid lists the junit files of a build it can read: one with a start it takes)
-        bucket, _, path = query.partition("/")
-        folder = f"{path}/{build}/"
+        bucket, _, path = where.partition("/")
+        folder = f"{path}/"
         try:
             listing = list_objects(gcs, bucket, folder)
             for listed, opened in tr.junit_reads(sorted(listing)):
@@ -3050,7 +3258,7 @@ def settle_flags(meta, checked, now):
     return settled, checked >= fin + RECHECK_HOURS * 3600
 
 
-def recheck(old, rec, target, base, run_id, now, compress, max_bytes, compare_final=False):
+def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_final=False):
     """An intact archived build: add new tab sightings and, until it is final (or when
     compare_final: a final build in this run's sevenths, see gcs_sevenths), compare its
     files with GCS and fetch again whatever GCS now holds instead."""
@@ -3064,6 +3272,19 @@ def recheck(old, rec, target, base, run_id, now, compress, max_bytes, compare_fi
     outcome = "already-archived"
     if not old.get("final") or compare_final:
         try:
+            # (where its files are: as its record says, for a pull request job's, or see build_folder)
+            try:
+                where = stored_folder(old) or build_folder(gcs, rec["query"], rec["build"])
+            except NoSuchBuild:  # (GCS no longer has it: compared as one GCS no longer has under its query)
+                where = f"{rec['query']}/{rec['build']}"
+            base = f"{gcs}/{where}"
+            if where != f"{rec['query']}/{rec['build']}" and meta.get("gcs_path") != where:
+                # (a pull request job's build archived by code that read it under Prow's index)
+                meta.update(gcs_path=where, log_url=f"{base}/build-log.txt",
+                            prow_url=f"https://prow.k8s.io/view/gs/{where}")
+                if str(meta.get("note", "")).startswith("GCS had neither finished.json nor build-log.txt"):
+                    del meta["note"]  # (said of the folder under the index, not of its own)
+                write_json(os.path.join(target, "meta.json"), meta)  # (kept, as the sightings are)
             finished = read_finished(base)
             changed = []
             if meta.get("log"):
@@ -3135,7 +3356,6 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
     build from a history gap that is judged here (see judge_in_tabs, and its timelines).
     compare_final: compare it with GCS even if it is final (see recheck)."""
     meta_path = os.path.join(target, "meta.json")
-    base = f"{gcs}/{rec['query']}/{rec['build']}"
     existed = os.path.exists(meta_path)
     try:
         old = read_json(meta_path)
@@ -3143,10 +3363,13 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
         old = None  # corrupt meta.json: archive the build again
     old = old if valid_meta(old) and old.get("job") == rec["job"] and old.get("build") == rec["build"] else None
     if old and intact(target, old, deep=True):
-        return recheck(old, rec, target, base, run_id, now, compress, max_bytes, compare_final)
+        return recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_final)
+    # (where its files are: as its record says, for a pull request job's, or see build_folder)
+    where = (old and stored_folder(old)) or build_folder(gcs, rec["query"], rec["build"])
+    base = f"{gcs}/{where}"
     if not rec.get("watch"):
         return store(rec, target, existed, old, read_finished(base), base, run_id, now, max_job_hours, compress,
-                     max_bytes)
+                     max_bytes, where)
     # from a history gap, not decided when last looked at
     state, tabs, partial = judge_in_tabs(gcs, rec, tab_rules or {}, timelines)
     if state != "red":
@@ -3162,7 +3385,7 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
     rec["backfilled"] = backfill_note(tabs, partial)
     try:
         return store(rec, target, existed, old, read_finished(base), base, run_id, now, max_job_hours, compress,
-                     max_bytes)
+                     max_bytes, where)
     except Exception as e:
         e.red_rec = rec  # now known to be red: retried and given up on like any other red build
         raise
@@ -3240,8 +3463,10 @@ def backfill_note(tabs, partial=None):
             + (f"; {partial}, so its failing tests are not listed" if partial else ""))
 
 
-def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours, compress, max_bytes):
-    """Download a red build's files into `target` and write its meta.json."""
+def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours, compress, max_bytes, where=None):
+    """Download a red build's files into `target` and write its meta.json. where: the folder ("bucket/path")
+    of its files in GCS, under base (see build_folder; else query/build)."""
+    where = where or f"{rec['query']}/{rec['build']}"
     meta_path = os.path.join(target, "meta.json")
     os.makedirs(target, exist_ok=True)
     podinfo = note = None
@@ -3298,12 +3523,14 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
                 tabs=tabs,
                 result=(finished or {}).get("result"),
                 finished=(finished or {}).get("timestamp"),
-                prow_url=f"https://prow.k8s.io/view/gs/{rec['query']}/{rec['build']}",
+                prow_url=f"https://prow.k8s.io/view/gs/{where}",
                 log_url=base + "/build-log.txt",
                 log=log,
                 podinfo=podinfo,
                 archived_by_run=home,
                 archived_at=folder_time(home) or now)
+    if where != f"{rec['query']}/{rec['build']}":
+        meta["gcs_path"] = where  # (a pull request job's build: where Prow's index links it)
     if (old or {}).get("backfilled"):
         meta["backfilled"] = old["backfilled"]
     if note:
