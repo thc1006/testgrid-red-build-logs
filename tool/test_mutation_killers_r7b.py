@@ -331,7 +331,7 @@ class Charts(unittest.TestCase):
         md = "\n".join(report.write_charts(root, [{"time": self.NOW - k * DAY, "tabs": ["d#t"]} for k in (0, 1, 3)],
                                            self.NOW))
         self.assertIn('alt="Red builds per day, data to Oct 10 17:20 UTC. ', md)
-        self.assertIn('alt="Red builds per tab, 14 days to Oct 10 to 17:20 UTC. ', md)
+        self.assertIn('alt="Red builds per tab, 14 days to Oct 10 17:20 UTC. ', md)  # fails: "to Oct 10 to 17:20 UTC"
 
 
 if __name__ == "__main__":

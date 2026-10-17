@@ -277,11 +277,6 @@ def as_of(s):
     return f"{short_day(t.date())} {t:%H:%M} UTC"
 
 
-def so_far(s):
-    """The last day, which was not over when the data was taken, e.g. "Oct 10 to 17:20 UTC"."""
-    return f"{short_day(s['today'])} to {dt.datetime.fromtimestamp(s['as_of'], dt.UTC):%H:%M} UTC"
-
-
 def unfinished_bar(x, y, w, h, c):
     """A bar for the day still in progress: light fill and a strong outline, visible in both themes."""
     return (f'<rect x="{x + 0.75:.1f}" y="{y + 0.75:.1f}" width="{max(w - 1.5, 0):.1f}" height="{max(h - 0.75, 0):.1f}" '
@@ -554,7 +549,7 @@ def write_charts(root, entries, now, current_run=None, rels=None):
         _, wt = week_text(p["week"])
         headline.append(f"{LABELS.get(p['dashboard'], p['dashboard'])}: {wt}")
     busiest = sorted(s["rows"], key=lambda r: -r["last7"])[:5]
-    tabs_alt = (f"Red builds per tab, {HEAT_DAYS} days to {so_far(s)}. Busiest over the last 7 of them: "
+    tabs_alt = (f"Red builds per tab, {HEAT_DAYS} days to {as_of(s)}. Busiest over the last 7 of them: "
                 + ", ".join(f"{r['tab']} {r['last7']}" for r in busiest if r["last7"]) + ".")
     lines = [picture("trend", f"Red builds per day, data to {as_of(s)}. " + "; ".join(headline)), "",
              picture("tabs", tabs_alt), "",
