@@ -1,9 +1,9 @@
 """Review wave W5a: the reworked read model of fetch_red_logs (commit 05793d9: READ_GAP, the
 reprocess seed, made_columns, Timeline.older_end's ID-ordered holds, Timeline.vanishes, the
 per-read display windows, run()'s watched builds) against TestGrid's Go code at the commit
-production runs (testgrid@v0.0.177-0.20260902201319-f15bfa4808a4; paths below are relative to
-it). Each test asserts what TestGrid does and fails on 05793d9 for the reason its docstring
-gives; nothing here changes fetch_red_logs.
+TestGrid's production manifests deploy (testgrid@v0.0.177-0.20260902201319-f15bfa4808a4; paths
+below are relative to it). Each test asserts what TestGrid does and fails on 05793d9 for the
+reason its docstring gives; nothing here changes fetch_red_logs.
 
 Schedules named in the tests are valid under the updater's code with production's flags
 (cluster/prod/updater.yaml: --wait=2h --group-timeout=20m, pubsub on kubernetes-ci-logs):

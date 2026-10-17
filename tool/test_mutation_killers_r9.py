@@ -1588,7 +1588,7 @@ class Drift(unittest.TestCase):
     the release itself), offline (curl a stand-in)."""
 
     def drift(self, updater, tabulator, pinned=None):
-        """drift.sh's exit code and outputs, production running these image tags."""
+        """drift.sh's exit code and outputs, the production manifests deploying these image tags."""
         d = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, d)
         oracle = os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle")

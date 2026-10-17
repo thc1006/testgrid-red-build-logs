@@ -122,7 +122,7 @@ jobs:
   # proposed as a pull request, where GitHub Actions may open one) when nothing the
   # port follows changed.
   follow:
-    name: Port against production's new commit
+    name: Port against the production manifests' new commit
     needs: oracle
     if: ${{ !cancelled() && needs.oracle.outputs.moved == 'true' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-24.04

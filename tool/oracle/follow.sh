@@ -118,11 +118,11 @@ else
   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
   git switch -q -c "$branch"
   git add oracle/pinned.json testgrid_types.json go_unicode.json.gz
-  git commit -q -m "oracle: follow TestGrid production to $short" \
+  git commit -q -m "oracle: follow TestGrid's production manifests to $short" \
     -m "Nothing in the code the port follows changed since the pinned commit, and every check of the oracle workflow passed against $version."
   git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" push -q origin "HEAD:refs/heads/$branch"
 fi
-if url=$(gh pr create --head "$branch" --base main --title "oracle: follow TestGrid production to $short" \
+if url=$(gh pr create --head "$branch" --base main --title "oracle: follow TestGrid's production manifests to $short" \
     --body "TestGrid's production manifests deploy $version. Nothing in the code the port follows changed since $pinned, and every check passed against it: see $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID." 2>&1); then
   echo "Proposed: $url" | tee -a "$summary"
 else

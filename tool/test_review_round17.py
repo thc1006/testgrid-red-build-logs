@@ -1,7 +1,7 @@
 """Review wave W7 and the checks run with it, on 1169263: the read model of fetch_red_logs against
-TestGrid's Go code at the commit production runs (testgrid@v0.0.177-0.20260902201319-f15bfa4808a4;
-paths below are relative to it). Each test asserts what TestGrid does and fails on 1169263 for
-the reason its docstring gives.
+TestGrid's Go code at the commit TestGrid's production manifests deploy
+(testgrid@v0.0.177-0.20260902201319-f15bfa4808a4; paths below are relative to it). Each test
+asserts what TestGrid does and fails on 1169263 for the reason its docstring gives.
 
 "An update at X" means an update of the job's test group that begins at X and reads its builds
 then (production: --wait=2h --group-timeout=20m, pubsub on kubernetes-ci-logs).

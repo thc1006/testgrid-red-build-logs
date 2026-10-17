@@ -1,9 +1,9 @@
 """Review wave W6a: the read model of fetch_red_logs after e5df0fb / 35c5616 / 398eb0d / 3395a24
 (possible_reads with hold spans, BuildRuns, HoldModel, Timeline, Timelines.prime, gcs_column,
-tab_verdict's `since`) against TestGrid's Go code at the commit production runs
-(testgrid@v0.0.177-0.20260902201319-f15bfa4808a4; paths below are relative to it). Each test
-asserts what TestGrid does (or, for performance, what a judged build should cost) and fails on
-14ff6b1 for the reason its docstring gives; nothing here changes fetch_red_logs.
+tab_verdict's `since`) against TestGrid's Go code at the commit TestGrid's production manifests
+deploy (testgrid@v0.0.177-0.20260902201319-f15bfa4808a4; paths below are relative to it). Each
+test asserts what TestGrid does (or, for performance, what a judged build should cost) and fails
+on 14ff6b1 for the reason its docstring gives; nothing here changes fetch_red_logs.
 
 "An update at X" means an update of the job's test group that begins at X and reads its builds
 then (production: --wait=2h --group-timeout=20m, pubsub on kubernetes-ci-logs). Each scenario of a
