@@ -458,6 +458,30 @@ class PendingRanges(ttc.ConfigWorld):
                       "forgotten; no longer judged, though TestGrid may have shown them red",
                       run["serious_warnings"])  # fails: not there
 
+    def test_also_by_a_run_killed_once_state_json_forgot_them(self):
+        """A run wrote state.json, without the ranges it stopped waiting for, before its first report:
+        killed in between (a step's timeout kills it at last), it left their warning nowhere, and the
+        next run, which no longer has them, says nothing."""
+        s0 = self.now - 20 * DAY
+        pending = {"since": s0, "lo": s0 - 7 * HOUR, "hi": s0 - 5 * HOUR}
+        self.put_state(tabs={"dash#t": {"scan": self.now - 2 * HOUR, "oldest": self.now - 60 * HOUR},
+                             "dash#gone": {"scan": s0, "oldest": s0 - 60 * HOUR, "missing_since": self.now - 31 * DAY,
+                                           "changed_pending": [pending]}})
+        config = self.history((self.now - 40 * DAY, {"dash": {"t": ttc.entry(""), "gone": ttc.entry("")}}))
+        real = frl.write_json
+
+        def write_json(path, data):
+            real(path, data)
+            if path.endswith("state.json"):
+                raise KeyboardInterrupt  # (killed just after it)
+        with mock.patch.object(frl, "write_json", write_json):
+            self.assertEqual(self.fetch_with(config), 130)
+        self.assertNotIn("dash#gone", self.state()["tabs"])
+        report = frl.read_report(self.root, frl.run_dirs(self.root)[-1])
+        self.assertIsNotNone(report)  # fails: no report
+        self.assertTrue(frl.stopped(report))
+        self.assertTrue(any(f"seen not red by the scan of {frl.iso(s0)}" in w for w in report["serious_warnings"]))
+
 
 # ------------------------------------------------------------------ a tab the config lacks, then no longer listed
 
@@ -1428,8 +1452,8 @@ class TakenOutInAGap(ttc.ConfigWorld):
 
 class CutOffRun(ArchiveWorld):
     """A run 4 days ago (older than the runs whose READMEs INDEX.md rewrites) archived a red build in
-    its folder, and was cut off before it ended (here: by an interrupt where it saves state.json, or
-    as it draws the charts, after its report)."""
+    its folder, and was cut off before it ended (here: by an interrupt where it first saves its report,
+    or as it draws the charts, after its report)."""
 
     def cut_off(self, where):
         self.finished(ago=4.2 * DAY)
@@ -1437,7 +1461,7 @@ class CutOffRun(ArchiveWorld):
         real_time, real_json, real_charts = time.time, frl.write_json, frl.report.write_charts
 
         def write_json(path, *args, **kwargs):
-            if where == "state.json" and path.endswith("state.json"):
+            if where == "report" and path.endswith("run.json") and frl.stopped(args[0]):
                 raise KeyboardInterrupt
             real_json(path, *args, **kwargs)
             if where == "final" and path.endswith("run.json") and not frl.stopped(args[0]):
@@ -1461,12 +1485,12 @@ class CutOffRun(ArchiveWorld):
     def test_its_readme_says_no_count_of_builds(self):
         """The README a run writes as it makes its folder (6f48f77) said it archived no build, which
         the workflow commits."""
-        self.cut_off("state.json")
+        self.cut_off("report")
         self.assertEqual(sorted(os.listdir(os.path.join(self.root, self.rel))), ["README.md", "job"])
         self.assertNotIn("Builds archived by this run (0)", self.readme())  # fails: "(0)", then "None."
 
     def test_the_next_run_lists_its_builds_whatever_its_age(self):
-        self.cut_off("state.json")
+        self.cut_off("report")
         self.assertEqual(self.fetch(), 0)
         self.assertIn(f"[job {self.build}]", self.readme())  # fails: "(0)", then "None.", for good
 
