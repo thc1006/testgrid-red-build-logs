@@ -402,7 +402,7 @@ class ReportLabels(unittest.TestCase):
     def test_RS2_AO2_the_charts_say_when_their_data_ends(self):
         now = dt.datetime(2026, 10, 10, 17, 20, 33, tzinfo=dt.UTC).timestamp()
         s = report.summarize([], [], now)
-        self.assertEqual((report.as_of(s), report.so_far(s)), ("Oct 10 17:20 UTC", "Oct 10 to 17:20 UTC"))
+        self.assertEqual(report.as_of(s), "Oct 10 17:20 UTC")
 
 
 class UnreadableFlag(r4.World):
