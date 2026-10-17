@@ -164,8 +164,9 @@ jobs:
 
       # Commit whatever was archived even when a step failed or timed out (a step
       # timeout is a failure, not a cancellation). The run's report in its folder
-      # under archive/runs/ says what went wrong; an interrupted fetch writes one
-      # too, unless it was killed outright. A run cancelled before this step
+      # under archive/runs/ says what went wrong; a fetch interrupted while it
+      # downloads writes one too. One cut off otherwise after it made its folder
+      # leaves a README there that says so. A run cancelled before this step
       # pushes nothing.
       - name: Commit the archive
         id: commit

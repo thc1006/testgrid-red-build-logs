@@ -3627,7 +3627,8 @@ def clean_partial_builds(root, warnings):
                     warnings.append(f"{run_rel}/{job}/{build}: no meta.json but unexpected files {sorted(names)[:5]}")
             if not listdir(job_abs):
                 remove_if_empty(job_abs)
-        # a run killed before it archived or reported anything leaves an empty folder
+        # (empty: a run killed right after it made its folder, or, with code from before the README from
+        # the start, before it archived or reported anything)
         if not listdir(run_abs):
             remove_if_empty(run_abs)
             remove_if_empty(os.path.dirname(run_abs))
@@ -5166,8 +5167,9 @@ def run(args, root, run_start, pool, deadline):
             r["config_mismatch"] = mismatch_of[key]
     # A README from the start, that the run was cut off, as one killed before it ends leaves it (a step's
     # timeout kills it at last): its folder stays, though what it fetches again is stored in older ones,
-    # and later runs see a run not done with its sevenths (see gcs_sevenths). The run writes it again once
-    # it has its report; each later run does for a run that did not end (see write_index).
+    # and later runs see a run killed before its first report as not done with its sevenths (see
+    # sevenths_done). The run writes it again once it has its report; each later run does for a run that
+    # did not end (see write_index).
     write_cut_off_readme(root, run_rel)
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors) + take_out_errors, 0, {}, {}
     uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
