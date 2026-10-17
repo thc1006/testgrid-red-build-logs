@@ -16,7 +16,7 @@ file, and moves it.
 
 Go 1.26.5, under the BSD 3-Clause license in
 [`third_party/go/LICENSE`](third_party/go/LICENSE). The license reads Copyright
-2009 The Go Authors; the source files below carry years from 2009 to 2022.
+2009 The Go Authors; the source files below carry years from 2009 to 2025.
 Paths are under `src/`.
 
 - `tool/goregexp.py`: the parser in `regexp/syntax/parse.go`,
@@ -33,6 +33,13 @@ Paths are under `src/`.
   `unicode/utf8/utf8.go`.
 - `tool/testgrid_config.py`: `ParseQuery` and `QueryUnescape` in
   `net/url/url.go`, translated to Python.
+- `tool/fetch_red_logs.py`: what TestGrid's reading of Prow's index links relies
+  on, rewritten in Python to behave the same: `TrimSpace` in
+  `strings/strings.go`; how `url.Parse` takes a link apart and unescapes it
+  (`getScheme`, `parse`, `parseAuthority`, `parseHost` and `unescape` in
+  `net/url/url.go`, with the host characters of `shouldEscape`'s table in
+  `net/url/encoding_table.go`); `Base` in `path/path.go`; and how `unquoteBytes`
+  in `encoding/json/decode.go` reads a lone surrogate escape (as U+FFFD).
 - Data: `tool/go_unicode.json.gz` holds the tables of package `unicode`, with
   the results of `unicode.SimpleFold`, dumped by `tool/oracle/go/cmd/unidump`.
   `tool/testgrid_types.json` holds the slice capacities `reflect.Value.Grow`
@@ -42,10 +49,10 @@ Paths are under `src/`.
 ## Unicode
 
 `tool/go_unicode.json.gz` holds Unicode 15.0.0 character data as Go's `unicode`
-tables carry it, and `tool/testgrid_rule.py` lists the White_Space characters
-`unicode.IsSpace` matches. Unicode 15.0.0 was released under the Unicode, Inc.
-License Agreement for Data Files and Software, in
-[`third_party/unicode/LICENSE`](third_party/unicode/LICENSE).
+tables carry it, and `tool/testgrid_rule.py` and `tool/fetch_red_logs.py` list
+the White_Space characters `unicode.IsSpace` matches. Unicode 15.0.0 was
+released under the Unicode, Inc. License Agreement for Data Files and Software,
+in [`third_party/unicode/LICENSE`](third_party/unicode/LICENSE).
 
 ## TestGrid
 
@@ -67,7 +74,10 @@ The Kubernetes Authors" (K8s), with the year shown.
   configurator can set them.
 - `tool/fetch_red_logs.py`: models when TestGrid's updater reads a build,
   following `pkg/updater/updater.go` (K8s 2018), `pkg/updater/read.go` and
-  `pkg/updater/inflate.go` (TG 2020).
+  `pkg/updater/inflate.go` (TG 2020). It reads the links of Prow's index as
+  `readLink`, `ListBuilds` and `Build` in `util/gcs/read.go` (K8s 2019) and
+  `Path.SetURL` and `Path.Object` in `util/gcs/gcs.go` (K8s 2018) do, rewritten
+  in Python.
 - `tool/oracle/go/pkg/updater/zz_oracle.go`: adapted from `readResult` and
   `readColumns` in `pkg/updater/read.go` (TG 2020). The four reads run one after
   another and every error is kept, so the oracle can compare each one with the
