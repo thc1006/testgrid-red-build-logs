@@ -712,8 +712,8 @@ def check(args, problems, notes, record):
     keys = [f"{t['dashboard']}#{t['tab']}" for t in tabs]
     # (and those a run saw TestGrid list while the latest config known lacked them, as the fetch keeps them)
     recorded = state.get("lacking_tabs") if isinstance(state.get("lacking_tabs"), dict) else {}
-    lacking = {k: v for k, v in recorded.items() if isinstance(k, str) and frl.plausible_time(v, time.time())
-               and t0 - v <= (frl.HELD_DAYS + 1) * 86400}
+    lacking = frl.lacking_kept({k: v for k, v in recorded.items()
+                                if isinstance(k, str) and frl.plausible_time(v, time.time())}, t0)
     lacking.update(dict.fromkeys([k for k in keys if current is not None and k not in current], t0))
     over_time = frl.history_rules(history, keys, t0, lacking, {f"{t['dashboard']}#{t['tab']}": t["query"] for t in tabs},
                                   era_rule)

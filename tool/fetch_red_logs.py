@@ -2920,6 +2920,12 @@ def pending_dropped(key, p, why):
             "shown them red")
 
 
+def lacking_kept(lacked, now):
+    """The tabs of state.json's lacking_tabs (see run()) whose record still counts at now: for as
+    long as a build held for the tab may wait, and a day more. cross_check.py reads them so too."""
+    return {k: t for k, t in lacked.items() if now - t <= (HELD_DAYS + 1) * 86400}
+
+
 def first_listed(run):
     """When the archive first listed a run of the upload job (for one listed before it kept
     that: when the run ended, or began)."""
@@ -4779,7 +4785,7 @@ def run(args, root, run_start, pool, deadline):
     # ... and one TestGrid listed so before, past that: its config since its last entry before then is not
     # known either, in the configs that came into force before then, though TestGrid no longer lists it (it
     # showed the tab then), for as long as a build held for it may wait
-    lacked = {k: t for k, t in (state.get("lacking_tabs") or {}).items() if run_start - t <= (HELD_DAYS + 1) * 86400}
+    lacked = lacking_kept(state.get("lacking_tabs") or {}, run_start)
     lacked.update(dict.fromkeys([k for k in lacking if k not in untaken], run_start))
     queries = {k: t["query"] for k, t in state["tabs"].items() if isinstance(t.get("query"), str)}
     queries.update((f"{r['dashboard']}#{r['tab']}", r["query"]) for r in reports
