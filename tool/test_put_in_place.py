@@ -9,6 +9,7 @@ import gzip
 import hashlib
 import os
 import shutil
+import signal
 import sys
 import tempfile
 import threading
@@ -98,6 +99,49 @@ class CutOffAsAFileGoesInPlace(ArchiveWorld):
                 self.assertIn(": 0 differ, 0 not settled yet", out)
                 self.assertEqual([line.strip() for line in out.splitlines() if "PROBLEM" in line], [
                     f"PROBLEM: the run warned: {run['serious_warnings'][0]}"])
+
+
+class InterruptedAsItWaits(ArchiveWorld):
+    """A signal (as the runner's SIGINT, then SIGTERM, at a step's timeout) while the run waits in abandon() for
+    a worker putting a file in place: the run stops its workers all the same, and says what it did. Before,
+    abandon() gave up waiting: the run wrote no report, and a second signal left it never abandoned."""
+
+    def fetch_interrupted(self, signals):
+        """Run the fetch, its deadline passing as a worker puts a log taken again in place, then `signals`
+        SIGINTs reaching the main thread as it waits for that worker. Returns its exit code and context."""
+        real, ctx = frl.replace, []
+        main = threading.main_thread().ident
+
+        def replace(src, dst):
+            done = real(src, dst)
+            if not ctx and threading.current_thread() is not threading.main_thread() \
+                    and os.path.basename(dst).startswith("build-log.txt"):
+                ctx.append(frl.context())
+                time.sleep(max(0.0, ctx[0].deadline - time.monotonic()) + 0.3)
+                for _ in range(signals):
+                    signal.pthread_kill(main, signal.SIGINT)
+                    time.sleep(0.2)
+            return done
+        with mock.patch.object(frl, "replace", replace):
+            try:
+                code = self.fetch("--run-timeout-minutes", "0.03")  # (1.8 s)
+            except KeyboardInterrupt:
+                self.fail("the signal left the run")
+        return code, ctx[0]
+
+    def test_one_signal_or_two(self):
+        self.finished(ago=3 * HOUR)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        for signals in (1, 2):
+            with self.subTest(signals=signals):
+                self.assertEqual(self.fetch(), 0)
+                self.srv.route(self.base + "/build-log.txt", obj(f"log, uploaded again {signals}\n".encode(), str(1 + signals)))
+                code, ctx = self.fetch_interrupted(signals)  # fails: (two) the signal left the run
+                run = self.runs()[-1]
+                self.assertIsNotNone(run)  # fails: (one) no run.json
+                self.assertEqual((code, run["interrupted"], run["outcomes"], ctx.abandoned.is_set()),
+                                 (130, True, {"refreshed": [self.key]}, True))
+                self.assertTrue(frl.archived_intact(self.bdir(), deep=True))
 
 
 class DiskErrorAsAFileGoesInPlace(ArchiveWorld):

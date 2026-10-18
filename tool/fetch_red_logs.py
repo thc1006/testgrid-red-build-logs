@@ -286,9 +286,19 @@ class RunContext:
     def abandon(self):
         """Stop the workers: once this returns, none is in the middle of changing a file of
         the archive (a rename or a removal) or can start to, as replace() and remove()
-        check under the same lock; at most a temp file git ignores can still appear."""
-        with self.write_lock:
-            self.abandoned.set()
+        check under the same lock; at most a temp file git ignores can still appear. A
+        signal while it waits for the lock (a KeyboardInterrupt) is raised once they are
+        stopped, not before."""
+        interrupt = None
+        while True:
+            try:
+                with self.write_lock:
+                    self.abandoned.set()
+                break
+            except KeyboardInterrupt as e:
+                interrupt = e
+        if interrupt:
+            raise interrupt
 
     def limit_for(self, url):
         origin = "://".join(urllib.parse.urlsplit(url)[:2])
@@ -4991,7 +5001,8 @@ def main(argv=None):
     try:
         return run(args, root, run_start, pool, deadline)
     except KeyboardInterrupt:  # outside the download wait (see run()): nothing to record yet
-        ctx.abandon()  # workers stop at their next read and cannot write
+        with contextlib.suppress(KeyboardInterrupt):  # (another signal, while it waits for the workers)
+            ctx.abandon()  # workers stop at their next read and cannot write
         print("ERROR interrupted; unfinished builds are picked up by the next run", file=sys.stderr)
         return 130
     finally:
@@ -5629,7 +5640,10 @@ def run(args, root, run_start, pool, deadline):
         interrupted = True
         not_done = {f for f in futures if not f.done()}
     if not_done:
-        ctx.abandon()
+        try:
+            ctx.abandon()
+        except KeyboardInterrupt:  # (one while it waited for a worker to finish putting files in place)
+            interrupted = True
     for fut in futures:
         b = futures[fut]
         key = f"{b['job']}/{b['build']}"
