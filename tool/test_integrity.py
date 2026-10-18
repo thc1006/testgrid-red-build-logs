@@ -562,6 +562,48 @@ class ContentOverTimeTest(ArchiveWorld):
             self.assertEqual(self.fetch(), 1)
         self.assertEqual((self.meta()["final"], self.meta().get("note")), (False, None))
 
+    def test_nor_does_one_making_a_temp_file_for_what_it_takes_again(self):
+        # (as a full disk can refuse a new name: one of the disk, as one writing the file is)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.fetch()
+        folder = self.bdir()
+        frl.write_json(os.path.join(folder, "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+        self.srv.route(self.base + "/build-log.txt", obj(b"log, replaced\n", "2"))
+        real = frl.temp_path
+
+        def full(path):
+            if path == os.path.join(folder, "build-log.txt"):
+                raise OSError(28, "No space left on device")
+            return real(path)
+        with mock.patch.object(frl, "temp_path", full):
+            self.assertEqual(self.fetch(), 1)  # fails: 0, the build made final
+        self.assertIn("comparing the archived copy with GCS failed: LocalIOError", self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual((self.meta()["final"], self.meta().get("note")), (False, None))
+
+    def test_nor_does_one_writing_its_meta_json_after_the_comparison(self):
+        # (its log taken again, then its meta.json cannot be written: not one of a build to archive, as its copy
+        # is intact, but a comparison the run did not end)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.fetch()
+        folder = self.bdir()
+        self.srv.route(self.base + "/build-log.txt", obj(b"log, replaced\n", "2"))
+        real, calls = frl.temp_path, []
+
+        def full(path):  # (the second meta.json written: the one after the log went in place with the first)
+            if path == os.path.join(folder, "meta.json"):
+                calls.append(path)
+                if len(calls) == 2:
+                    raise OSError(28, "No space left on device")
+            return real(path)
+        with mock.patch.object(frl, "temp_path", full):
+            self.assertEqual(self.fetch(), 1)
+        run = self.runs()[-1]
+        self.assertIn("comparing the archived copy with GCS failed: LocalIOError", run["errors"][0]["error"])
+        # fails: OSError: [Errno 28] No space left on device
+        self.assertNotIn(self.key, frl.read_json(os.path.join(self.root, "state.json"))["unresolved"])  # fails: in it
+        self.assertEqual((run["gcs_compared"], self.read("build-log.txt")), (False, b"log, replaced\n"))  # fails: True
+        self.assertTrue(frl.archived_intact(folder, deep=True))
+
     def test_cross_check_notes_but_does_not_fail_on_an_unsettled_copy(self):
         self.finished(ago=60)
         self.srv.route(self.base + "/build-log.txt", obj(b"first\n"))

@@ -1445,7 +1445,10 @@ def download(url, path, compress=False, max_bytes=None):
     Its info's md5 and byte count describe the raw content either way.
     """
     final = path + ".gz" if compress else path
-    part = temp_path(final)
+    try:
+        part = temp_path(final)
+    except OSError as e:  # (a disk error, as one writing it is)
+        raise LocalIOError(f"{final}: {e}") from None
     made = []  # (the copy an attempt made: removed if the request is tried again after it)
 
     def consume(r):
@@ -3365,7 +3368,7 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                             prow_url=f"https://prow.k8s.io/view/gs/{where}")
                 if str(meta.get("note", "")).startswith("GCS had neither finished.json nor build-log.txt"):
                     del meta["note"]  # (said of the folder under the index, not of its own)
-                write_json(os.path.join(target, "meta.json"), meta)  # (kept, as the sightings are)
+                put_in_place(target, meta)  # (kept, as the sightings are; a disk error is a LocalIOError)
             finished = read_finished(base)
             changed = []
             # (a file taken again goes in place with the meta.json that says so, see put_in_place; meta stays
@@ -3431,7 +3434,10 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                 meta["finished"] = finished["timestamp"]
         meta["settled"], meta["final"] = settle_flags(meta, time.time(), now)
     if meta != old:
-        write_json(os.path.join(target, "meta.json"), meta)
+        try:
+            put_in_place(target, meta)
+        except LocalIOError as e:  # (as in the comparison: what it found is not recorded, so compared again)
+            raise RecheckError(f"comparing the archived copy with GCS failed: LocalIOError: {e}") from None
     return outcome, meta
 
 

@@ -203,6 +203,22 @@ class PodInfo(ArchiveWorld):
         self.assertEqual(self.fetch(), 0)
         self.assertEqual(self.read("podinfo.json"), POD)
 
+    def test_nor_one_whose_temp_file_cannot_be_made(self):
+        # (as a full disk can refuse a new name: an error of the build too, not one reading it from GCS)
+        self.pod()
+        real = frl.temp_path
+
+        def full(path):
+            if os.path.basename(path) == "podinfo.json":
+                raise OSError(28, "No space left on device")
+            return real(path)
+        with mock.patch.object(frl, "temp_path", full):
+            self.assertEqual(self.fetch(), 1)  # fails: 0, archived without it
+        self.assertIn("LocalIOError", self.runs()[-1]["errors"][0]["error"])
+        self.assertIn(self.key, frl.read_json(os.path.join(self.root, "state.json"))["unresolved"])
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.read("podinfo.json"), POD)
+
     def test_one_gcs_changed_is_reported_then_fetched_again(self):
         self.pod()
         self.assertEqual(self.fetch(), 0)
