@@ -109,14 +109,16 @@ class Place(unittest.TestCase):
         return tmp
 
     def test_K1_a_file_of_exactly_max_bytes_is_stored_whole(self):
-        self.assertEqual(frl.place(self.download(10), self.final, 10), [])
-        self.assertEqual(os.listdir(self.d), ["build-log.txt"])
+        tmp = self.download(10)
+        self.assertEqual(frl.split_parts(tmp, self.final, 10), ([(tmp, self.final)], []))
 
     def test_K3_K4_a_file_of_exactly_1000_parts_is_stored_in_parts(self):
-        parts = frl.place(self.download(2000), self.final, 2)
+        temps, parts = frl.split_parts(self.download(2000), self.final, 2)
         self.assertEqual((len(parts), parts[-1]), (1000, {"file": "build-log.txt.999", "bytes": 2}))
+        self.assertEqual([os.path.basename(name) for _, name in temps], [p["file"] for p in parts])
+        frl.remove_temps(temps)
         with self.assertRaises(frl.LocalIOError):
-            frl.place(self.download(2001), self.final, 2)
+            frl.split_parts(self.download(2001), self.final, 2)
 
 
 class Parts(unittest.TestCase):

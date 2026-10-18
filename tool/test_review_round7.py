@@ -877,45 +877,6 @@ class ThirdWaveCrossCheck(r4.World):
 
 
 class ThirdWaveUnits(unittest.TestCase):
-    def test_parts_replace_the_old_copy_all_or_none_when_the_run_is_abandoned(self):
-        ctx = frl.RunContext(frl.AdaptiveLimit(1, 1))
-        with tempfile.TemporaryDirectory() as d:
-            final = os.path.join(d, "build-log.txt")
-            for i in range(3):
-                with open(f"{final}.{i:03d}", "wb") as f:
-                    f.write(b"O" * 10)
-            tmp = os.path.join(d, ".dl.part")
-            with open(tmp, "wb") as f:
-                f.write(b"N" * 30)
-            real, started = frl.replace, threading.Event()
-
-            def slow_replace(src, dst):
-                out = real(src, dst)
-                if dst.endswith(".000"):
-                    started.set()
-                    time.sleep(0.3)  # abandon() is called now, from another thread
-                return out
-            result = {}
-
-            def worker():
-                frl.bind_context(ctx)
-                try:
-                    result["parts"] = frl.place(tmp, final, 10)
-                except Exception as e:  # noqa: BLE001
-                    result["error"] = e
-            with mock.patch.object(frl, "replace", slow_replace):
-                t = threading.Thread(target=worker, daemon=True)
-                t.start()
-                started.wait(5)
-                ctx.abandon()
-                t.join(5)
-            contents = set()
-            for n in sorted(os.listdir(d)):
-                if not n.startswith("."):
-                    with open(os.path.join(d, n), "rb") as f:
-                        contents.add(f.read())
-            self.assertEqual(contents, {b"N" * 10}, result)
-
     def test_the_main_thread_says_what_this_run_did_to_a_build(self):
         with tempfile.TemporaryDirectory() as target:
             def meta(**kw):

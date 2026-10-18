@@ -1425,16 +1425,32 @@ def remove(path):
             os.remove(path)
 
 
-def download(url, path, compress=False, max_bytes=None):
-    """Save url to path (gzipped to path.gz if compress), checking length and md5 against GCS;
-    a file larger than max_bytes is stored as numbered parts instead (see place()).
+class Staged:
+    """A verified copy of a build's file (name: build-log.txt or podinfo.json) in temp files of its folder,
+    for put_in_place: temps, [(temp file, the name it takes)], one for the file whole or one per part (see
+    split_parts); info, what meta.json records of it."""
 
-    The returned md5 and byte count describe the raw content either way.
+    def __init__(self, name, info, temps):
+        self.name, self.info, self.temps = name, info, temps
+
+    def discard(self):
+        remove_temps(self.temps)
+
+
+def download(url, path, compress=False, max_bytes=None):
+    """Fetch url to temp files next to path, checking length and md5 against GCS: a Staged copy, which
+    put_in_place puts in place as path (gzipped, as path.gz, if compress), or as numbered parts if it is
+    larger than max_bytes (see split_parts).
+
+    Its info's md5 and byte count describe the raw content either way.
     """
     final = path + ".gz" if compress else path
     part = temp_path(final)
+    made = []  # (the copy an attempt made: removed if the request is tried again after it)
 
     def consume(r):
+        while made:
+            made.pop().discard()
         gcs = remote_identity(r.headers)
         stored_enc = gcs["encoding"]
         sent_enc = r.headers.get("Content-Encoding", "identity")
@@ -1507,20 +1523,26 @@ def download(url, path, compress=False, max_bytes=None):
             raise IntegrityError(f"{url}: got crc32c {crc[crc_of]:08x}, GCS stores {gcs['crc32c']}")
         try:
             file_bytes = os.path.getsize(part)
-            parts = place(part, final, max_bytes)
+            temps, parts = split_parts(part, final, max_bytes)
         except OSError as e:
             raise LocalIOError(f"{final}: {e}") from None
         info = {"bytes": out_len, "md5": out.hexdigest(),
                 "verified": gcs["bytes"] is not None and (gcs["md5"] is not None or crc_of is not None),
                 "file": os.path.basename(final), "file_bytes": file_bytes, "gcs": gcs}
-        return dict(info, parts=parts) if parts else info
+        made.append(Staged(os.path.basename(path), dict(info, parts=parts) if parts else info, temps))
+        return made[0]
 
     try:
         # Accept gzip so a gzip-stored object arrives exactly as stored and stays verifiable.
         return request(url, consume, headers={"Accept-Encoding": "gzip"})
+    except BaseException:
+        while made:
+            made.pop().discard()
+        raise
     finally:
-        if os.path.exists(part):
-            os.remove(part)
+        if not made:  # (one made into a copy is the copy, or went to its parts)
+            with contextlib.suppress(OSError):
+                os.remove(part)
 
 
 def json_text(data):
@@ -1668,18 +1690,11 @@ def merge_tabs(old, new):
 PART_STEP = 1 << 20  # parts are copied this much at a time
 
 
-def remove_parts(target, name, keep=()):
-    """Remove the stored parts of `name` in target, except the ones named in keep."""
-    for n in listdir(target):
-        m = PART_RE.fullmatch(n)
-        if m and m.group(1) == name and n not in keep:
-            remove(os.path.join(target, n))
-
-
 def remove_temps(temps):
-    """Remove the temp files of [(temp file, the name it takes)] that were not put in place."""
+    """Remove the temp files of [(temp file, the name it takes)] that were not put in place (one that cannot be
+    removed is the next run's to sweep: see sweep_parts)."""
     for tmp, _ in temps:
-        if os.path.exists(tmp):
+        with contextlib.suppress(OSError):
             os.remove(tmp)
 
 
@@ -1687,8 +1702,8 @@ def split_parts(tmp, final, max_bytes=None):
     """How a verified download, in temp file tmp, goes in place: ([(temp file, the name it takes)], its parts).
     Whole, as `final` ([(tmp, final)], no parts), or, if it is larger than max_bytes, as numbered parts
     final.000, final.001, ... of at most max_bytes each (GitHub rejects files over 100 MB), copied to temp
-    files of their own: meta.json lists them, and `cat <file>.* > <file>` puts the file back together. A file
-    too large for git so never sits under a name git commits."""
+    files of their own (tmp then goes): meta.json lists them, and `cat <file>.* > <file>` puts the file back
+    together. A file too large for git so never sits under a name git commits."""
     size = os.path.getsize(tmp)
     if max_bytes is None or size <= max_bytes:
         return [(tmp, final)], []
@@ -1707,45 +1722,78 @@ def split_parts(tmp, final, max_bytes=None):
                         written += len(data)
                         data = f.read(min(PART_STEP, max_bytes - written)) if written < max_bytes else b""
                 parts.append({"file": os.path.basename(part), "bytes": written})
+        os.remove(tmp)
     except BaseException:
         remove_temps(staged)
         raise
     return staged, parts
 
 
-def place(tmp, final, max_bytes=None):
-    """Move a verified download from its temp file to `final`, whole or in parts (see split_parts).
-    The new copy replaces the old one (whole or in parts) at once, after every part of it is
-    written: a run abandoned, or a disk full, part-way through leaves the old copy as it was.
-    Returns the parts ([] for a whole file)."""
-    target, name = os.path.split(final)
-    staged, parts = split_parts(tmp, final, max_bytes)
+def take_copy(base, target, compress, max_bytes, name="build-log.txt"):
+    """A Staged copy of the build's build-log.txt (or `name`, as podinfo.json) from GCS, at base, in temp
+    files of its folder, target (see download)."""
+    return download(f"{base}/{name}", os.path.join(target, name), compress, max_bytes)
+
+
+def drop_other_copies(target, name, info):
+    """Remove the stored copies of name in a build folder (as it came or gzipped, whole or in parts) other
+    than info's. One that cannot be removed (or listed) stays, a stray the cleanup removes or reports (see
+    clean_partial_builds)."""
+    keep = {p["file"] for p in info["parts"]} if info.get("parts") else {info["file"]}
     try:
-        with context().write_lock:  # all of them or none: abandon() waits, and replace() checks it first
-            for part_tmp, part in staged:
-                replace(part_tmp, part)
-            if parts:
-                remove(final)  # (an earlier copy stored whole)
-            remove_parts(target, name, keep={p["file"] for p in parts})  # (and one stored in parts)
+        names = listdir(target)
+    except OSError:
+        names = []
+    for n in names:
+        m = PART_RE.fullmatch(n)
+        if (m.group(1) if m else n) in (name, name + ".gz") and n not in keep:
+            with contextlib.suppress(OSError):
+                remove(os.path.join(target, n))
+
+
+def put_in_place(target, meta, copies=()):
+    """Write a build's meta.json, and put in place with it the Staged copies of its files it lists: all under the
+    write lock (abandon() waits for it), and by renames only, once every byte is written (meta.json's too: a
+    full disk stops it before anything changes). The copies go first to the names not there yet (a full disk
+    can refuse a new name), then over the files there, and meta.json last; then the copies of the same files
+    that it no longer lists (in the other form, or split otherwise) go. A rename refused part-way so changes no
+    file the old meta.json lists, unless one was renamed over before it (the new names taken are strays the
+    cleanup removes). The temp files go either way."""
+    path, tmp = os.path.join(target, "meta.json"), None
+    try:
+        tmp = temp_path(path)
+        with open(tmp, "w", encoding="utf-8", errors="backslashreplace") as f:  # (as write_file writes it)
+            f.write(json_text(meta))
+        with context().write_lock:  # (the first rename is refused once the run is abandoned: then none is done)
+            renames = sorted((t for c in copies for t in c.temps), key=lambda t: os.path.lexists(t[1]))
+            for src, dst in renames + [(tmp, path)]:
+                replace(src, dst)
+            for c in copies:
+                drop_other_copies(target, c.name, c.info)
+    except OSError as e:
+        raise LocalIOError(f"{target}: {e}") from None
+    finally:  # (one that cannot be removed is the next run's to sweep: see sweep_parts)
+        for c in copies:
+            c.discard()
+        if tmp:
+            with contextlib.suppress(OSError):
+                os.remove(tmp)
+
+
+def save_log(base, target, compress, max_bytes, name="build-log.txt"):
+    """Download build-log.txt (or `name`, as podinfo.json) into place, dropping a copy in the other format
+    left by an earlier run (the caller writes its meta.json after)."""
+    staged = take_copy(base, target, compress, max_bytes, name)
+    try:
+        with context().write_lock:  # all of its files or none: abandon() waits, and replace() checks it first
+            for src, dst in staged.temps:
+                replace(src, dst)
+            drop_other_copies(target, name, staged.info)
+    except OSError as e:
+        raise LocalIOError(f"{target}: {e}") from None
     finally:
-        remove_temps(staged)
-    return parts
-
-
-def save_log(base, target, compress, max_bytes, name="build-log.txt", keep_other=False):
-    """Download build-log.txt (or `name`, as podinfo.json), dropping a copy in the other format left by
-    an earlier run (unless keep_other: the caller drops it, once a meta.json lists this one)."""
-    log = download(f"{base}/{name}", os.path.join(target, name), compress, max_bytes)
-    if not keep_other:
-        drop_other_form(target, name, log)
-    return log
-
-
-def drop_other_form(target, name, info):
-    """Remove the copy of name in the other format (as it came, or gzipped) than info's, and its parts."""
-    for stale in {name, name + ".gz"} - {info["file"]}:
-        remove(os.path.join(target, stale))
-        remove_parts(target, stale)
+        staged.discard()
+    return staged.info
 
 
 def stray_files(target, meta):
@@ -3512,10 +3560,10 @@ def backfill_note(tabs, partial=None):
 
 
 def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours, compress, max_bytes, where=None):
-    """Download a red build's files into `target` and write its meta.json. where: the folder ("bucket/path")
-    of its files in GCS, under base (see build_folder; else query/build)."""
+    """Take a red build's files from GCS, and put them in place in `target` with its meta.json (see
+    put_in_place). where: the folder ("bucket/path") of its files in GCS, under base (see build_folder; else
+    query/build)."""
     where = where or f"{rec['query']}/{rec['build']}"
-    meta_path = os.path.join(target, "meta.json")
     # A folder whose meta.json cannot be read as this build's (held: the copies it holds): no copy is known
     # to be intact, and a new meta.json lists only what this run takes from GCS (the end of the run removes
     # the rest). So a copy of a file it cannot take (GCS no longer has it, or cannot serve it) stays, and so
@@ -3532,15 +3580,14 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     # which may have none now (it deletes old builds' files).
     kept = {key: (old or {}).get(key) for key in ("log", "podinfo")}
     whole = {key: bool(kept[key]) and intact(target, {key: kept[key]}, deep=True) for key in kept}
-    taken = []  # (what it took from GCS)
+    copies = []  # (what it takes from GCS: put in place with the new meta.json, once all are taken)
     try:
         if whole["log"]:
             log = kept["log"]
         else:
             try:
-                # (one held stays as it is until a new meta.json lists the copy taken: see held)
-                log = save_log(base, target, compress, max_bytes, keep_other=bool(held))
-                taken.append("build-log.txt")
+                copies.append(take_copy(base, target, compress, max_bytes))
+                log = copies[-1].info
             except NotFound:
                 if kept["log"]:
                     raise RuntimeError(f"the archived log is damaged and GCS no longer has it ({base})") from None
@@ -3564,8 +3611,8 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
             podinfo = kept["podinfo"]
         else:
             try:
-                podinfo = save_log(base, target, compress, max_bytes, "podinfo.json", keep_other=bool(held))
-                taken.append("podinfo.json")
+                copies.append(take_copy(base, target, compress, max_bytes, "podinfo.json"))
+                podinfo = copies[-1].info
             except (Abandoned, LocalIOError):
                 raise
             except Exception as e:
@@ -3577,6 +3624,8 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
                     raise  # (the build's only file: archived once it can be read)
                 unread = not isinstance(e, NotFound)
     except Exception:
+        for c in copies:
+            c.discard()
         remove_build_dir(target)
         raise
     tabs = merge_tabs(old["tabs"], rec["tabs"])[0] if old else rec["tabs"]
@@ -3598,14 +3647,11 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     if note:
         meta["note"] = note
     if existed:
-        meta.update(repaired_by_run=run_id, repaired=taken)
+        meta.update(repaired_by_run=run_id, repaired=[c.name for c in copies])
     meta["settled"], meta["final"] = settle_flags(meta, time.time(), now)
     if unread:
         meta["final"] = False  # (the next run compares it, and so reads its podinfo.json again)
-    write_json(meta_path, meta)
-    for key, name in (("log", "build-log.txt"), ("podinfo", "podinfo.json")):
-        if held and name in taken:  # (the copy held in the other format goes, now that meta.json lists this one)
-            drop_other_form(target, name, meta[key])
+    put_in_place(target, meta, copies)
     return ("archived" if log else "archived-without-log") if not existed else "repaired", meta
 
 
