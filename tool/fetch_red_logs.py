@@ -1676,21 +1676,22 @@ def remove_parts(target, name, keep=()):
             remove(os.path.join(target, n))
 
 
-def place(tmp, final, max_bytes=None):
-    """Move a verified download from its temp file to `final`, or, if it is larger than
-    max_bytes, to numbered parts final.000, final.001, ... of at most max_bytes each
-    (GitHub rejects files over 100 MB): meta.json lists them, and `cat <file>.* > <file>`
-    puts the file back together. A file too large for git so never sits under a name git
-    commits. The new copy replaces the old one (whole or in parts) at once, after every
-    part of it is written: a run abandoned, or a disk full, part-way through leaves the
-    old copy as it was. Returns the parts ([] for a whole file)."""
-    target, name = os.path.split(final)
+def remove_temps(temps):
+    """Remove the temp files of [(temp file, the name it takes)] that were not put in place."""
+    for tmp, _ in temps:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+
+
+def split_parts(tmp, final, max_bytes=None):
+    """How a verified download, in temp file tmp, goes in place: ([(temp file, the name it takes)], its parts).
+    Whole, as `final` ([(tmp, final)], no parts), or, if it is larger than max_bytes, as numbered parts
+    final.000, final.001, ... of at most max_bytes each (GitHub rejects files over 100 MB), copied to temp
+    files of their own: meta.json lists them, and `cat <file>.* > <file>` puts the file back together. A file
+    too large for git so never sits under a name git commits."""
     size = os.path.getsize(tmp)
     if max_bytes is None or size <= max_bytes:
-        with context().write_lock:  # (replace() and remove() take it too)
-            replace(tmp, final)
-            remove_parts(target, name)  # (left from an earlier copy stored in parts)
-        return []
+        return [(tmp, final)], []
     if size > 1000 * max_bytes:  # (names run .000 to .999, so `cat <file>.*` keeps their order)
         raise LocalIOError(f"{final}: {size} bytes would take more than 1000 parts of {max_bytes}")
     parts, staged = [], []
@@ -1706,15 +1707,28 @@ def place(tmp, final, max_bytes=None):
                         written += len(data)
                         data = f.read(min(PART_STEP, max_bytes - written)) if written < max_bytes else b""
                 parts.append({"file": os.path.basename(part), "bytes": written})
+    except BaseException:
+        remove_temps(staged)
+        raise
+    return staged, parts
+
+
+def place(tmp, final, max_bytes=None):
+    """Move a verified download from its temp file to `final`, whole or in parts (see split_parts).
+    The new copy replaces the old one (whole or in parts) at once, after every part of it is
+    written: a run abandoned, or a disk full, part-way through leaves the old copy as it was.
+    Returns the parts ([] for a whole file)."""
+    target, name = os.path.split(final)
+    staged, parts = split_parts(tmp, final, max_bytes)
+    try:
         with context().write_lock:  # all of them or none: abandon() waits, and replace() checks it first
             for part_tmp, part in staged:
                 replace(part_tmp, part)
-            remove(final)  # (an earlier copy stored whole)
-            remove_parts(target, name, keep={p["file"] for p in parts})
+            if parts:
+                remove(final)  # (an earlier copy stored whole)
+            remove_parts(target, name, keep={p["file"] for p in parts})  # (and one stored in parts)
     finally:
-        for part_tmp, _ in staged:
-            if os.path.exists(part_tmp):
-                os.remove(part_tmp)
+        remove_temps(staged)
     return parts
 
 
