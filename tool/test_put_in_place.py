@@ -21,7 +21,7 @@ sys.path.insert(0, HERE)
 
 import fetch_red_logs as frl  # noqa: E402
 from test_fetch_red_logs import FakeServer  # noqa: E402
-from test_integrity import DAY, ArchiveWorld, obj  # noqa: E402
+from test_integrity import DAY, HOUR, ArchiveWorld, obj  # noqa: E402
 from test_podinfo import POD  # noqa: E402
 
 
@@ -68,6 +68,123 @@ class CutOffAsAFileGoesInPlace(ArchiveWorld):
         self.assertTrue(frl.archived_intact(self.bdir(), deep=True))
         self.assertEqual(gzip.decompress(self.read("build-log.txt.gz")), b"log, uploaded again\n")
         self.assertEqual(self.check()[0], 0)
+
+
+    def test_a_refresh(self):
+        # (a file GCS has a new copy of, or a podinfo.json it has now, taken: it goes in place with the meta.json
+        # that says so, and the run says it did not compare the build to the end)
+        self.finished(ago=3 * HOUR)  # (not final: each run compares it with GCS)
+        limit = ("--max-file-mb", "0.00005")  # (52-byte parts)
+        for name, extra, first, again in (("build-log.txt", (), POD, b"log, uploaded again\n"),
+                                          ("podinfo.json", (), POD, POD.replace(b"OOMKilled", b"Error")),
+                                          ("build-log.txt", limit, POD, b"log, longer than a part\n" * 4),
+                                          ("podinfo.json", (), None, POD)):
+            with self.subTest(name=name, extra=extra, added=first is None):
+                shutil.rmtree(os.path.join(self.root, "runs"), ignore_errors=True)
+                self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+                self.srv.route(self.base + "/podinfo.json", obj(first) if first else (404, {}, b""))
+                self.assertEqual(self.fetch(*extra), 0)
+                self.srv.route(f"{self.base}/{name}", obj(again, "2"))
+                self.fetch_cut_off_as(name, *extra)
+                run = self.runs()[-1]
+                self.assertEqual((run["outcomes"], run["errors"], run["gcs_compared"]),
+                                 ({"refreshed": [self.key]}, [], False))
+                # fails: TimeoutError: run timeout reached before this build was done (a podinfo.json added: not-checked)
+                self.assertEqual(self.meta()["refreshed"], [name])
+                self.assertTrue(frl.archived_intact(self.bdir(), deep=True))
+                # (the copies it no longer lists went with it, not for the end of the run to remove)
+                self.assertEqual([w for w in run["warnings"] if "does not list it" in w], [])
+                code, out = self.check()  # (its files are GCS's: the one problem is the run's warning)
+                self.assertIn(": 0 differ, 0 not settled yet", out)
+                self.assertEqual([line.strip() for line in out.splitlines() if "PROBLEM" in line], [
+                    f"PROBLEM: the run warned: {run['serious_warnings'][0]}"])
+
+
+class DiskErrorAsAFileGoesInPlace(ArchiveWorld):
+    """A file a run takes again goes in place with the meta.json that lists it: a disk error before the renames
+    changes nothing."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * HOUR)  # (not final: each run compares it with GCS)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)  # (without --gzip)
+        self.folder = self.bdir()
+        self.srv.route(self.base + "/build-log.txt", obj(b"log, uploaded again\n", "2"))
+
+    def assert_as_it_was(self):
+        self.assertEqual((self.read("build-log.txt"), sorted(os.listdir(self.folder))), (b"log\n", ["build-log.txt",
+                                                                                                    "meta.json"]))
+        self.assertTrue(frl.archived_intact(self.folder, deep=True))
+
+    def test_one_whose_meta_json_cannot_be_written(self):
+        # (a full disk: the copy taken does not go in place, and the next run takes it again)
+        real = frl.temp_path
+
+        def full(path):
+            if path == os.path.join(self.folder, "meta.json"):
+                raise OSError(28, "No space left on device")
+            return real(path)
+        with mock.patch.object(frl, "temp_path", full):
+            self.assertEqual(self.fetch(), 1)
+        run = self.runs()[-1]
+        self.assertIn("comparing the archived copy with GCS failed: LocalIOError", run["errors"][0]["error"])
+        # fails: OSError (taken for GCS's: one not final 14 days after it was archived is then made final)
+        self.assertEqual((self.read("build-log.txt"), run["gcs_compared"]), (b"log\n", False))  # fails: the new log
+        self.assert_as_it_was()
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.read("build-log.txt"), b"log, uploaded again\n")
+
+    def test_one_in_another_form_whose_meta_json_cannot_be_put_in_place(self):
+        # (as a run killed outright between the two leaves it: the copy as it came stays with the meta.json that
+        # lists it, and the end of the run removes the one gzipped)
+        real = os.replace
+
+        def failing(src, dst):
+            if dst == os.path.join(self.folder, "meta.json"):
+                raise OSError(5, "Input/output error")
+            return real(src, dst)
+        with mock.patch.object(frl.os, "replace", failing):
+            self.assertEqual(self.fetch("--gzip"), 1)
+        self.assertTrue(frl.archived_intact(self.folder, deep=True))
+        # fails: its copy as it came removed before (and the end of the run removes the one gzipped: no log is left)
+        self.assert_as_it_was()
+        self.assertTrue(any(w.endswith("/build-log.txt.gz: removed, as its meta.json does not list it (a copy cut off "
+                                       "part-way)") for w in self.runs()[-1]["warnings"]))
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(sorted(os.listdir(self.folder)), ["build-log.txt.gz", "meta.json"])
+
+
+    def test_control_one_in_the_same_form_whose_meta_json_cannot_be_put_in_place(self):
+        # (as before: the disk failing once the log is renamed over its copy leaves it under the old meta.json,
+        # and the next run repairs it from GCS)
+        real = os.replace
+
+        def failing(src, dst):
+            if dst == os.path.join(self.folder, "meta.json"):
+                raise OSError(5, "Input/output error")
+            return real(src, dst)
+        with mock.patch.object(frl.os, "replace", failing):
+            self.assertEqual(self.fetch(), 1)
+        self.assertFalse(frl.archived_intact(self.folder, deep=True))
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual((self.runs()[-1]["outcomes"], self.read("build-log.txt")),
+                         ({"repaired": [self.key]}, b"log, uploaded again\n"))
+        self.assertTrue(frl.archived_intact(self.folder, deep=True))
+
+    def test_one_whose_file_fails_to_go_in_place_otherwise(self):
+        # (not the disk's doing: taken for GCS's, so one not final 14 days after it was archived is made final,
+        # and the meta.json the run writes for it then lists the copy in place, not the one taken)
+        frl.write_json(os.path.join(self.folder, "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+
+        def failing(target, meta, copies=()):  # (as put_in_place fails: its temp files go)
+            for c in copies:
+                c.discard()
+            raise RuntimeError("not the disk")
+        with mock.patch.object(frl, "put_in_place", failing):
+            self.assertEqual(self.fetch(), 0)
+        self.assertEqual((self.runs()[-1]["outcomes"], self.meta()["final"]), ({"stopped-comparing": [self.key]}, True))
+        self.assert_as_it_was()
 
 
 class PutInPlace(unittest.TestCase):

@@ -1780,22 +1780,6 @@ def put_in_place(target, meta, copies=()):
                 os.remove(tmp)
 
 
-def save_log(base, target, compress, max_bytes, name="build-log.txt"):
-    """Download build-log.txt (or `name`, as podinfo.json) into place, dropping a copy in the other format
-    left by an earlier run (the caller writes its meta.json after)."""
-    staged = take_copy(base, target, compress, max_bytes, name)
-    try:
-        with context().write_lock:  # all of its files or none: abandon() waits, and replace() checks it first
-            for src, dst in staged.temps:
-                replace(src, dst)
-            drop_other_copies(target, name, staged.info)
-    except OSError as e:
-        raise LocalIOError(f"{target}: {e}") from None
-    finally:
-        staged.discard()
-    return staged.info
-
-
 def stray_files(target, meta):
     """Stored-file names in a build folder that its meta.json does not list: what a copy
     cut off part-way leaves (parts of a newer copy, or a copy in the other form). None at all
@@ -1821,7 +1805,8 @@ def stray_files(target, meta):
 
 
 class RecheckError(Exception):
-    """Comparing an intact archived build with GCS failed; its copy stays and is compared again by the
+    """Comparing an intact archived build with GCS failed; its copy stays (but where the disk failed as a file
+    was renamed over one there, see put_in_place: the next run then repairs it) and is compared again by the
     next run (the run is not done with its sevenths: see gcs_sevenths)."""
 
 
@@ -3383,36 +3368,41 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                 write_json(os.path.join(target, "meta.json"), meta)  # (kept, as the sightings are)
             finished = read_finished(base)
             changed = []
+            # (a file taken again goes in place with the meta.json that says so, see put_in_place; meta stays
+            # what is in place, for a failure below to keep)
             if meta.get("log"):
                 if not unchanged_in_gcs(base + "/build-log.txt", meta["log"]):
-                    before = meta["log"].get("md5")
-                    meta["log"] = save_log(base, target, compress, max_bytes)
-                    if meta["log"]["md5"] != before:  # an old record may only lack GCS's identity
+                    log = take_copy(base, target, compress, max_bytes)
+                    new = dict(meta, log=log.info)
+                    if log.info["md5"] != meta["log"].get("md5"):  # an old record may only lack GCS's identity
                         changed.append("build-log.txt")
-                        meta.update(refreshed_by_run=run_id, refreshed=list(changed))
-                    write_json(os.path.join(target, "meta.json"), meta)  # the file on disk changed: say so now
+                        new.update(refreshed_by_run=run_id, refreshed=list(changed))
+                    put_in_place(target, new, [log])
+                    meta = new
             else:
                 try:  # archived without a log: has one appeared since?
-                    meta["log"] = save_log(base, target, compress, max_bytes)
-                    meta["log_recovered_by_run"] = run_id
-                    outcome = "log-recovered"
-                    write_json(os.path.join(target, "meta.json"), meta)  # the file on disk changed: say so now
+                    log = take_copy(base, target, compress, max_bytes)
+                    new = dict(meta, log=log.info, log_recovered_by_run=run_id)
+                    put_in_place(target, new, [log])
+                    meta, outcome = new, "log-recovered"
                 except NotFound:
                     pass
             # (one that cannot be read fails the comparison, as the log does: the next run compares it again)
             if meta.get("podinfo") and not unchanged_in_gcs(base + "/podinfo.json", meta["podinfo"]):
-                before = meta["podinfo"].get("md5")
-                meta["podinfo"] = save_log(base, target, compress, max_bytes, "podinfo.json")
-                if meta["podinfo"]["md5"] != before:
+                pod = take_copy(base, target, compress, max_bytes, "podinfo.json")
+                new = dict(meta, podinfo=pod.info)
+                if pod.info["md5"] != meta["podinfo"].get("md5"):
                     changed.append("podinfo.json")
-                    meta.update(refreshed_by_run=run_id, refreshed=list(changed))
-                write_json(os.path.join(target, "meta.json"), meta)  # the file on disk changed: say so now
+                    new.update(refreshed_by_run=run_id, refreshed=list(changed))
+                put_in_place(target, new, [pod])
+                meta = new
             elif not meta.get("podinfo"):
                 try:  # (Prow writes it up to minutes after finished.json; code before kept it only without a log)
-                    meta["podinfo"] = save_log(base, target, compress, max_bytes, "podinfo.json")
+                    pod = take_copy(base, target, compress, max_bytes, "podinfo.json")
                     changed.append("podinfo.json")
-                    meta.update(refreshed_by_run=run_id, refreshed=list(changed))
-                    write_json(os.path.join(target, "meta.json"), meta)  # the file on disk changed: say so now
+                    new = dict(meta, podinfo=pod.info, refreshed_by_run=run_id, refreshed=list(changed))
+                    put_in_place(target, new, [pod])
+                    meta = new
                 except NotFound:
                     pass
         except Abandoned:
@@ -5674,8 +5664,8 @@ def run(args, root, run_start, pool, deadline):
             elif outcome in ("watching", "held"):
                 watch[key] = {"rec": b, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
         except RecheckError as e:
-            # The archived copy stays as it is, and the next run compares it again (the run is not done
-            # with its sevenths, see gcs_sevenths).
+            # The archived copy stays as it is (see RecheckError), and the next run compares it again (the
+            # run is not done with its sevenths, see gcs_sevenths).
             errors.append({"build": key, "error": str(e)})
             recheck_failed = True
         except Exception as e:
