@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2111707576377806848",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1792305324,
+  "created": 1792305294,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] Garbage collector should support orphan deletion of custom resources",
+          "status": "FAIL",
+          "message": "[FAILED] Told to stop trying after 0.002s.\nUnexpected final error whil...st/e2e/apimachinery/garbage_collector.go:1116 @ 10/18/26 06:46:09.585\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792306937,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2111707576377806848",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2111707576377806848/build-log.txt",
+  "log": {
+    "bytes": 135968,
+    "md5": "142b052fc5165afd657be0108a9276da",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20055,
+    "gcs": {
+      "generation": "1792306953804361",
+      "md5": "142b052fc5165afd657be0108a9276da",
+      "crc32c": "e379a66e",
+      "bytes": 135968,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94350,
+    "md5": "fbf45fc3fae0e5131c9e9648c5188a2f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12539,
+    "gcs": {
+      "generation": "1792306956953388",
+      "md5": "fbf45fc3fae0e5131c9e9648c5188a2f",
+      "crc32c": "ce8dbca3",
+      "bytes": 94350,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-18T155216Z",
+  "archived_at": 1792338736.0,
+  "settled": true,
+  "final": false
+}

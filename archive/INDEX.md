@@ -1,34 +1,34 @@
 # Red TestGrid builds
 
-Updated 2026-10-18T05:35:46Z. The builds with a red cell on sig-release-master-blocking and sig-release-master-informing that the runs found: seen red on TestGrid, or taken from GCS by TestGrid's rule ([what that can miss or add](../README.md#limits)); times are UTC. Each run's downloads are in its own folder under [runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
+Updated 2026-10-18T15:52:26Z. The builds with a red cell on sig-release-master-blocking and sig-release-master-informing that the runs found: seen red on TestGrid, or taken from GCS by TestGrid's rule ([what that can miss or add](../README.md#limits)); times are UTC. Each run's downloads are in its own folder under [runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/trend-dark.svg">
-  <img alt="Red builds per day, data to Oct 18 05:35 UTC. Blocking: week-over-week change appears after 14 fully covered days; Informing: last 7 full days 61 · +13% vs previous 7 (54)" src="charts/trend-light.svg">
+  <img alt="Red builds per day, data to Oct 18 15:52 UTC. Blocking: week-over-week change appears after 14 fully covered days; Informing: last 7 full days 58 · no change vs previous 7 (58)" src="charts/trend-light.svg">
 </picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/tabs-dark.svg">
-  <img alt="Red builds per tab, 14 days to Oct 18 05:35 UTC. Busiest over the last 7 of them: gce-ubuntu-master-containerd 18, integration-master 18, gce-cos-master-serial 15, integration-arm64-master 13, gce-cos-master-default 13." src="charts/tabs-light.svg">
+  <img alt="Red builds per tab, 14 days to Oct 18 15:52 UTC. Busiest over the last 7 of them: gce-ubuntu-master-containerd 20, integration-master 20, gce-cos-master-serial 15, integration-arm64-master 14, gce-cos-master-default 13." src="charts/tabs-light.svg">
 </picture>
 
 <details><summary>Red builds per tab (table)</summary>
 
 | Dashboard | Tab | 7 days to Oct 18 | 14 days |
 |---|---|---:|---:|
-| Blocking | gce-ubuntu-master-containerd | 18 | 36 |
-| Blocking | integration-master | 18 | 26 |
-| Blocking | integration-arm64-master | 13 | 24 |
+| Blocking | gce-ubuntu-master-containerd | 20 | 38 |
+| Blocking | integration-master | 20 | 28 |
+| Blocking | integration-arm64-master | 14 | 25 |
 | Blocking | gce-cos-master-default | 13 | 23 |
+| Blocking | ci-kubernetes-unit | 10 | 18 |
 | Blocking | gce-cos-alphafeatures-master | 8 | 21 |
-| Blocking | ci-kubernetes-unit | 8 | 16 |
-| Blocking | kind-master | 7 | 11 |
+| Blocking | kind-master | 8 | 12 |
+| Blocking | gce-cos-default-master | 5 | 11 |
 | Blocking | gce-device-plugin-gpu-master | 5 | 8 |
 | Blocking | ci-node-e2e | 4 | 14 |
+| Blocking | kind-ipv6-master | 4 | 8 |
 | Blocking | gce-master-scale-performance-100 | 4 | 4 |
-| Blocking | gce-cos-default-master | 3 | 9 |
-| Blocking | kind-ipv6-master | 3 | 7 |
-| Blocking | kind-master-beta-features | 2 | 7 |
+| Blocking | kind-master-beta-features | 3 | 8 |
 | Blocking | Conformance - GCE - master | 2 | 2 |
 | Blocking | cmd-master | 1 | 4 |
 | Blocking | conformance-ga-only | 1 | 1 |
@@ -38,8 +38,8 @@ Updated 2026-10-18T05:35:46Z. The builds with a red cell on sig-release-master-b
 | Informing | gce-cos-master-slow | 11 | 25 |
 | Informing | gce-cos-slow-master | 8 | 12 |
 | Informing | capz-windows-master | 6 | 13 |
+| Informing | kind-master-alpha-beta-features | 4 | 8 |
 | Informing | kind-master-alpha-beta-enabled | 3 | 8 |
-| Informing | kind-master-alpha-beta-features | 3 | 7 |
 | Informing | gce-cos-serial-master | 2 | 9 |
 | Informing | kind-master-beta-enabled | 1 | 3 |
 | Informing | kind-master-beta-enabled-conformance | 1 | 2 |
@@ -57,8 +57,8 @@ Updated 2026-10-18T05:35:46Z. The builds with a red cell on sig-release-master-b
 
 | Day (UTC) | Blocking | Informing |
 |---|---:|---:|
-| 2026-10-18 | 1 (so far, to 05:35 UTC) | 0 (so far, to 05:35 UTC) |
-| 2026-10-17 | 16 (partial) | 5 (partial) |
+| 2026-10-18 | 13 (so far, to 15:52 UTC) | 1 (so far, to 15:52 UTC) |
+| 2026-10-17 | 16 | 5 |
 | 2026-10-16 | 13 | 10 |
 | 2026-10-15 | 20 | 12 |
 | 2026-10-14 | 23 | 9 |
@@ -98,6 +98,7 @@ Verification is the outcome that verification recorded in the run's verification
 
 | Run (UTC) | New builds | Updated | Collection result | Verification |
 |---|---:|---:|---|---|
+| [2026-10-18 15:52:16](runs/2026-10/2026-10-18T155216Z/) | 13 | 0 | ok | [ok](runs/2026-10/2026-10-18T155216Z/verification.json) |
 | [2026-10-18 05:35:36](runs/2026-10/2026-10-18T053536Z/) | 1 | 0 | ok | [ok](runs/2026-10/2026-10-18T053536Z/verification.json) |
 | [2026-10-18 04:31:27](runs/2026-10/2026-10-18T043127Z/) | 0 | 0 | ok | [ok](runs/2026-10/2026-10-18T043127Z/verification.json) |
 | [2026-10-17 23:30:55](runs/2026-10/2026-10-17T233055Z/) | 6 | 851 | ok | [ok](runs/2026-10/2026-10-17T233055Z/verification.json) |
@@ -127,13 +128,26 @@ Verification is the outcome that verification recorded in the run's verification
 
 ## Builds from the last 14 days
 
-326 archived builds that started since 2026-10-05 (UTC), newest first.
+339 archived builds that started since 2026-10-05 (UTC), newest first.
 
 ### 2026-10-18
 
 | Time | Tab | Build | Red tests | Files |
 |---|---|---|---|---|
-| 04:17 | blocking#kind-ipv6-master | [ci-kubernetes-e2e-kind-ipv6 2111672847314194432](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2111672847314194432) | Kubernetes e2e suite.\[It\] \[sig-cli\] Kubectl client Simple pod should support inline execut (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T053536Z/ci-kubernetes-e2e-kind-ipv6/2111672847314194432/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T053536Z/ci-kubernetes-e2e-kind-ipv6/2111672847314194432/podinfo.json.gz) (provisional) |
+| 15:19 | blocking#kind-master-beta-features | [ci-kubernetes-e2e-kind-beta-features 2111839446671298560](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2111839446671298560) | Kubernetes e2e suite.\[It\] \[sig-storage\] In-tree Volumes \[Driver: nfs3\] \[Testpattern: Inlin (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-kind-beta-features/2111839446671298560/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-kind-beta-features/2111839446671298560/podinfo.json.gz) (provisional) |
+| 15:11 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2111837684866486272](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2111837684866486272) | Kubernetes e2e suite.\[It\] \[sig-cli\] Kubectl client Simple pod should return command exit c (+2) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111837684866486272/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111837684866486272/podinfo.json.gz) (provisional) |
+| 14:53 | blocking#gce-cos-default-master | [ci-kubernetes-e2e-gce-cos-default-master 2111832903162793984](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2111832903162793984) | kubetest.Up (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-gce-cos-default-master/2111832903162793984/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-gce-cos-default-master/2111832903162793984/podinfo.json.gz) (provisional) |
+| 10:53 | blocking#gce-cos-default-master | [ci-kubernetes-e2e-gce-cos-default-master 2111772504597991424](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2111772504597991424) | kubetest.Up (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-gce-cos-default-master/2111772504597991424/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-gce-cos-default-master/2111772504597991424/podinfo.json.gz) |
+| 10:53 | blocking#integration-master | [ci-kubernetes-integration-master 2111772254260957184](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2111772254260957184) | \[sig-api-machinery\] k8s.io/kubernetes/test/integration/apiserver.storage (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-integration-master/2111772254260957184/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-integration-master/2111772254260957184/podinfo.json.gz) |
+| 10:19 | blocking#kind-ipv6-master | [ci-kubernetes-e2e-kind-ipv6 2111763948402380800](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2111763948402380800) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS with multiple PVs and PVCs a (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-kind-ipv6/2111763948402380800/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-kind-ipv6/2111763948402380800/podinfo.json.gz) |
+| 09:09 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2111746333109915648](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2111746333109915648) | \[sig-api-machinery\] k8s.io/client-go.rest (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-unit/2111746333109915648/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-unit/2111746333109915648/podinfo.json.gz) |
+| 07:55 | blocking#kind-master | [ci-kubernetes-e2e-kind 2111726955773562880](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2111726955773562880) | Kubernetes e2e suite.\[It\] \[sig-api-machinery\] ResourceQuota should create a ResourceQuota (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-kind/2111726955773562880/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-kind/2111726955773562880/podinfo.json.gz) |
+| 06:35 | informing#kind-master-alpha-beta-features | [ci-kubernetes-e2e-kind-alpha-beta-features 2111707576377806848](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2111707576377806848) | Kubernetes e2e suite.\[It\] \[sig-api-machinery\] Garbage collector should support orphan dele (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-kind-alpha-beta-features/2111707576377806848/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-kind-alpha-beta-features/2111707576377806848/podinfo.json.gz) |
+| 06:09 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2111701034282782720](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2111701034282782720) | \[sig-scheduling\] k8s.io/kubernetes/pkg/scheduler/framework.preemption (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-unit/2111701034282782720/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-unit/2111701034282782720/podinfo.json.gz) |
+| 05:53 | blocking#integration-master | [ci-kubernetes-integration-master 2111696754905714688](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2111696754905714688) | \[sig-scheduling\] k8s.io/kubernetes/test/integration/scheduler.podgroup (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-integration-master/2111696754905714688/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-integration-master/2111696754905714688/podinfo.json.gz) |
+| 05:27 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2111690715103760384](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2111690715103760384) | Kubernetes e2e suite.\[It\] \[sig-network\] Networking Granular Checks: Services should update (+2) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111690715103760384/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2111690715103760384/podinfo.json.gz) |
+| 04:57 | blocking#integration-arm64-master | [ci-kubernetes-integration-arm64-master 2111682914432323584](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2111682914432323584) | \[sig-api-machinery\] k8s.io/kubernetes/test/integration.storageversionmigrator (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-integration-arm64-master/2111682914432323584/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T155216Z/ci-kubernetes-integration-arm64-master/2111682914432323584/podinfo.json.gz) |
+| 04:17 | blocking#kind-ipv6-master | [ci-kubernetes-e2e-kind-ipv6 2111672847314194432](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2111672847314194432) | Kubernetes e2e suite.\[It\] \[sig-cli\] Kubectl client Simple pod should support inline execut (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T053536Z/ci-kubernetes-e2e-kind-ipv6/2111672847314194432/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T053536Z/ci-kubernetes-e2e-kind-ipv6/2111672847314194432/podinfo.json.gz) |
 
 ### 2026-10-17
 
@@ -529,13 +543,13 @@ Verification is the outcome that verification recorded in the run's verification
 
 | | Builds |
 |---|---:|
-| Archived builds | 864 |
-| … with a log | 859 |
+| Archived builds | 877 |
+| … with a log | 872 |
 | … with only podinfo.json (the pod never ran) | 5 |
 | … without a file (GCS had none) | 0 |
 | … with a file stored in parts (too large for one file in git) | 0 |
-| … provisional (taken before Prow finished uploading) | 1 |
-| … still compared with GCS on every run | 47 |
+| … provisional (taken before Prow finished uploading) | 3 |
+| … still compared with GCS on every run | 52 |
 | … taken from GCS, judged by TestGrid's rule (not seen red on TestGrid) | 0 |
 | Red builds waiting to be archived | 0 |
 | … of them with a damaged copy here, to be fetched again | 0 |
@@ -544,7 +558,7 @@ Verification is the outcome that verification recorded in the run's verification
 
 ## Every week
 
-- [2026-W42](weeks/2026-W42.md): Oct 12 – Oct 18, 163 builds
+- [2026-W42](weeks/2026-W42.md): Oct 12 – Oct 18, 176 builds
 - [2026-W41](weeks/2026-W41.md): Oct 5 – Oct 11, 163 builds
 - [2026-W40](weeks/2026-W40.md): Sep 28 – Oct 4, 331 builds
 - [2026-W39](weeks/2026-W39.md): Sep 21 – Sep 27, 201 builds

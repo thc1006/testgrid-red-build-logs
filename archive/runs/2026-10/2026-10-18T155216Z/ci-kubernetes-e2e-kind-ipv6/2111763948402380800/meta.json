@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2111763948402380800",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1792318762,
+  "created": 1792318734,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with multiple PVs and PVCs all in same ns should create 2 PVs and 4 PVCs: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-9jnvb\" did not exit with Success: pod \"pvc-te...es/test/e2e/storage/persistent_volumes.go:340 @ 10/18/26 10:31:13.423\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792320390,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2111763948402380800",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2111763948402380800/build-log.txt",
+  "log": {
+    "bytes": 135729,
+    "md5": "8e2fbd01c0b1126ddbb51837159af10f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22117,
+    "gcs": {
+      "generation": "1792320405865970",
+      "md5": "8e2fbd01c0b1126ddbb51837159af10f",
+      "crc32c": "ec0aaedd",
+      "bytes": 135729,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96966,
+    "md5": "48e4bcac79263efaa2f1120a926d792d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12620,
+    "gcs": {
+      "generation": "1792320408390463",
+      "md5": "48e4bcac79263efaa2f1120a926d792d",
+      "crc32c": "8a729f87",
+      "bytes": 96966,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-18T155216Z",
+  "archived_at": 1792338736.0,
+  "settled": true,
+  "final": false
+}

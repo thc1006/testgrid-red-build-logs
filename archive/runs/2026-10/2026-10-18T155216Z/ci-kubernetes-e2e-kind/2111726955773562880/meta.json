@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2111726955773562880",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1792310152,
+  "created": 1792309914,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a custom resource.",
+          "status": "FAIL",
+          "message": "[FAILED] context deadline exceeded\nIn [It] at: k8s.io/kubernetes/test/e2e/apimachinery/resource_quota.go:681 @ 10/18/26 08:07:40.13\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792311741,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2111726955773562880",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2111726955773562880/build-log.txt",
+  "log": {
+    "bytes": 118153,
+    "md5": "8cffe5c40ae8d76d3a8697946677f926",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 18809,
+    "gcs": {
+      "generation": "1792311757126941",
+      "md5": "8cffe5c40ae8d76d3a8697946677f926",
+      "crc32c": "af7a4d63",
+      "bytes": 118153,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 120123,
+    "md5": "1fa2cfdc7f168b03026f7a384f6c5114",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 14251,
+    "gcs": {
+      "generation": "1792311760056654",
+      "md5": "1fa2cfdc7f168b03026f7a384f6c5114",
+      "crc32c": "f93f8b63",
+      "bytes": 120123,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-18T155216Z",
+  "archived_at": 1792338736.0,
+  "settled": true,
+  "final": false
+}
