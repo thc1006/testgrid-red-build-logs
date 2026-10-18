@@ -319,6 +319,7 @@ class RunContext:
 
 _local = threading.local()
 _DEFAULT_CONTEXT = RunContext(AdaptiveLimit(8, 8))
+_last_run = None  # the context of the run main() last started (see __main__: main() binds the caller's again)
 
 
 def context():
@@ -4988,6 +4989,8 @@ def main(argv=None):
             return 2
     deadline = time.monotonic() + args.run_timeout_minutes * 60
     ctx = RunContext(AdaptiveLimit(args.start_concurrency, args.max_concurrency), deadline)
+    global _last_run
+    _last_run = ctx
     caller = context()  # (bound again when the run returns: a run stopped part-way leaves its own abandoned)
     bind_context(ctx)
     # keep a kept-alive connection for every request that can be in flight (pools made from now on)
@@ -5839,6 +5842,6 @@ if __name__ == "__main__":
     code = main()
     sys.stdout.flush()
     sys.stderr.flush()
-    if context().abandoned.is_set():
+    if _last_run is not None and _last_run.abandoned.is_set():
         os._exit(code)  # do not wait for workers abandoned at the run timeout
     sys.exit(code)
