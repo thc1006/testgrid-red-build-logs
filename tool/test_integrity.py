@@ -12,6 +12,7 @@ import os
 import random
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 import threading
@@ -1202,6 +1203,28 @@ class MarginAndTimeoutTest(ArchiveWorld):
         self.assertEqual(frl.read_json(os.path.join(self.root, "state.json"))["unresolved"], {})
         self.assertNotIn(self.key, json.dumps(run["errors"]))
         time.sleep(1.6)
+
+
+    def test_a_run_that_abandons_a_worker_ends_without_it(self):
+        # (one still waiting for GCS past the deadline: abandoned, it cannot write, so the process does not wait
+        # for its answer)
+        self.finished(ago=3 * DAY)
+        answer = threading.Event()
+
+        def slow(h):
+            answer.wait(30)
+            with contextlib.suppress(OSError):
+                obj(b"log\n")(h)
+        self.srv.route(self.base + "/build-log.txt", slow)
+        t0 = time.monotonic()
+        try:
+            done = subprocess.run([sys.executable, frl.__file__, "--archive", self.root, "--dashboard", "dash",
+                                   "--testgrid", self.srv.url, "--gcs", self.srv.url, "--run-timeout-minutes", "0.03"],
+                                  capture_output=True, timeout=120)
+        finally:
+            answer.set()
+        self.assertEqual(done.returncode, 1, done.stderr[-2000:])
+        self.assertLess(time.monotonic() - t0, 20)  # fails: 30 s and more (it waited for GCS's answer)
 
 
 class TestGridRuleTest(unittest.TestCase):
