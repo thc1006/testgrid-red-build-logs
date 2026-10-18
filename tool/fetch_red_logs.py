@@ -5579,16 +5579,20 @@ def run(args, root, run_start, pool, deadline):
         key = f"{b['job']}/{b['build']}"
         previous = state["unresolved"].get(key, {})
         try:
-            if fut in not_done:
+            # (a worker the run gave up on that has ended since, but not for being stopped, is taken as one
+            # that ended in time: none can write once abandon() returns)
+            if fut in not_done and (not fut.done() or isinstance(fut.exception(), Abandoned)):
                 if archived_intact(target_of(b), deep=True):
-                    # Finished just as the run gave up, or already on disk. One due to be
-                    # compared with GCS that this run did not update was not compared to the end
-                    # ("not-checked"): the next run compares it (the run is not done with its
-                    # sevenths, see gcs_sevenths).
+                    # Stopped part-way, or already on disk. One due to be compared with GCS was
+                    # not compared to the end, even if this run took a file of it again first
+                    # ("not-checked" if it did not update it): the next run compares it (the
+                    # run is not done with its sevenths, see gcs_sevenths).
                     outcome = add_sightings(target_of(b), b, run_id)
-                    if outcome == "already-archived" and due_in_gcs(target_of(b), key in resampled):
-                        outcome = "not-checked"
+                    if outcome in ("already-archived", "refreshed", "log-recovered") \
+                            and due_in_gcs(target_of(b), key in resampled):
                         uncompared.append(key)
+                        if outcome == "already-archived":
+                            outcome = "not-checked"
                     outcomes.setdefault(outcome, []).append(key)
                     continue
                 cause = "interrupted" if interrupted else "run timeout reached"

@@ -3,6 +3,7 @@ on), kept for every archived build GCS has one for. Before, only a build GCS had
 
 Run: cd tool && python -m unittest test_podinfo -v
 """
+import contextlib
 import gzip
 import hashlib
 import json
@@ -10,6 +11,7 @@ import os
 import shutil
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from unittest import mock
@@ -102,6 +104,71 @@ class PodInfo(ArchiveWorld):
             self.assertEqual(self.fetch(), 1)
         self.assertEqual(sorted(os.listdir(self.bdir())), ["build-log.txt", "meta.json", "podinfo.json"])  # fails: none
         self.assertEqual((self.meta()["podinfo"]["md5"], self.runs()[-1]["warnings"]), (hashlib.md5(POD).hexdigest(), []))
+
+    def test_one_the_deadline_cuts_off_after_a_log_is_taken_again_is_not_compared_to_the_end(self):
+        # (its podinfo.json, compared after the log: the run says it did not compare all it was due to, as
+        # for one it did not update; stopped: its worker, answered once the run stops it, ends before the run
+        # looks at it, stopped at its next write)
+        real_abandon = frl.RunContext.abandon
+        for outcome, first, stopped in [(o, f, s) for o, f in (("refreshed", obj(b"log\n")), ("log-recovered", (404, {}, b"")))
+                                        for s in (False, True)]:
+            with self.subTest(outcome, stopped=stopped):
+                shutil.rmtree(os.path.join(self.root, "runs"), ignore_errors=True)
+                self.srv.route(self.base + "/build-log.txt", first)
+                self.pod()
+                self.assertEqual(self.fetch(), 0)
+                self.srv.route(self.base + "/build-log.txt", obj(b"log, uploaded again\n", "2"))
+                answer = threading.Event()
+
+                def slow(h, answer=answer):
+                    answer.wait(10)
+                    with contextlib.suppress(OSError):
+                        obj(POD)(h)
+
+                def abandon(ctx, answer=answer):
+                    real_abandon(ctx)
+                    answer.set()
+                    time.sleep(0.5)
+                self.srv.route(self.base + "/podinfo.json", slow)
+                try:
+                    with mock.patch.object(frl.RunContext, "abandon", abandon if stopped else real_abandon):
+                        self.assertEqual(self.fetch("--run-timeout-minutes", "0.03"), 1)  # (1.8 s)  # fails: 0
+                finally:
+                    answer.set()
+                run = self.runs()[-1]
+                self.assertEqual((run["outcomes"], run["gcs_compared"]), ({outcome: [self.key]}, False))  # fails: True
+                self.assertEqual(run["serious_warnings"], [
+                    f"1 archived builds were not compared with GCS before the run reached its deadline ({self.key}): "
+                    "the next run compares them"])
+
+    def test_one_whose_worker_ends_just_after_the_deadline_is_compared(self):
+        # (before the run stopped its workers: it ended as one in time does, and is not counted as cut off;
+        # nor is one whose comparison failed then, for GCS: its error is the run's)
+        self.pod()
+        self.assertEqual(self.fetch(), 0)
+        real_unchanged, real_abandon = frl.unchanged_in_gcs, frl.RunContext.abandon
+        for failing in (False, True):
+            with self.subTest(failing=failing):
+                def unchanged(url, info, failing=failing):
+                    same = real_unchanged(url, info)
+                    if url.endswith("/podinfo.json"):  # (its last request: it ends just after the deadline)
+                        time.sleep(max(0.0, frl.context().deadline - time.monotonic()) + 0.2)
+                        if failing:
+                            raise frl.IntegrityError("GCS's answer was not what it said")
+                    return same
+
+                def abandon(ctx):
+                    time.sleep(1)  # (then the run stops its workers)
+                    real_abandon(ctx)
+                with mock.patch.object(frl, "unchanged_in_gcs", unchanged), \
+                        mock.patch.object(frl.RunContext, "abandon", abandon):
+                    self.assertEqual(self.fetch("--run-timeout-minutes", "0.03"), int(failing))  # (1.8 s)  # fails: (ended) 1
+                run = self.runs()[-1]
+                self.assertEqual((run["outcomes"], run["gcs_compared"], [e["error"] for e in run["errors"]]),
+                                 ({}, False, ["comparing the archived copy with GCS failed: IntegrityError: GCS's answer was "
+                                              "not what it said"]) if failing else
+                                 ({"already-archived": [self.key]}, True, []))
+                # fails: not-checked, False (and no error)
 
     def test_the_same_one_under_a_new_generation_is_not_refreshed(self):
         self.pod()
