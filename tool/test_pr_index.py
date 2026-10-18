@@ -467,6 +467,26 @@ class PullRequestJob(r4.World):
         self.assertEqual(code, 1)
         self.assertIn(f"{self.key} build-log.txt: GCS changed since it was archived", out)
 
+    def test_one_whose_meta_json_cannot_be_given_its_folder_is_one_not_compared(self):
+        # (a full disk: not GCS's doing, so not one that makes the run stop comparing a build 14 days after it
+        # was archived; its copy and meta.json are kept)
+        self.archived_from_under_the_index()
+        folder = self.bdir()
+        frl.write_json(os.path.join(folder, "meta.json"), dict(self.meta(), archived_at=self.now - 15 * DAY))
+        self.entry(self.build)
+        real, failed = frl.temp_path, []
+
+        def full(path):  # (once: the disk has room again for what the run writes next)
+            if path == os.path.join(folder, "meta.json") and not failed:
+                failed.append(path)
+                raise OSError(28, "No space left on device")
+            return real(path)
+        with mock.patch.object(frl, "temp_path", full):
+            self.assertEqual(self.fetch(), 1)  # fails: 0, the build made final
+        run = self.runs()[-1]
+        self.assertIn("comparing the archived copy with GCS failed: LocalIOError", run["errors"][0]["error"])
+        self.assertEqual((run["gcs_compared"], self.meta()["final"], self.meta().get("gcs_path")), (False, False, None))
+
     def test_control_one_read_under_the_index_that_gcs_no_longer_has_is_compared_as_gone(self):
         # (as one of a periodic job's: GCS deletes old builds; the copy stays, and the run compares all
         # it was due to, every run after)
