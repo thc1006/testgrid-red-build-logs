@@ -1,15 +1,15 @@
 # Red TestGrid builds
 
-Updated 2026-10-18T04:31:37Z. The builds with a red cell on sig-release-master-blocking and sig-release-master-informing that the runs found: seen red on TestGrid, or taken from GCS by TestGrid's rule ([what that can miss or add](../README.md#limits)); times are UTC. Each run's downloads are in its own folder under [runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
+Updated 2026-10-18T05:35:46Z. The builds with a red cell on sig-release-master-blocking and sig-release-master-informing that the runs found: seen red on TestGrid, or taken from GCS by TestGrid's rule ([what that can miss or add](../README.md#limits)); times are UTC. Each run's downloads are in its own folder under [runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/trend-dark.svg">
-  <img alt="Red builds per day, data to Oct 18 04:31 UTC. Blocking: week-over-week change appears after 14 fully covered days; Informing: last 7 full days 61 · +13% vs previous 7 (54)" src="charts/trend-light.svg">
+  <img alt="Red builds per day, data to Oct 18 05:35 UTC. Blocking: week-over-week change appears after 14 fully covered days; Informing: last 7 full days 61 · +13% vs previous 7 (54)" src="charts/trend-light.svg">
 </picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/tabs-dark.svg">
-  <img alt="Red builds per tab, 14 days to Oct 18 04:31 UTC. Busiest over the last 7 of them: gce-ubuntu-master-containerd 18, integration-master 18, gce-cos-master-serial 15, integration-arm64-master 13, gce-cos-master-default 13." src="charts/tabs-light.svg">
+  <img alt="Red builds per tab, 14 days to Oct 18 05:35 UTC. Busiest over the last 7 of them: gce-ubuntu-master-containerd 18, integration-master 18, gce-cos-master-serial 15, integration-arm64-master 13, gce-cos-master-default 13." src="charts/tabs-light.svg">
 </picture>
 
 <details><summary>Red builds per tab (table)</summary>
@@ -27,8 +27,8 @@ Updated 2026-10-18T04:31:37Z. The builds with a red cell on sig-release-master-b
 | Blocking | ci-node-e2e | 4 | 14 |
 | Blocking | gce-master-scale-performance-100 | 4 | 4 |
 | Blocking | gce-cos-default-master | 3 | 9 |
+| Blocking | kind-ipv6-master | 3 | 7 |
 | Blocking | kind-master-beta-features | 2 | 7 |
-| Blocking | kind-ipv6-master | 2 | 6 |
 | Blocking | Conformance - GCE - master | 2 | 2 |
 | Blocking | cmd-master | 1 | 4 |
 | Blocking | conformance-ga-only | 1 | 1 |
@@ -57,7 +57,7 @@ Updated 2026-10-18T04:31:37Z. The builds with a red cell on sig-release-master-b
 
 | Day (UTC) | Blocking | Informing |
 |---|---:|---:|
-| 2026-10-18 | 0 (so far, to 04:31 UTC) | 0 (so far, to 04:31 UTC) |
+| 2026-10-18 | 1 (so far, to 05:35 UTC) | 0 (so far, to 05:35 UTC) |
 | 2026-10-17 | 16 (partial) | 5 (partial) |
 | 2026-10-16 | 13 | 10 |
 | 2026-10-15 | 20 | 12 |
@@ -98,6 +98,7 @@ Verification is the outcome that verification recorded in the run's verification
 
 | Run (UTC) | New builds | Updated | Collection result | Verification |
 |---|---:|---:|---|---|
+| [2026-10-18 05:35:36](runs/2026-10/2026-10-18T053536Z/) | 1 | 0 | ok | [ok](runs/2026-10/2026-10-18T053536Z/verification.json) |
 | [2026-10-18 04:31:27](runs/2026-10/2026-10-18T043127Z/) | 0 | 0 | ok | [ok](runs/2026-10/2026-10-18T043127Z/verification.json) |
 | [2026-10-17 23:30:55](runs/2026-10/2026-10-17T233055Z/) | 6 | 851 | ok | [ok](runs/2026-10/2026-10-17T233055Z/verification.json) |
 | [2026-10-17 15:34:20](runs/2026-10/2026-10-17T153420Z/) | 12 | 0 | ok | [ok](runs/2026-10/2026-10-17T153420Z/verification.json) |
@@ -126,7 +127,13 @@ Verification is the outcome that verification recorded in the run's verification
 
 ## Builds from the last 14 days
 
-325 archived builds that started since 2026-10-05 (UTC), newest first.
+326 archived builds that started since 2026-10-05 (UTC), newest first.
+
+### 2026-10-18
+
+| Time | Tab | Build | Red tests | Files |
+|---|---|---|---|---|
+| 04:17 | blocking#kind-ipv6-master | [ci-kubernetes-e2e-kind-ipv6 2111672847314194432](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2111672847314194432) | Kubernetes e2e suite.\[It\] \[sig-cli\] Kubectl client Simple pod should support inline execut (+1) | [build-log.txt.gz](runs/2026-10/2026-10-18T053536Z/ci-kubernetes-e2e-kind-ipv6/2111672847314194432/build-log.txt.gz) [podinfo.json.gz](runs/2026-10/2026-10-18T053536Z/ci-kubernetes-e2e-kind-ipv6/2111672847314194432/podinfo.json.gz) (provisional) |
 
 ### 2026-10-17
 
@@ -522,12 +529,12 @@ Verification is the outcome that verification recorded in the run's verification
 
 | | Builds |
 |---|---:|
-| Archived builds | 863 |
-| … with a log | 858 |
+| Archived builds | 864 |
+| … with a log | 859 |
 | … with only podinfo.json (the pod never ran) | 5 |
 | … without a file (GCS had none) | 0 |
 | … with a file stored in parts (too large for one file in git) | 0 |
-| … provisional (taken before Prow finished uploading) | 0 |
+| … provisional (taken before Prow finished uploading) | 1 |
 | … still compared with GCS on every run | 47 |
 | … taken from GCS, judged by TestGrid's rule (not seen red on TestGrid) | 0 |
 | Red builds waiting to be archived | 0 |
@@ -537,7 +544,7 @@ Verification is the outcome that verification recorded in the run's verification
 
 ## Every week
 
-- [2026-W42](weeks/2026-W42.md): Oct 12 – Oct 18, 162 builds
+- [2026-W42](weeks/2026-W42.md): Oct 12 – Oct 18, 163 builds
 - [2026-W41](weeks/2026-W41.md): Oct 5 – Oct 11, 163 builds
 - [2026-W40](weeks/2026-W40.md): Sep 28 – Oct 4, 331 builds
 - [2026-W39](weeks/2026-W39.md): Sep 21 – Sep 27, 201 builds

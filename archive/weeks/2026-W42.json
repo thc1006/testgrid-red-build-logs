@@ -1,5 +1,34 @@
 [
   {
+    "time": 1792297043,
+    "job": "ci-kubernetes-e2e-kind-ipv6",
+    "build": "2111672847314194432",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-ipv6-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should support inline execution and attach",
+      "ci-kubernetes-e2e-kind-ipv6.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-18T053536Z/ci-kubernetes-e2e-kind-ipv6/2111672847314194432",
+    "run": "2026-10-18T053536Z",
+    "files": [
+      "runs/2026-10/2026-10-18T053536Z/ci-kubernetes-e2e-kind-ipv6/2111672847314194432/build-log.txt.gz",
+      "runs/2026-10/2026-10-18T053536Z/ci-kubernetes-e2e-kind-ipv6/2111672847314194432/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 214889,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2111672847314194432"
+  },
+  {
     "time": 1792270386,
     "job": "ci-kubernetes-e2e-kind",
     "build": "2111560607110008832",
@@ -1222,7 +1251,7 @@
     "remote": [],
     "bytes": 302420,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

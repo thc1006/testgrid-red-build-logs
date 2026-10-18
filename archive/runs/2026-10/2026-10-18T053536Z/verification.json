@@ -1,0 +1,46 @@
+{
+  "run": "2026-10-18T053536Z",
+  "outcome": "ok",
+  "started": 1792301746.7522998,
+  "finished": 1792301759.6231508,
+  "tool": {
+    "commit": "b61cbaa9ac783091d9f3d85666ee712854e8237a",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "39101063827",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1792128936.7699473,
+      "to": 1792301736.7699473
+    },
+    "tabs": 46,
+    "builds": 864,
+    "compared_with_gcs": 165,
+    "sevenths": [
+      3
+    ],
+    "differ": 0,
+    "not_settled": 1,
+    "red_on_testgrid": 41,
+    "red_not_settled": 0,
+    "gcs_builds": 1924,
+    "judged_by_rule": 23
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 8,
+  "notes": [
+    "ci-kubernetes-build-fast/2111057252625420288: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2111119412328140800: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2111421153292587008: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-enabled/2111421406909566976: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-enabled-conformance/2111057755249840128: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2111106327362146304: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2111546513573285888: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-master/2110982508232314880: ERROR, not listed on TestGrid (not archived)"
+  ]
+}
