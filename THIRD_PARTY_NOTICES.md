@@ -59,7 +59,8 @@ in [`third_party/unicode/LICENSE`](third_party/unicode/LICENSE).
 github.com/GoogleCloudPlatform/testgrid at `f15bfa4808a4`, under the Apache
 License 2.0, the license of this repository ([`LICENSE`](LICENSE)). Each file
 below carries "Copyright <year> The TestGrid Authors" (TG) or "Copyright <year>
-The Kubernetes Authors" (K8s), with the year shown.
+The Kubernetes Authors" (K8s), with the year shown, but
+`pb/test_status/test_status.proto`, which carries none.
 
 - `tool/testgrid_rule.py`: parts of `pkg/updater/read.go` (TG 2020),
   `pkg/updater/gcs.go` (TG 2020), `pkg/updater/eval.go` (TG 2022),

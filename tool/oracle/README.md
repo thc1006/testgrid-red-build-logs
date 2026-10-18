@@ -20,12 +20,14 @@ check the port against, and the fetch's reading of Prow's index links
 - `go/cmd/tgoracle`: judges builds held in memory, one JSON object per line.
 - `go/cmd/schemadump`: the Go types podinfo.json, started.json and finished.json
   decode into. `gotypes.py` turns its output into `../testgrid_types.json`.
+- `go/cmd/unidump`: Go's unicode tables, which `../goregexp.py` matches by.
+  `gounicode.py` checks `../go_unicode.json.gz` against its output, or writes it.
 - `go/cmd/gocheck`: what Go's strconv, time.Parse, resource.ParseQuantity and
   fmt.Sprintf make of strings, the rows `filterGrid` keeps, and the builds
   `util/gcs`'s `ListBuilds` takes from an entry of Prow's index of a pull request
   job.
 - `fuzz/`:
-  - `edge.py`: about 250 cases, one Go behaviour each.
+  - `edge.py`: about 290 cases, one Go behaviour each.
   - `gen.py` and `run.py`: random builds.
   - `realdiff.py`: real builds of the archive's jobs, read from GCS independently and
     by the fetch's own `gcs_column` (its listing, pages, sizes and encodings), judged
@@ -49,7 +51,8 @@ The workflow `.github/workflows/oracle.yml` runs daily, and on a change to the
 port. It does all of this:
 
 - builds TestGrid's code;
-- checks that the types match `testgrid_types.json`;
+- checks that the types match `testgrid_types.json`, and that Go's unicode tables
+  match `go_unicode.json.gz`;
 - runs the edge cases, 5000 random builds (a seed per run; the cases that differ are
   attached to a failed run) and 2 real builds of each job;
 - runs the filter's edge cases and 20,000 random ones;
@@ -64,7 +67,8 @@ port. It does all of this:
   they deploy, runs every check above against it, and lists what changed between the
   two commits in the code the port follows (`relevant_diff.py`). When nothing did
   and every check passes, it moves `pinned.json` (and regenerates
-  `testgrid_types.json`) on the branch `follow-testgrid-<commit>` and proposes it
+  `testgrid_types.json` and `go_unicode.json.gz`) on the branch
+  `follow-testgrid-<commit>` and proposes it
   as a pull request; GitHub Actions may not open pull requests in this repository
   (Settings, Actions, General), so the run then links to open one from the branch.
   Otherwise it fails with what changed, for a person to compare.
@@ -82,6 +86,7 @@ uv run --locked --no-dev python -I oracle/fuzz/linkdiff.py 1 20000   # it import
 python3 -I oracle/fuzz/run.py 1 5000     # seed, cases; mismatches go to bad-<seed>.jsonl
 uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 3   # the fetch's code and environment
 /tmp/oracle/schemadump | python3 -I oracle/gotypes.py | cmp - testgrid_types.json
+/tmp/oracle/unidump | python3 -I oracle/gounicode.py check go_unicode.json.gz   # write instead of check, after a Go change
 python3 -I oracle/fuzz/golden.py testdata/testgrid_rule_golden.jsonl.gz   # only when the rule changed
 ```
 
@@ -98,9 +103,12 @@ port follows changed. When something did:
    the Go version decides encoding/json, encoding/xml, net/url, fmt and regexp).
    A TestGroup field the updater newly reads belongs in `testgrid_config.py`'s
    `GROUP_FIELDS`, and `cell_options` or `group_problems`.
-2. Port any change into `testgrid_rule.py`.
+2. Port any change into the file that follows that code (`THIRD_PARTY_NOTICES.md`
+   names which): `testgrid_rule.py`, `testgrid_config.py`, `gofmt.py`,
+   `goregexp.py` or `fetch_red_logs.py`.
 3. Update `pinned.json`.
-4. Rebuild, regenerate `testgrid_types.json`, and run the checks above.
+4. Rebuild, regenerate `testgrid_types.json` and `go_unicode.json.gz`, and run
+   the checks above.
 5. Regenerate the golden vectors, and make sure no other test changed.
 6. Update `THIRD_PARTY_NOTICES.md` at the root, and the headers of the ported
    files, to the new versions and files.
