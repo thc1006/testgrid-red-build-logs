@@ -1,7 +1,9 @@
-"""The archive workflow's due job (.github/workflows/red-build-logs.yml): whether a run archives.
-Its script runs as GitHub runs it (bash -eo pipefail), with gh and the clock stood in."""
+"""The archive workflow (.github/workflows/red-build-logs.yml): whether a run archives (its due job,
+whose script runs as GitHub runs it, bash -eo pipefail, with gh and the clock stood in), and which of
+the archive job's steps fail the run when they fail."""
 import datetime as dt
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -71,6 +73,41 @@ class Due(unittest.TestCase):
                              {"age": "1740", "due": "true"}, kw)
         for last, kw in (("", {}), ("2026-10-12T12:01:00Z", {"gh_fails": True}), ("not a date", {})):
             self.assertEqual(self.due(last, "2026-10-12T12:30:00Z", **kw), {"age": "0", "due": "true"}, (last, kw))
+
+
+
+class FailedSteps(unittest.TestCase):
+    """GitHub takes a step with continue-on-error that fails for one that succeeded (its conclusion), though
+    its outcome is failure: such a step fails the run only if the last step checks its outcome. The steps
+    after a failed one that keep what the run took run unless the run is cancelled."""
+
+    def setUp(self):
+        with open(WORKFLOW) as f:
+            self.steps = yaml.safe_load(f)["jobs"]["archive"]["steps"]
+
+    def step(self, name):
+        return next(s for s in self.steps if s.get("name") == name)
+
+    def test_those_that_fail_without_failing_the_run(self):
+        # (each says why: one that warns, a config earlier runs read, a cleanup the commit does again)
+        checked = set(re.findall(r"steps\.([\w-]+)\.outcome == 'failure'", self.steps[-1]["if"]))
+        self.assertEqual(checked, {"fetch", "verify"})
+        quiet = [s["name"] for s in self.steps if s.get("continue-on-error") and s.get("id") not in checked]
+        self.assertEqual(quiet, ["TestGrid's production manifests still deploy the commit the port follows",
+                                 "Read TestGrid's config from its upload job's runs",
+                                 "Remove what a cut-off fetch left"])  # fails: and Show the verification in INDEX.md
+
+    def test_one_that_shows_the_verification_fails_the_run_after_the_commit(self):
+        # (INDEX.md then still says the verification is pending: the run was successful all the same)
+        show = self.step("Show the verification in INDEX.md")
+        self.assertIn("--show-verifications", show["run"])
+        self.assertNotIn("continue-on-error", show)  # fails: true
+        names = [s.get("name") for s in self.steps]
+        after = self.steps[names.index("Show the verification in INDEX.md") + 1:]
+        self.assertEqual([s["name"] for s in after],
+                         ["Commit the archive", "Keep the unpushed commit", "Fail the run if fetching or verifying failed"])
+        self.assertEqual(after[0]["if"], "${{ !cancelled() }}")
+        self.assertTrue(after[1]["if"].startswith("${{ failure() && "))
 
 
 if __name__ == "__main__":

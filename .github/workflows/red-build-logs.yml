@@ -163,10 +163,11 @@ jobs:
         run: exec tool/.venv/bin/python tool/cross_check.py --archive archive --hours 48 --record
 
       # The fetch wrote INDEX.md before the run was verified: put the verification's
-      # outcome (verification.json) in its table of runs, so the commit shows it.
+      # outcome (verification.json) in its table of runs, so the commit shows it. If
+      # this fails, INDEX.md still says the verification is pending, and the run
+      # fails, after the commit.
       - name: Show the verification in INDEX.md
         if: ${{ !cancelled() }}
-        continue-on-error: true
         timeout-minutes: 2
         run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --show-verifications
 
