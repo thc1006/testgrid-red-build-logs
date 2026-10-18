@@ -1006,11 +1006,46 @@ class SelfReviewFixesTest(ArchiveWorld):
         self.assertEqual(held, ["build-log.txt", "meta.json", "podinfo.json"])
         self.srv.route(self.base + "/podinfo.json", self.head_only(b'{"pod": {}}', 403))
         self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0, its podinfo.json then removed
-        self.assertIn("build-log.txt", os.listdir(folder))
+        self.assertEqual(sorted(os.listdir(folder)), held)  # fails: build-log.txt.gz beside them
         frl.write_json(os.path.join(folder, "meta.json"), self.saved)  # (as from git)
         self.gone("build-log.txt", "podinfo.json", "finished.json")
         self.assertEqual(self.fetch("--gzip"), 0)
         self.assertEqual((self.read("build-log.txt"), self.read("podinfo.json")), (b"log\n", b'{"pod": {}}'))
+
+    def test_nor_one_taken_again_in_parts_otherwise_or_anew_before_that(self):
+        # (nor whole where it was in parts, nor in the same form: nothing it takes goes in place before all of
+        # it is taken, so a copy held stays as it was)
+        pod, big, limit = b'{"pod": {}}', b"log, longer than a part\n" * 4, ("--max-file-mb", "0.00005")  # (52-byte parts)
+        for name, first, log, then, now in (("whole, then in parts", (), b"log\n", limit, big),
+                                            ("in parts, then whole", limit, big, (), big),
+                                            ("whole, then anew", (), b"log\n", (), b"log, uploaded again\n")):
+            with self.subTest(name):
+                shutil.rmtree(os.path.join(self.root, "runs"), ignore_errors=True)
+                folder, held = self.unreadable_meta(*first, log=log, podinfo=pod)
+                kept = {n: self.read(n) for n in held}
+                self.srv.route(self.base + "/build-log.txt", obj(now, "2"))
+                self.srv.route(self.base + "/podinfo.json", self.head_only(pod, 403))
+                self.assertEqual(self.fetch(*then), 1)
+                self.assert_left_as_it_is(folder, held, "GCS cannot serve (HTTPError: HTTP Error 403")
+                # fails: (in parts, or whole) the copy taken in place, and the copy held gone
+                self.assertEqual({n: self.read(n) for n in held}, kept)  # fails: (anew) the copy held replaced
+
+    def test_nor_one_whose_new_meta_json_cannot_be_written(self):
+        # (a full disk: the copies it took do not go in place without it)
+        folder, held = self.unreadable_meta(podinfo=b'{"pod": {}}')
+        kept = {n: self.read(n) for n in held}
+        self.srv.route(self.base + "/build-log.txt", obj(b"log, uploaded again\n", "2"))
+        real = frl.temp_path
+
+        def full(path):
+            if path == os.path.join(folder, "meta.json"):
+                raise OSError(28, "No space left on device")
+            return real(path)
+        with mock.patch.object(frl, "temp_path", full):
+            self.assertEqual(self.fetch(), 1)
+        self.assertIn("No space left on device", self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual(sorted(os.listdir(folder)), held)
+        self.assertEqual({n: self.read(n) for n in held}, kept)  # fails: its log replaced
 
     def test_control_a_head_gcs_answers_with_an_error_is_no_answer(self):
         # (not taken for one GCS no longer has: an error of the build all the same, and the folder kept)
