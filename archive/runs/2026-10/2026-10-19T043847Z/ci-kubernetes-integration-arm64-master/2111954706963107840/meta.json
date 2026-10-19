@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2111954706963107840",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1792364249,
+  "created": 1792364215,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration.garbagecollector",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCascadingDeleteOnCRDConversionFailure\n    testser... webhook\n--- FAIL: TestCascadingDeleteOnCRDConversionFailure (11.28s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792366507,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2111954706963107840",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2111954706963107840/build-log.txt",
+  "log": {
+    "bytes": 235792,
+    "md5": "4da6e4a138fb1fd0adaaa09d8f8dc1c8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22238,
+    "gcs": {
+      "generation": "1792366511277132",
+      "md5": "4da6e4a138fb1fd0adaaa09d8f8dc1c8",
+      "crc32c": "3b606fb1",
+      "bytes": 235792,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94219,
+    "md5": "e703804450464936145af55f212a4fcc",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12322,
+    "gcs": {
+      "generation": "1792366513499124",
+      "md5": "e703804450464936145af55f212a4fcc",
+      "crc32c": "4d256d38",
+      "bytes": 94219,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-19T043847Z",
+  "archived_at": 1792384727.0,
+  "settled": true,
+  "final": false
+}

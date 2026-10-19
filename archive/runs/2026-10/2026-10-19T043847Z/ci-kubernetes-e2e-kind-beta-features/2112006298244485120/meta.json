@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2112006298244485120",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1792376692,
+  "created": 1792376515,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.000s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 10/19/26 02:36:25.482\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792378211,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2112006298244485120",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2112006298244485120/build-log.txt",
+  "log": {
+    "bytes": 134036,
+    "md5": "118db40e9f62fdb107a457ee69ce762d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21872,
+    "gcs": {
+      "generation": "1792378227201660",
+      "md5": "118db40e9f62fdb107a457ee69ce762d",
+      "crc32c": "24237f94",
+      "bytes": 134036,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 142495,
+    "md5": "d89a296ea13b1710893bdc4168c0a7e4",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 15467,
+    "gcs": {
+      "generation": "1792378229893815",
+      "md5": "d89a296ea13b1710893bdc4168c0a7e4",
+      "crc32c": "97e16195",
+      "bytes": 142495,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-19T043847Z",
+  "archived_at": 1792384727.0,
+  "settled": false,
+  "final": false
+}

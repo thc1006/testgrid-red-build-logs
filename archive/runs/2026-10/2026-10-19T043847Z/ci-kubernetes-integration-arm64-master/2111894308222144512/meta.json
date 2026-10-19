@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2111894308222144512",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1792349851,
+  "created": 1792349814,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.openapi",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestOpenAPIV2LazyBuild/gate_enabled\n    testserver.go...RUN   TestOpenAPIV2LazyBuild\n--- FAIL: TestOpenAPIV2LazyBuild (3.69s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792352145,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2111894308222144512",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2111894308222144512/build-log.txt",
+  "log": {
+    "bytes": 203027,
+    "md5": "42f90332682b12eb4b84a32397d4cc5e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19748,
+    "gcs": {
+      "generation": "1792352149389021",
+      "md5": "42f90332682b12eb4b84a32397d4cc5e",
+      "crc32c": "930a7ee3",
+      "bytes": 203027,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 104587,
+    "md5": "81233ac015cf71254eb0e98a2e10b293",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12942,
+    "gcs": {
+      "generation": "1792352152017080",
+      "md5": "81233ac015cf71254eb0e98a2e10b293",
+      "crc32c": "ebabbf0d",
+      "bytes": 104587,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-19T043847Z",
+  "archived_at": 1792384727.0,
+  "settled": true,
+  "final": false
+}

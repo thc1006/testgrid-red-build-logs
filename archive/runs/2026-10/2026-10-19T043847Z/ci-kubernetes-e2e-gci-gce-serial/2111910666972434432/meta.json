@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2111910666972434432",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1792353715,
+  "created": 1792353715,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (default fs)] volume-stress multiple pods should access different volumes repeatedly [Serial] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] while cleaning up resource: persistent Volume pvc-6f993758-b5...t/e2e/storage/testsuites/volume_stress.go:185 @ 10/18/26 22:06:24.882\n"
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792370254,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2111910666972434432",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2111910666972434432/build-log.txt",
+  "log": {
+    "bytes": 406590,
+    "md5": "2bb2048a2790d091691df7add6285f0a",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 44068,
+    "gcs": {
+      "generation": "1792370281378289",
+      "md5": "2bb2048a2790d091691df7add6285f0a",
+      "crc32c": "7e57928f",
+      "bytes": 406590,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 65645,
+    "md5": "81ff00abdf71fe861ebd2bbbbfeef3af",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10276,
+    "gcs": {
+      "generation": "1792370283499342",
+      "md5": "81ff00abdf71fe861ebd2bbbbfeef3af",
+      "crc32c": "e2e15729",
+      "bytes": 65645,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-19T043847Z",
+  "archived_at": 1792384727.0,
+  "settled": true,
+  "final": false
+}

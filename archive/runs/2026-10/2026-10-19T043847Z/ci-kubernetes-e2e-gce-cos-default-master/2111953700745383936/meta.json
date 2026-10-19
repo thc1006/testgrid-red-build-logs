@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2111953700745383936",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1792364003,
+  "created": 1792363975,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should implement NodePort and HealthCheckNodePort correctly when ExternalTrafficPolicy changes",
+          "status": "FAIL",
+          "message": "[FAILED] updating ExternalTrafficPolicy and HealthCheckNodePort: faile...o/kubernetes/test/e2e/network/service.go:4036 @ 10/18/26 23:00:51.617\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792366563,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2111953700745383936",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2111953700745383936/build-log.txt",
+  "log": {
+    "bytes": 136801,
+    "md5": "38f3b93714fe052375139e0f6cea7bcd",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22563,
+    "gcs": {
+      "generation": "1792366577631614",
+      "md5": "38f3b93714fe052375139e0f6cea7bcd",
+      "crc32c": "3f27a33b",
+      "bytes": 136801,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96292,
+    "md5": "caa8d50f623e55c2179d5e41fcc990a0",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12438,
+    "gcs": {
+      "generation": "1792366579422211",
+      "md5": "caa8d50f623e55c2179d5e41fcc990a0",
+      "crc32c": "80b62b93",
+      "bytes": 96292,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-19T043847Z",
+  "archived_at": 1792384727.0,
+  "settled": true,
+  "final": false
+}

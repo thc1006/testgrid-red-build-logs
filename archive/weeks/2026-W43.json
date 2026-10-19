@@ -1,0 +1,120 @@
+[
+  {
+    "time": 1792376692,
+    "job": "ci-kubernetes-e2e-kind-beta-features",
+    "build": "2112006298244485120",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should store data",
+      "ci-kubernetes-e2e-kind-beta-features.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-e2e-kind-beta-features/2112006298244485120",
+    "run": "2026-10-19T043847Z",
+    "files": [
+      "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-e2e-kind-beta-features/2112006298244485120/build-log.txt.gz",
+      "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-e2e-kind-beta-features/2112006298244485120/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 276531,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2112006298244485120"
+  },
+  {
+    "time": 1792375643,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+    "build": "2112002522620104704",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-enabled"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Pre-provisioned PV (default fs)] volumes should store data",
+      "Kubernetes e2e suite.[It] [sig-storage] Volume metrics PVC should create prometheus metrics for volume provisioning and attach/detach",
+      "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2112002522620104704",
+    "run": "2026-10-19T043847Z",
+    "files": [
+      "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2112002522620104704/build-log.txt.gz",
+      "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2112002522620104704/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 330367,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2112002522620104704"
+  },
+  {
+    "time": 1792374985,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2111999754190721024",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler/preemption.podgroup",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-integration-master/2111999754190721024",
+    "run": "2026-10-19T043847Z",
+    "files": [
+      "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-integration-master/2111999754190721024/build-log.txt.gz",
+      "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-integration-master/2111999754190721024/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 314919,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2111999754190721024"
+  },
+  {
+    "time": 1792368295,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2111971819907977216",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota [FeatureGate:VolumeAttributesClass] should verify ResourceQuota's volume attributes class scope (quota set to pvc count: 1) against a pvc with different volume attributes class.",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-e2e-gci-gce/2111971819907977216",
+    "run": "2026-10-19T043847Z",
+    "files": [
+      "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-e2e-gci-gce/2111971819907977216/build-log.txt.gz",
+      "runs/2026-10/2026-10-19T043847Z/ci-kubernetes-e2e-gci-gce/2111971819907977216/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 226675,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2111971819907977216"
+  }
+]
