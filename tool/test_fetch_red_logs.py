@@ -1191,6 +1191,16 @@ class ReportTest(unittest.TestCase):
             shutil.rmtree(root)
 
 
+class HoldingsTest(unittest.TestCase):
+    def test_the_row_of_builds_taken_from_gcs_says_only_how_they_were_taken(self):
+        # (it counts every backfilled build, also one TestGrid later showed with a red cell listed: its row no longer marks it)
+        e = {"has_log": True, "files": ["l"], "remote": [], "in_parts": False, "settled": True, "final": True,
+             "backfilled": True, "from_gcs": False}
+        rows = [r for r in frl.holdings([e, dict(e, backfilled=False)], [], None) if "from GCS" in r]
+        want = "| … taken from GCS, judged by TestGrid's rule | 1 |"
+        self.assertEqual(rows, [want])  # fails: its label ends in (not seen red on TestGrid)
+
+
 class CrossCheckTest(unittest.TestCase):
     def setUp(self):
         import cross_check
