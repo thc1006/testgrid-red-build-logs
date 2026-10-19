@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2112124829585903616",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1792404776,
+  "created": 1792404775,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Deployment should not disrupt a cloud load-balancer's connectivity during rollout [Provider:aws,azure,gce]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 136.114.26.183:80 after ...ernetes/test/e2e/framework/service/util.go:49 @ 10/19/26 10:29:03.258\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792406938,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2112124829585903616",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2112124829585903616/build-log.txt",
+  "log": {
+    "bytes": 278130,
+    "md5": "0591d27a7b7df00d22882e5df6ddac3b",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 36783,
+    "gcs": {
+      "generation": "1792406953690452",
+      "md5": "0591d27a7b7df00d22882e5df6ddac3b",
+      "crc32c": "c150e1c4",
+      "bytes": 278130,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86191,
+    "md5": "97da49aa331a924e518d7d0cdd3bdd90",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12037,
+    "gcs": {
+      "generation": "1792406957286963",
+      "md5": "97da49aa331a924e518d7d0cdd3bdd90",
+      "crc32c": "d3c0bce0",
+      "bytes": 86191,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-19T131247Z",
+  "archived_at": 1792415567.0,
+  "settled": true,
+  "final": false
+}

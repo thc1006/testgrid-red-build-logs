@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2112064179262197760",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1792390315,
+  "created": 1792390315,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Deployment should not disrupt a cloud load-balancer's connectivity during rollout [Provider:aws,azure,gce]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 34.122.21.144:80 after 2...ernetes/test/e2e/framework/service/util.go:49 @ 10/19/26 06:39:09.723\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792392846,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2112064179262197760",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2112064179262197760/build-log.txt",
+  "log": {
+    "bytes": 279370,
+    "md5": "3e7adbcea10b41dc96a1efab61db807e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 37444,
+    "gcs": {
+      "generation": "1792392864963245",
+      "md5": "3e7adbcea10b41dc96a1efab61db807e",
+      "crc32c": "d65fe54b",
+      "bytes": 279370,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85314,
+    "md5": "e653dabce5a6937340943df9e59ba88a",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11786,
+    "gcs": {
+      "generation": "1792392868005228",
+      "md5": "e653dabce5a6937340943df9e59ba88a",
+      "crc32c": "d3f715e6",
+      "bytes": 85314,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-19T131247Z",
+  "archived_at": 1792415567.0,
+  "settled": true,
+  "final": false
+}

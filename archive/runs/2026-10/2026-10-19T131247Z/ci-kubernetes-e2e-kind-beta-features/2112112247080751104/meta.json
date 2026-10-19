@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2112112247080751104",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1792401805,
+  "created": 1792401775,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota [FeatureGate:VolumeAttributesClass] should verify ResourceQuota's volume attributes class scope (quota set to pvc count: 1) against a pvc with different volume attributes class.",
+          "status": "FAIL",
+          "message": "[FAILED] persistentvolumeclaims \"test-claim\" is forbidden: exceeded qu.../test/e2e/apimachinery/resource_quota.go:1387 @ 10/19/26 09:38:19.358\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792403359,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2112112247080751104",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2112112247080751104/build-log.txt",
+  "log": {
+    "bytes": 130319,
+    "md5": "4d7a877c75577988a30b0ab8bf4a1368",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20413,
+    "gcs": {
+      "generation": "1792403375801824",
+      "md5": "4d7a877c75577988a30b0ab8bf4a1368",
+      "crc32c": "e308de21",
+      "bytes": 130319,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94150,
+    "md5": "8c8f741ed3015df988305cc4a0fcc0e8",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12585,
+    "gcs": {
+      "generation": "1792403378479718",
+      "md5": "8c8f741ed3015df988305cc4a0fcc0e8",
+      "crc32c": "441b5304",
+      "bytes": 94150,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-19T131247Z",
+  "archived_at": 1792415567.0,
+  "settled": true,
+  "final": false
+}
