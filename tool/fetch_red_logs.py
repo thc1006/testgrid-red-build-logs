@@ -4325,7 +4325,7 @@ def holdings(entries, waiting, current_run):
             ("… provisional (taken before Prow finished uploading)",
              count(lambda e: e["settled"] is False and e["final"] is not True)),
             ("… still compared with GCS on every run", count(lambda e: e["final"] is not True)),
-            ("… taken from GCS, judged by TestGrid's rule (not seen red on TestGrid)", count(lambda e: e["backfilled"])),
+            ("… taken from GCS, judged by TestGrid's rule", count(lambda e: e["backfilled"])),
             ("Red builds waiting to be archived", sum(1 for e in waiting if not e["status"].startswith("given up"))),
             ("… of them with a damaged copy here, to be fetched again",
              sum(1 for e in waiting if e["on_disk"] and not e["status"].startswith("given up"))),
