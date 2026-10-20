@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 import report  # noqa: E402
-from test_fetch_red_logs import DAY, FakeServer, md5_b64, run_record, send, table  # noqa: E402
+from test_fetch_red_logs import DAY, FakeServer, gzip_stored, md5_b64, run_record, send, table  # noqa: E402
 
 HOUR = 3600
 
@@ -625,7 +625,6 @@ class ContentOverTimeTest(ArchiveWorld):
         self.assertIn("podinfo.json: GCS changed since it was archived", out)
 
     def test_cross_check_compares_an_old_gzip_record_by_content(self):
-        from test_fetch_red_logs import gzip_stored
         self.finished(ago=3 * HOUR)
         self.srv.route(self.base + "/build-log.txt", gzip_stored(b"evidence\n"))
         self.fetch()
@@ -800,6 +799,76 @@ class LayoutTest(ArchiveWorld):
         with mock.patch.object(frl, "MAX_DOWNLOAD_BYTES", 50):
             self.assertEqual(self.fetch(), 1)
         self.assertIn("byte limit", self.runs()[-1]["errors"][0]["error"])
+
+    def assert_refused_once_gunzipped(self, *args, route=None):
+        # (by default stored in 24 bytes, under the limit, and one byte past it gunzipped)
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", route or gzip_stored(b"x" * 51))
+        with mock.patch.object(frl, "MAX_DOWNLOAD_BYTES", 50):
+            self.assertEqual(self.fetch(*args), 1)
+        errors = [e.get("error") or "" for e in self.runs()[-1]["errors"]]
+        self.assertTrue(any(e.startswith("IntegrityError: ") and e.endswith("byte limit once gunzipped") for e in errors),
+                        errors)
+        self.assertEqual(self.srv.hits(self.base + "/build-log.txt"), frl.RETRIES)  # (tried again, as a refusal is)
+        self.assertIsNone(self.bdir())
+
+    def test_a_download_too_large_once_gunzipped_is_refused(self):
+        self.assert_refused_once_gunzipped("--gzip")  # fails: archived (exit 0, no error, 1 request)
+
+    def test_so_is_one_kept_as_it_came(self):
+        self.assert_refused_once_gunzipped()  # fails: archived gunzipped (exit 0, no error, 1 request)
+
+    def test_so_is_one_stored_without_encoding_but_sent_gzipped(self):
+        # (as a proxy that compresses sends it: GCS's length and md5 are those of the gunzipped bytes)
+        content = b"x" * 51
+        headers = {"x-goog-stored-content-encoding": "identity", "x-goog-stored-content-length": str(len(content)),
+                   "x-goog-hash": f"md5={md5_b64(content)}", "Content-Encoding": "gzip"}
+
+        def proxied(h):
+            send(h, 200, headers, gzip.compress(content))
+        self.assert_refused_once_gunzipped("--gzip", route=proxied)  # fails: archived (exit 0, no error, 1 request)
+
+    def test_one_gunzipped_to_exactly_the_limit_is_archived(self):
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", gzip_stored(b"x" * 50))
+        with mock.patch.object(frl, "MAX_DOWNLOAD_BYTES", 50):
+            self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(gzip.decompress(self.read("build-log.txt.gz")), b"x" * 50)
+
+    def test_no_byte_past_the_limit_is_written(self):
+        # (kept as it came, so the temp file the refusal removes holds what was written; gunzipped 10 bytes a step)
+        self.finished(ago=3 * DAY)
+        self.srv.route(self.base + "/build-log.txt", gzip_stored(b"x" * 51))
+        sizes, remove = [], os.remove
+
+        def removed(path, *args, **kwargs):
+            if os.path.basename(path).startswith(".build-log.txt.") and os.path.isfile(path):
+                sizes.append(os.path.getsize(path))
+            return remove(path, *args, **kwargs)
+        with mock.patch.object(frl, "MAX_DOWNLOAD_BYTES", 50), mock.patch.object(frl, "GUNZIP_STEP", 10), \
+                mock.patch.object(frl.os, "remove", removed):
+            self.assertEqual(self.fetch(), 1)  # fails: 0 (archived)
+        self.assertEqual(set(sizes), {50})  # fails: set() (put in place, no temp file removed)
+
+    def test_the_count_runs_on_from_one_read_to_the_next(self):
+        # (the log read a byte at a time: it gunzips to 1, 1 and 49 bytes, each from a read of its own)
+        real, split = frl.chunks, []
+
+        def bytewise(r, url):
+            for chunk in real(r, url):
+                if url.endswith("/build-log.txt"):
+                    split.append(url)
+                    yield from (chunk[i:i + 1] for i in range(len(chunk)))
+                else:
+                    yield chunk
+        with mock.patch.object(frl, "chunks", bytewise):
+            self.assert_refused_once_gunzipped("--gzip")  # fails: archived (exit 0, no error, 1 request)
+        self.assertTrue(split)  # (download() read the log through frl.chunks)
+
+    def test_and_from_one_gzip_member_to_the_next(self):
+        # (two members, of 26 and 25 bytes gunzipped: one stream, as gzip(1) reads it)
+        two = gzip_stored(b"x" * 51, gzip.compress(b"x" * 26) + gzip.compress(b"x" * 25))
+        self.assert_refused_once_gunzipped("--gzip", route=two)  # fails: archived (exit 0, no error, 1 request)
 
     def test_unusable_tab_names_fail_only_their_entry(self):
         self.srv.summary("dash", {"t": "FAILING", "bad\ud800": "FAILING", "": "FAILING", "two\nlines": "FAILING",
