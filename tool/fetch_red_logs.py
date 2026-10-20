@@ -1688,10 +1688,21 @@ def valid_meta(meta):
             and all(isinstance(t, dict) and "dashboard" in t and "tab" in t for t in meta["tabs"]))
 
 
+def cells_left_out(tab):
+    """How many red cells of the build a tab TestGrid showed counts but does not list (a mass failure's, see
+    red_columns), else 0. Only an int above 0 is a count, and none above MAX_JSON_BYTES: no table could hold
+    that many rows, and a build has one cell a row. A tab judged from GCS counts no cell it does not list."""
+    n = tab.get("red_cells_omitted")
+    return n if is_int(n) and 0 < n <= MAX_JSON_BYTES and not tab.get("judged_from_gcs") else 0
+
+
 def merge_tabs(old, new):
     """Old tab sightings plus any tab this build is newly red on. The first sighting
     wins, except that one taken from GCS in a history gap (judged by TestGrid's
-    rule, or from before that, without red cells) takes the cells TestGrid shows later."""
+    rule, or from before that, without red cells), or one TestGrid showed with every
+    red cell left out (see cells_left_out), takes the cells TestGrid shows later. One
+    with every cell left out lists none to take, so it takes the place of none: the
+    cells judged from GCS stay, and the index cannot tell TestGrid showed the build there."""
     def from_gcs(t):
         return t.get("judged_from_gcs") or not t.get("red_cells")
     cells = {(t["dashboard"], t["tab"]): t for t in new if not from_gcs(t)}
@@ -4058,9 +4069,9 @@ def index_entry(job, build, meta, now, rel=None):
         "backfilled": bool(meta.get("backfilled")),
         "has_log": bool(meta.get("log")),
         "in_parts": any((meta.get(key) or {}).get("parts") for key in ("log", "podinfo")),
-        # red only by TestGrid's rule applied to GCS: TestGrid never showed it red to the archive
-        "from_gcs": bool(meta.get("backfilled")) and all(t.get("judged_from_gcs") or not t.get("red_cells")
-                                                         for t in meta["tabs"]),
+        # red only by TestGrid's rule applied to GCS: meta.json keeps no sighting of it on TestGrid (see merge_tabs)
+        "from_gcs": bool(meta.get("backfilled")) and all(
+            t.get("judged_from_gcs") or not (t.get("red_cells") or cells_left_out(t)) for t in meta["tabs"]),
         "prow_url": meta.get("prow_url") or f"https://prow.k8s.io/view/gs/{meta['query']}/{build}",
     }
 
@@ -4733,7 +4744,7 @@ def add_sightings(target, rec, run_id):
     run did to it, as its meta.json records."""
     try:
         meta = read_json(os.path.join(target, "meta.json"))
-        tabs, changed = merge_tabs(meta["tabs"], [t for t in rec["tabs"] if t.get("red_cells") or t.get("red_cells_omitted")])
+        tabs, changed = merge_tabs(meta["tabs"], [t for t in rec["tabs"] if t.get("red_cells") or cells_left_out(t)])
         if changed:
             write_json(os.path.join(target, "meta.json"), dict(meta, tabs=tabs))
     except (ValueError, OSError, KeyError, TypeError, AttributeError):
