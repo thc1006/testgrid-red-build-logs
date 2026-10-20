@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2112251415320596480",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1792434985,
+  "created": 1792434955,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod Allocated Endpoint [FeatureGate:KubeletAllocatedPodsEndpoint] should return all allocated pods with status cleared when listing [Alpha] [Feature:OffByDefault] [FeatureGate:InPlacePodVerticalScaling]",
+          "status": "FAIL",
+          "message": "[FAILED] Pod pod-allocated-9998/pod-allocated-list-f8e53148-96fe-4896-...es/test/e2e/node/allocated_subresource.go:103 @ 10/19/26 18:43:01.677\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792436613,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2112251415320596480",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2112251415320596480/build-log.txt",
+  "log": {
+    "bytes": 133316,
+    "md5": "78df02d83ca5b76820f988909eb59542",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19628,
+    "gcs": {
+      "generation": "1792436630461449",
+      "md5": "78df02d83ca5b76820f988909eb59542",
+      "crc32c": "7a293968",
+      "bytes": 133316,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94548,
+    "md5": "62c176f5660bfa0f55fe7f8056a6e33c",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12588,
+    "gcs": {
+      "generation": "1792436747351309",
+      "md5": "62c176f5660bfa0f55fe7f8056a6e33c",
+      "crc32c": "7d4df227",
+      "bytes": 94548,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-20T002151Z",
+  "archived_at": 1792455711.0,
+  "settled": true,
+  "final": false
+}

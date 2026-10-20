@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2112212659116969984",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1792425755,
+  "created": 1792425715,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.podgroup",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCPGScheduling/TestCPGMinGroupCount\n    stepsframe...4s)\n\n=== RUN   TestCPGScheduling\n--- FAIL: TestCPGScheduling (99.15s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792428031,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2112212659116969984",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2112212659116969984/build-log.txt",
+  "log": {
+    "bytes": 287672,
+    "md5": "3532a1f0aafeb37b6fde89f8d3b8c22b",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24270,
+    "gcs": {
+      "generation": "1792428039076216",
+      "md5": "3532a1f0aafeb37b6fde89f8d3b8c22b",
+      "crc32c": "a5748b72",
+      "bytes": 287672,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95143,
+    "md5": "fcb21d4f081ee1cd94a6bede82fc0f0c",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12321,
+    "gcs": {
+      "generation": "1792428041086445",
+      "md5": "fcb21d4f081ee1cd94a6bede82fc0f0c",
+      "crc32c": "52f1a4bf",
+      "bytes": 95143,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-20T002151Z",
+  "archived_at": 1792455711.0,
+  "settled": true,
+  "final": false
+}

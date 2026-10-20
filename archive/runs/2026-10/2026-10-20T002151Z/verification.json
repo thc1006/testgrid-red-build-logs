@@ -1,0 +1,42 @@
+{
+  "run": "2026-10-20T002151Z",
+  "outcome": "ok",
+  "started": 1792455725.7569487,
+  "finished": 1792455744.2866414,
+  "tool": {
+    "commit": "d360da417428666dab297a57fdf8b7cb5075939a",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "39346924227",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1792282911.6928883,
+      "to": 1792455711.6928883
+    },
+    "tabs": 46,
+    "builds": 912,
+    "compared_with_gcs": 162,
+    "sevenths": [
+      5
+    ],
+    "differ": 0,
+    "not_settled": 1,
+    "red_on_testgrid": 46,
+    "red_not_settled": 0,
+    "gcs_builds": 1961,
+    "judged_by_rule": 21
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 4,
+  "notes": [
+    "ci-kubernetes-build-fast/2111723179645865984: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2111784836447342592: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-ec2-scale-performance-5000/2111714372639264768: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2111879208765493248: ERROR, not listed on TestGrid (not archived)"
+  ]
+}

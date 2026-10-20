@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2112272303390724096",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1792439965,
+  "created": 1792439935,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-testing] k8s.io/kubernetes/test/integration.golangci-lint",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestGolangciLint\n        \tinstalling golangci-lint, l...utput: no JSON output line found\n--- FAIL: TestGolangciLint (179.22s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792442173,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2112272303390724096",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2112272303390724096/build-log.txt",
+  "log": {
+    "bytes": 179592,
+    "md5": "ff94260b247a828922ea57be6c836287",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 18174,
+    "gcs": {
+      "generation": "1792442177578984",
+      "md5": "ff94260b247a828922ea57be6c836287",
+      "crc32c": "f83f3547",
+      "bytes": 179592,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95001,
+    "md5": "a0aa273b893a8ce59b8c9b931a2bdafe",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12421,
+    "gcs": {
+      "generation": "1792442181884545",
+      "md5": "a0aa273b893a8ce59b8c9b931a2bdafe",
+      "crc32c": "2d962f05",
+      "bytes": 95001,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-20T002151Z",
+  "archived_at": 1792455711.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2112257204500303872",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1792436424,
+  "created": 1792436336,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and a pre-bound PV: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-gndt2\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 10/19/26 19:19:25.126\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792438043,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2112257204500303872",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2112257204500303872/build-log.txt",
+  "log": {
+    "bytes": 131180,
+    "md5": "447146b10d72e408b2fab5cb87857215",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21574,
+    "gcs": {
+      "generation": "1792438063091815",
+      "md5": "447146b10d72e408b2fab5cb87857215",
+      "crc32c": "7c602a5d",
+      "bytes": 131180,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 117307,
+    "md5": "263c5f3302376ff9bd5c1beeae96a5c7",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 14135,
+    "gcs": {
+      "generation": "1792438159569771",
+      "md5": "263c5f3302376ff9bd5c1beeae96a5c7",
+      "crc32c": "9cdfe6f0",
+      "bytes": 117307,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-20T002151Z",
+  "archived_at": 1792455711.0,
+  "settled": true,
+  "final": false
+}
