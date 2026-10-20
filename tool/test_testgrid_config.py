@@ -424,6 +424,42 @@ class Extract(unittest.TestCase):
             self.assertEqual(tgc.main(["extract", os.path.join(d, "config.yaml"), "--recipe", "r", "--commit", "abc",
                                        "--committed", "1790000000", "--image", "img", "--dashboard", "nope"]), 1)
 
+    def test_extract_takes_no_dashboard_name_holding_a_hash(self):
+        d = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, d)
+        import yaml
+        # (the config holds an "a#b" dashboard, so that only the name check can refuse it)
+        config = dict(self.CONFIG, dashboards=[*self.CONFIG["dashboards"],
+                                               {"name": "a#b", "dashboard_tab": [{"name": "c", "test_group_name": "job"}]}])
+        with open(os.path.join(d, "config.yaml"), "w") as f:
+            yaml.safe_dump(config, f)
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            with self.assertRaises(SystemExit) as raised:
+                tgc.main(["extract", os.path.join(d, "config.yaml"), "--recipe", "r", "--commit", "abc", "--committed",
+                          "1790000000", "--image", "img", "--dashboard", "dash", "--dashboard", "a#b"])  # fails: returned 0
+        self.assertEqual(raised.exception.code, 2)
+        self.assertIn("must hold no '#', got 'a#b'", err.getvalue())
+
+    def test_a_config_whose_dashboard_name_holds_a_hash_is_not_taken(self):
+        # (its tabs key as another dashboard's: "a#b" with tab "c", and "a" with tab "b#c", are both "a#b#c"; "a#b" is
+        # listed first, so it is refused before the two collide)
+        commit, recipe = "c" * 40, recipe_of("c" * 40)
+        built = {"commit": commit, "committed": 1_789_990_000, "image": "img",
+                 "dashboards": {"a#b": {"c": entry()}, "a": {"b#c": entry(CORRECTNESS)}}}
+        loaded = tgc.load(self.write({"format": 3, "after": 1_789_999_000.5, "runs": [], "configs": {recipe: built},
+                                      "group_changes": {}, "failed": {}}))
+        self.assertEqual(loaded["configs"], {})  # fails: taken, with one tab for the two
+        self.assertEqual(loaded["failed"], {recipe: "its config as written: a#b: a dashboard name with '#'"})  # fails: {}
+
+    def test_control_a_config_whose_tab_name_holds_a_hash_is_taken(self):
+        # (its key, "a#b#c", splits at its first "#" back to dashboard "a")
+        commit, recipe = "c" * 40, recipe_of("c" * 40)
+        built = {"commit": commit, "committed": 1_789_990_000, "image": "img", "dashboards": {"a": {"b#c": entry()}}}
+        loaded = tgc.load(self.write({"format": 3, "after": 1_789_999_000.5, "runs": [], "configs": {recipe: built},
+                                      "group_changes": {}, "failed": {}}))
+        self.assertEqual((loaded["configs"][recipe][0], loaded["failed"]), ({"a#b#c": entry()}, {}))
+
     def test_merge_works_out_how_runs_changed_their_test_groups(self):
         a, b, c = ({"build": str(1000 + i), "commit": x * 40, "started": 1_790_000_000 + i, "finished": 1_790_000_005 + i,
                     "recipe": tgc.recipe_id(x * 40, None)} for i, x in enumerate("abc"))

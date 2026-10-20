@@ -787,6 +787,15 @@ class EndToEndTest(unittest.TestCase):
                 with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
                     self.run_tool(flag, value)
 
+    def test_a_dashboard_name_holding_a_hash_is_rejected(self):
+        # (a tab's key, dashboard#tab, is split at its first "#"; TestGrid's names hold none)
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err), self.assertRaises(SystemExit) as raised:
+            self.run_tool("--dashboard", "a#b")  # fails: returned 1, after a run
+        self.assertEqual(raised.exception.code, 2)
+        self.assertIn("must hold no '#', got 'a#b'", err.getvalue())
+        self.assertFalse(os.path.exists(self.path("runs")))  # (stopped before a run began)
+
     def test_malformed_state_entries_are_dropped(self):
         evil = {"job": "job-a", "build": "../../x", "query": "bucket/logs/job-a", "started": None,
                 "created": 1, "tabs": []}
