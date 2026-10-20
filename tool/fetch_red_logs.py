@@ -4031,7 +4031,7 @@ def clean_partial_builds(root, warnings):
             remove_if_empty(os.path.dirname(run_abs))
 
 
-INDEX_TESTS = 100  # red tests an index entry lists (meta.json has them all)
+INDEX_TESTS = 100  # red tests an index entry lists (meta.json lists more, but past MAX_RED_CELLS in a table counts the cells)
 
 
 def index_entry(job, build, meta, now, rel=None):
@@ -4041,6 +4041,7 @@ def index_entry(job, build, meta, now, rel=None):
     red_tests = sorted({c["test"] for tab in meta["tabs"] for c in tab["red_cells"]},
                        key=lambda name: (name == f"{job}.Overall", name.startswith(f"{job}."), name))
     job_rows = [name for name in red_tests if name.startswith(f"{job}.")]
+    left_out = sum(cells_left_out(tab) for tab in meta["tabs"])
     files = [((meta.get(key) or {}).get("file", name), meta.get(key))
              for name, key in (("build-log.txt", "log"), ("podinfo.json", "podinfo"))]
     base = (meta.get("log_url") or "").rsplit("/", 1)[0]
@@ -4058,6 +4059,8 @@ def index_entry(job, build, meta, now, rel=None):
         "red_tests": red_tests[:max(0, INDEX_TESTS - len(job_rows))] + job_rows if len(red_tests) > INDEX_TESTS
         else red_tests,
         "red_test_count": len(red_tests),
+        # (red cells meta.json counts but does not list: cells, not tests, as one test can be red on several tabs)
+        **({"red_cells_omitted": left_out} if left_out else {}),
         "dir": rel,
         "run": rel.split("/")[2] if rel else None,
         "files": [f"{rel}/{part['file']}" for name, info in files if info and not info.get("omitted")
@@ -4119,6 +4122,9 @@ def build_rows(entries, files=True, prefix=""):
             lines += ["", f"### {day}", "", head, "|---|---|---|---|---|"]
         tests, count = e["red_tests"], e.get("red_test_count", len(e["red_tests"]))
         shown = (md_cell(tests[0][:90]) + (f" (+{count - 1})" if count > 1 else "")) if tests else ""
+        if e.get("red_cells_omitted"):
+            n = e["red_cells_omitted"]
+            shown = (shown + " (and " if shown else "(") + f"{n} red cell{'s' if n != 1 else ''} left out)"
         if e.get("from_gcs"):
             shown = (shown + " " if shown else "") + "(taken from GCS: red by TestGrid's rule, not seen red on TestGrid)"
         if files:
