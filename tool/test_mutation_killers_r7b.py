@@ -91,10 +91,12 @@ class IndexRows(unittest.TestCase):
         self.assertIn("| t1 (+1) (taken from GCS: red by TestGrid's rule, not seen red on TestGrid) |",
                       "".join(frl.build_rows([e], files=False)))
 
-    def test_IE6_a_build_shown_red_with_its_cells_omitted_was_not_taken_from_gcs(self):
+    def test_IE6_a_build_is_taken_from_gcs_only_with_a_backfilled_note(self):
         # (a mass failure past MAX_RED_CELLS: the tab listed none of the build's red cells)
         meta = {"job": "job", "build": "1", "query": "b/logs/job", "started": None, "created": time.time() - 3600,
                 "log": None, "podinfo": None, "tabs": [{"dashboard": "d", "tab": "m", "red_cells": [], "red_cells_omitted": 7}]}
+        self.assertFalse(frl.index_entry("job", "1", meta, time.time())["from_gcs"])
+        meta["tabs"] = [{"dashboard": "d", "tab": "m", "red_cells": []}]  # (only the missing backfilled note keeps it False)
         self.assertFalse(frl.index_entry("job", "1", meta, time.time())["from_gcs"])
 
 
