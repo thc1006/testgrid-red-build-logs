@@ -130,7 +130,7 @@ RETRY_AFTER_CAP = 60.0  # never wait longer than this for one Retry-After
 BASE_DEADLINE = 120.0
 MIN_RATE = 50_000  # bytes per second
 MAX_JSON_BYTES = 256 << 20  # a TestGrid summary or table larger than this is refused
-MAX_DOWNLOAD_BYTES = 4 << 30  # a GCS object larger than this is refused rather than streamed forever
+MAX_DOWNLOAD_BYTES = 4 << 30  # a GCS object larger than this, stored or gunzipped, is refused rather than streamed forever
 MAX_LIST_PAGES = 1000  # a GCS listing that pages on longer than this is broken
 GUNZIP_STEP = 256 << 10  # gunzip yields at most this many bytes per step, whatever the ratio
 GIVE_UP_DAYS = 14  # stop retrying a build GCS still lacks after this long
@@ -1506,6 +1506,8 @@ def download(url, path, compress=False, max_bytes=None):
                     crc["raw"] = crc32c(chunk, crc["raw"])
                 if gunzip:
                     for piece in gunzip.feed(chunk):
+                        if out_len + len(piece) > MAX_DOWNLOAD_BYTES:  # (a few bytes can gunzip to many)
+                            raise IntegrityError(f"{url}: more than the {MAX_DOWNLOAD_BYTES} byte limit once gunzipped")
                         write(piece)
                 else:
                     write(chunk)
