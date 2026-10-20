@@ -466,6 +466,9 @@ def load(path):
             raise ValueError(f"{recipe[:40]}: not a config extract wrote")
         tabs, bad = {}, None
         for dashboard, entries in built["dashboards"].items():
+            if "#" in dashboard:  # (see dashboard_name)
+                bad = f"{dashboard}: a dashboard name with '#'"
+                break
             if not isinstance(entries, dict):
                 bad = f"{dashboard}: not an object"
                 break
@@ -939,6 +942,15 @@ def merge(planned, extracts, failed):
             "failed": {rid: why for rid, why in failed.items() if rid not in built}}
 
 
+def dashboard_name(text):
+    """A dashboard a command line names. The tools key a tab as "dashboard#tab" and split that key
+    at its first "#", so a dashboard name holding one could stand for a tab of another; TestGrid's
+    names hold none (nameRegex in its config/config.go)."""
+    if "#" in text:
+        raise argparse.ArgumentTypeError(f"must hold no '#', got {text!r}")
+    return text
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -957,7 +969,7 @@ def main(argv=None):
     e.add_argument("--committed", type=int, required=True)
     e.add_argument("--image", required=True)
     e.add_argument("--digest", default="")
-    e.add_argument("--dashboard", action="append", dest="dashboards")
+    e.add_argument("--dashboard", action="append", dest="dashboards", type=dashboard_name)
     m = sub.add_parser("merge")
     m.add_argument("uploads")
     m.add_argument("--failed", help="RECIPE<tab>WHY per line: the configs that could not be built")

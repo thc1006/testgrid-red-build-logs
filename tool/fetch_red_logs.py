@@ -4941,7 +4941,8 @@ def main(argv=None):
     cpus = cpu_count()
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--archive", required=True, help="archive root directory")
-    p.add_argument("--dashboard", action="append", dest="dashboards", help=f"default: {' '.join(DASHBOARDS)}")
+    p.add_argument("--dashboard", action="append", dest="dashboards", type=tgc.dashboard_name,
+                   help=f"default: {' '.join(DASHBOARDS)}")
     p.add_argument("--since-hours", type=positive(float),
                    help="only archive builds started within this many hours (default: everything TestGrid shows)")
     p.add_argument("--max-job-hours", type=positive(float), default=6,
