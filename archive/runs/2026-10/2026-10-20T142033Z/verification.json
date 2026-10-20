@@ -1,0 +1,40 @@
+{
+  "run": "2026-10-20T142033Z",
+  "outcome": "ok",
+  "started": 1792506053.4759114,
+  "finished": 1792506086.3285365,
+  "tool": {
+    "commit": "d0c260c985225c249372f01c41625b78878caf17",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "39437933822",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1792333233.5725794,
+      "to": 1792506033.5725794
+    },
+    "tabs": 46,
+    "builds": 923,
+    "compared_with_gcs": 166,
+    "sevenths": [
+      5
+    ],
+    "differ": 0,
+    "not_settled": 3,
+    "red_on_testgrid": 46,
+    "red_not_settled": 0,
+    "gcs_builds": 1936,
+    "judged_by_rule": 43
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 2,
+  "notes": [
+    "ci-kubernetes-integration-arm64-master/2111879208765493248: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2112501817349771264: ERROR, not listed on TestGrid (not archived)"
+  ]
+}
