@@ -1834,7 +1834,12 @@ def stray_files(target, meta):
 class RecheckError(Exception):
     """Comparing an intact archived build with GCS failed; its copy stays (but where the disk failed as a file
     was renamed over one there, see put_in_place: the next run then repairs it) and is compared again by the
-    next run (the run is not done with its sevenths: see gcs_sevenths)."""
+    next run (the run is not done with its sevenths: see gcs_sevenths). meta says what the run took again of
+    it before the failure: such a file is in place (see put_in_place)."""
+
+    def __init__(self, message, meta):
+        super().__init__(message)
+        self.meta = meta
 
 
 def read_finished(base):
@@ -3435,12 +3440,12 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
         except Abandoned:
             raise
         except LocalIOError as e:  # (not GCS's doing: no reason to stop comparing it, but not compared either)
-            raise RecheckError(f"comparing the archived copy with GCS failed: LocalIOError: {e}") from None
+            raise RecheckError(f"comparing the archived copy with GCS failed: LocalIOError: {e}", meta) from None
         except Exception as e:
             first = meta.get("archived_at") if plausible_time(meta.get("archived_at"), now) else meta["created"]
             # (a final one is compared again by the next run that compares its seventh)
             if old.get("final") or now - first <= GIVE_UP_DAYS * 86400:
-                raise RecheckError(f"comparing the archived copy with GCS failed: {type(e).__name__}: {e}") from None
+                raise RecheckError(f"comparing the archived copy with GCS failed: {type(e).__name__}: {e}", meta) from None
             meta.update(final=True, note=f"not compared with GCS after {GIVE_UP_DAYS} days of errors: "
                                          f"{type(e).__name__}: {e}"[:300])
             write_json(os.path.join(target, "meta.json"), meta)
@@ -3461,7 +3466,7 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
         try:
             put_in_place(target, meta)
         except LocalIOError as e:  # (as in the comparison: what it found is not recorded, so compared again)
-            raise RecheckError(f"comparing the archived copy with GCS failed: LocalIOError: {e}") from None
+            raise RecheckError(f"comparing the archived copy with GCS failed: LocalIOError: {e}", meta) from None
     return outcome, meta
 
 
@@ -5687,6 +5692,15 @@ def run(args, root, run_start, pool, deadline):
             ctx.abandon()
         except KeyboardInterrupt:  # (one while it waited for a worker to finish putting files in place)
             interrupted = True
+
+    # A build whose comparison with GCS failed after this run took a file of it again (in place, see
+    # RecheckError) is listed as updated, as when the comparison does not fail; returned: the bytes it took.
+    def taken_before_failing(key, meta):
+        updated = updated_by(meta, run_id)
+        if updated is None:
+            return 0
+        outcomes.setdefault(updated, []).append(key)
+        return bytes_taken(updated, meta, run_id)
     for fut in futures:
         b = futures[fut]
         key = f"{b['job']}/{b['build']}"
@@ -5715,6 +5729,8 @@ def run(args, root, run_start, pool, deadline):
                 outcome = "backfilled"
             outcomes.setdefault(outcome, []).append(key)
             downloaded += bytes_taken(outcome, meta, run_id)
+            if outcome == "stopped-comparing":
+                downloaded += taken_before_failing(key, meta)
             if outcome == "pending":  # (a watched build found red is queued as red from now on)
                 unresolved[key] = {"rec": meta, "first_seen": previous.get("first_seen", run_start), "last_error": None}
             elif outcome in ("watching", "held"):
@@ -5724,6 +5740,7 @@ def run(args, root, run_start, pool, deadline):
             # run is not done with its sevenths, see gcs_sevenths).
             errors.append({"build": key, "error": str(e)})
             recheck_failed = True
+            downloaded += taken_before_failing(key, e.meta)
         except Exception as e:
             message = f"{type(e).__name__}: {e}"
             if b.get("watch") and not getattr(e, "red_rec", None):
