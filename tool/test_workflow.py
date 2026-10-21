@@ -89,7 +89,7 @@ class FailedSteps(unittest.TestCase):
         return next(s for s in self.steps if s.get("name") == name)
 
     def test_those_that_fail_without_failing_the_run(self):
-        # (each says why: one that warns, a config earlier runs read, a cleanup the commit does again)
+        # (each says why: an error it need not stop on, a config earlier runs read, a cleanup the commit does again)
         checked = set(re.findall(r"steps\.([\w-]+)\.outcome == 'failure'", self.steps[-1]["if"]))
         self.assertEqual(checked, {"fetch", "verify"})
         quiet = [s["name"] for s in self.steps if s.get("continue-on-error") and s.get("id") not in checked]

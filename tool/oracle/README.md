@@ -62,7 +62,7 @@ port. It does all of this:
 - fails if TestGrid's production manifests (`cluster/prod/updater.yaml` and
   `tabulator.yaml`) no longer deploy the pinned commit of its updater or tabulator
   (`drift.sh`, checked even when another check failed; every archive run checks it
-  too, and warns);
+  too, without failing on it);
 - then, if the manifests moved, `follow.sh` builds TestGrid's code at the commit
   they deploy, runs every check above against it, and lists what changed between the
   two commits in the code the port follows (`relevant_diff.py`). When nothing did
