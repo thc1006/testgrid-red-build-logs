@@ -4528,9 +4528,9 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     lines = ["# Red TestGrid builds", "",
              f"Updated {iso(now)}. The builds with a red cell on {' and '.join(DASHBOARDS)} that the runs "
              "found: seen red on TestGrid, or taken from GCS by TestGrid's rule ([what that can miss or add]"
-             "(../README.md#limits)); times are UTC. Each run's downloads are in its own folder under "
-             "[runs/](runs/). A file marked provisional was taken before Prow finished uploading; it is "
-             "compared with GCS on every run and fetched again if GCS changes.", ""]
+             "(../README.md#limits)); times are UTC. Each archived build is in the folder of the run that "
+             "first archived it, under [runs/](runs/). A file marked provisional was taken before Prow finished "
+             "uploading; it is compared with GCS on every run and fetched again if GCS changes.", ""]
     lines += report.write_charts(root, counted, now, current_run, run_dirs(root))
     if waiting:
         lines += ["## Not archived yet", "", f"{len(waiting)} red builds without an intact local copy yet."]
