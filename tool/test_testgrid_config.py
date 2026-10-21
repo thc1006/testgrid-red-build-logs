@@ -819,6 +819,14 @@ class RelevantDiff(unittest.TestCase):
                          ["pkg/updater/read.go", "pkg/tabulator/new.go", "internal/result/result.go",
                           "pb/config/config.proto", "go.mod: go 1.26.5 -> 1.27.0", "go.mod: k8s.io/api v0.27.4 -> v0.28.0"])
 
+    def test_cmd_updater_counts(self):
+        # (testgrid_config.group_source follows its source(): where the updater reads a group's builds from)
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
+        import relevant_diff
+        old = self.tree({"cmd/updater/main.go": "s", "cmd/updater/main_test.go": "t"})
+        new = self.tree({"cmd/updater/main.go": "s2", "cmd/updater/main_test.go": "t2"})
+        self.assertEqual(relevant_diff.changes(old, new), ["cmd/updater/main.go"])  # fails: []
+
     def test_every_part_the_port_follows(self):
         sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
         import relevant_diff
