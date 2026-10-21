@@ -28,6 +28,20 @@ dir_of() {
 old_dir=$(dir_of "$pinned")
 new_dir=$(dir_of "$version")
 changed=$(python3 -I oracle/relevant_diff.py "$old_dir" "$new_dir")
+# (written now, before the build and the checks: a build that fails, or a run cut off, still leaves it)
+{
+  echo "## TestGrid's production manifests deploy $version"
+  echo
+  echo "Pinned: $pinned."
+  if [ -n "$changed" ]; then
+    echo "Changed in the code the port follows:"
+    echo
+    while IFS= read -r line; do echo "- \`$line\`"; done <<< "$changed"
+  else
+    echo "Nothing the port follows changed."
+  fi
+  echo
+} >> "$summary"
 # The Go TestGrid's production images are built with (its Bazel WORKSPACE; else go.mod's): the
 # oracle is built with it too (setup-go's GOTOOLCHAIN=local would refuse a newer one).
 go_version=$(python3 -I -c 'import sys
@@ -68,17 +82,6 @@ check "index links" uv run --locked --no-dev python -I oracle/fuzz/linkdiff.py "
 check "real builds" uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 2
 
 {
-  echo "## TestGrid's production manifests deploy $version"
-  echo
-  echo "Pinned: $pinned."
-  if [ -n "$changed" ]; then
-    echo "Changed in the code the port follows:"
-    echo
-    while IFS= read -r line; do echo "- \`$line\`"; done <<< "$changed"
-  else
-    echo "Nothing the port follows changed."
-  fi
-  echo
   if [ ${#failed[@]} -gt 0 ]; then
     echo "Checks that failed against the new commit: ${failed[*]}."
   else
