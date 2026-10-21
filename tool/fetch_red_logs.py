@@ -5721,6 +5721,10 @@ def run(args, root, run_start, pool, deadline):
                         if outcome == "already-archived":
                             outcome = "not-checked"
                     outcomes.setdefault(outcome, []).append(key)
+                    # (what it took before it was stopped, as its meta.json says; one that cannot be read is
+                    # reported by the index)
+                    with contextlib.suppress(ValueError, OSError, KeyError, TypeError, AttributeError):
+                        downloaded += bytes_taken(outcome, read_json(os.path.join(target_of(b), "meta.json")), run_id)
                     continue
                 cause = "interrupted" if interrupted else "run timeout reached"
                 raise TimeoutError(f"{cause} before this build was done")

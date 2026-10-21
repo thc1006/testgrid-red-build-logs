@@ -137,6 +137,7 @@ class PodInfo(ArchiveWorld):
                     answer.set()
                 run = self.runs()[-1]
                 self.assertEqual((run["outcomes"], run["gcs_compared"]), ({outcome: [self.key]}, False))  # fails: True
+                self.assertEqual(run["bytes_downloaded"], len(b"log, uploaded again\n"))  # fails: 0
                 self.assertEqual(run["serious_warnings"], [
                     f"1 archived builds were not compared with GCS before the run reached its deadline ({self.key}): "
                     "the next run compares them"])
