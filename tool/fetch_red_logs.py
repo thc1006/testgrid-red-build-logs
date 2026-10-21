@@ -4399,7 +4399,7 @@ def write_run_readme(root, rel, run, entries):
         lines.append("This run was cut off before it wrote its report.")
     details = "[run.json](run.json) has the details; " if isinstance(run, dict) else ""
     lines += ["", f"{details}[INDEX.md]({up}INDEX.md) lists the archived builds of the last {report.HEAT_DAYS} days, "
-              "and links a page per week for older ones. "
+              "and links a page for each week. "
               "A file marked provisional was taken before Prow finished uploading and is re-checked against "
               "GCS on every run until it settles.", ""]
     lines.append(f"## Builds archived by this run ({len(mine)})")
