@@ -3,26 +3,27 @@ relevant_diff.py OLD_DIR NEW_DIR prints one line per change (nothing when none d
 
 The port (testgrid_rule.py, testgrid_config.py, and fetch_red_logs.py's model of
 when TestGrid reads a build and shows it) follows pkg/updater (GCS reading and the
-cells), cmd/updater (where a group's builds are read from: source()), util/queue
-and config/queue.go (when a group is handed out again), cmd/config_merger,
-pkg/merger and config/snapshot (when a new config is taken, and a failed read of it
-tried again), pkg/tabulator and cmd/tabulator (a tab's row filter, and when a tab is
+cells), cmd/updater (where a group's builds are read from: source()), util/queue and
+config/queue.go (when a group is handed out again), cmd/config_merger, pkg/merger
+and config/snapshot (when a new config is taken, and a failed read of it tried
+again), pkg/tabulator and cmd/tabulator (a tab's row filter, and when a tab is
 written again), util/gcs, metadata, metadata/junit, internal/result (the order of
-statuses), the TestGroup and DashboardTab fields and the statuses in pb, and the Go
-version and the modules whose behaviour it ports or follows (the Pod type,
-quantities, GCS's object reader, go-retry's backoff): as go.mod names them, and as
-the Bazel build TestGrid's production images are made with does (WORKSPACE's Go,
-repos.bzl's modules, .bazelversion). Not the flags TestGrid's production manifests
-run its components with (--wait, --group-timeout), which the model also follows,
-nor the commit they deploy the config merger at (drift.sh reads the updater's and
-the tabulator's)."""
+statuses), the TestGroup and DashboardTab fields, the custom evaluator's rules and
+the statuses in pb, and the Go version and the modules whose behaviour it ports or
+follows (the Pod type, quantities, GCS's object reader, go-retry's backoff): as
+go.mod names them, and as the Bazel build TestGrid's production images are made with
+does (WORKSPACE's Go, repos.bzl's modules, .bazelversion). Not the flags TestGrid's
+production manifests run its components with (--wait, --group-timeout), which the
+model also follows, nor the commit they deploy the config merger at (drift.sh reads
+the updater's and the tabulator's)."""
 import os
 import re
 import sys
 
 PACKAGES = ["pkg/updater", "cmd/updater", "util/queue", "config/snapshot", "cmd/config_merger", "pkg/merger", "pkg/tabulator",
             "cmd/tabulator", "util/gcs", "metadata", "metadata/junit", "internal/result"]
-FILES = ["pb/config/config.proto", "pb/test_status/test_status.proto", "config/queue.go", ".bazelversion"]
+FILES = ["pb/config/config.proto", "pb/custom_evaluator/custom_evaluator.proto", "pb/test_status/test_status.proto",
+         "config/queue.go", ".bazelversion"]
 MODULES = ["k8s.io/api", "k8s.io/apimachinery", "cloud.google.com/go/storage", "github.com/sethvargo/go-retry"]
 
 
