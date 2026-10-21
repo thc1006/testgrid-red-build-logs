@@ -1,0 +1,127 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2112844155456589824",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1792576276,
+  "created": 1792576276,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] DisruptionController should not evict unready pods with IfHealthyBudget UnhealthyPodEvictionPolicy",
+          "status": "FAIL",
+          "message": "[FAILED] verify running pods for \"test-rs-with-delayed-ready\" in names...io/kubernetes/test/e2e/apps/disruption.go:503 @ 10/21/26 10:03:09.923\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should be capable to mount multiple trust bundles by signer+labels should start if only signer name and explicit label selector matches nothing + optional=true [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-projected-ctb-891d0aea-71e8-4ba4-80da-bc9dd...s/test/e2e/framework/pod/output/output.go:281 @ 10/21/26 10:03:32.872\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should be capable to mount multiple trust bundles by signer+labels should start if only signer name and nil label selector + optional=true [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-projected-ctb-fd8e4149-bd1f-4ad9-8b32-742fb...s/test/e2e/framework/pod/output/output.go:281 @ 10/21/26 10:03:10.591\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should support exec through an HTTP proxy",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be running and read...io/kubernetes/test/e2e/kubectl/kubectl.go:433 @ 10/21/26 10:03:06.223\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] EndpointSlice should support a Service with multiple endpoint IPs specified in multiple EndpointSlices [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be running and read...ernetes/test/e2e/network/endpointslice.go:616 @ 10/21/26 10:03:19.197\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should be able to switch session affinity for NodePort service [LinuxOnly] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] failed to wait for deployment affinity-nodeport-transition in...io/kubernetes/test/e2e/network/service.go:272 @ 10/21/26 10:03:15.235\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should respect internalTrafficPolicy=Local Pod and Node, to Pod (hostNetwork: true)",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be running and read...o/kubernetes/test/e2e/network/service.go:2711 @ 10/21/26 10:03:06.316\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Container Lifecycle Hook when create a pod with lifecycle hook should execute poststart https hook properly [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.000s.\nexpected pod to be running and read...netes/test/e2e/common/node/lifecycle_hook.go:96 @ 10/21/26 10:03:07.6\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes-local [LocalVolumeType: block] One pod requesting one prebound PVC should be able to mount volume and read from pod1",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected Pod to be in <v1.PodPhase>...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes-local [LocalVolumeType: blockfswithoutformat] Two pods mounting a local volume one after the other should be able to write from pod1 and read from pod2",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected Pod to be in <v1.PodPhase>...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes-local [LocalVolumeType: dir-bindmounted] One pod requesting one prebound PVC should be able to mount volume and read from pod1",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected Pod to be in <v1.PodPhase>...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes-local [LocalVolumeType: dir] Set fsGroup for local volume should set different fsGroup for second pod if first pod is deleted",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected Pod to be in <v1.PodPhase>...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Projected secret should be consumable from pods in volume [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-projected-secrets-801a9dff-a70e-4cb8-aa6e-9...s/test/e2e/framework/pod/output/output.go:281 @ 10/21/26 10:03:29.319\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792578922,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2112844155456589824",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2112844155456589824/build-log.txt",
+  "log": {
+    "bytes": 1181214,
+    "md5": "6c485cb88805934f046a26eb7ee89100",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 143020,
+    "gcs": {
+      "generation": "1792578938656844",
+      "md5": "6c485cb88805934f046a26eb7ee89100",
+      "crc32c": "c102c614",
+      "bytes": 1181214,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87216,
+    "md5": "ecd905559d678cd26e1ba450b55ab01a",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11991,
+    "gcs": {
+      "generation": "1792578940394568",
+      "md5": "ecd905559d678cd26e1ba450b55ab01a",
+      "crc32c": "a5a13ec9",
+      "bytes": 87216,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-21T171216Z",
+  "archived_at": 1792602736.0,
+  "settled": true,
+  "final": false
+}

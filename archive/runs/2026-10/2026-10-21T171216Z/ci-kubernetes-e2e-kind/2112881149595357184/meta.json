@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2112881149595357184",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1792585126,
+  "created": 1792585096,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS when invoking the Recycle reclaim policy should test that a PV becomes Available and is clean after the PVC is deleted.",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be Succeeded or Fai...es/test/e2e/storage/persistent_volumes.go:390 @ 10/21/26 12:30:23.797\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792586728,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2112881149595357184",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2112881149595357184/build-log.txt",
+  "log": {
+    "bytes": 135102,
+    "md5": "0b5876a61292e995f0069cb0e6620e05",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21933,
+    "gcs": {
+      "generation": "1792586748328917",
+      "md5": "0b5876a61292e995f0069cb0e6620e05",
+      "crc32c": "ebe177d3",
+      "bytes": 135102,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94879,
+    "md5": "c208674d2098612426746f6c11b39841",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12455,
+    "gcs": {
+      "generation": "1792586750879780",
+      "md5": "c208674d2098612426746f6c11b39841",
+      "crc32c": "1929ae7c",
+      "bytes": 94879,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-21T171216Z",
+  "archived_at": 1792602736.0,
+  "settled": true,
+  "final": false
+}

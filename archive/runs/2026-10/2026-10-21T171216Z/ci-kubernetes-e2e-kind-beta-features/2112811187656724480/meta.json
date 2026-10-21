@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2112811187656724480",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1792568446,
+  "created": 1792568415,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Inline-volume (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.001s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 10/21/26 07:53:19.745\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792570004,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2112811187656724480",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2112811187656724480/build-log.txt",
+  "log": {
+    "bytes": 133216,
+    "md5": "de17ab4ad4d7585f4490fbbba614a8c0",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21450,
+    "gcs": {
+      "generation": "1792570020853720",
+      "md5": "de17ab4ad4d7585f4490fbbba614a8c0",
+      "crc32c": "d0ed8395",
+      "bytes": 133216,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94286,
+    "md5": "d7614f30f9b4e86c56273829f75f7472",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12530,
+    "gcs": {
+      "generation": "1792570034078316",
+      "md5": "d7614f30f9b4e86c56273829f75f7472",
+      "crc32c": "4d7a856c",
+      "bytes": 94286,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-21T171216Z",
+  "archived_at": 1792602736.0,
+  "settled": true,
+  "final": false
+}

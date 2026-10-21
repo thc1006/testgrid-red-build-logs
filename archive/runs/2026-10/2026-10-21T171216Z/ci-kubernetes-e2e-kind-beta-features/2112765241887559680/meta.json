@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2112765241887559680",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1792557491,
+  "created": 1792557461,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-bnb66\" did not exit with Success: pod \"pvc-te...etes/test/e2e/storage/persistent_volumes.go:63 @ 10/21/26 04:49:46.62\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792559093,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2112765241887559680",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2112765241887559680/build-log.txt",
+  "log": {
+    "bytes": 134147,
+    "md5": "e0f23242a2bc85e0cef119bcd20067c9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21842,
+    "gcs": {
+      "generation": "1792559111785352",
+      "md5": "e0f23242a2bc85e0cef119bcd20067c9",
+      "crc32c": "77c17a34",
+      "bytes": 134147,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95861,
+    "md5": "d412c79f1f55ce3e393f4c4fdabff9a0",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12663,
+    "gcs": {
+      "generation": "1792559113707529",
+      "md5": "d412c79f1f55ce3e393f4c4fdabff9a0",
+      "crc32c": "199367dd",
+      "bytes": 95861,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-21T171216Z",
+  "archived_at": 1792602736.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2112903044499771392",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1792590325,
+  "created": 1792590316,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should be capable to mount multiple trust bundles by signer+labels can combine all signer CTBs with an empty label selector [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected \"(mode of file \\\"/var/run/ctbtest/trust-bundle.crt\\\"...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792597251,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2112903044499771392",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2112903044499771392/build-log.txt",
+  "log": {
+    "bytes": 306670,
+    "md5": "be8530d438fa734deb79d74ab5ba14ac",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 47436,
+    "gcs": {
+      "generation": "1792597258292674",
+      "md5": "be8530d438fa734deb79d74ab5ba14ac",
+      "crc32c": "e5285770",
+      "bytes": 306670,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 62951,
+    "md5": "ef8e431756bdaf13340d526b1c7df198",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10253,
+    "gcs": {
+      "generation": "1792597260159472",
+      "md5": "ef8e431756bdaf13340d526b1c7df198",
+      "crc32c": "a2401393",
+      "bytes": 62951,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-21T171216Z",
+  "archived_at": 1792602736.0,
+  "settled": false,
+  "final": false
+}
