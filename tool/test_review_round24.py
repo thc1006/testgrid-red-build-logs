@@ -1692,13 +1692,39 @@ class RunReadme(unittest.TestCase):
         # (and an entry of the list that is no report, as in a run.json edited by hand: no tab)
         readme = self.readme({"run": "x", "outcomes": {}, "tabs": [5, None, {"dashboard": "d", "tab": "t"},
                                                                    {"dashboard": "other", "tab": None, "error": "boom"}]})
-        self.assertIn("1 tabs read (0 failed), 1 dashboard summary problem, ", readme)  # fails: 4 tabs read (1 failed)
+        self.assertIn("1 tab read (0 failed), 1 dashboard summary problem, ", readme)  # fails: 1 tabs read (0 failed)
         readme = self.readme({"run": "x", "outcomes": {}, "tabs": [{"dashboard": "d", "tab": None, "error": "boom"},
                                                                    {"dashboard": "e", "tab": None, "error": "boom"}]})
         self.assertIn("0 tabs read (0 failed), 2 dashboard summary problems, ", readme)
 
     def test_control_a_run_with_its_report_links_it(self):
         self.assertIn("[run.json](run.json) has the details;", self.readme({"run": "x", "outcomes": {}}))
+
+
+class OneInTheSingular(ArchiveWorld):
+    """The pages a run writes said "1 tabs read", "1 red builds on TestGrid", "archived 1 new builds",
+    "1 archived builds that started since", "1 builds" (as INDEX.md did of 2026-W37) and "1 red builds
+    without an intact local copy"."""
+
+    def test_one_archived_build(self):
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        with open(os.path.join(self.root, frl.run_dirs(self.root)[-1], "README.md")) as f:
+            self.assertIn("1 tab read (0 failed), 1 red build on TestGrid. This run archived 1 new build.",
+                          f.read())  # fails: 1 tabs read (0 failed), 1 red builds on TestGrid. ... 1 new builds.
+        with open(os.path.join(self.root, "INDEX.md")) as f:
+            index = f.read()
+        self.assertIn("\n1 archived build that started since ", index)  # fails: 1 archived builds
+        week = re.search(r"^- \[(\d{4}-W\d\d)\]\(weeks/\1\.md\): .*, (1 builds?)$", index, re.M)
+        self.assertEqual(week.group(2), "1 build")  # fails: 1 builds
+        with open(os.path.join(self.root, "weeks", f"{week.group(1)}.md")) as f:
+            self.assertIn(" (UTC): 1 build, newest first.", f.read())  # fails: 1 builds, newest first.
+
+    def test_one_build_not_archived_yet(self):
+        self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
+        self.fetch()
+        with open(os.path.join(self.root, "INDEX.md")) as f:
+            self.assertIn("\n1 red build without an intact local copy yet.", f.read())  # fails: 1 red builds
 
 
 # ------------------------------------------------------------------ a dashboard, or the whole run, named as itself
