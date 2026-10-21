@@ -8,9 +8,9 @@ files each part comes from, their licenses, and what changed.
 The ports were written from Go 1.26.5, TestGrid `f15bfa4808a4`, and
 k8s.io/apimachinery and k8s.io/api v0.27.4, the versions TestGrid's `go.mod`
 requires. [`tool/oracle/pinned.json`](tool/oracle/pinned.json) names the
-versions the tool is checked against now. It moves on its own only when nothing
-the ports follow has changed; otherwise a person ports the change, updates this
-file, and moves it.
+versions the tool is checked against now;
+[the oracle's README](tool/oracle/README.md#when-testgrids-production-manifests-move-to-another-commit)
+says how it moves.
 
 ## Go
 
