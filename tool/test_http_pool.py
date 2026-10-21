@@ -1,11 +1,14 @@
 """The pooled HTTP layer: keep-alive reuse, never reusing a connection with unread
 data, per-origin request limits, and redirects."""
+import http.client
 import http.server
+import io
 import os
 import sys
 import threading
 import unittest
 import urllib.error
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_red_logs as frl  # noqa: E402
@@ -141,6 +144,56 @@ class RedirectTest(PoolWorld):
             frl.request(self.srv.url + "/loop")
         self.assertEqual(self.srv.hits("/loop"), frl.MAX_REDIRECTS + 1)
         self.assertEqual(other.hits("/x"), 0)
+
+
+UNPARSABLE = "X-Unparsable"  # (a header the parser of unparsable() fails on)
+
+
+def unparsable(real=http.client.parse_headers, error=None):
+    """http.client's header parser, failing on a response with UNPARSABLE (with error, or as CPython 3.12's fails
+    on some Content-Types: python/cpython#134151), whatever the Python that runs the tests."""
+    def parse(fp, *args, **kwargs):
+        headers = real(fp, *args, **kwargs)
+        if headers.get(UNPARSABLE):
+            raise error or TypeError("'<' not supported between instances of 'int' and 'NoneType'")
+        return headers
+    return parse
+
+
+class UnparsableResponseTest(PoolWorld):
+    def test_one_http_client_cannot_parse_is_one_that_cannot_be_read(self):
+        # (retried as such a response is, then raised with its URL)
+        self.srv.route("/odd", (200, {UNPARSABLE: "1"}, b"body"))
+        with mock.patch.object(http.client, "parse_headers", unparsable()), self.assertRaises(Exception) as caught:
+            frl.request(self.srv.url + "/odd")
+        e = caught.exception
+        self.assertRegex(f"{type(e).__name__}: {e}", r"^IntegrityError: \S+/odd: a response that cannot be read \(TypeError: ")
+        # fails: TypeError: '<' not supported between instances of 'int' and 'NoneType'
+        self.assertEqual(self.srv.hits("/odd"), frl.RETRIES)  # fails: 1
+
+    def test_so_is_one_it_fails_on_with_another_exception_of_a_bug(self):
+        self.srv.route("/odd", (200, {UNPARSABLE: "1"}, b"body"))
+        with mock.patch.object(http.client, "parse_headers", unparsable(error=RecursionError("too deep"))), \
+                self.assertRaises(Exception) as caught:
+            frl.request(self.srv.url + "/odd")
+        e, want = caught.exception, r"^IntegrityError: \S+/odd: a response that cannot be read \(RecursionError: too deep\)$"
+        self.assertRegex(f"{type(e).__name__}: {e}", want)  # fails: RecursionError: too deep
+
+    def test_an_interim_one_too(self):
+        # (urllib3 reads a proxy's answer to CONNECT with FinalResponse._read_status alone, outside begin)
+        class Sock:
+            def makefile(self, mode):
+                return io.BytesIO(b"HTTP/1.1 103 Early Hints\r\nX-Unparsable: 1\r\n\r\nHTTP/1.1 200 OK\r\n\r\n")
+        with mock.patch.object(http.client, "parse_headers", unparsable()), \
+                self.assertRaisesRegex(frl.IntegrityError, r"^a response that cannot be read \(TypeError: "):
+            frl.FinalResponse(Sock())._read_status()  # fails: TypeError, as it was raised
+
+    def test_control_a_bug_in_the_request_itself_is_raised_as_it_is(self):
+        # (only what http.client raises as it parses a response is the response's)
+        self.srv.route("/fine", (200, {}, b"body"))
+        with self.assertRaises(TypeError):
+            frl.request(self.srv.url + "/fine", headers={"X-Generation": None})
+        self.assertEqual(self.srv.hits("/fine"), 0)
 
 
 class HeadersTest(unittest.TestCase):
