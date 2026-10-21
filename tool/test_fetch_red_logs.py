@@ -928,8 +928,13 @@ class EndToEndTest(unittest.TestCase):
         for name in ("2020-W01.md", "2020-W01.json", "notes.md"):
             open(self.path("weeks", name), "w").close()
         self.run_tool()
+        # (the weeks of the builds archived: two to five hours before OLD, they can start in the week before its own)
+        metas = [frl.read_json(p)
+                 for p in glob.glob(os.path.join(glob.escape(self.root), "runs", "*", "*", "*", "*", "meta.json"))]
+        self.assertEqual(len(metas), 3)  # (1004, 1002 and 1001: none archived would leave nothing to compare)
+        weeks = {frl.week_of(m["started"] or m["created"]) for m in metas}
         self.assertEqual(sorted(n for n in os.listdir(self.path("weeks")) if n.startswith("20") or n == "notes.md"),
-                         sorted([f"{frl.week_of(OLD // 1000)}.json", f"{frl.week_of(OLD // 1000)}.md", "notes.md"]))
+                         sorted([f"{w}.{ext}" for w in weeks for ext in ("json", "md")] + ["notes.md"]))
 
     def test_huge_numbers_in_state_and_run_reports_do_not_crash(self):
         frl.write_json(self.path("state.json"), {"tabs": {"dash#purple": 10 ** 400}})
