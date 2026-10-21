@@ -637,7 +637,8 @@ class CrossCheckRound7(r4.World):
         self.assertIn("notes: 104857601 bytes, more than GitHub accepts", out)
 
     def test_an_odd_record_does_not_stop_the_inventory(self):
-        self.assertIn("1 builds: 1 without files", cc.inventory({("j", "1"): ("x", {"log": ["x"], "podinfo": 5})}, self.root))
+        self.assertIn("1 build: 1 without files",
+                      cc.inventory({("j", "1"): ("x", {"log": ["x"], "podinfo": 5})}, self.root))  # fails: 1 builds:
 
 
 

@@ -463,7 +463,7 @@ def inventory(archived, root):
         if any(i and i.get("omitted") for i in (log, pod)):
             count("with a file not stored (an older record: too large)")
         if log and m.get("finished") is None:
-            count("log without a finish time")
+            count("with a log but no finish time")
         if frl.given_up_on(m):  # (as INDEX.md marks it: given up on, settled or not)
             count("given up on after failed comparisons with GCS")
         elif m.get("settled") is False:
@@ -481,7 +481,7 @@ def inventory(archived, root):
         n = len(state.get(key) or {}) if isinstance(state, dict) else 0
         if n:
             counts[what] = n
-    return f"{len(archived)} builds: " + ", ".join(f"{n} {what}" for what, n in counts.items())
+    return f"{frl.count_text(len(archived), 'build')}: " + ", ".join(f"{n} {what}" for what, n in counts.items())
 
 
 def verify(args, record=None):
@@ -574,7 +574,8 @@ def check(args, problems, notes, record):
         except (OSError, ValueError, KeyError, TypeError, AttributeError) as e:
             problems.append(f"unreadable {path}: {type(e).__name__}: {e}")
     job_of = {t["query"]: t["query"].rsplit("/", 1)[-1] for t in tabs}
-    print(f"verifying run {run['run']}: window {iso(since)} .. {iso(t0)}, {len(tabs)} tabs, {len(archived)} builds archived")
+    print(f"verifying run {run['run']}: window {iso(since)} .. {iso(t0)}, {frl.count_text(len(tabs), 'tab')}, "
+          f"{frl.count_text(len(archived), 'build')} archived")
     record.scope(window={"from": since, "to": t0}, tabs=len(tabs), builds=len(archived))
 
     ctx = frl.RunContext(frl.AdaptiveLimit(4 * frl.cpu_count(), args.max_concurrency))
@@ -640,9 +641,10 @@ def check(args, problems, notes, record):
             else:
                 problems.append(p)
     compared = sum(1 for _, m in items if compare_with_gcs(m))
-    print(f"  integrity: {len(items)} builds' files checked on disk, {compared} of them compared with GCS (those "
+    whose = frl.count_text(len(items), "build") + ("'s" if len(items) == 1 else "'")
+    print(f"  integrity: {whose} files checked on disk, {compared} of them compared with GCS (those "
           f"from the window, and {len(sevenths)}/7 of the rest, one seventh per day since the last run done with its "
-          f"own): {bad} differ, {len(unsettled)} not settled yet"
+          f"own): {bad} differ{'s' if bad == 1 else ''}, {len(unsettled)} not settled yet"
           + (f"; of those compared, {given_up} given up on after failed comparisons with GCS (only noted)" if given_up
              else ""))
     print("  inventory: " + inventory(archived, root))
@@ -709,7 +711,8 @@ def check(args, problems, notes, record):
                             f"finished.json {'present' if fin is not None else 'missing'}")
         else:
             late += 1
-    print(f"  testgrid: {len(red_now)} red builds in window, {len(red_now) - len(unarchived) - len(taken_out)} archived, "
+    print(f"  testgrid: {frl.count_text(len(red_now), 'red build')} in window, "
+          f"{len(red_now) - len(unarchived) - len(taken_out)} archived, "
           + (f"{len(taken_out)} taken out ({frl.EXCLUDED}), " if taken_out else "") +
           f"{late} not settled at run time (finished <{args.lag_minutes:.0f} min before it, or no finished.json), "
           f"{len(unarchived) - late} missed")
@@ -858,7 +861,8 @@ def check(args, problems, notes, record):
             notes.append(f"{key[0]}/{b}: {result}, TestGrid paints it {'/'.join(sorted(NAMES[c] for c in cells))} "
                          f"(not red, not archived)")
     pool.shutdown()
-    print(f"  gcs: {len(candidates)} builds created in window: " + ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
+    print(f"  gcs: {frl.count_text(len(candidates), 'build')} created in window: "
+          + ", ".join(f"{k}={v}" for k, v in sorted(counts.items())))
     print(f"  gcs: {len(judged)} of them no longer shown by TestGrid and not archived, judged by its rule"
           + (": " + ", ".join(f"{k}={v}" for k, v in sorted(judged_as.items())) if judged_as else ""))
     record.scope(gcs_builds=len(candidates), judged_by_rule=len(judged))
