@@ -1593,15 +1593,16 @@ class IndexOpening(unittest.TestCase):
                       opening)  # fails: not in it: Each run's downloads are in its own folder
 
     def test_nor_does_a_run_folders_readme(self):
-        """A run folder's README.md said INDEX.md "lists every build": it lists those of the last 14
-        days, and links a page per week for older ones."""
+        """A run folder's README.md said INDEX.md "lists every build", then that it "links a page per
+        week for older ones": it lists those of the last 14 days, and links a page for each week, the
+        current one too."""
         with tempfile.TemporaryDirectory() as root:
             rel = "runs/2026-10/2026-10-15T000000Z"
             os.makedirs(os.path.join(root, rel))
             frl.write_run_readme(root, rel, {"tabs": [], "red_builds_seen": 1}, [])
             with open(os.path.join(root, rel, "README.md")) as f:
-                self.assertIn("(../../../INDEX.md) lists the archived builds of the last 14 days, and links a page per "
-                              "week for older ones.", f.read())  # fails: every build.
+                self.assertIn("(../../../INDEX.md) lists the archived builds of the last 14 days, and links a page for "
+                              "each week.", f.read())  # fails: and links a page per week for older ones.
 
 
 # ------------------------------------------------------------------ a run folder's README
@@ -1638,7 +1639,7 @@ class RunReadme(unittest.TestCase):
         readme = self.readme(None, run_json=None)
         self.assertIn("This run was cut off before it wrote its report.", readme)
         self.assertNotIn("(run.json)", readme)  # fails: [run.json](run.json) has the details
-        self.assertIn("lists the archived builds of the last 14 days, and links a page per week for older ones.", readme)
+        self.assertIn("lists the archived builds of the last 14 days, and links a page", readme)
 
     def test_a_report_that_cannot_be_read_is_called_that(self):
         """A run whose run.json is there but cannot be read was called cut off before it wrote its
