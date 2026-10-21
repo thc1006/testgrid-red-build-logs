@@ -412,8 +412,14 @@ def check_file(root, rel, m, key, default, remote=True):
             return LocalDamage(f"{label}: local md5 {md5} ({size} bytes) != meta {info['md5']} ({info['bytes']} bytes)")
         if on_disk != info.get("file_bytes", info["bytes"]):
             return LocalDamage(f"{label}: {on_disk} bytes on disk, meta says {info.get('file_bytes')}")
-    if not remote:
-        return None
+    return gcs_change(m, key, default) if remote else None
+
+
+def gcs_change(m, key, default):
+    """A "GCS changed" message if GCS holds another copy of one archived file than the one archived, else None
+    (none either if GCS no longer has it). Raises if GCS cannot be read."""
+    info = m[key]
+    label = f"{m['job']}/{m['build']} {default if info.get('omitted') else info.get('file', default)}"
     url = m["log_url"].rsplit("/", 1)[0] + "/" + default
     try:
         headers = request(url, consume=lambda r: r.headers, method="HEAD", headers={"Accept-Encoding": "gzip"})
@@ -429,6 +435,15 @@ def check_file(root, rel, m, key, default, remote=True):
         # an old record of a gzip-stored object: compare the gunzipped content
         return f"{label}: GCS content changed since it was archived (gunzipped md5 differs)"
     return None
+
+
+def gcs_log_appeared(m):
+    """For a build archived without a log: a message if GCS has one now, else None. Raises if GCS cannot be read."""
+    try:
+        request(m["log_url"], consume=lambda r: r.headers, method="HEAD")
+    except NotFound:
+        return None
+    return f"{m['job']}/{m['build']}: GCS now has a build-log.txt that is not archived"
 
 
 def inventory(archived, root):
@@ -592,11 +607,7 @@ def check(args, problems, notes, record):
                   for n in frl.listdir(folder) if not n.startswith(".")  # (not a temp file git ignores)
                   and os.path.getsize(os.path.join(folder, n)) > GITHUB_MAX_BYTES]
         if remote and not m.get("log"):
-            try:  # archived without a log: has one appeared in GCS since?
-                request(m["log_url"], consume=lambda r: r.headers, method="HEAD")
-                found.append(f"{m['job']}/{m['build']}: GCS now has a build-log.txt that is not archived")
-            except NotFound:
-                pass
+            found.append(gcs_log_appeared(m))
         return [p for p in found if p]
 
     items = sorted(archived.values(), key=lambda item: item[0])
