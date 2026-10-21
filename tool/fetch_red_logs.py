@@ -185,6 +185,10 @@ class LocalIOError(Exception):
 
 # Socket timeouts, resets and SSL errors are OSError; urllib3 wraps the rest.
 TRANSIENT = (OSError, http.client.HTTPException, urllib3.exceptions.HTTPError, IntegrityError)
+# What a bug in Python code raises. One http.client raises as it parses a response's headers is the response's
+# (see FinalResponse.begin and _read_status; begin takes one of _read_status's own code for that too).
+BUGS = (TypeError, AttributeError, NameError, LookupError, AssertionError, ZeroDivisionError, RecursionError,
+        NotImplementedError)
 
 
 def cpu_count():
@@ -344,6 +348,12 @@ class FinalResponse(http.client.HTTPResponse):
     Hints) would be taken for the response, and the real one left on the connection for
     the next request. 101 (Switching Protocols) is final, and refused by fetch_once."""
 
+    def begin(self):
+        try:
+            super().begin()
+        except BUGS as e:  # (http.client's, as it parses headers it cannot read: an odd Content-Type)
+            raise IntegrityError(f"a response that cannot be read ({type(e).__name__}: {e})") from None
+
     def _read_status(self):
         start = time.monotonic()
         for _ in range(MAX_INTERIM + 1):
@@ -352,7 +362,10 @@ class FinalResponse(http.client.HTTPResponse):
                 return version, status, reason
             if time.monotonic() - start > INTERIM_SECONDS:
                 raise http.client.HTTPException(f"interim responses for more than {INTERIM_SECONDS:.0f} s")
-            http.client.parse_headers(self.fp)  # its headers (bounded as any response's are)
+            try:
+                http.client.parse_headers(self.fp)  # its headers (bounded as any response's are)
+            except BUGS as e:  # (as in begin: urllib3 reads a proxy's answer to CONNECT with this alone)
+                raise IntegrityError(f"a response that cannot be read ({type(e).__name__}: {e})") from None
         raise http.client.HTTPException(f"more than {MAX_INTERIM} interim responses")
 
 
@@ -461,6 +474,8 @@ def fetch_once(url, consume, headers, timeout, method):
             except urllib3.exceptions.ProtocolError as e:
                 if again or not closed_on_reuse(e):
                     raise
+            except IntegrityError as e:  # (FinalResponse's: a response it cannot read)
+                raise IntegrityError(f"{url}: {e}") from None
         consumed = False
         try:
             if raw.status < 200:  # (101: FinalResponse takes every other 1xx as interim)
