@@ -4400,8 +4400,8 @@ def write_run_readme(root, rel, run, entries):
     details = "[run.json](run.json) has the details; " if isinstance(run, dict) else ""
     lines += ["", f"{details}[INDEX.md]({up}INDEX.md) lists the archived builds of the last {report.HEAT_DAYS} days, "
               "and links a page for each week. "
-              "A file marked provisional was taken before Prow finished uploading and is re-checked against "
-              "GCS on every run until it settles.", ""]
+              "A file marked provisional may have been taken before Prow finished uploading; it is compared "
+              "with GCS on every run and fetched again if GCS changes.", ""]
     lines.append(f"## Builds archived by this run ({len(mine)})")
     lines += build_rows(mine, prefix=up) if mine else ["", "None."]
     if isinstance(run, dict):
@@ -4444,7 +4444,7 @@ def holdings(entries, waiting, current_run):
             ("… with only podinfo.json (the pod never ran)", count(lambda e: not e["has_log"] and e["files"])),
             ("… without a file (GCS had none)", count(lambda e: not e["has_log"] and not e["files"] and not e["remote"])),
             ("… with a file stored in parts (too large for one file in git)", count(lambda e: e["in_parts"])),
-            ("… provisional (taken before Prow finished uploading)",
+            ("… provisional (perhaps taken before Prow finished uploading)",
              count(lambda e: e["settled"] is False and e["final"] is not True)),
             ("… still compared with GCS on every run", count(lambda e: e["final"] is not True)),
             ("… given up on after failed comparisons with GCS (still compared at least once a week)",
@@ -4529,8 +4529,8 @@ def write_index(root, now, current_run=None, missing=(), known=None):
              f"Updated {iso(now)}. The builds with a red cell on {' and '.join(DASHBOARDS)} that the runs "
              "found: seen red on TestGrid, or taken from GCS by TestGrid's rule ([what that can miss or add]"
              "(../README.md#limits)); times are UTC. Each archived build is in the folder of the run that "
-             "first archived it, under [runs/](runs/). A file marked provisional was taken before Prow finished "
-             "uploading; it is compared with GCS on every run and fetched again if GCS changes.", ""]
+             "first archived it, under [runs/](runs/). A file marked provisional may have been taken before "
+             "Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.", ""]
     lines += report.write_charts(root, counted, now, current_run, run_dirs(root))
     if waiting:
         lines += ["## Not archived yet", "", f"{len(waiting)} red builds without an intact local copy yet."]

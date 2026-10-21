@@ -1641,6 +1641,24 @@ class RunReadme(unittest.TestCase):
         self.assertNotIn("(run.json)", readme)  # fails: [run.json](run.json) has the details
         self.assertIn("lists the archived builds of the last 14 days, and links a page", readme)
 
+    def test_it_says_what_index_md_says_of_a_provisional_file(self):
+        """A run folder's README said a provisional file "is re-checked against GCS on every run until
+        it settles": one that settles does so SETTLE_HOURS after its build finished, but is compared on
+        every run until it is final (settle_flags), as INDEX.md says. Both pages, and INDEX.md's row,
+        said it "was taken before Prow finished uploading": one whose finished.json has no time the
+        archive can use is provisional for GIVE_UP_DAYS, though Prow had finished."""
+        readme = self.readme({"run": "x", "outcomes": {}, "tabs": []})
+        with tempfile.TemporaryDirectory() as root:
+            frl.write_index(root, time.time())
+            with open(os.path.join(root, "INDEX.md")) as f:
+                index = f.read()
+        said = ("A file marked provisional may have been taken before Prow finished uploading; it is compared with GCS "
+                "on every run and fetched again if GCS changes.")
+        self.assertIn(said, index)  # fails: not in it: was taken before Prow finished uploading
+        self.assertIn(said, readme)  # fails: not in it: is re-checked against GCS on every run until it settles
+        self.assertIn("| … provisional (perhaps taken before Prow finished uploading) |",
+                      index)  # fails: (taken before Prow finished uploading)
+
     def test_a_report_that_cannot_be_read_is_called_that(self):
         """A run whose run.json is there but cannot be read was called cut off before it wrote its
         report, in its README (which linked run.json all the same) and in INDEX.md."""
