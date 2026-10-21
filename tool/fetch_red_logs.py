@@ -4746,6 +4746,30 @@ def archived_intact(target, deep=False):
     return valid_meta(meta) and intact(target, meta, deep)
 
 
+def updated_by(meta, run_id):
+    """How run_id updated a build archived earlier, as its meta.json records: "repaired", "log-recovered" or
+    "refreshed"; None if it did not."""
+    for key, outcome in (("repaired_by_run", "repaired"), ("log_recovered_by_run", "log-recovered"),
+                         ("refreshed_by_run", "refreshed")):
+        if meta.get(key) == run_id:
+            return outcome
+    return None
+
+
+def bytes_taken(outcome, meta, run_id):
+    """The bytes run_id downloaded of a build, as its outcome and meta.json say: all its files if it archived
+    it, only those it took again if it updated it (see updated_by), none otherwise."""
+    if outcome in ("archived", "archived-without-log", "backfilled"):
+        return sum(meta[k]["bytes"] for k in ("log", "podinfo") if meta.get(k))
+    if outcome not in ("log-recovered", "refreshed", "repaired"):
+        return 0
+    again = set(meta.get("refreshed") or ()) if meta.get("refreshed_by_run") == run_id else set()
+    again |= {"build-log.txt"} if outcome == "log-recovered" else set()
+    again |= set(meta.get("repaired") or ()) if outcome == "repaired" else set()
+    return sum(meta[k]["bytes"] for k, name in (("log", "build-log.txt"), ("podinfo", "podinfo.json"))
+               if meta.get(k) and name in again)
+
+
 def add_sightings(target, rec, run_id):
     """For a build whose worker the run gave up on, but whose copy is intact: merge rec's red
     tab sightings into its meta.json (so one from a gap search is kept), and say what this
@@ -4760,11 +4784,7 @@ def add_sightings(target, rec, run_id):
     if meta.get("archived_by_run") == run_id:
         new = "backfilled" if meta.get("backfilled") else "archived" if meta.get("log") else "archived-without-log"
         return "repaired" if meta.get("repaired_by_run") == run_id else new
-    for key, outcome in (("repaired_by_run", "repaired"), ("log_recovered_by_run", "log-recovered"),
-                         ("refreshed_by_run", "refreshed")):
-        if meta.get(key) == run_id:
-            return outcome
-    return "already-archived"
+    return updated_by(meta, run_id) or "already-archived"
 
 
 def due_in_gcs(target, sampled):
@@ -5694,14 +5714,7 @@ def run(args, root, run_start, pool, deadline):
             if outcome in ("archived", "archived-without-log") and meta.get("backfilled"):
                 outcome = "backfilled"
             outcomes.setdefault(outcome, []).append(key)
-            if outcome in ("archived", "archived-without-log", "backfilled"):
-                downloaded += sum(meta[k]["bytes"] for k in ("log", "podinfo") if meta.get(k))
-            elif outcome in ("log-recovered", "refreshed", "repaired"):  # (only the files it took again)
-                again = set(meta.get("refreshed") or ()) if meta.get("refreshed_by_run") == run_id else set()
-                again |= {"build-log.txt"} if outcome == "log-recovered" else set()
-                again |= set(meta.get("repaired") or ()) if outcome == "repaired" else set()
-                downloaded += sum(meta[k]["bytes"] for k, name in (("log", "build-log.txt"), ("podinfo", "podinfo.json"))
-                                  if meta.get(k) and name in again)
+            downloaded += bytes_taken(outcome, meta, run_id)
             if outcome == "pending":  # (a watched build found red is queued as red from now on)
                 unresolved[key] = {"rec": meta, "first_seen": previous.get("first_seen", run_start), "last_error": None}
             elif outcome in ("watching", "held"):
