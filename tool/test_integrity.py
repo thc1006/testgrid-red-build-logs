@@ -467,6 +467,21 @@ class ContentOverTimeTest(ArchiveWorld):
         self.assertEqual((self.meta()["settled"], self.meta()["final"]), (False, True))
         self.assertIn("(never settled", slurp(os.path.join(self.root, "INDEX.md")))
 
+    def test_one_whose_finished_json_has_no_time_it_can_use_is_not_said_to_lack_it(self):
+        # (finished.json appeared, with a time before the build was made: settle_flags takes no such time, so the
+        # copy never settles, and is final 14 days after it was archived)
+        self.srv.route(self.base + "/finished.json", (200, {}, {"result": "FAILURE", "timestamp": 1}))
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.fetch()
+        m = self.meta()
+        m["archived_at"] = time.time() - 15 * DAY
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), m)
+        self.fetch()
+        m = self.meta()
+        self.assertEqual((m["finished"], m["settled"], m["final"]), (1, False, True))
+        self.assertIn("(never settled: no usable finished.json)",
+                      slurp(os.path.join(self.root, "INDEX.md")))  # fails: (never settled: finished.json did not appear)
+
     def test_a_log_archived_before_finished_json_existed_is_followed_until_it_settles(self):
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.fetch()
