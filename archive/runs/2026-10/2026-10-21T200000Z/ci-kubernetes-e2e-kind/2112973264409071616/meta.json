@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2112973264409071616",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1792607086,
+  "created": 1792607058,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pods Extended (pod generation) Pod Generation pod generation should start at 1 and increment per update [MinimumKubeletVersion:1.34] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 20.000s.\nexpected pod generation to be 5, got...: k8s.io/kubernetes/test/e2e/node/pods.go:534 @ 10/21/26 18:32:27.893\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792608702,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2112973264409071616",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2112973264409071616/build-log.txt",
+  "log": {
+    "bytes": 123158,
+    "md5": "ce718024d001612e65646cde9907c215",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19547,
+    "gcs": {
+      "generation": "1792608719417510",
+      "md5": "ce718024d001612e65646cde9907c215",
+      "crc32c": "dc6cd61a",
+      "bytes": 123158,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95650,
+    "md5": "b82dab1e84831d64154c4d63e58aa3e2",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12448,
+    "gcs": {
+      "generation": "1792608721420278",
+      "md5": "b82dab1e84831d64154c4d63e58aa3e2",
+      "crc32c": "1b7d36a2",
+      "bytes": 95650,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-21T200000Z",
+  "archived_at": 1792612800.0,
+  "settled": false,
+  "final": false
+}
