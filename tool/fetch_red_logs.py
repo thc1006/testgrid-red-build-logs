@@ -4237,7 +4237,7 @@ def build_rows(entries, files=True, prefix=""):
                 last += f" (no comparison with GCS has succeeded since {iso(since)[:10]})" if since else \
                     " (its comparisons with GCS failed)"
             elif e.get("settled") is False:
-                last += " (never settled: finished.json did not appear)" if e.get("final") else " (provisional)"
+                last += " (never settled: no usable finished.json)" if e.get("final") else " (provisional)"
         else:
             last = md_cell(e["status"])
         tabs = "<br>".join(md_cell(t.replace("sig-release-master-", "")) for t in e["tabs"])
