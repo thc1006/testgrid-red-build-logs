@@ -1581,6 +1581,17 @@ class IndexOpening(unittest.TestCase):
         with open(os.path.join(HERE, "..", "README.md")) as f:
             self.assertIn("\n## Limits\n", f.read())  # (where the link goes)
 
+    def test_it_says_where_a_build_taken_again_is(self):
+        """INDEX.md said "Each run's downloads are in its own folder under runs/": a build taken
+        again (refreshed, repaired, its log recovered) goes in the folder of the run that first
+        archived it (run's target_of)."""
+        with tempfile.TemporaryDirectory() as root:
+            frl.write_index(root, time.time())
+            with open(os.path.join(root, "INDEX.md")) as f:
+                opening = f.read().split("\n\n")[1]
+        self.assertIn("Each archived build is in the folder of the run that first archived it, under [runs/](runs/).",
+                      opening)  # fails: not in it: Each run's downloads are in its own folder
+
     def test_nor_does_a_run_folders_readme(self):
         """A run folder's README.md said INDEX.md "lists every build": it lists those of the last 14
         days, and links a page per week for older ones."""
