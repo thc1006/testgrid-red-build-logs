@@ -4293,18 +4293,23 @@ def run_counts(run):
 
 
 def tabs_read_text(reports):
-    """"N tabs read (M failed)" for a run's tab reports, then ", K dashboard summary problems" for
-    those without a tab (a dashboard's summary that could not be read, or a tab name in it that
-    cannot be used), if any."""
+    """"N tabs read (M failed)" ("1 tab read" for one) for a run's tab reports, then ", K dashboard
+    summary problems" for those without a tab (a dashboard's summary that could not be read, or a tab
+    name in it that cannot be used), if any."""
     tabs = [r for r in reports if isinstance(r, dict) and r.get("tab") is not None]
     other = sum(1 for r in reports if isinstance(r, dict) and r.get("tab") is None and r.get("error"))
-    text = f"{len(tabs)} tabs read ({sum(1 for r in tabs if r.get('error'))} failed)"
+    text = f"{count_text(len(tabs), 'tab')} read ({sum(1 for r in tabs if r.get('error'))} failed)"
     return text + (f", {other} dashboard summary " + ("problem" if other == 1 else "problems") if other else "")
 
 
 def problems_text(n):
     """"1 problem", "2 problems"."""
     return f"{n} problem" + ("" if n == 1 else "s")
+
+
+def count_text(n, noun):
+    """"1 build", "2 red builds": n, then the noun, plural unless n is 1."""
+    return f"{n} {noun}" + ("" if n == 1 else "s")
 
 
 def run_rows(root, first_day, current=None):
@@ -4382,9 +4387,9 @@ def write_run_readme(root, rel, run, entries):
         tabs = run.get("tabs") if isinstance(run.get("tabs"), list) else []
         new, updated, problems = run_counts(run)
         seen = run.get("red_builds_seen") if is_int(run.get("red_builds_seen")) else "?"
-        lines.append(f"{tabs_read_text(tabs)}, {seen} red builds on "
-                     f"TestGrid. This run archived {new} new builds" + (f" and updated {updated} archived earlier"
-                                                                       if updated else "") + ".")
+        lines.append(f"{tabs_read_text(tabs)}, {count_text(seen, 'red build')} on "
+                     f"TestGrid. This run archived {count_text(new, 'new build')}"
+                     + (f" and updated {updated} archived earlier" if updated else "") + ".")
         if run.get("interrupted") is True:
             lines.append("The run was interrupted; unfinished builds are retried by the next run.")
         read = run.get("testgrid_config")
@@ -4499,7 +4504,7 @@ def write_index(root, now, current_run=None, missing=(), known=None):
         first, last = week_days(key)
         items = weeks[key]
         page = [f"# Red TestGrid builds, week {key}", "",
-                f"{short(first)} – {short(last)}, {last.year} (UTC): {len(items)} builds, newest first. "
+                f"{short(first)} – {short(last)}, {last.year} (UTC): {count_text(len(items), 'build')}, newest first. "
                 f"[Back to the index](../INDEX.md)."]
         write_text(os.path.join(root, "weeks", f"{key}.md"), "\n".join(page + build_rows(items, prefix="../")) + "\n")
         write_text(os.path.join(root, "weeks", f"{key}.json"), json.dumps(items, indent=2, ensure_ascii=False) + "\n")
@@ -4533,7 +4538,7 @@ def write_index(root, now, current_run=None, missing=(), known=None):
              "Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.", ""]
     lines += report.write_charts(root, counted, now, current_run, run_dirs(root))
     if waiting:
-        lines += ["## Not archived yet", "", f"{len(waiting)} red builds without an intact local copy yet."]
+        lines += ["## Not archived yet", "", f"{count_text(len(waiting), 'red build')} without an intact local copy yet."]
         lines += build_rows(waiting, files=False) + [""]
     lines += left_for_later((current_run or {}).get("left_for_later"))
     lines += [f"## Runs in the last {report.HEAT_DAYS} days", "",
@@ -4551,10 +4556,10 @@ def write_index(root, now, current_run=None, missing=(), known=None):
               "| Run (UTC) | New builds | Updated | Collection result | Verification |", "|---|---:|---:|---|---|"]
     lines += run_rows(root, first_day, current_run) + [""]
     lines += [f"## Builds from the last {report.HEAT_DAYS} days", "",
-              f"{len(recent)} archived builds that started since {first_day.isoformat()} (UTC), newest first."]
+              f"{count_text(len(recent), 'archived build')} that started since {first_day.isoformat()} (UTC), newest first."]
     lines += build_rows(recent) + [""] + holdings(entries, waiting, current_run) + ["", "## Every week", ""]
     lines += [f"- [{w['week']}]({w['page']}): {short(dt.date.fromisoformat(w['from']))} – "
-              f"{short(dt.date.fromisoformat(w['to']))}, {w['builds']} builds" for w in listing]
+              f"{short(dt.date.fromisoformat(w['to']))}, {count_text(w['builds'], 'build')}" for w in listing]
     write_text(os.path.join(root, "INDEX.md"), "\n".join(lines) + "\n")
     # Recent runs' READMEs show their builds' current state (a provisional file can settle later), and,
     # whatever their age, those of runs cut off (with no report, or the one a run has until it ends)
