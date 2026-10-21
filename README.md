@@ -140,8 +140,8 @@ from GCS.
    `verification.json`.
 
 The docstrings in [`tool/`](tool/) explain each step.
-[`tool/oracle/`](tool/oracle/README.md) checks the port of TestGrid's rule
-against TestGrid's own Go code.
+[`tool/oracle/`](tool/oracle/README.md) checks most of the tool's ports against
+the Go code they come from.
 
 ## Schedule and alerts
 
