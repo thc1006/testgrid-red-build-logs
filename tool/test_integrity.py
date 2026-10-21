@@ -546,12 +546,14 @@ class ContentOverTimeTest(ArchiveWorld):
         self.assertEqual(self.fetch(), 0)
         self.assertEqual(self.read("build-log.txt"), b"log, replaced\n")
 
-    def test_nor_does_a_disk_error_make_the_run_stop_comparing_an_old_build(self):
-        # (one compared on every run until GIVE_UP_DAYS after it was archived, as one without finished.json
-        # is: past that, GCS's errors make the run stop comparing it, and a disk error is not GCS's)
+    def test_nor_does_a_disk_error_give_up_on_a_build_failing_for_14_days(self):
+        # (a disk error is not GCS's: it neither starts nor ends the build's failed comparisons, see
+        # frl.COMPARISON_FAILING)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.fetch()
-        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+        since = time.time() - 15 * DAY
+        frl.write_json(os.path.join(self.bdir(), "meta.json"),
+                       dict(self.meta(), created=since - DAY, comparison_failing_since=since))
         self.srv.route(self.base + "/build-log.txt", obj(b"log, replaced\n", "2"))
         real = os.replace
 
@@ -561,14 +563,17 @@ class ContentOverTimeTest(ArchiveWorld):
             return real(src, dst)
         with mock.patch.object(frl.os, "replace", side_effect=full):
             self.assertEqual(self.fetch(), 1)
-        self.assertEqual((self.meta()["final"], self.meta().get("note")), (False, None))
+        m = self.meta()
+        self.assertEqual((m["final"], m.get("comparison_given_up"), m["comparison_failing_since"]), (False, None, since))
 
     def test_nor_does_one_making_a_temp_file_for_what_it_takes_again(self):
         # (as a full disk can refuse a new name: one of the disk, as one writing the file is)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.fetch()
         folder = self.bdir()
-        frl.write_json(os.path.join(folder, "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+        since = time.time() - 15 * DAY
+        frl.write_json(os.path.join(folder, "meta.json"),
+                       dict(self.meta(), created=since - DAY, comparison_failing_since=since))
         self.srv.route(self.base + "/build-log.txt", obj(b"log, replaced\n", "2"))
         real = frl.temp_path
 
@@ -577,9 +582,10 @@ class ContentOverTimeTest(ArchiveWorld):
                 raise OSError(28, "No space left on device")
             return real(path)
         with mock.patch.object(frl, "temp_path", full):
-            self.assertEqual(self.fetch(), 1)  # fails: 0, the build made final
+            self.assertEqual(self.fetch(), 1)
         self.assertIn("comparing the archived copy with GCS failed: LocalIOError", self.runs()[-1]["errors"][0]["error"])
-        self.assertEqual((self.meta()["final"], self.meta().get("note")), (False, None))
+        m = self.meta()
+        self.assertEqual((m["final"], m.get("comparison_given_up"), m["comparison_failing_since"]), (False, None, since))
 
     def test_nor_does_one_writing_its_meta_json_after_the_comparison(self):
         # (its log taken again, then its meta.json cannot be written: not one of a build to archive, as its copy
@@ -1455,18 +1461,25 @@ class Round3ArchiveTest(ArchiveWorld):
         self.assertEqual((after["result"], after["finished"], after["settled"]),
                          (before["result"], before["finished"], before["settled"]))
 
-    def test_a_copy_that_cannot_be_compared_for_14_days_stops_being_compared(self):
+    def test_a_copy_that_cannot_be_compared_for_14_days_is_given_up_on(self):
         self.finished(ago=3 * HOUR)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.fetch()
         m = self.meta()
-        m["archived_at"] = time.time() - 15 * DAY
+        m["archived_at"] = m["comparison_failing_since"] = time.time() - 15 * DAY
+        m["created"] = m["archived_at"] - DAY
         frl.write_json(os.path.join(self.bdir(), "meta.json"), m)
         self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
-        self.fetch()
-        self.assertEqual(self.runs()[-1]["outcomes"], {"stopped-comparing": [self.key]})
-        self.assertTrue(self.meta()["final"])
-        self.assertIn("not compared with GCS", self.meta()["note"])
+        self.assertEqual(self.fetch(), 1)  # fails: 0
+        run, m = self.runs()[-1], self.meta()
+        self.assertEqual(run["outcomes"], {"comparison-given-up": [self.key]})  # fails: {'stopped-comparing': [...]}
+        self.assertEqual(m.get("comparison_given_up"), "HTTPError: HTTP Error 500: Internal Server Error")  # fails: None
+        self.assertEqual([e["error"] for e in run["errors"]],
+                         [f"no comparison with GCS has succeeded since {frl.iso(m['comparison_failing_since'])}: after 14 "
+                          "days of failures, the archived copy is still compared at least once a week, but from now on a "
+                          "failure on GCS's side is a warning: HTTPError: HTTP Error 500: Internal Server Error"])
+        # fails: []
+        self.assertTrue(m["final"])
 
     def test_duplicates_are_reported_once(self):
         self.finished(ago=3 * DAY)
@@ -1667,19 +1680,6 @@ class TakenBeforeAFailedComparisonTest(ArchiveWorld):
         self.assertEqual((run["outcomes"], run["bytes_downloaded"]), ({"log-recovered": [self.key]}, len(b"late log\n")))
         # fails: ({}, 0)
         self.assertIs(run["gcs_compared"], False)
-
-    def test_a_log_taken_again_by_the_run_that_stops_comparing_it(self):
-        # (without finished.json: compared on every run until 14 days after it was archived)
-        self.archive()
-        self.srv.route(self.base + "/build-log.txt", obj(b"log, uploaded again\n", "2"))
-        path = os.path.join(self.bdir(), "meta.json")
-        frl.write_json(path, dict(frl.read_json(path), archived_at=time.time() - 15 * DAY))
-        self.assertEqual(self.fetch(), 0)
-        run = self.runs()[-1]
-        self.assertEqual(run["outcomes"], {"refreshed": [self.key], "stopped-comparing": [self.key]})
-        # fails: {'stopped-comparing': [...]}
-        self.assertEqual(run["bytes_downloaded"], len(b"log, uploaded again\n"))  # fails: 0
-        self.assertEqual(self.read("build-log.txt"), b"log, uploaded again\n")
 
     def test_control_a_failure_without_a_file_taken_again(self):
         self.finished(ago=3 * HOUR)

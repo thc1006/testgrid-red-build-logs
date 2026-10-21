@@ -21,7 +21,10 @@ For one run (default: the latest):
              shows as the run had TestGrid's config), is archived; and
              every failed one is archived, or the reason it is not is shown
 A difference in GCS for a build whose copy is not settled yet (taken before
-Prow finished uploading) is only noted: the next fetch compares it again.
+Prow finished uploading) is only noted: the next fetch compares it again. So is
+what GCS holds of a build the fetch gave up on after failed comparisons with
+GCS (see fetch_red_logs.COMPARISON_FAILING); its copy on disk is checked as
+any other.
 Exits 1 when a check finds a problem.
 
 With --record (as the workflow verifies each run), what was checked and the
@@ -461,7 +464,9 @@ def inventory(archived, root):
             count("with a file not stored (an older record: too large)")
         if log and m.get("finished") is None:
             count("log without a finish time")
-        if m.get("settled") is False:
+        if frl.given_up_on(m):  # (as INDEX.md marks it: given up on, settled or not)
+            count("given up on after failed comparisons with GCS")
+        elif m.get("settled") is False:
             count("provisional" if m.get("final") is not True else "never settled")
         if m.get("final") is not True:
             count("still compared with GCS on every run")
@@ -592,11 +597,15 @@ def check(args, problems, notes, record):
         try:
             return check_build(rel, m, compare_with_gcs(m))
         except Exception as e:
-            return [LocalDamage(f"{m.get('job')}/{m.get('build')}: cannot verify: {type(e).__name__}: {e}")]
+            return [LocalDamage(f"{m.get('job')}/{m.get('build')}: cannot verify: {type(e).__name__}: {e}")], []
 
     def check_build(rel, m, remote):
-        found = [check_file(root, rel, m, key, default, remote)
-                 for key, default in (("log", "build-log.txt"), ("podinfo", "podinfo.json")) if m.get(key)]
+        """(what is wrong with the build, what is only noted): what GCS holds of one the runs gave up on after
+        failed comparisons with GCS is noted (see frl.COMPARISON_FAILING), what is on disk is checked as for any
+        other."""
+        given_up = frl.given_up_on(m)
+        files = [(key, default) for key, default in (("log", "build-log.txt"), ("podinfo", "podinfo.json")) if m.get(key)]
+        found = [check_file(root, rel, m, key, default, remote and not given_up) for key, default in files]
         # a stored file its meta.json does not list (`cat <file>.*` would take a stray part in),
         # or one GitHub would refuse
         folder = os.path.join(root, rel)
@@ -606,15 +615,24 @@ def check(args, problems, notes, record):
                               "more than GitHub accepts in one file")
                   for n in frl.listdir(folder) if not n.startswith(".")  # (not a temp file git ignores)
                   and os.path.getsize(os.path.join(folder, n)) > GITHUB_MAX_BYTES]
-        if remote and not m.get("log"):
+        if remote and not m.get("log") and not given_up:
             found.append(gcs_log_appeared(m))
-        return [p for p in found if p]
+        noted = []
+        if remote and given_up:
+            try:
+                noted = [gcs_change(m, key, default) for key, default in files]
+                noted += [] if m.get("log") else [gcs_log_appeared(m)]
+            except Exception as e:
+                noted = [f"{m['job']}/{m['build']}: cannot read GCS: {type(e).__name__}: {e}"]
+        return [p for p in found if p], [p for p in noted if p]
 
     items = sorted(archived.values(), key=lambda item: item[0])
     unsettled = [m for _, m in items if m.get("settled") is False]
-    bad = 0
-    for (_, m), found in zip(items, pool.map(integrity, items), strict=True):
+    bad = given_up = 0
+    for (_, m), (found, noted) in zip(items, pool.map(integrity, items), strict=True):
         bad += bool(found)
+        given_up += frl.given_up_on(m) and compare_with_gcs(m)
+        notes += [f"{p} (only noted: the runs gave up on it after failed comparisons with GCS)" for p in noted]
         for p in found:
             # GCS may still change a copy that is not settled, and the next fetch compares it again
             if not isinstance(p, LocalDamage) and m.get("settled") is False and m.get("final") is not True:
@@ -624,9 +642,12 @@ def check(args, problems, notes, record):
     compared = sum(1 for _, m in items if compare_with_gcs(m))
     print(f"  integrity: {len(items)} builds' files checked on disk, {compared} of them compared with GCS (those "
           f"from the window, and {len(sevenths)}/7 of the rest, one seventh per day since the last run done with its "
-          f"own): {bad} differ, {len(unsettled)} not settled yet")
+          f"own): {bad} differ, {len(unsettled)} not settled yet"
+          + (f"; of those compared, {given_up} given up on after failed comparisons with GCS (only noted)" if given_up
+             else ""))
     print("  inventory: " + inventory(archived, root))
-    record.scope(compared_with_gcs=compared, sevenths=sorted(sevenths), differ=bad, not_settled=len(unsettled))
+    record.scope(compared_with_gcs=compared, sevenths=sorted(sevenths), differ=bad, not_settled=len(unsettled),
+                 **({"given_up": given_up} if given_up else {}))
 
     # 2. every column TestGrid paints red now
     def load(t):

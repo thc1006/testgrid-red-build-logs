@@ -35,9 +35,12 @@ once a week: each run compares the seventh of the archive for its UTC day, and
 those of the days since the last run done with its own (it compared them all,
 and its verification found none differing: see gcs_sevenths), as
 cross_check.py does. So one a run cut off did not get to is compared by the
-next run. A copy taken
-less than SETTLE_HOURS after the build finished, or before
-it finished at all, is marked as not settled.
+next run. A comparison that fails is an error, and is made again by the next
+run; once a build's comparisons have failed for GIVE_UP_DAYS, the runs give up
+on it: it is still compared at least once a week, but a failure on GCS's side
+is no error, and does not keep a run from being done with its sevenths (see
+COMPARISON_FAILING). A copy taken less than SETTLE_HOURS after the build
+finished, or before it finished at all, is marked as not settled.
 
 Each run gets its own folder; a build is stored in the folder of the run that
 first archived it, and later repairs or refreshes happen in place. Layout
@@ -133,7 +136,7 @@ MAX_JSON_BYTES = 256 << 20  # a TestGrid summary or table larger than this is re
 MAX_DOWNLOAD_BYTES = 4 << 30  # a GCS object larger than this, stored or gunzipped, is refused rather than streamed forever
 MAX_LIST_PAGES = 1000  # a GCS listing that pages on longer than this is broken
 GUNZIP_STEP = 256 << 10  # gunzip yields at most this many bytes per step, whatever the ratio
-GIVE_UP_DAYS = 14  # stop retrying a build GCS still lacks after this long
+GIVE_UP_DAYS = 14  # give up on a build GCS still lacks, or one whose comparisons with GCS keep failing, after this long
 VANISH_ROUNDS = 4  # how many times HoldModel works out again which builds vanish, as they change each other
 MAX_LOOKBACK = 21 * 86400  # how far before a build its job's other builds are read, at most (see Timeline.most)
 HELD_DAYS = 60  # watch a build only its tab's unfollowed config keeps undecided this long
@@ -185,8 +188,9 @@ class LocalIOError(Exception):
 
 # Socket timeouts, resets and SSL errors are OSError; urllib3 wraps the rest.
 TRANSIENT = (OSError, http.client.HTTPException, urllib3.exceptions.HTTPError, IntegrityError)
-# What a bug in Python code raises. One http.client raises as it parses a response's headers is the response's
-# (see FinalResponse.begin and _read_status; begin takes one of _read_status's own code for that too).
+# What a bug in this code raises, not GCS (see COMPARISON_FAILING). One http.client raises as it parses a response's
+# headers is the response's (see FinalResponse.begin and _read_status; begin takes one of _read_status's own code for
+# that too).
 BUGS = (TypeError, AttributeError, NameError, LookupError, AssertionError, ZeroDivisionError, RecursionError,
         NotImplementedError)
 
@@ -1857,6 +1861,16 @@ class RecheckError(Exception):
         self.meta = meta
 
 
+class NotCompared(Exception):
+    """Comparing with GCS a build the runs gave up on failed again, on GCS's side (see COMPARISON_FAILING): no
+    error of the run, and it is compared again in its seventh. The message says why, and meta what the run took
+    again of it before the failure (as RecheckError's does)."""
+
+    def __init__(self, message, meta):
+        super().__init__(message)
+        self.meta = meta
+
+
 def read_finished(base):
     """The result and finish time to record for a build, from its finished.json;
     None while GCS has none. A field that is not a usable result string or Unix
@@ -3386,10 +3400,42 @@ def settle_flags(meta, checked, now):
     return settled, checked >= fin + RECHECK_HOURS * 3600
 
 
+# A comparison with GCS that fails (GCS refuses a file, or serves one that cannot be verified) is an error of the
+# run, and the next run compares the build again. meta.json keeps when the first run that failed began, until one
+# succeeds. A run that fails once GIVE_UP_DAYS have passed since gives up, with an error: the build is final, and
+# meta.json keeps that run's failure (COMPARISON_GIVEN_UP). Later runs still compare it in its seventh (see
+# gcs_sevenths), and one that succeeds removes both, but a failure on GCS's side there is no error (see
+# NotCompared). A comparison the disk fails, or a bug in this code (BUGS), is an error that neither starts
+# nor ends a build's failures.
+COMPARISON_FAILING = "comparison_failing_since"
+COMPARISON_GIVEN_UP = "comparison_given_up"
+OLD_GAVE_UP_NOTE = "not compared with GCS after "  # (the note code before COMPARISON_FAILING wrote for it)
+
+
+def given_up_on(meta):
+    """Whether the runs gave up on this archived build after its comparisons with GCS failed (see
+    COMPARISON_FAILING)."""
+    note = meta.get("note")
+    return isinstance(meta.get(COMPARISON_GIVEN_UP), str) or isinstance(note, str) and note.startswith(OLD_GAVE_UP_NOTE)
+
+
+def failing_since(meta, now):
+    """When the first run that failed to compare this build with GCS began (COMPARISON_FAILING); None if none
+    failed since one succeeded, or if meta.json holds no time they could have failed since (more than a day
+    before the build was made, when it says when that was)."""
+    since, made = meta.get(COMPARISON_FAILING), meta.get("created")
+    if not plausible_time(since, now) or plausible_time(made, now) and since < made - 86400:
+        return None
+    return since
+
+
 def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_final=False):
     """An intact archived build: add new tab sightings and, until it is final (or when
     compare_final: a final build in this run's sevenths, see gcs_sevenths), compare its
-    files with GCS and fetch again whatever GCS now holds instead."""
+    files with GCS and fetch again whatever GCS now holds instead. A comparison that
+    fails raises RecheckError, until the run that gives up on the build returns
+    "comparison-given-up"; one that fails on GCS's side after that raises
+    NotCompared (see COMPARISON_FAILING)."""
     tabs, _ = merge_tabs(old["tabs"], rec["tabs"])
     meta = copy.deepcopy(dict(old, tabs=tabs))  # the file records may gain a GCS identity below
     if meta.get("started") is None and rec.get("started") is not None:
@@ -3454,23 +3500,37 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                     pass
         except Abandoned:
             raise
-        except LocalIOError as e:  # (not GCS's doing: no reason to stop comparing it, but not compared either)
-            raise RecheckError(f"comparing the archived copy with GCS failed: LocalIOError: {e}", meta) from None
-        except Exception as e:
-            first = meta.get("archived_at") if plausible_time(meta.get("archived_at"), now) else meta["created"]
-            # (a final one is compared again by the next run that compares its seventh)
-            if old.get("final") or now - first <= GIVE_UP_DAYS * 86400:
-                raise RecheckError(f"comparing the archived copy with GCS failed: {type(e).__name__}: {e}", meta) from None
-            meta.update(final=True, note=f"not compared with GCS after {GIVE_UP_DAYS} days of errors: "
-                                         f"{type(e).__name__}: {e}"[:300])
-            write_json(os.path.join(target, "meta.json"), meta)
-            return "stopped-comparing", meta
+        except (LocalIOError, *BUGS) as e:  # (not GCS's doing: an error that neither starts nor ends its failures)
+            raise RecheckError(f"comparing the archived copy with GCS failed: {type(e).__name__}: {e}", meta) from None
+        except Exception as e:  # (GCS's doing: see COMPARISON_FAILING)
+            error = f"{type(e).__name__}: {e}"
+            folder = str(meta.get("log_url") or "").rsplit("/", 1)[0]
+            short = error.replace(folder + "/", "") if folder else error  # (the build's own URL: what fails is after it)
+            if given_up_on(meta):
+                raise NotCompared(short, meta) from None
+            since = failing_since(meta, now)
+            if since is not None and now - since <= GIVE_UP_DAYS * 86400:
+                raise RecheckError(f"comparing the archived copy with GCS failed: {error}", meta) from None
+            if since is None:  # (the first run to fail since one succeeded)
+                meta[COMPARISON_FAILING] = now
+            else:
+                meta.update(final=True, **{COMPARISON_GIVEN_UP: short[:300]})
+            try:  # (meta is what is in place: a file taken before the failure is in it)
+                put_in_place(target, meta)
+            except (LocalIOError, *BUGS) as disk:
+                raise RecheckError(f"comparing the archived copy with GCS failed: {error} (and its meta.json could "
+                                   f"not record that: {type(disk).__name__}: {disk})", meta) from None
+            if since is None:
+                raise RecheckError(f"comparing the archived copy with GCS failed: {error}", meta) from None
+            return "comparison-given-up", meta
         if changed:
             meta.update(refreshed_by_run=run_id, refreshed=changed)
             if outcome == "already-archived":
                 outcome = "refreshed"
-        if str(meta.get("note", "")).startswith("not compared with GCS after "):
+        if isinstance(meta.get("note"), str) and meta["note"].startswith(OLD_GAVE_UP_NOTE):
             del meta["note"]  # (compared now, after all)
+        meta.pop(COMPARISON_FAILING, None)
+        meta.pop(COMPARISON_GIVEN_UP, None)
         if finished is not None:  # a field this read could not tell keeps what was recorded
             if finished["result"] is not None:
                 meta["result"] = finished["result"]
@@ -3480,8 +3540,8 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
     if meta != old:
         try:
             put_in_place(target, meta)
-        except LocalIOError as e:  # (as in the comparison: what it found is not recorded, so compared again)
-            raise RecheckError(f"comparing the archived copy with GCS failed: LocalIOError: {e}", meta) from None
+        except (LocalIOError, *BUGS) as e:  # (as in the comparison: what it found is not recorded, so compared again)
+            raise RecheckError(f"comparing the archived copy with GCS failed: {type(e).__name__}: {e}", meta) from None
     return outcome, meta
 
 
@@ -3656,6 +3716,8 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
             except (Abandoned, LocalIOError):
                 raise
             except Exception as e:
+                if existed and isinstance(e, BUGS):
+                    raise  # (a repair keeps the copy it has: a bug fails it, not taken for GCS refusing the file)
                 if kept["podinfo"] and isinstance(e, NotFound):
                     raise RuntimeError(f"the archived podinfo.json is damaged and GCS no longer has it ({base})") from None
                 if "podinfo.json" in held:
@@ -3691,6 +3753,15 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     meta["settled"], meta["final"] = settle_flags(meta, time.time(), now)
     if unread:
         meta["final"] = False  # (the next run compares it, and so reads its podinfo.json again)
+    # (a copy kept, not compared with GCS, or a file GCS did not serve now: what the runs know of its comparisons
+    # failing stays, see COMPARISON_FAILING)
+    if old and (any(whole.values()) or unread):
+        meta.update({k: old[k] for k in (COMPARISON_FAILING, COMPARISON_GIVEN_UP) if k in old})
+        if given_up_on(old):
+            meta["final"] = True  # (as the run that gave up left it: compared in its seventh, which tries again a
+            # podinfo.json left unread, once GCS serves the log)
+            if not meta.get("note") and isinstance(old.get("note"), str) and old["note"].startswith(OLD_GAVE_UP_NOTE):
+                meta["note"] = old["note"]
     put_in_place(target, meta, copies)
     return ("archived" if log else "archived-without-log") if not existed else "repaired", meta
 
@@ -3745,9 +3816,10 @@ def run_started(path):
 
 def sevenths_done(root, rel):
     """Whether the run in folder rel was done with its sevenths of the archive (see gcs_sevenths):
-    its fetch compared all it was due to with GCS ("gcs_compared" in its run.json), and its
-    verification compared them too and found none differing ("differ" in its verification.json),
-    whatever else it found (a tab that cannot be read, say)."""
+    its fetch compared all it was due to with GCS ("gcs_compared" in its run.json; a build the runs
+    gave up on, in that run or before, counts even if its comparison failed on GCS's side: see
+    COMPARISON_FAILING), and its verification compared them too and found none differing ("differ"
+    in its verification.json), whatever else it found (a tab that cannot be read, say)."""
     try:
         path = os.path.join(root, rel, "run.json")
         run = None if os.path.islink(path) else read_json(path)  # (a link in the archive is never followed)
@@ -4070,6 +4142,7 @@ def index_entry(job, build, meta, now, rel=None):
     remote = [(name.removesuffix(".gz") if name else default, f"{base}/{default}")
               for (name, info), default in zip(files, ("build-log.txt", "podinfo.json"), strict=True)
               if info and info.get("omitted") and base]
+    since = failing_since(meta, now)
     return {
         "time": t,
         "job": job,
@@ -4091,6 +4164,9 @@ def index_entry(job, build, meta, now, rel=None):
         "bytes": sum(info["bytes"] for _, info in files if info),
         "settled": meta.get("settled") if isinstance(meta.get("settled"), bool) else None,
         "final": meta.get("final") if isinstance(meta.get("final"), bool) else None,
+        # (since when its comparisons with GCS have failed, if they have, and whether the runs gave up on it)
+        **({"comparison_failing_since": since} if since is not None else {}),
+        **({"comparison_given_up": True} if given_up_on(meta) else {}),
         "backfilled": bool(meta.get("backfilled")),
         "has_log": bool(meta.get("log")),
         "in_parts": any((meta.get(key) or {}).get("parts") for key in ("log", "podinfo")),
@@ -4153,7 +4229,11 @@ def build_rows(entries, files=True, prefix=""):
             links = [f"[{p.rsplit('/', 1)[1]}]({prefix}{p})" for p in e["files"]]
             links += [f"[{name} in GCS (too large to store)]({url})" for name, url in e.get("remote") or []]
             last = " ".join(links) or "none"
-            if e.get("settled") is False:
+            if e.get("comparison_given_up"):  # (final for that, settled or not)
+                since = e.get("comparison_failing_since")
+                last += f" (no comparison with GCS has succeeded since {iso(since)[:10]})" if since else \
+                    " (its comparisons with GCS failed)"
+            elif e.get("settled") is False:
                 last += " (never settled: finished.json did not appear)" if e.get("final") else " (provisional)"
         else:
             last = md_cell(e["status"])
@@ -4364,6 +4444,8 @@ def holdings(entries, waiting, current_run):
             ("… provisional (taken before Prow finished uploading)",
              count(lambda e: e["settled"] is False and e["final"] is not True)),
             ("… still compared with GCS on every run", count(lambda e: e["final"] is not True)),
+            ("… given up on after failed comparisons with GCS (still compared at least once a week)",
+             count(lambda e: "comparison_given_up" in e)),
             ("… taken from GCS, judged by TestGrid's rule", count(lambda e: e["backfilled"])),
             ("Red builds waiting to be archived", sum(1 for e in waiting if not e["status"].startswith("given up"))),
             ("… of them with a damaged copy here, to be fetched again",
@@ -5642,9 +5724,11 @@ def run(args, root, run_start, pool, deadline):
     write_cut_off_readme(root, run_rel)
     outcomes, errors, downloaded, unresolved, watch = {}, list(backfill_errors) + take_out_errors, 0, {}, {}
     uncompared = []  # (archived builds due to be compared with GCS whose comparison did not end)
+    still_failing = {}  # (archived builds given up on whose comparison failed again: why, see NotCompared)
     if taken_out or shown_out:  # (taken out of the archive now, or shown red by TestGrid and left out)
         outcomes["excluded"] = sorted(set(taken_out) | shown_out)
-    recheck_failed = False  # (a comparison with GCS failed)
+    recheck_failed = False  # (a comparison with GCS failed: of a build not given up on in this run or before, or
+    # not on GCS's side)
     # judged by the gap search just now and still running, overdue on TestGrid, or watched and still
     # shown by TestGrid: watched without a look now, for as long as a build is ever watched
     for w in running_gap + list(stalled.values()) + still_shown:
@@ -5748,12 +5832,21 @@ def run(args, root, run_start, pool, deadline):
                 outcome = "backfilled"
             outcomes.setdefault(outcome, []).append(key)
             downloaded += bytes_taken(outcome, meta, run_id)
-            if outcome == "stopped-comparing":
+            if outcome == "comparison-given-up":  # (said once, as for a red build given up on: see COMPARISON_FAILING)
+                errors.append({"build": key, "error": f"no comparison with GCS has succeeded since "
+                                                      f"{iso(meta[COMPARISON_FAILING])}: after {GIVE_UP_DAYS} days of "
+                                                      "failures, the archived copy is still compared at least once a "
+                                                      "week, but from now on a failure on GCS's side is a warning: "
+                                                      f"{meta[COMPARISON_GIVEN_UP]}"})
                 downloaded += taken_before_failing(key, meta)
             if outcome == "pending":  # (a watched build found red is queued as red from now on)
                 unresolved[key] = {"rec": meta, "first_seen": previous.get("first_seen", run_start), "last_error": None}
             elif outcome in ("watching", "held"):
                 watch[key] = {"rec": b, "first_seen": state["watch"].get(key, {}).get("first_seen", run_start)}
+        except NotCompared as e:  # (no error, nor serious: see COMPARISON_FAILING)
+            outcomes.setdefault("given-up-still-failing", []).append(key)
+            still_failing[key] = str(e)
+            downloaded += taken_before_failing(key, e.meta)
         except RecheckError as e:
             # The archived copy stays as it is (see RecheckError), and the next run compares it again (the
             # run is not done with its sevenths, see gcs_sevenths).
@@ -5802,6 +5895,12 @@ def run(args, root, run_start, pool, deadline):
     # A possible gap in TestGrid history, a tab gone from its dashboard or a lost
     # retry list means builds may be missing without an error naming them.
     serious = [w for w in warnings if any(k in w for k in SERIOUS)]
+    if still_failing:  # (after serious: it quotes GCS's error, whatever that says)
+        failing = sorted(still_failing)
+        warnings.append(f"comparisons with GCS still fail for {len(failing)} archived build{'s' if len(failing) > 1 else ''}"
+                        " the runs gave up on ("
+                        + "; ".join(f"{k}: {still_failing[k][:150]}" for k in failing[:3])
+                        + f"{'; ...' if len(failing) > 3 else ''}): each is compared again at least once a week")
     config_record = {"source": config_source, "read": run_start} if config_source else previous_read or None
     # (what later runs still have to search or judge: the older parts of history gaps, and the ranges of
     # builds a scan saw that wait for a config not known yet)
@@ -5818,8 +5917,11 @@ def run(args, root, run_start, pool, deadline):
                "rechecked": rechecks, "watched": len(watch),
                "backfilled_from_gcs": len(outcomes.get("backfilled", [])), "outcomes": outcomes,
                "errors": errors, "warnings": warnings, "serious_warnings": serious, "interrupted": interrupted,
-               # (whether it compared with GCS all the archived builds it was due to: see gcs_sevenths)
+               # (whether it compared with GCS all the archived builds it was due to, but for the failures on GCS's
+               # side of those the runs gave up on: see gcs_sevenths, COMPARISON_FAILING)
                "gcs_compared": not (uncompared or recheck_failed or interrupted),
+               # (why the comparison of each of those failed again, see NotCompared)
+               **({"given_up_still_failing": dict(sorted(still_failing.items()))} if still_failing else {}),
                "left_for_later": {k: v for k, v in left.items() if v}}
     run_json = os.path.join(root, run_rel, "run.json")
     # Save what the next run needs before drawing the pages and charts: a failure

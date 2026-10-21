@@ -468,11 +468,13 @@ class PullRequestJob(r4.World):
         self.assertIn(f"{self.key} build-log.txt: GCS changed since it was archived", out)
 
     def test_one_whose_meta_json_cannot_be_given_its_folder_is_one_not_compared(self):
-        # (a full disk: not GCS's doing, so not one that makes the run stop comparing a build 14 days after it
-        # was archived; its copy and meta.json are kept)
+        # (a full disk: not GCS's doing, so it neither starts nor ends the build's failed comparisons, see
+        # frl.COMPARISON_FAILING; its copy and meta.json are kept)
         self.archived_from_under_the_index()
         folder = self.bdir()
-        frl.write_json(os.path.join(folder, "meta.json"), dict(self.meta(), archived_at=self.now - 15 * DAY))
+        since = self.now - 15 * DAY
+        frl.write_json(os.path.join(folder, "meta.json"),
+                       dict(self.meta(), created=since - DAY, comparison_failing_since=since))
         self.entry(self.build)
         real, failed = frl.temp_path, []
 
@@ -482,10 +484,11 @@ class PullRequestJob(r4.World):
                 raise OSError(28, "No space left on device")
             return real(path)
         with mock.patch.object(frl, "temp_path", full):
-            self.assertEqual(self.fetch(), 1)  # fails: 0, the build made final
-        run = self.runs()[-1]
+            self.assertEqual(self.fetch(), 1)
+        run, m = self.runs()[-1], self.meta()
         self.assertIn("comparing the archived copy with GCS failed: LocalIOError", run["errors"][0]["error"])
-        self.assertEqual((run["gcs_compared"], self.meta()["final"], self.meta().get("gcs_path")), (False, False, None))
+        self.assertEqual((run["gcs_compared"], m["final"], m.get("gcs_path")), (False, False, None))
+        self.assertEqual((m.get("comparison_given_up"), m["comparison_failing_since"]), (None, since))
 
     def test_control_one_read_under_the_index_that_gcs_no_longer_has_is_compared_as_gone(self):
         # (as one of a periodic job's: GCS deletes old builds; the copy stays, and the run compares all

@@ -126,9 +126,15 @@ from GCS.
    compares the seventh for its UTC day, and those of the days since the last
    run that finished its comparisons and whose verification found no difference.
    `cross_check.py` compares the same ones.
+
+   A build whose comparison failed is compared again by the next run, until
+   its comparisons have failed for 14 days. Then the run gives up on it: it is
+   still compared at least once a week, but a failure on GCS's side is no
+   longer an error.
 5. Rewrite the index and the charts, then run
    [`cross_check.py`](tool/cross_check.py). It checks the archive again on its
    own, and fails the run if a red build is missing or a stored file changed.
+   For a build given up on in step 4, what GCS holds is only noted.
    What it checked, and the outcome, are kept in the run's folder as
    `verification.json`.
 

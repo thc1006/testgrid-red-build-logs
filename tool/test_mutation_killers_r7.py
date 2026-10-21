@@ -293,14 +293,14 @@ class Holdings(unittest.TestCase):
                    e(has_log=True, files=["l"]),
                    e(files=["p"], backfilled=True),
                    e(remote=[("podinfo.json", "u")], final=None),
-                   e(settled=False, final=True),
+                   e(settled=False, final=True, comparison_given_up=True, comparison_failing_since=1_790_000_000.0),
                    e()]
         waiting = [{"status": "waiting for GCS upload", "on_disk": True}, {"status": "given up: x", "on_disk": True},
                    {"status": "given up: y", "on_disk": False}]
         rows = dict(line.rsplit(" | ", 1) for line in frl.holdings(entries, waiting, {"outcomes": {"watching": ["a"]}})
                     if line.startswith("| ") and not line.startswith("| |"))
         counts = {k.strip("| ").replace("\\", ""): int(v.strip(" |")) for k, v in rows.items()}
-        self.assertEqual(list(counts.values()), [6, 2, 1, 2, 1, 1, 2, 2, 1, 1, 2, 1], counts)
+        self.assertEqual(list(counts.values()), [6, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1], counts)  # fails: no row for it
         # the count of watched builds is the run's (state.json's), not only its "watching" outcomes
         self.assertIn("| 3 |", frl.holdings(entries, waiting, {"watched": 3, "outcomes": {"watching": ["a"]}})[-1])
 
