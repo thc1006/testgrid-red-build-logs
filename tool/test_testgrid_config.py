@@ -842,6 +842,14 @@ class RelevantDiff(unittest.TestCase):
                           "pkg/merger/merger.go", "cmd/tabulator/main.go", "config/queue.go",
                           "go.mod: github.com/sethvargo/go-retry v0.2.4 -> v0.2.5"])  # fails: []
 
+    def test_the_custom_evaluators_rules_count(self):
+        # (cell_options reads a group's custom_evaluator_rule_set, a RuleSet of this proto, which config.proto imports)
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
+        import relevant_diff
+        old = self.tree({"pb/custom_evaluator/custom_evaluator.proto": "e"})
+        new = self.tree({"pb/custom_evaluator/custom_evaluator.proto": "e2"})
+        self.assertEqual(relevant_diff.changes(old, new), ["pb/custom_evaluator/custom_evaluator.proto"])  # fails: []
+
     def test_every_part_the_port_follows(self):
         sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
         import relevant_diff
