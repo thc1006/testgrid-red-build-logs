@@ -2,7 +2,8 @@
 relevant_diff.py OLD_DIR NEW_DIR prints one line per change (nothing when none did).
 
 The port (testgrid_rule.py, testgrid_config.py) follows pkg/updater (GCS reading
-and the cells), pkg/tabulator (a tab's row filter), util/gcs, metadata,
+and the cells), cmd/updater (where a group's builds are read from: source()),
+pkg/tabulator (a tab's row filter), util/gcs, metadata,
 metadata/junit, internal/result (the order of statuses), the TestGroup and
 DashboardTab fields and the statuses in pb, and the Go version and the modules
 whose behaviour it ports (the Pod type, quantities, GCS's object reader): as go.mod
@@ -12,7 +13,7 @@ import os
 import re
 import sys
 
-PACKAGES = ["pkg/updater", "pkg/tabulator", "util/gcs", "metadata", "metadata/junit", "internal/result"]
+PACKAGES = ["pkg/updater", "cmd/updater", "pkg/tabulator", "util/gcs", "metadata", "metadata/junit", "internal/result"]
 FILES = ["pb/config/config.proto", "pb/test_status/test_status.proto", ".bazelversion"]
 MODULES = ["k8s.io/api", "k8s.io/apimachinery", "cloud.google.com/go/storage"]
 
