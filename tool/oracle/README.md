@@ -100,8 +100,11 @@ port follows changed. When something did:
    request's) lists what changed there in its summary once it has compared the
    two commits; it does not when the manifests deploy the updater and the
    tabulator at different commits, or cannot be read.
-   A TestGroup field the updater newly reads belongs in `testgrid_config.py`'s
-   `GROUP_FIELDS`, and `cell_options` or `group_problems`.
+   A TestGroup field the updater newly reads to decide whether it reads a group's
+   builds, from where, or a column's rows or results belongs in `testgrid_config.py`'s
+   `FIELD_TYPES`, with its type, and in what follows its use (`cell_options`,
+   `group_days`, `group_source` or `group_problems`), or in `group_problems`'
+   docstring if the port need not follow it.
 2. Port any change into the file that follows that code (`THIRD_PARTY_NOTICES.md`
    names which): `testgrid_rule.py`, `testgrid_config.py`, `gofmt.py`,
    `goregexp.py` or `fetch_red_logs.py`.
