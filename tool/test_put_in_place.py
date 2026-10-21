@@ -217,17 +217,23 @@ class DiskErrorAsAFileGoesInPlace(ArchiveWorld):
         self.assertTrue(frl.archived_intact(self.folder, deep=True))
 
     def test_one_whose_file_fails_to_go_in_place_otherwise(self):
-        # (not the disk's doing: taken for GCS's, so one not final 14 days after it was archived is made final,
+        # (not the disk's doing: taken for GCS's, so one whose comparisons have failed for 14 days is given up on,
         # and the meta.json the run writes for it then lists the copy in place, not the one taken)
-        frl.write_json(os.path.join(self.folder, "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+        since = time.time() - 15 * DAY
+        frl.write_json(os.path.join(self.folder, "meta.json"),
+                       dict(self.meta(), created=since - DAY, archived_at=since, comparison_failing_since=since))
+        real = frl.put_in_place
 
         def failing(target, meta, copies=()):  # (as put_in_place fails: its temp files go)
+            if not copies:
+                return real(target, meta)
             for c in copies:
                 c.discard()
             raise RuntimeError("not the disk")
         with mock.patch.object(frl, "put_in_place", failing):
-            self.assertEqual(self.fetch(), 0)
-        self.assertEqual((self.runs()[-1]["outcomes"], self.meta()["final"]), ({"stopped-comparing": [self.key]}, True))
+            self.assertEqual(self.fetch(), 1)  # fails: 0 (given up on without an error)
+        self.assertEqual((self.runs()[-1]["outcomes"], self.meta()["final"]), ({"comparison-given-up": [self.key]}, True))
+        # fails: ({'stopped-comparing': [...]}, True)
         self.assert_as_it_was()
 
 

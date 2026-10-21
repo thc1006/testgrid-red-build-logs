@@ -505,11 +505,11 @@ class Recheck(r3.World):
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.fetch()
         m = self.meta()
-        m["archived_at"] = self.now - 2 * DAY
+        m["comparison_failing_since"] = self.now - 2 * DAY
         frl.write_json(os.path.join(self.bdir(), "meta.json"), m)
         self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
         self.assertEqual(self.fetch(), 1)
-        self.assertNotIn("stopped-comparing", self.outcomes())
+        self.assertNotIn("comparison-given-up", self.outcomes())
         self.assertFalse(self.meta()["final"])
 
 

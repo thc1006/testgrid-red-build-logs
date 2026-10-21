@@ -1269,7 +1269,7 @@ class FinalBuilds(ArchiveWorld):
         self.assertGreater(len(seen[0][1]), 1)
 
     def test_a_final_build_that_cannot_be_compared_is_an_error_of_the_run(self):
-        # (archived 20 days before: a build not final would stop being compared after 14 days of errors)
+        # (archived 20 days before, but failing for the first time: the run records when its failures began)
         meta = os.path.join(self.bdir(), "meta.json")
         frl.write_json(meta, dict(self.meta(), archived_at=time.time() - 20 * DAY))
         self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
@@ -1277,8 +1277,9 @@ class FinalBuilds(ArchiveWorld):
         self.assertEqual(self.fetch_in(set(range(7))), 1)  # fails: 0, not compared
         run = self.runs()[-1]
         self.assertIn("comparing the archived copy with GCS failed", run["errors"][0]["error"])
-        self.assertNotIn("stopped-comparing", run["outcomes"])
-        self.assertEqual(self.meta(), before)  # (compared again by the next run that compares its seventh)
+        self.assertNotIn("comparison-given-up", run["outcomes"])
+        # (compared again by the next run that compares its seventh)
+        self.assertEqual(self.meta(), dict(before, comparison_failing_since=run["started"]))  # fails: as before
         self.assertNotIn(self.key, frl.read_json(os.path.join(self.root, "state.json"))["unresolved"])
         self.assertEqual(self.read("build-log.txt"), b"first upload\n")
 
@@ -1364,15 +1365,17 @@ class FinalBuildsOtherwise(ArchiveWorld):
         self.assertEqual(self.fetch_in(set(range(7))), 0)
         self.assertEqual((self.meta()["settled"], self.meta()["final"]), (True, True))  # fails: (False, True)
 
-    def test_control_one_not_final_still_gives_up_in_the_runs_sevenths(self):
-        # (in the sevenths but not final: after 14 days of errors it stops being compared, as before)
+    def test_one_not_final_still_gives_up_in_the_runs_sevenths(self):
+        # (in the sevenths but not final: after 14 days of errors the runs give up on it, as for a final one)
         self.finished(ago=3 * 3600)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.assertEqual(self.fetch(), 0)
-        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_at=time.time() - 15 * DAY))
+        since = time.time() - 15 * DAY
+        frl.write_json(os.path.join(self.bdir(), "meta.json"),
+                       dict(self.meta(), created=since - DAY, archived_at=since, comparison_failing_since=since))
         self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
-        self.assertEqual(self.fetch_in(set(range(7))), 0)
-        self.assertEqual(self.runs()[-1]["outcomes"], {"stopped-comparing": [self.key]})
+        self.assertEqual(self.fetch_in(set(range(7))), 1)  # fails: 0 (given up on without an error)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"comparison-given-up": [self.key]})  # fails: {'stopped-comparing': ...}
 
     def test_control_one_not_final_is_compared_outside_the_runs_sevenths_too(self):
         # (off TestGrid and not final: compared on every run, whichever sevenths the run compares)
