@@ -1342,7 +1342,7 @@ class CrossCheckTest(unittest.TestCase):
         self.assertEqual(len(parts), 5)
         code, out = self.check()
         self.assertEqual(code, 0, out)
-        self.assertIn("inventory: 1 builds: 1 with a log, 1 with a file stored in parts", out)
+        self.assertIn("inventory: 1 build: 1 with a log, 1 with a file stored in parts", out)  # fails: 1 builds:
         with open(os.path.join(target, parts[2]["file"]), "r+b") as f:  # same size, other bytes
             byte = f.read(1)
             f.seek(0)

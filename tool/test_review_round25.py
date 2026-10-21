@@ -1350,7 +1350,9 @@ class TakenOutInTheWindow(ArchiveWorld):
         with contextlib.redirect_stdout(out):
             code = cc.main(["--archive", self.root, "--testgrid", self.srv.url, "--gcs", self.srv.url, "--hours", "48"])
         self.assertEqual(code, 0, out.getvalue())  # fails: 1, MISSED
-        self.assertIn("1 red builds in window, 0 archived, 1 taken out (excluded.json), ", out.getvalue())
+        self.assertIn("1 red build in window, 0 archived, 1 taken out (excluded.json), ",
+                      out.getvalue())  # fails: 1 red builds in window
+        self.assertIn("  integrity: 0 builds' files checked on disk, ", out.getvalue())  # (0 builds: the plural)
 
 
 class TakenOutOfAnOlderRun(ArchiveWorld):

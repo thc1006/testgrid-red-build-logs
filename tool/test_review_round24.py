@@ -31,7 +31,7 @@ import report  # noqa: E402
 import test_config_history as tch  # noqa: E402  (module imports: their tests are not collected here)
 import test_testgrid_config as ttc  # noqa: E402
 from test_fetch_red_logs import DAY, table as fetch_table  # noqa: E402
-from test_integrity import HOUR, ArchiveWorld, obj  # noqa: E402
+from test_integrity import HOUR, ArchiveWorld, obj, snowflake  # noqa: E402
 
 
 # ------------------------------------------------------------------ testgrid_config.sh: the configs to build
@@ -1704,7 +1704,7 @@ class RunReadme(unittest.TestCase):
 class OneInTheSingular(ArchiveWorld):
     """The pages a run writes said "1 tabs read", "1 red builds on TestGrid", "archived 1 new builds",
     "1 archived builds that started since", "1 builds" (as INDEX.md did of 2026-W37) and "1 red builds
-    without an intact local copy"."""
+    without an intact local copy"; cross_check.py's report said "1 builds" and "1 red builds" too."""
 
     def test_one_archived_build(self):
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
@@ -1719,6 +1719,54 @@ class OneInTheSingular(ArchiveWorld):
         self.assertEqual(week.group(2), "1 build")  # fails: 1 builds
         with open(os.path.join(self.root, "weeks", f"{week.group(1)}.md")) as f:
             self.assertIn(" (UTC): 1 build, newest first.", f.read())  # fails: 1 builds, newest first.
+
+    def test_cross_check_of_one_build(self):
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.srv.gcs_listing("bucket", [f"logs/job/{self.build}/build-log.txt"])
+        self.assertEqual(self.fetch(), 0)
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertIn(", 1 tab, 1 build archived\n", out)  # fails: 1 tabs, 1 builds archived
+        self.assertIn("\n  integrity: 1 build's files checked on disk, ", out)  # fails: 1 builds' files
+        self.assertIn("\n  inventory: 1 build: ", out)  # fails: 1 builds:
+        self.assertIn("\n  testgrid: 1 red build in window, ", out)  # fails: 1 red builds
+        self.assertIn("\n  gcs: 1 build created in window: ", out)  # fails: 1 builds
+
+    def test_cross_check_of_one_damaged_build(self):
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        with open(os.path.join(self.bdir(), "build-log.txt"), "ab") as f:
+            f.write(b"damage")
+        code, out = self.check()
+        self.assertEqual(code, 1, out)
+        self.assertIn("): 1 differs, ", out)  # fails: 1 differ,
+
+    def test_control_cross_check_of_two_builds(self):
+        other = snowflake(self.start - 3600)
+        self.show([self.build, other], {"job.Overall": ([12, 12], ["boom", "boom"])})
+        for b in (self.build, other):
+            self.srv.route(f"/bucket/logs/job/{b}/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertIn(", 2 builds archived\n", out)
+        self.assertIn("\n  integrity: 2 builds' files checked on disk, ", out)
+        self.assertIn("): 0 differ, ", out)
+        self.assertIn("\n  inventory: 2 builds: 2 with a log, ", out)
+        self.assertIn("\n  testgrid: 2 red builds in window, ", out)
+
+    def test_control_cross_check_of_two_damaged_builds(self):
+        other = snowflake(self.start - 3600)
+        self.show([self.build, other], {"job.Overall": ([12, 12], ["boom", "boom"])})
+        for b in (self.build, other):
+            self.srv.route(f"/bucket/logs/job/{b}/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        for b in (self.build, other):
+            with open(os.path.join(self.bdir(b), "build-log.txt"), "ab") as f:
+                f.write(b"damage")
+        code, out = self.check()
+        self.assertEqual(code, 1, out)
+        self.assertIn("): 2 differ, ", out)
 
     def test_one_build_not_archived_yet(self):
         self.srv.route(self.base + "/build-log.txt", (500, {}, b""))
