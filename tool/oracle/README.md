@@ -95,12 +95,11 @@ python3 -I oracle/fuzz/golden.py testdata/testgrid_rule_golden.jsonl.gz   # only
 The daily workflow notices, and proposes the new commit itself when nothing the
 port follows changed. When something did:
 
-1. Compare the new commit with the pinned one. The code that matters is in
-   `pkg/updater` (`read.go`, `gcs.go`, `inflate.go`, `updater.go`), `util/gcs`
-   (`read.go`, and `gcs.go`'s `Path.SetURL`, which `fetch_red_logs.link_folder`
-   follows), `metadata` and `metadata/junit`, `pkg/tabulator` (`filter.go`,
-   and where `tabulate` calls it), plus `go.mod` (k8s.io/api is the Pod type, and
-   the Go version decides encoding/json, encoding/xml, net/url, fmt and regexp).
+1. Compare the new commit with the pinned one in the code `relevant_diff.py`
+   follows (its docstring says what that is). A failed run (not a pull
+   request's) lists what changed there in its summary once it has compared the
+   two commits; it does not when the manifests deploy the updater and the
+   tabulator at different commits, or cannot be read.
    A TestGroup field the updater newly reads belongs in `testgrid_config.py`'s
    `GROUP_FIELDS`, and `cell_options` or `group_problems`.
 2. Port any change into the file that follows that code (`THIRD_PARTY_NOTICES.md`
