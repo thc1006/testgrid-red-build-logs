@@ -348,6 +348,45 @@ class FollowChecks(unittest.TestCase):
         self.assertEqual(self.check("unicode", "#!/bin/sh\necho '{}'\nexit 2\n"), ["unicode"])
 
 
+class FollowSummary(unittest.TestCase):
+    """follow.sh wrote what changed in the code the port follows to the run's summary only once it had built
+    the new commit and run every check: a build that failed (zz_oracle.go not compiling against a changed
+    pkg/updater, say), or a run cut off, left no list for the person the failed run is for."""
+
+    def test_a_build_that_fails_leaves_the_list(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            oracle, stubs = os.path.join(tmp, "tool", "oracle"), os.path.join(tmp, "bin")
+            os.makedirs(oracle)
+            os.makedirs(stubs)
+            for name in ("follow.sh", "relevant_diff.py", "pinned.json"):
+                shutil.copy(os.path.join(HERE, "oracle", name), oracle)
+            for side, text in (("old", "a"), ("new", "a2")):
+                os.makedirs(os.path.join(tmp, side, "pkg", "updater"))
+                with open(os.path.join(tmp, side, "pkg", "updater", "read.go"), "w") as f:
+                    f.write(text)
+            with open(os.path.join(oracle, "pinned.json")) as f:
+                pinned = json.load(f)["testgrid_module_version"]
+            for name, script in (("build.sh", "#!/bin/sh\nexit 1\n"), ("go", (
+                    '#!/bin/sh\ncase "$1 $2" in\n  "mod init") exit 0 ;;\n'
+                    '  "list -m") echo \'{"Version": "v0.0.2-new"}\' ;;\n'
+                    f'  "mod download") case "$4" in *@{pinned}) echo \'{{"Dir": "{tmp}/old"}}\' ;;\n'
+                    f'    *) echo \'{{"Dir": "{tmp}/new"}}\' ;; esac ;;\nesac\n'))):
+                path = os.path.join(oracle if name == "build.sh" else stubs, name)
+                with open(path, "w") as f:
+                    f.write(script)
+                os.chmod(path, 0o755)
+            summary = os.path.join(tmp, "summary.md")
+            done = subprocess.run(["bash", os.path.join(oracle, "follow.sh"), "abc123", "1"], cwd=tmp,
+                                  env=dict(os.environ, PATH=f"{stubs}:{os.environ['PATH']}", GITHUB_STEP_SUMMARY=summary),
+                                  capture_output=True, text=True, timeout=120)
+            self.assertEqual(done.returncode, 1, done.stdout + done.stderr)  # (the build failed: set -e)
+            written = ""
+            if os.path.exists(summary):
+                with open(summary) as f:
+                    written = f.read()
+        self.assertIn("Changed in the code the port follows:\n\n- `pkg/updater/read.go`\n", written)  # fails: not written
+
+
 # ------------------------------------------------------------------ the commit step: files GitHub would refuse
 
 LIMIT = 95 << 20  # (the commit step's limit; GitHub blocks files over 100 MiB)
