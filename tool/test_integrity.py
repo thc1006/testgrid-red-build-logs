@@ -1630,5 +1630,65 @@ class BytesDownloadedTest(ArchiveWorld):
         self.assertEqual(self.check()[0], 0)
 
 
+class TakenBeforeAFailedComparisonTest(ArchiveWorld):
+    """A run that took a file of an archived build again from GCS, then failed to compare its other file, left
+    the build out of its outcomes, and so out of its README's updated builds, and the file's bytes out of
+    bytes_downloaded, though the file it took is in place."""
+
+    def archive(self, log=True):
+        if log:
+            self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.srv.route(self.base + "/podinfo.json", obj(b'{"pod": {}}'))
+        self.assertEqual(self.fetch(), 0)
+        self.assertIs(self.meta()["final"], False)
+        self.srv.route(self.base + "/podinfo.json", (403, {}, b""))
+
+    def test_a_log_taken_again_before_its_podinfo_fails(self):
+        self.finished(ago=3 * HOUR)
+        self.archive()
+        self.srv.route(self.base + "/build-log.txt", obj(b"log, uploaded again\n", "2"))
+        self.assertEqual(self.fetch(), 1)
+        run = self.runs()[-1]
+        self.assertIn("comparing the archived copy with GCS failed: HTTPError", run["errors"][0]["error"])
+        self.assertEqual((self.read("build-log.txt"), self.meta()["refreshed_by_run"]), (b"log, uploaded again\n", run["run"]))
+        self.assertEqual(run["outcomes"], {"refreshed": [self.key]})  # fails: {}
+        self.assertEqual(run["bytes_downloaded"], len(b"log, uploaded again\n"))  # fails: 0
+        self.assertIn("## Archived earlier, updated by this run", slurp(os.path.join(self.root, run["dir"], "README.md")))
+        # fails: not in it
+        self.assertIs(run["gcs_compared"], False)
+
+    def test_a_log_recovered_before_its_podinfo_fails(self):
+        self.finished(ago=3 * HOUR)
+        self.archive(log=False)
+        self.srv.route(self.base + "/build-log.txt", obj(b"late log\n"))
+        self.assertEqual(self.fetch(), 1)
+        run = self.runs()[-1]
+        self.assertEqual(self.meta()["log_recovered_by_run"], run["run"])
+        self.assertEqual((run["outcomes"], run["bytes_downloaded"]), ({"log-recovered": [self.key]}, len(b"late log\n")))
+        # fails: ({}, 0)
+        self.assertIs(run["gcs_compared"], False)
+
+    def test_a_log_taken_again_by_the_run_that_stops_comparing_it(self):
+        # (without finished.json: compared on every run until 14 days after it was archived)
+        self.archive()
+        self.srv.route(self.base + "/build-log.txt", obj(b"log, uploaded again\n", "2"))
+        path = os.path.join(self.bdir(), "meta.json")
+        frl.write_json(path, dict(frl.read_json(path), archived_at=time.time() - 15 * DAY))
+        self.assertEqual(self.fetch(), 0)
+        run = self.runs()[-1]
+        self.assertEqual(run["outcomes"], {"refreshed": [self.key], "stopped-comparing": [self.key]})
+        # fails: {'stopped-comparing': [...]}
+        self.assertEqual(run["bytes_downloaded"], len(b"log, uploaded again\n"))  # fails: 0
+        self.assertEqual(self.read("build-log.txt"), b"log, uploaded again\n")
+
+    def test_control_a_failure_without_a_file_taken_again(self):
+        self.finished(ago=3 * HOUR)
+        self.archive()
+        self.srv.route(self.base + "/build-log.txt", (403, {}, b""))
+        self.assertEqual(self.fetch(), 1)
+        run = self.runs()[-1]
+        self.assertEqual((run["outcomes"], run["bytes_downloaded"], run["gcs_compared"]), ({}, 0, False))
+
+
 if __name__ == "__main__":
     unittest.main()
