@@ -292,7 +292,9 @@ class PodInfoGzipped(ArchiveWorld):
         self.assertEqual([p["file"] for p in parts][:2], ["podinfo.json.gz.000", "podinfo.json.gz.001"])
         # fails: podinfo.json.000, ...
         self.assertEqual(gzip.decompress(b"".join(self.read(p["file"]) for p in parts)), POD)
-        self.assertEqual(self.check()[0], 0)
+        code, out = self.check()
+        self.assertEqual(code, 0)
+        self.assertIn("1 with a file stored in parts", out)  # (cross_check's inventory counts it, as INDEX.md does)
         stray = f"podinfo.json.gz.{len(parts):03d}"
         with open(os.path.join(self.bdir(), stray), "wb") as f:
             f.write(b"x")
