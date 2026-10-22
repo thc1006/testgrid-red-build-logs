@@ -1,7 +1,7 @@
 """A tab the archive keeps no scan of, such as one new to it or one it forgot after the tab was unlisted: GCS is
 searched for the builds it no longer shows from the archive's start (less the tab's longest job time), but no further
-back than GIVE_UP_DAYS, and the run's warnings say that the archive keeps no scan of the tab, and since when a run looks
-for them."""
+back than GIVE_UP_DAYS, and the run's warnings say that the archive keeps no scan of the tab, since when a run looks
+for them, and how many red builds were taken from GCS ("1 red build ... was" for one)."""
 import contextlib
 import io
 import os
@@ -85,3 +85,18 @@ class NewTab(r3.World):
         for w, _, _ in self.gap_warnings():
             self.assertIn(f"but the last scan ({frl.iso(scan)}) needed them from", w)
         self.assertEqual(self.outcomes(), {"backfilled": [f"job/{red}"]})
+
+    def test_one_red_build_taken_from_gcs_is_one(self):
+        red = self.one_red_build_in_gcs()
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.outcomes(), {"backfilled": [f"job/{red}"]})
+        (gap,) = [w for w in self.runs()[-1]["warnings"] if "GCS was searched instead" in w]
+        self.assertIn("and 1 red build from that time was taken from it", gap)  # fails: 1 red builds from that time were
+
+    def test_none_taken_from_gcs_are_none(self):
+        run_folder(self.root, self.now - 3 * DAY)
+        visible = self.show_recent()
+        self.srv.gcs_listing("bucket", [f"logs/job/{visible}/finished.json"])
+        self.assertEqual(self.fetch(), 0)
+        (gap,) = [w for w in self.runs()[-1]["warnings"] if "GCS was searched instead" in w]
+        self.assertIn("and 0 red builds from that time were taken from it", gap)

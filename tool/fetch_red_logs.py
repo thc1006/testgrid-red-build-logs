@@ -5956,8 +5956,9 @@ def run(args, root, run_start, pool, deadline):
             held = sum(1 for w in undecided if held_by(w, tab_rules))
             why = [f"{held} held until the config TestGrid had then is known and followed here"] * bool(held) + \
                 [f"{len(undecided) - held} still running, or unreadable"] * bool(len(undecided) - held)
-            warnings.append(f"{key}: {'; '.join(what)}; GCS was searched instead, and {len(found)} red builds from "
-                            "that time were taken from it"
+            warnings.append(f"{key}: {'; '.join(what)}; GCS was searched instead, and "
+                            f"{count_text(len(found), 'red build')} from that time {'was' if len(found) == 1 else 'were'} "
+                            "taken from it"
                             + (f" ({len(undecided)} not decided yet, looked at again: {'; '.join(why)})"
                                if undecided else ""))
     elif gaps:
