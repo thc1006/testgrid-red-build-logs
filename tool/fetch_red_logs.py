@@ -175,6 +175,7 @@ BASE_DEADLINE = 120.0
 MIN_RATE = 50_000  # bytes per second
 MAX_JSON_BYTES = 256 << 20  # a TestGrid summary or table larger than this is refused
 MAX_DOWNLOAD_BYTES = 4 << 30  # a GCS object larger than this, stored or gunzipped, is refused rather than streamed forever
+MAX_FILE_MB = 95  # a stored file larger than this (MiB) is split in numbered parts: GitHub blocks files over 100 MiB
 MAX_LIST_PAGES = 1000  # a GCS listing that pages on longer than this is broken
 GUNZIP_STEP = 256 << 10  # gunzip yields at most this many bytes per step, whatever the ratio
 GIVE_UP_DAYS = 14  # give up on a build GCS still lacks, or one whose comparisons with GCS keep failing, after this long
@@ -1824,7 +1825,7 @@ def remove_temps(temps):
 def split_parts(tmp, final, max_bytes=None):
     """How a verified download, in temp file tmp, goes in place: ([(temp file, the name it takes)], its parts).
     Whole, as `final` ([(tmp, final)], no parts), or, if it is larger than max_bytes, as numbered parts
-    final.000, final.001, ... of at most max_bytes each (GitHub rejects files over 100 MB), copied to temp
+    final.000, final.001, ... of at most max_bytes each (GitHub rejects files over 100 MiB), copied to temp
     files of their own (tmp then goes): meta.json lists them, and `cat <file>.* > <file>` puts the file back
     together. A file too large for git so never sits under a name git commits."""
     size = os.path.getsize(tmp)
@@ -3772,7 +3773,7 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
     return outcome, meta
 
 
-def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_bytes=95 << 20, tab_rules=None,
+def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_bytes=MAX_FILE_MB << 20, tab_rules=None,
             timelines=None, compare_final=False):
     """Archive one red build into `target` (its existing folder, or one in this run's folder).
     tab_rules: per tab ("dashboard#tab"), the rows it shows and its days of results, for a
@@ -5359,9 +5360,9 @@ def main(argv=None):
     p.add_argument("--gzip", action="store_true",
                    help="store each file gzipped, as build-log.txt.gz, podinfo.json.gz, <node>.<file>.gz and "
                         "cluster-info.log.gz (meta.json keeps each raw file's md5 and size)")
-    p.add_argument("--max-file-mb", type=positive(float), default=95,
+    p.add_argument("--max-file-mb", type=positive(float), default=MAX_FILE_MB,
                    help="store a file larger than this (MiB) as numbered parts of this size, as GitHub rejects "
-                        "files over 100 MB (default: 95)")
+                        f"files over 100 MiB (default: {MAX_FILE_MB})")
     p.add_argument("--testgrid-config", metavar="PATH",
                    help="TestGrid's config for the tabs, as testgrid_config.sh writes it: the rows each tab shows and "
                         "its test group's options, to judge builds TestGrid no longer shows (default, or when it "
