@@ -36,6 +36,7 @@ check the port against, and the fetch's reading of Prow's index links
     `../test_testgrid_rule.py` replays without Go.
   - `filtergolden.py`: writes `../testdata/testgrid_filter_golden.jsonl.gz`,
     which `../test_testgrid_config.py` replays without Go.
+  - `fmtdiff.py`: `../gofmt.py` against Go's `fmt.Sprintf`, on random formats.
   - `filterdiff.py`: `../testgrid_config.py`'s row filter (Go's url.ParseQuery and
     regexp, matched without backtracking) against `filterGrid`: the base options
     of testgrid.k8s.io's tabs, about 250 edge cases, and random ones. Where
@@ -52,7 +53,7 @@ check the port against, and the fetch's reading of Prow's index links
 The workflow `.github/workflows/oracle.yml` runs daily, and on a change to the
 port. It does all of this:
 
-- builds TestGrid's code;
+- builds TestGrid's code (`build.sh`);
 - checks that the types match `testgrid_types.json`, and that Go's unicode tables
   match `go_unicode.json.gz`;
 - runs the edge cases, 5000 random builds (a seed per run; the cases that differ are
