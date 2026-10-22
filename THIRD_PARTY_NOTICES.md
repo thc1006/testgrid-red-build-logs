@@ -59,8 +59,9 @@ in [`third_party/unicode/LICENSE`](third_party/unicode/LICENSE).
 github.com/GoogleCloudPlatform/testgrid at `f15bfa4808a4`, under the Apache
 License 2.0, the license of this repository ([`LICENSE`](LICENSE)). Each file
 below carries "Copyright <year> The TestGrid Authors" (TG) or "Copyright <year>
-The Kubernetes Authors" (K8s), with the year shown, but
-`pb/test_status/test_status.proto`, which carries none.
+The Kubernetes Authors" (K8s), with the year shown, but the protos
+(`pb/config/config.proto`, `pb/custom_evaluator/custom_evaluator.proto` and
+`pb/test_status/test_status.proto`), which carry none.
 
 - `tool/testgrid_rule.py`: parts of `pkg/updater/read.go` (TG 2020),
   `pkg/updater/gcs.go` (TG 2020), `pkg/updater/eval.go` (TG 2022),
@@ -72,10 +73,17 @@ The Kubernetes Authors" (K8s), with the year shown, but
   `pkg/updater/updater.go` (K8s 2018) find a test group's results, and how
   `makeOptions` in `pkg/updater/read.go` (TG 2020) and `evalProperties` in
   `pkg/updater/eval.go` (TG 2022) treat its options, as far as test-infra's
-  configurator can set them.
+  configurator can set them: the TestGroup fields of `pb/config/config.proto`
+  and the rules of `pb/custom_evaluator/custom_evaluator.proto`.
 - `tool/fetch_red_logs.py`: models when TestGrid's updater reads a build,
-  following `pkg/updater/updater.go` (K8s 2018), `pkg/updater/read.go` and
-  `pkg/updater/inflate.go` (TG 2020). It reads the links of Prow's index as
+  following `cmd/updater/main.go` and `pkg/updater/updater.go` (K8s 2018),
+  `pkg/updater/read.go`, `pkg/updater/gcs.go` and `pkg/updater/inflate.go`
+  (TG 2020), `util/queue/queue.go` and `config/queue.go` (TG 2021), and when
+  TestGrid takes a new config and writes a tab again, following
+  `cmd/config_merger/main.go` and `pkg/merger/merger.go` (K8s 2021),
+  `pkg/tabulator/pubsub.go` (TG 2021), `config/snapshot/config_snapshot.go`
+  (TG 2022; with go-retry, below), `pkg/tabulator/tabstate.go` and
+  `cmd/tabulator/main.go` (TG 2022). It reads the links of Prow's index as
   `readLink`, `ListBuilds` and `Build` in `util/gcs/read.go` (K8s 2019) and
   `Path.SetURL` and `Path.Object` in `util/gcs/gcs.go` (K8s 2018) do, rewritten
   in Python.
@@ -107,3 +115,14 @@ cloud.google.com/go/storage v1.31.0, under the Apache License 2.0
 
 - `tool/testgrid_rule.py` uses its error text for a missing object, and
   `tool/fetch_red_logs.py` follows how it reads a gzip-encoded object.
+
+## go-retry
+
+github.com/sethvargo/go-retry v0.2.4, under the Apache License 2.0
+([`LICENSE`](LICENSE)); neither its LICENSE nor its source files name a
+copyright holder.
+
+- `tool/fetch_red_logs.py` follows how TestGrid's `config/snapshot` retries a
+  failed read of its config with it (`Do` and `RetryableError` in `retry.go`,
+  `WithMaxRetries` in `backoff.go`, `NewExponential` in
+  `backoff_exponential.go`): twice, 5 and 10 seconds later.
