@@ -827,6 +827,21 @@ class RelevantDiff(unittest.TestCase):
         new = self.tree({"cmd/updater/main.go": "s2", "cmd/updater/main_test.go": "t2"})
         self.assertEqual(relevant_diff.changes(old, new), ["cmd/updater/main.go"])  # fails: []
 
+    def test_the_code_the_fetchs_timing_follows_counts(self):
+        # (fetch_red_logs's READ_GAP, PICKUP and TABULATE: when a group is handed out again, when a new config is
+        # taken, when a tab is written again)
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
+        import relevant_diff
+        files = {"util/queue/queue.go": "q", "config/queue.go": "c", "config/config.go": "x",
+                 "config/snapshot/config_snapshot.go": "s", "cmd/config_merger/main.go": "m", "pkg/merger/merger.go": "g",
+                 "cmd/tabulator/main.go": "t", "go.mod": "module m\n\nrequire github.com/sethvargo/go-retry v0.2.4\n"}
+        old = self.tree(files)
+        new = self.tree({k: v.replace("v0.2.4", "v0.2.5") if k == "go.mod" else v + "2" for k, v in files.items()})
+        self.assertEqual(relevant_diff.changes(old, new),
+                         ["util/queue/queue.go", "config/snapshot/config_snapshot.go", "cmd/config_merger/main.go",
+                          "pkg/merger/merger.go", "cmd/tabulator/main.go", "config/queue.go",
+                          "go.mod: github.com/sethvargo/go-retry v0.2.4 -> v0.2.5"])  # fails: []
+
     def test_every_part_the_port_follows(self):
         sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
         import relevant_diff

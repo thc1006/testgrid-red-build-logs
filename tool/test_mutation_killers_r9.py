@@ -1075,18 +1075,21 @@ class BazelBuild(unittest.TestCase):
                 f.write(text)
         return d
 
-    MODULES = [("k8s.io/api", "v0.27.4"), ("k8s.io/apimachinery", "v0.27.5"), ("cloud.google.com/go/storage", "v1.31.0")]
+    MODULES = [("k8s.io/api", "v0.27.4"), ("k8s.io/apimachinery", "v0.27.5"), ("cloud.google.com/go/storage", "v1.31.0"),
+               ("github.com/sethvargo/go-retry", "v0.2.4")]
 
     def test_what_the_build_uses(self):  # MD003, MD011-MD013, MD015, MD022, MD024, MD025, MD027, MD031, MD032, SD02, SD03, SD08
         root = self.tree({"WORKSPACE": WORKSPACE.format("1.26.5"), "repos.bzl": repos(*self.MODULES)})
         self.assertEqual(self.rd.bazel(root), {"go": "1.26.5", "k8s.io/api": "v0.27.4", "k8s.io/apimachinery": "v0.27.5",
-                                               "cloud.google.com/go/storage": "v1.31.0"})
+                                               "cloud.google.com/go/storage": "v1.31.0",
+                                               "github.com/sethvargo/go-retry": "v0.2.4"})  # fails: without go-retry
 
     def test_a_rule_without_a_version_has_none(self):  # MD003, MD012, MD013, MD015, MD027, MD031, MD032, SD01, SD02
         # (a module's rule without a version: not the version of the rule after it)
         root = self.tree({"repos.bzl": repos(("k8s.io/api", None), ("k8s.io/apimachinery", "v0.27.5"))})
         self.assertEqual(self.rd.bazel(root), {"go": None, "k8s.io/api": None, "k8s.io/apimachinery": "v0.27.5",
-                                               "cloud.google.com/go/storage": None})
+                                               "cloud.google.com/go/storage": None,
+                                               "github.com/sethvargo/go-retry": None})  # fails: without go-retry
 
     def test_changes(self):
         # MD003, MD007, MD011-MD013, MD015, MD020, MD022, MD024, MD025, MD027, MD031, MD032, SD02-SD05, SD07, SD08
