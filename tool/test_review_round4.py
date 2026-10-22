@@ -373,8 +373,9 @@ class MutationReviewDefects(r3.World):
         self.srv.gcs_listing("bucket", [f"logs/job/{b}/finished.json" for b in (red, visible)])
         self.fetch()  # the listing works again
         self.assertEqual(self.outcomes().get("backfilled"), [f"job/{red}"])  # fails: never searched again
-        given_up = [w for w in first["warnings"] if "after 14 days the search is given up" in w]
-        self.assertEqual(given_up, [], "the very first attempt was reported as 14 days of failures")
+        # (the first run said its search failed, and that the next run tries again, as it did)
+        self.assertTrue(any("looking them up in GCS failed; the next run tries again" in w for w in first["warnings"]),
+                        first["warnings"])
 
     def test_D2_cross_check_misses_a_red_build_testgrid_lists_only_as_a_placeholder(self):
         """cross_check's unlisted check skips every build in `statuses`, which includes
