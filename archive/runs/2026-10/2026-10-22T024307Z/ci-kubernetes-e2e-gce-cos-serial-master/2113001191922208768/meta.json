@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2113001191922208768",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1792613746,
+  "created": 1792613716,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Up",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-up.sh: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792614252,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2113001191922208768",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2113001191922208768/build-log.txt",
+  "log": {
+    "bytes": 35632,
+    "md5": "f647ceba56e7ff81b2d082592d9c709a",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 7941,
+    "gcs": {
+      "generation": "1792614253299513",
+      "md5": "f647ceba56e7ff81b2d082592d9c709a",
+      "crc32c": "b68ccd60",
+      "bytes": 35632,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96250,
+    "md5": "d7a0901e70f7ec0c3a7ce0269f30d0e5",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12425,
+    "gcs": {
+      "generation": "1792614256095716",
+      "md5": "d7a0901e70f7ec0c3a7ce0269f30d0e5",
+      "crc32c": "eda73bc8",
+      "bytes": 96250,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-22T024307Z",
+  "archived_at": 1792636987.0,
+  "settled": true,
+  "final": false
+}

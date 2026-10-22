@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2112988357343580160",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1792610687,
+  "created": 1792610656,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler/podgroup.topology_aware_scheduling",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCPGTopologyAwareScheduling/CPG_schedules_on_a_sin...logyAwareScheduling\n--- FAIL: TestCPGTopologyAwareScheduling (99.26s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792612952,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2112988357343580160",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2112988357343580160/build-log.txt",
+  "log": {
+    "bytes": 218692,
+    "md5": "72045a0f4838fa453041a135ce8d9d11",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19882,
+    "gcs": {
+      "generation": "1792612957830289",
+      "md5": "72045a0f4838fa453041a135ce8d9d11",
+      "crc32c": "ad3e1ab4",
+      "bytes": 218692,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96300,
+    "md5": "ac72e9504164d7fbda4fe006d3695bb9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12366,
+    "gcs": {
+      "generation": "1792612963045145",
+      "md5": "ac72e9504164d7fbda4fe006d3695bb9",
+      "crc32c": "f9a6445f",
+      "bytes": 96300,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-22T024307Z",
+  "archived_at": 1792636987.0,
+  "settled": true,
+  "final": false
+}
