@@ -131,7 +131,7 @@ port follows changed. When something did:
 ## What the port cannot know
 
 - **Timing.** TestGrid read a build when it did, not now: the fetch works out when
-  it may have from TestGrid's updater code and GCS's object times (see
+  it may have from TestGrid's code and GCS's object times (see
   `fetch_red_logs.gcs_column`), and judges every column it may have read then.
   An error TestGrid itself hit reading GCS is invisible from here.
 - **Racing reads.** When `readResult`'s reads race, every outcome is possible,
