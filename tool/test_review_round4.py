@@ -361,7 +361,7 @@ class MutationReviewDefects(r3.World):
 
     def test_D1_a_failed_first_search_of_a_new_tab_in_an_old_archive_is_tried_again(self):
         """A tab new to an archive older than GIVE_UP_DAYS gets one try at its first-scan
-        gap search: last_scan() falls back to the archive's first run, so a single failed
+        gap search: its last scan was taken to be the archive's first run, so a single failed
         GCS listing counts as "failing for 14 days" and the search is given up for good."""
         run_folder(self.root, self.now - 30 * DAY)  # the archive has run for a month
         visible = self.show_recent()  # a tab it has never scanned shows only the last hour

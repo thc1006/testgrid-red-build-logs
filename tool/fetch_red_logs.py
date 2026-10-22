@@ -5725,8 +5725,7 @@ def run(args, root, run_start, pool, deadline):
         first = prev is None and archive_start is not None
         pending = (prev or {}).get("unsearched")  # (an older part of a gap, searched a chunk a run)
         if first:
-            # never scanned while the archive ran (new, or failing until now): look
-            # for red builds since the archive began, as far back as gaps are searched
+            # no scan kept: the tab is new, or forgotten
             prev = {"scan": max(archive_start, horizon), "oldest": None}
         # Builds the last scan saw that might still have been running started after
         # max(that scan's oldest column, its time - max_job_hours); if the oldest
@@ -5882,8 +5881,11 @@ def run(args, root, run_start, pool, deadline):
     # archive the ones TestGrid painted red by its own rule, since it no longer shows them.
     backfill_errors, backfilled, new_watch, taken, running_gap, searched = [], 0, {}, set(), [], set()
 
-    def last_scan(key):
-        return (state["tabs"].get(key) or {"scan": archive_start})["scan"]
+    def gap_text(key, r, since):  # (a tab's history gap: what its last scan needed, or, with none kept, where a run looks)
+        shown = f"TestGrid only shows builds since {iso(r['oldest'])}"
+        if state["tabs"].get(key):
+            return f"{shown}, but the last scan ({iso(state['tabs'][key]['scan'])}) needed them from {iso(since)}"
+        return f"{shown}, and the archive keeps no scan of the tab: a run looks for them from {iso(since)}"
     if gaps and not args.list_only:
         # Builds retried anyway are not taken again: one known to be red (waiting to be
         # archived) is only judged for the gap's tab, and one watched gains that tab.
@@ -5916,8 +5918,7 @@ def run(args, root, run_start, pool, deadline):
             found = backfill.get(key)
             what = []  # (what the gap's search covered: the recent part, an older one, those seen before a change)
             if floor is not None:
-                what.append(f"TestGrid only shows builds since {iso(r['oldest'])}, but the last scan "
-                            f"({iso(last_scan(key))}) needed them from {iso(floor)}")
+                what.append(gap_text(key, r, floor))
             if older:
                 what.append(f"the older part of its history gap from {iso(older[0])} to {iso(older[1])} is searched "
                             "now" + (f" (the rest, back to {iso(read_ok[key]['unsearched'][0])}, by the next runs)"
@@ -5960,10 +5961,9 @@ def run(args, root, run_start, pool, deadline):
                             + (f" ({len(undecided)} not decided yet, looked at again: {'; '.join(why)})"
                                if undecided else ""))
     elif gaps:
-        warnings += [f"{key}: TestGrid only shows builds since {iso(r['oldest'])}, but the last scan "
-                     f"({iso(last_scan(key))}) needed them from "
-                     f"{iso(floor if floor is not None else older[0] if older else min(c[0] for c in changed))}"
-                     "; red builds in between may be missing" for key, r, floor, older, changed in gaps]
+        for key, r, floor, older, changed in gaps:
+            since = floor if floor is not None else older[0] if older else min(c[0] for c in changed)
+            warnings.append(f"{key}: {gap_text(key, r, since)}; red builds in between may be missing")
     # Each range this run stopped waiting for, but the one derived from a scan that a failed gap search
     # keeps: the next run derives it again.
     warnings += [pending_dropped(key, p, why) for key, ranges in sorted(dropped.items()) for p, derived, why in ranges
