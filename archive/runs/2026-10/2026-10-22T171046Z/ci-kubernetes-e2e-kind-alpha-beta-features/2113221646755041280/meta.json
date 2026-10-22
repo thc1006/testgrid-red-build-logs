@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2113221646755041280",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1792666304,
+  "created": 1792666277,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics PVC should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 10/22/26 11:30:26.643\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792668710,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2113221646755041280",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2113221646755041280/build-log.txt",
+  "log": {
+    "bytes": 169672,
+    "md5": "fca743aad3cb81bb4f9d59c2069a27bf",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22705,
+    "gcs": {
+      "generation": "1792668728937304",
+      "md5": "fca743aad3cb81bb4f9d59c2069a27bf",
+      "crc32c": "9a1b8b53",
+      "bytes": 169672,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94757,
+    "md5": "84f27fca27ee216e96b82bf6c5b2ba83",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12702,
+    "gcs": {
+      "generation": "1792668730912923",
+      "md5": "84f27fca27ee216e96b82bf6c5b2ba83",
+      "crc32c": "9f77f056",
+      "bytes": 94757,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-22T171046Z",
+  "archived_at": 1792689046.0,
+  "settled": true,
+  "final": false
+}

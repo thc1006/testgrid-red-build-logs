@@ -1,0 +1,82 @@
+{
+  "job": "ci-node-crio-conformance",
+  "build": "2113274243583053824",
+  "query": "kubernetes-ci-logs/logs/ci-node-crio-conformance",
+  "started": 1792678847,
+  "created": 1792678817,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-node-crio-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "E2eNode Suite.[It] [sig-network] Networking Granular Checks: Pods should function for intra-pod communication: udp [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.003s.\nexpected pod to be running and read...netes/test/e2e/framework/network/utils.go:924 @ 10/22/26 14:34:01.355\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] MirrorPodWithGracePeriod when create a mirror pod mirror pod termination should satisfy grace period when static pod is deleted [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 120.001s.\nExpected\n    <*errors.errorString |...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] Pods should allow activeDeadlineSeconds to be updated [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be running and read...o/kubernetes/test/e2e/common/node/pods.go:425 @ 10/22/26 14:34:01.254\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-storage] EmptyDir volumes pod should support memory backed volumes of specified size [LinuxOnly] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be running and read...netes/test/e2e/common/storage/empty_dir.go:379 @ 10/22/26 14:34:01.35\n"
+        },
+        {
+          "test": "ci-node-crio-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792681039,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2113274243583053824",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-crio-conformance/2113274243583053824/build-log.txt",
+  "log": {
+    "bytes": 1990665,
+    "md5": "851d365b828daa605fe1559d5abdc831",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 239291,
+    "gcs": {
+      "generation": "1792681041425673",
+      "md5": "851d365b828daa605fe1559d5abdc831",
+      "crc32c": "d348c259",
+      "bytes": 1990665,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 106612,
+    "md5": "00cba0e57537500491fec952c4d1bebb",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13148,
+    "gcs": {
+      "generation": "1792681047275409",
+      "md5": "00cba0e57537500491fec952c4d1bebb",
+      "crc32c": "1e448021",
+      "bytes": 106612,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-22T171046Z",
+  "archived_at": 1792689046.0,
+  "settled": true,
+  "final": false
+}

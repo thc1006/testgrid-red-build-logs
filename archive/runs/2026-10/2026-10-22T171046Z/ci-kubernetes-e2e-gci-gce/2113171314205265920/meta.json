@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2113171314205265920",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1792654277,
+  "created": 1792654276,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Pre-provisioned PV (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.000s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 10/22/26 07:50:11.201\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792656480,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2113171314205265920",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2113171314205265920/build-log.txt",
+  "log": {
+    "bytes": 149458,
+    "md5": "3a9c93ff7c7a16de50019ece7b72f547",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25048,
+    "gcs": {
+      "generation": "1792656496844478",
+      "md5": "3a9c93ff7c7a16de50019ece7b72f547",
+      "crc32c": "5ace38d4",
+      "bytes": 149458,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85291,
+    "md5": "ee770a23fd68bef308060488091199b4",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11752,
+    "gcs": {
+      "generation": "1792656501670724",
+      "md5": "ee770a23fd68bef308060488091199b4",
+      "crc32c": "0cdd2e88",
+      "bytes": 85291,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-22T171046Z",
+  "archived_at": 1792689046.0,
+  "settled": true,
+  "final": false
+}

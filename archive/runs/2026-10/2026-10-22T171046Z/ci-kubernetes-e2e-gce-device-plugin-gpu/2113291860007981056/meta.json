@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2113291860007981056",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1792683047,
+  "created": 1792683017,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] [Feature:GPUDevicePlugin] Sanity test using nvidia-smi [Provider:aws,gce] should run nvidia-smi and cuda-demo-suite [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 1800.001s.\nexpected pod to be started or comp...t: k8s.io/kubernetes/test/e2e/node/gpu.go:158 @ 10/22/26 16:16:34.795\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792686421,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2113291860007981056",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2113291860007981056/build-log.txt",
+  "log": {
+    "bytes": 157808,
+    "md5": "1325a3b5be2cfa11ef96f90bfe58e099",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21425,
+    "gcs": {
+      "generation": "1792686422416682",
+      "md5": "1325a3b5be2cfa11ef96f90bfe58e099",
+      "crc32c": "5408688e",
+      "bytes": 157808,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97490,
+    "md5": "9731d013bcfce093b82b31a55647e071",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12526,
+    "gcs": {
+      "generation": "1792686425103717",
+      "md5": "9731d013bcfce093b82b31a55647e071",
+      "crc32c": "b2acbb4a",
+      "bytes": 97490,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-22T171046Z",
+  "archived_at": 1792689046.0,
+  "settled": false,
+  "final": false
+}
