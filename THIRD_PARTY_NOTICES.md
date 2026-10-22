@@ -111,10 +111,14 @@ below carry 2014 or 2016.
 ## Google Cloud Storage client
 
 cloud.google.com/go/storage v1.31.0, under the Apache License 2.0
-([`LICENSE`](LICENSE)), Copyright 2014 Google LLC.
+([`LICENSE`](LICENSE)). Each file below carries "Copyright <year> Google LLC",
+with the year shown.
 
-- `tool/testgrid_rule.py` uses its error text for a missing object, and
-  `tool/fetch_red_logs.py` follows how it reads a gzip-encoded object.
+- `tool/testgrid_rule.py` uses its error text for a missing object
+  (`ErrObjectNotExist` in `storage.go`, 2014), and `tool/fetch_red_logs.py`
+  follows how it reads a gzip-encoded object (`NewRangeReader`,
+  `decompressiveTranscoding` and `Reader.Read` in `reader.go`, 2016, and
+  `parseReadResponse` in `http_client.go`, 2022).
 
 ## go-retry
 
