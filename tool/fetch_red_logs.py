@@ -3,8 +3,9 @@
 # cmd/config_merger, pkg/merger, pkg/tabulator and cmd/tabulator (f15bfa4808a4; Copyright The Kubernetes Authors and
 # The TestGrid Authors), the GCS client's reading of a gzip-encoded object (cloud.google.com/go/storage v1.31.0;
 # Copyright Google LLC) and go-retry's retries (github.com/sethvargo/go-retry v0.2.4), Apache License 2.0
-# (LICENSE), and Go's net/url, strings, path and encoding/json (1.26.5; Copyright The Go Authors), BSD 3-Clause
-# license in third_party/go/LICENSE. THIRD_PARTY_NOTICES.md lists what was ported.
+# (LICENSE), Go's net/url, strings, path and encoding/json (1.26.5; Copyright The Go Authors), BSD 3-Clause
+# license in third_party/go/LICENSE, and Unicode's White_Space characters (15.0.0; Copyright Unicode, Inc.),
+# Unicode License in third_party/unicode/LICENSE. THIRD_PARTY_NOTICES.md lists what was ported.
 """Archive the raw Prow build-log.txt behind the red cells on TestGrid dashboards.
 
 A cell counts as red exactly when TestGrid's own UI paints it red (#a00):
