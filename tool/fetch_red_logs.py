@@ -4731,7 +4731,8 @@ def holdings(entries, waiting, current_run):
             ("Red builds waiting to be archived", sum(1 for e in waiting if not e["status"].startswith("given up"))),
             ("… of them with a damaged copy here, to be fetched again",
              sum(1 for e in waiting if e["on_disk"] and not e["status"].startswith("given up"))),
-            ("Red builds given up on (after 14 days)", sum(1 for e in waiting if e["status"].startswith("given up"))),
+            (f"Red builds given up on (after {GIVE_UP_DAYS} days)",
+             sum(1 for e in waiting if e["status"].startswith("given up"))),
             ("Builds watched until TestGrid's rule can judge them (still running, unreadable, or shown under "
              "a config not known or followed here)", watched)]
     return (["## What the archive holds", "", "| | Builds |", "|---|---:|"]
