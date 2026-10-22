@@ -1,11 +1,13 @@
 name: Test
 
-# (and .gitignore and README.md: tests read them)
+# (and the files outside tool/ that tests read: .gitignore, the docs and the licenses)
 on:
   push:
-    paths: ["tool/**", ".github/workflows/**", ".gitignore", "README.md"]
+    paths: ["tool/**", ".github/workflows/**", ".gitignore", "README.md", "AGENTS.md", "THIRD_PARTY_NOTICES.md",
+            "LICENSE", "third_party/**"]
   pull_request:
-    paths: ["tool/**", ".github/workflows/**", ".gitignore", "README.md"]
+    paths: ["tool/**", ".github/workflows/**", ".gitignore", "README.md", "AGENTS.md", "THIRD_PARTY_NOTICES.md",
+            "LICENSE", "third_party/**"]
 
 permissions:
   contents: read # check out the code, nothing else
