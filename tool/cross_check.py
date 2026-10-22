@@ -397,11 +397,10 @@ def remote_raw_md5(url):
     return request(url, consume=consume, headers={"Accept-Encoding": "gzip"})
 
 
-def check_file(root, rel, m, key, default, remote=True):
-    """What is wrong with one archived file (build-log.txt or podinfo.json): a
+def check_file(root, rel, m, info, default, remote=True):
+    """What is wrong with one archived file, `default` as meta.json m records it (info: see frl.file_records): a
     LocalDamage or a "GCS changed" message, or None. Without `remote`, only the
     copy on disk is checked."""
-    info = m[key]
     name = default if info.get("omitted") else info.get("file", default)
     label = f"{m['job']}/{m['build']} {name}"
     if not info.get("omitted"):  # a file too large to store is only compared with GCS
@@ -415,13 +414,12 @@ def check_file(root, rel, m, key, default, remote=True):
             return LocalDamage(f"{label}: local md5 {md5} ({size} bytes) != meta {info['md5']} ({info['bytes']} bytes)")
         if on_disk != info.get("file_bytes", info["bytes"]):
             return LocalDamage(f"{label}: {on_disk} bytes on disk, meta says {info.get('file_bytes')}")
-    return gcs_change(m, key, default) if remote else None
+    return gcs_change(m, info, default) if remote else None
 
 
-def gcs_change(m, key, default):
-    """A "GCS changed" message if GCS holds another copy of one archived file than the one archived, else None
-    (none either if GCS no longer has it). Raises if GCS cannot be read."""
-    info = m[key]
+def gcs_change(m, info, default):
+    """A "GCS changed" message if GCS holds another copy of one archived file (`default`, as m records it: info)
+    than the one archived, else None (none either if GCS no longer has it). Raises if GCS cannot be read."""
     label = f"{m['job']}/{m['build']} {default if info.get('omitted') else info.get('file', default)}"
     url = m["log_url"].rsplit("/", 1)[0] + "/" + default
     try:
@@ -458,9 +456,10 @@ def inventory(archived, root):
     for _, m in archived.values():
         log, pod = (m.get(k) if isinstance(m.get(k), dict) else None for k in ("log", "podinfo"))
         count("with a log" if log else "with only podinfo.json" if pod else "without files")
-        if any(i and i.get("parts") for i in (log, pod)):
+        records = [i for _, i in frl.file_records(m) if isinstance(i, dict)]
+        if any(i.get("parts") for i in records):
             count("with a file stored in parts")
-        if any(i and i.get("omitted") for i in (log, pod)):
+        if any(i.get("omitted") for i in records):
             count("with a file not stored (an older record: too large)")
         if log and m.get("finished") is None:
             count("with a log but no finish time")
@@ -605,8 +604,8 @@ def check(args, problems, notes, record):
         failed comparisons with GCS is noted (see frl.COMPARISON_FAILING), what is on disk is checked as for any
         other."""
         given_up = frl.given_up_on(m)
-        files = [(key, default) for key, default in (("log", "build-log.txt"), ("podinfo", "podinfo.json")) if m.get(key)]
-        found = [check_file(root, rel, m, key, default, remote and not given_up) for key, default in files]
+        files = [(default, info) for default, info in frl.file_records(m) if info]
+        found = [check_file(root, rel, m, info, default, remote and not given_up) for default, info in files]
         # a stored file its meta.json does not list (`cat <file>.*` would take a stray part in),
         # or one GitHub would refuse
         folder = os.path.join(root, rel)
@@ -621,7 +620,7 @@ def check(args, problems, notes, record):
         noted = []
         if remote and given_up:
             try:
-                noted = [gcs_change(m, key, default) for key, default in files]
+                noted = [gcs_change(m, info, default) for default, info in files]
                 noted += [] if m.get("log") else [gcs_log_appeared(m)]
             except Exception as e:
                 noted = [f"{m['job']}/{m['build']}: cannot read GCS: {type(e).__name__}: {e}"]

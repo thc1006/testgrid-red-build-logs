@@ -120,9 +120,13 @@ JOB_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 BUILD_RE = re.compile(r"[0-9]{1,20}")
 # <bucket>/<path>/<job>: plain segments only, so it cannot step out of the bucket in a URL.
 QUERY_RE = re.compile(r"[a-z0-9][a-z0-9._-]*(?:/(?!\.\.?(?:/|$))[A-Za-z0-9._-]+)+")
-LOG_FILES = {"build-log.txt", "build-log.txt.gz", "podinfo.json", "podinfo.json.gz"}
+# the files a build folder stores, the log first: meta.json's key for each, and its name in GCS and in the folder (as
+# it came, or gzipped as <name>.gz). What reads a folder's files reads them by it (see file_records); store() and
+# recheck() take each from GCS in code of its own.
+STORED = (("log", "build-log.txt"), ("podinfo", "podinfo.json"))
+LOG_FILES = {n for _, name in STORED for n in (name, name + ".gz")}
 # a stored file too large for one file in git is kept as numbered parts: <file>.000, <file>.001, ...
-PART_RE = re.compile(r"(build-log\.txt(?:\.gz)?|podinfo\.json(?:\.gz)?)\.([0-9]{3})")
+PART_RE = re.compile("(" + "|".join(re.escape(name) + r"(?:\.gz)?" for _, name in STORED) + r")\.([0-9]{3})")
 RUN_FILES = {"run.json", "README.md", "verification.json"}  # in a run folder, next to its job folders
 # verification.json's outcomes (cross_check.py --record): "incomplete" until the verification ends
 VERIFICATION_OUTCOMES = ("incomplete", "ok", "problems", "timed out", "interrupted", "stopped")
@@ -1682,11 +1686,16 @@ def file_md5(path):
     return file_digest(path)[0]
 
 
+def file_records(meta):
+    """(name, record) of each file a build folder stores (see STORED), as its meta.json records it (None for one
+    it records none of), the log first."""
+    return [(name, meta.get(key)) for key, name in STORED]
+
+
 def intact(target, meta, deep=False):
     """Whether the files meta.json describes are on disk with the recorded size
     (and, if deep, the recorded raw md5 and length)."""
-    for default, key in (("build-log.txt", "log"), ("podinfo.json", "podinfo")):
-        info = meta.get(key)
+    for default, info in file_records(meta):
         if info:
             try:
                 if info.get("omitted"):
@@ -1834,8 +1843,7 @@ def stray_files(target, meta):
     cut off part-way leaves (parts of a newer copy, or a copy in the other form). None at all
     if the meta.json names a file otherwise than intact() reads names: it cannot say which are its own."""
     listed = []
-    for default, key in (("build-log.txt", "log"), ("podinfo.json", "podinfo")):
-        info = meta.get(key)
+    for default, info in file_records(meta):
         if info and not isinstance(info, dict):  # (one intact() cannot read)
             return []
         if info and not info.get("omitted"):  # (as intact() reads it)
@@ -3671,9 +3679,8 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     # to be intact, and a new meta.json lists only what this run takes from GCS (the end of the run removes
     # the rest). So a copy of a file it cannot take (GCS no longer has it, or cannot serve it) stays, and so
     # does the meta.json. GCS is asked first (a HEAD), not to download the others for nothing.
-    held = {name for name in ("build-log.txt", "podinfo.json") if holds_copy(target, name)} if existed and not old \
-        else set()
-    for name in ("build-log.txt", "podinfo.json"):
+    held = {name for _, name in STORED if holds_copy(target, name)} if existed and not old else set()
+    for _, name in STORED:
         if name in held and not in_gcs(f"{base}/{name}"):
             raise left_as_it_is(name, base)
     os.makedirs(target, exist_ok=True)
@@ -3681,7 +3688,7 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     unread = False  # (its podinfo.json could not be read: the next run compares the build, and reads it again)
     # A repair takes again only the files it has no intact copy of: one intact stays, unasked of GCS,
     # which may have none now (it deletes old builds' files).
-    kept = {key: (old or {}).get(key) for key in ("log", "podinfo")}
+    kept = {key: (old or {}).get(key) for key, _ in STORED}
     whole = {key: bool(kept[key]) and intact(target, {key: kept[key]}, deep=True) for key in kept}
     copies = []  # (what it takes from GCS: put in place with the new meta.json, once all are taken)
     try:
@@ -4139,11 +4146,11 @@ def index_entry(job, build, meta, now, rel=None):
                        key=lambda name: (name == f"{job}.Overall", name.startswith(f"{job}."), name))
     job_rows = [name for name in red_tests if name.startswith(f"{job}.")]
     left_out = sum(cells_left_out(tab) for tab in meta["tabs"])
-    files = [((meta.get(key) or {}).get("file", name), meta.get(key))
-             for name, key in (("build-log.txt", "log"), ("podinfo.json", "podinfo"))]
+    stored = file_records(meta)
+    files = [((info or {}).get("file", name), info) for name, info in stored]
     base = (meta.get("log_url") or "").rsplit("/", 1)[0]
     remote = [(name.removesuffix(".gz") if name else default, f"{base}/{default}")
-              for (name, info), default in zip(files, ("build-log.txt", "podinfo.json"), strict=True)
+              for (name, info), (default, _) in zip(files, stored, strict=True)
               if info and info.get("omitted") and base]
     since = failing_since(meta, now)
     return {
@@ -4172,7 +4179,7 @@ def index_entry(job, build, meta, now, rel=None):
         **({"comparison_given_up": True} if given_up_on(meta) else {}),
         "backfilled": bool(meta.get("backfilled")),
         "has_log": bool(meta.get("log")),
-        "in_parts": any((meta.get(key) or {}).get("parts") for key in ("log", "podinfo")),
+        "in_parts": any((info or {}).get("parts") for _, info in stored),
         # red only by TestGrid's rule applied to GCS: meta.json keeps no sighting of it on TestGrid (see merge_tabs)
         "from_gcs": bool(meta.get("backfilled")) and all(
             t.get("judged_from_gcs") or not (t.get("red_cells") or cells_left_out(t)) for t in meta["tabs"]),
@@ -4870,14 +4877,13 @@ def bytes_taken(outcome, meta, run_id):
     """The bytes run_id downloaded of a build, as its outcome and meta.json say: all its files if it archived
     it, only those it took again if it updated it (see updated_by), none otherwise."""
     if outcome in ("archived", "archived-without-log", "backfilled"):
-        return sum(meta[k]["bytes"] for k in ("log", "podinfo") if meta.get(k))
+        return sum(info["bytes"] for _, info in file_records(meta) if info)
     if outcome not in ("log-recovered", "refreshed", "repaired"):
         return 0
     again = set(meta.get("refreshed") or ()) if meta.get("refreshed_by_run") == run_id else set()
     again |= {"build-log.txt"} if outcome == "log-recovered" else set()
     again |= set(meta.get("repaired") or ()) if outcome == "repaired" else set()
-    return sum(meta[k]["bytes"] for k, name in (("log", "build-log.txt"), ("podinfo", "podinfo.json"))
-               if meta.get(k) and name in again)
+    return sum(info["bytes"] for name, info in file_records(meta) if info and name in again)
 
 
 def add_sightings(target, rec, run_id):
