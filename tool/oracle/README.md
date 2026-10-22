@@ -34,6 +34,8 @@ check the port against, and the fetch's reading of Prow's index links
     by TestGrid's code and by the port.
   - `golden.py`: writes `../testdata/testgrid_rule_golden.jsonl.gz`, which
     `../test_testgrid_rule.py` replays without Go.
+  - `filtergolden.py`: writes `../testdata/testgrid_filter_golden.jsonl.gz`,
+    which `../test_testgrid_config.py` replays without Go.
   - `filterdiff.py`: `../testgrid_config.py`'s row filter (Go's url.ParseQuery and
     regexp, matched without backtracking) against `filterGrid`: the base options
     of testgrid.k8s.io's tabs, about 250 edge cases, and random ones. Where
@@ -88,6 +90,7 @@ uv run --locked --no-dev python -I oracle/fuzz/realdiff.py ../archive 3   # the 
 /tmp/oracle/schemadump | python3 -I oracle/gotypes.py | cmp - testgrid_types.json
 /tmp/oracle/unidump | python3 -I oracle/gounicode.py check go_unicode.json.gz   # write instead of check, after a Go change
 python3 -I oracle/fuzz/golden.py testdata/testgrid_rule_golden.jsonl.gz   # only when the rule changed
+python3 -I oracle/fuzz/filtergolden.py testdata/testgrid_filter_golden.jsonl.gz   # only when the filter changed
 ```
 
 ## When TestGrid's production manifests move to another commit
