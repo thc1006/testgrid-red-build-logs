@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-ec2-scale-performance-5000",
+  "build": "2113526157524602880",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000",
+  "started": 1792738912,
+  "created": 1792738878,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ec2-master-scale-performance-5000",
+      "tab_status": "FAILING",
+      "red_cells": [
+        {
+          "test": "ClusterLoaderV2.load overall (/home/prow/go/src/k8s.io/perf-tests/clusterloader2/testing/load/config.yaml)",
+          "status": "FAIL",
+          "message": ":0\n[measurement call TestMetrics - TestMetrics error: [action gather f...ler-77b955f7bb-f8d86, aws-load-balancer-controller)=13, want <= 0]]\n:0"
+        },
+        {
+          "test": "ClusterLoaderV2.load: [step: 29] gathering measurements [12] - TestMetrics",
+          "status": "FAIL",
+          "message": ":0\n[measurement call TestMetrics - TestMetrics error: [action gather f...ler-77b955f7bb-f8d86, aws-load-balancer-controller)=13, want <= 0]]\n:0"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ec2-scale-performance-5000.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792747592,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2113526157524602880",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2113526157524602880/build-log.txt",
+  "log": {
+    "bytes": 51989874,
+    "md5": "d01f160e02319a2787a125b42c344644",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 3140978,
+    "gcs": {
+      "generation": "1792748452448359",
+      "md5": "d01f160e02319a2787a125b42c344644",
+      "crc32c": "e274b3db",
+      "bytes": 51989874,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 68516,
+    "md5": "443a5df52ef7b72dbbcc9cd42bbe5292",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11637,
+    "gcs": {
+      "generation": "1792748602717385",
+      "md5": "443a5df52ef7b72dbbcc9cd42bbe5292",
+      "crc32c": "ff09a3b9",
+      "bytes": 68516,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-23T170714Z",
+  "archived_at": 1792775234.0,
+  "settled": true,
+  "final": false
+}

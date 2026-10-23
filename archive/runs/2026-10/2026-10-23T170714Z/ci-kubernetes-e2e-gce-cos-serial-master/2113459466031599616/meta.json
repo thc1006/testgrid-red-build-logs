@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2113459466031599616",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1792723007,
+  "created": 1792722977,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: local] [LocalVolumeType: dir-link-bindmounted] [Testpattern: Pre-provisioned PV (filesystem volmode)] disruptive [LinuxOnly] [Provider:gce,aws,local,azure] Should test that pv written before kubelet restart is readable after restart. [Disruptive]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 60.001s.\nNode bootstrap-e2e-minion-group-sz12...ubernetes/test/e2e/framework/node/wait.go:181 @ 10/23/26 04:50:45.531\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792737456,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2113459466031599616",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2113459466031599616/build-log.txt",
+  "log": {
+    "bytes": 115381,
+    "md5": "8710ff54f18a9a0a01b0aa9d0cd6a0bc",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20550,
+    "gcs": {
+      "generation": "1792737484900586",
+      "md5": "8710ff54f18a9a0a01b0aa9d0cd6a0bc",
+      "crc32c": "2330f473",
+      "bytes": 115381,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 69849,
+    "md5": "126b501eab72d6edf86c2284a8d5e818",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10603,
+    "gcs": {
+      "generation": "1792737487838949",
+      "md5": "126b501eab72d6edf86c2284a8d5e818",
+      "crc32c": "01e850a5",
+      "bytes": 69849,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-23T170714Z",
+  "archived_at": 1792775234.0,
+  "settled": true,
+  "final": false
+}

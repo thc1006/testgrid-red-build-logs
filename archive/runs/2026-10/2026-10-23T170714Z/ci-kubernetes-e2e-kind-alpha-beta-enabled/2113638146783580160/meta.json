@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "build": "2113638146783580160",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "started": 1792765607,
+  "created": 1792765578,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should not be able to connect to terminating and unready endpoints if PublishNotReadyAddresses is false",
+          "status": "FAIL",
+          "message": "[FAILED] error waiting for pod webserver-pod to be unready Timed out a...io/kubernetes/test/e2e/network/service.go:2167 @ 10/23/26 14:39:13.33\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792767194,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2113638146783580160",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2113638146783580160/build-log.txt",
+  "log": {
+    "bytes": 149304,
+    "md5": "e653bf150ff3ddeb6245f9f4ff9782aa",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22532,
+    "gcs": {
+      "generation": "1792767218038328",
+      "md5": "e653bf150ff3ddeb6245f9f4ff9782aa",
+      "crc32c": "2fa47dc6",
+      "bytes": 149304,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96169,
+    "md5": "84c47a2d1f6010f16401f8df82381797",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12543,
+    "gcs": {
+      "generation": "1792767220258022",
+      "md5": "84c47a2d1f6010f16401f8df82381797",
+      "crc32c": "79367a58",
+      "bytes": 96169,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-23T170714Z",
+  "archived_at": 1792775234.0,
+  "settled": true,
+  "final": false
+}
