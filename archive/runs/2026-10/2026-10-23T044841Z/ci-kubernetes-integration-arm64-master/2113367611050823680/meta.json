@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2113367611050823680",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1792701120,
+  "created": 1792701077,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-instrumentation] k8s.io/kubernetes/test/integration.events",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestEventSeries\n    testserver.go:708: Resolved tests...imed out waiting for the condition\n--- FAIL: TestEventSeries (21.89s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792703488,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2113367611050823680",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2113367611050823680/build-log.txt",
+  "log": {
+    "bytes": 215841,
+    "md5": "d73c86841916f23374fc62f954e3cc20",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20391,
+    "gcs": {
+      "generation": "1792703493718934",
+      "md5": "d73c86841916f23374fc62f954e3cc20",
+      "crc32c": "ad0ae9a6",
+      "bytes": 215841,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95084,
+    "md5": "58ce2e4bca5c0f608ee1b988cce8aa45",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12284,
+    "gcs": {
+      "generation": "1792703495762409",
+      "md5": "58ce2e4bca5c0f608ee1b988cce8aa45",
+      "crc32c": "967bb8ab",
+      "bytes": 95084,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-23T044841Z",
+  "archived_at": 1792730921.0,
+  "settled": true,
+  "final": false
+}

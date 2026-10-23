@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2113449651582537728",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1792720667,
+  "created": 1792720637,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and a pre-bound PV: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-cs7hn\" did not exit with Success: pod \"pvc-te...etes/test/e2e/storage/persistent_volumes.go:63 @ 10/23/26 02:10:14.01\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792722242,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2113449651582537728",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2113449651582537728/build-log.txt",
+  "log": {
+    "bytes": 135462,
+    "md5": "d05ac23db87f8cf5080692a659ab191c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22159,
+    "gcs": {
+      "generation": "1792722265147826",
+      "md5": "d05ac23db87f8cf5080692a659ab191c",
+      "crc32c": "ad9db9ff",
+      "bytes": 135462,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95715,
+    "md5": "8dfd3bbf37b5ac11644f0b2e7c99a3e4",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12489,
+    "gcs": {
+      "generation": "1792722267299746",
+      "md5": "8dfd3bbf37b5ac11644f0b2e7c99a3e4",
+      "crc32c": "c412b7a3",
+      "bytes": 95715,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-23T044841Z",
+  "archived_at": 1792730921.0,
+  "settled": true,
+  "final": false
+}
