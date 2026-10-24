@@ -23,7 +23,7 @@ sys.path.insert(0, HERE)
 import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 import test_review_round4 as r4  # noqa: E402  (a module import: its tests are not collected again here)
-from test_fetch_red_logs import FakeServer, send, table  # noqa: E402
+from test_fetch_red_logs import FakeServer, gcs_object, send, table  # noqa: E402
 from test_integrity import DAY, HOUR, obj, snowflake  # noqa: E402
 
 INDEX = "pr-logs/directory/pull-job"
@@ -365,6 +365,16 @@ class PullRequestJob(r4.World):
                           f"{self.srv.url}/{self.folder}/build-log.txt", b"log\n"))
         code, out = self.check()
         self.assertEqual(code, 0, out)
+
+    def test_the_logs_of_its_cluster_s_nodes_are_listed_there_too(self):  # (kills a mutant)
+        # (of a build whose Up failed, as of a periodic job's)
+        self.show([self.build], {"pull-job.Overall": ([12], ["boom"]), "kubetest.Up": ([12], [""])})
+        self.finished(ago=3 * HOUR)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.srv.route(self.base + "/artifacts/e2e-master/etcd.log", gcs_object(b"etcd\n"))
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]], ["artifacts/e2e-master/etcd.log"])
+        self.assertEqual(self.read("e2e-master.etcd.log"), b"etcd\n")
 
     def test_later_runs_read_it_where_its_record_says(self):
         # (even once the index has no entry for it: its log, replaced in GCS, is fetched again from there)

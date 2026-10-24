@@ -129,6 +129,19 @@ class NodeLogsListed(ArchiveWorld):
                 self.assertFalse(frl.intact(self.bdir(), meta))  # fails: True
                 self.assertEqual(frl.stray_files(self.bdir(), meta), [])  # (it cannot say which are its own)
 
+    def test_nor_one_whose_copy_has_another_files_name(self):  # (kills a mutant)
+        # (as podinfo.json.gz: a record of a node log names its copy <node>.<file>, or <node>.<file>.gz)
+        shutil.copy(os.path.join(self.bdir(), self.names[0]), os.path.join(self.bdir(), "podinfo.json.gz"))
+        meta = self.meta()
+        meta["artifacts"] = [dict(self.records[0], file="podinfo.json.gz"), self.records[1]]
+        self.assertFalse(frl.intact(self.bdir(), meta, deep=True))
+        self.assertEqual(frl.stray_files(self.bdir(), meta), [])
+
+    def test_each_copy_is_a_stray_of_a_meta_json_whose_list_of_them_is_empty(self):  # (kills a mutant)
+        # (a list, of none: as of one archived when GCS could not list them, which keeps none)
+        meta = dict(self.meta(), artifacts=[])
+        self.assertEqual(frl.stray_files(self.bdir(), meta), sorted(self.names))
+
     def test_one_in_parts(self):
         meta = self.meta()
         frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, artifacts=[]))
@@ -246,6 +259,11 @@ class LogSays(unittest.TestCase):
 
     def test_not_an_older_record_of_one_too_large_to_store(self):
         self.assertFalse(frl.log_says(self.d, {"omitted": True, "file": "build-log.txt"}))  # fails: AttributeError
+
+    def test_a_copy_it_cannot_read_is_a_disk_error(self):  # (kills a mutant)
+        # (not a log that does not say so)
+        with self.assertRaises(frl.LocalIOError):
+            frl.log_says(self.d, {"file": "build-log.txt"})
 
 
 class UpFailedWorld(ArchiveWorld):
@@ -388,6 +406,9 @@ class UpFailed(UpFailedWorld):
         self.assertEqual((self.runs()[-1]["outcomes"], m["artifacts"], m["final"]), ({"archived": [self.key]}, [], False))
         # fails: KeyError: 'artifacts'
         self.assertEqual(sorted(os.listdir(self.bdir())), ["build-log.txt.gz", "meta.json"])
+        code, out = self.check()  # (kills a mutant: as INDEX.md, it counts none as kept)
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("node logs", out)
 
     def test_nor_does_a_repair_of_its_log_drop_those_it_has(self):
         # (their copies are intact: they stay, and the build is not final, so the next run lists them again)
@@ -455,6 +476,59 @@ class UpFailed(UpFailedWorld):
         with self.bug():
             self.assertEqual(self.fetch("--gzip"), 0)
         self.assertEqual((self.meta()["artifacts"], self.meta()["final"]), ([], False))  # fails: KeyError: 'artifacts'
+
+    def test_a_bug_after_some_were_taken_keeps_none_of_them(self):  # (kills two mutants)
+        # (those it took before it are not put in place, for the end of the run to remove, and are not kept as if GCS
+        # had refused the one it was taking; the build is not final, its nodes' logs not read)
+        self.finished(ago=3 * DAY)
+        with self.bug("e2e-master/serial-1.log"):
+            self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual((self.meta()["artifacts"], self.meta()["final"]), ([], False))
+        self.assertEqual(sorted(os.listdir(self.bdir())), ["build-log.txt.gz", "meta.json"])
+        self.assertEqual(self.runs()[-1]["warnings"], [])
+
+    def test_a_bug_taking_them_fails_a_repair_of_its_log_too(self):  # (kills a mutant)
+        # (its nodes' logs intact, and none to take again: the repair is not left for GCS to serve the one it took)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        with open(os.path.join(self.bdir(), "build-log.txt.gz"), "ab") as f:
+            f.write(b"damage")
+        self.put("e2e-minion-group-ef56/kube-node-installation.log", b"a node that came up late\n")
+        with self.bug("e2e-minion-group-ef56/"):
+            self.assertEqual(self.fetch("--gzip"), 1)
+        self.assertIn("TypeError: a bug", self.runs()[-1]["errors"][0]["error"])
+
+    def test_a_bug_listing_them_fails_a_repair_too(self):  # (kills a mutant)
+        # (it is not taken for GCS's failing to list them, which the repair would leave for the next run)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        with open(os.path.join(self.bdir(), "build-log.txt.gz"), "ab") as f:
+            f.write(b"damage")
+        with mock.patch.object(frl, "listed_node_logs", side_effect=TypeError("a bug")):
+            self.assertEqual(self.fetch("--gzip"), 1)
+        self.assertIn("TypeError: a bug", self.runs()[-1]["errors"][0]["error"])
+
+    def test_a_disk_error_taking_them_is_one_of_the_build(self):  # (kills two mutants)
+        # (as one taking its podinfo.json: the build is not archived without them, but retried)
+        real = frl.temp_path
+
+        def full(path):
+            if os.path.basename(path) == "e2e-master.etcd.log.gz":
+                raise OSError(28, "No space left on device")
+            return real(path)
+        with mock.patch.object(frl, "temp_path", full):
+            self.assertEqual(self.fetch("--gzip"), 1)
+        self.assertIn("LocalIOError", self.runs()[-1]["errors"][0]["error"])
+        self.assertIn(self.key, frl.read_json(os.path.join(self.root, "state.json"))["unresolved"])
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(self.stored("e2e-master.etcd.log"), b"etcd\n")
+
+    def test_one_without_a_log_keeps_them_too(self):  # (kills two mutants)
+        # (its log cannot say the cluster failed to initialize; the next run compares them, as any)
+        del self.srv.httpd.routes[self.base + "/build-log.txt"]
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"archived-without-log": [self.key]})
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]], self.paths(self.LOGS))
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
 
 
 class UpFailedRepaired(UpFailedWorld):
@@ -719,6 +793,36 @@ class UpFailedRepaired(UpFailedWorld):
         # fails: KeyError: 'artifacts'
         self.assertEqual(self.runs()[-1]["outcomes"], {"repaired": [self.key]})
 
+    def test_one_damaged_with_its_size_as_it_was(self):  # (kills a mutant)
+        # (a bit of its gzip trailer flipped: only reading it tells it from the copy meta.json records)
+        with open(os.path.join(self.bdir(), "e2e-master.serial-1.log.gz"), "r+b") as f:
+            data = f.read()
+            f.seek(0)
+            f.write(data[:-8] + bytes([data[-8] ^ 1]) + data[-7:])
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(self.meta()["repaired"], [self.damaged, "e2e-master.serial-1.log"])
+        self.assertTrue(frl.intact(self.bdir(), self.meta(), deep=True))
+
+    def test_a_record_of_no_such_log_goes(self):  # (kills a mutant)
+        # (one whose path is that of no node's log: the repair drops it, and takes again the log whose copy it named,
+        # as one it has no record of)
+        m = self.meta()
+        m["artifacts"][0] = dict(m["artifacts"][0], path="artifacts/E2E-master/containerd.log")
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), m)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        run = self.runs()[-1]
+        self.assertEqual((run["outcomes"], run["errors"], run["warnings"]), ({"repaired": [self.key]}, [], []))
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]], self.paths(self.LOGS))
+
+    def test_an_intact_one_gcs_has_at_another_path_now_is_taken_from_there(self):  # (kills two mutants)
+        # (of two of one name, the first by path: kubetest2's cluster-logs/ sorts first)
+        self.put("cluster-logs/e2e-master/serial-1.log", b"serial, of kubetest2\n")
+        self.assertEqual(self.fetch("--gzip"), 0)
+        record, = (r for r in self.meta()["artifacts"] if name_of(r["path"]) == "e2e-master.serial-1.log")
+        self.assertEqual((record["path"], self.stored("e2e-master.serial-1.log")),
+                         ("artifacts/cluster-logs/e2e-master/serial-1.log", b"serial, of kubetest2\n"))
+        self.assertTrue(frl.intact(self.bdir(), self.meta(), deep=True))
+
 
 class UpFailedCompared(UpFailedWorld):
     """As UpFailed, archived: each later run compares its nodes' logs with GCS, as its other files, until it is
@@ -796,6 +900,56 @@ class UpFailedCompared(UpFailedWorld):
         self.assertEqual(self.stored("e2e-master.etcd.log"), b"etcd\n")
         self.assertEqual(self.check()[0], 0)
 
+    def test_a_copy_taken_before_the_comparison_failed_goes(self):  # (kills a mutant)
+        # (that of one GCS changed, when the disk then fails taking one GCS has later: the copy in place stays, and
+        # the next run takes it again)
+        self.put("e2e-master/etcd.log", b"etcd, uploaded again\n")
+        self.put("e2e-minion-group-ef56/kube-node-installation.log", b"a node that came up late\n")
+        real = frl.temp_path
+
+        def full(path):
+            if os.path.basename(path).startswith("e2e-minion-group-ef56."):
+                raise OSError(28, "No space left on device")
+            return real(path)
+        with mock.patch.object(frl, "temp_path", full):
+            self.assertEqual(self.fetch("--gzip"), 1)
+        self.assertIn("LocalIOError", self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual([n for n in os.listdir(self.bdir()) if n.endswith(".part")], [])
+        self.assertEqual(self.stored("e2e-master.etcd.log"), b"etcd\n")
+
+    def test_nor_does_a_disk_error_or_a_bug_comparing_one_let_it_compare_the_others(self):  # (kills two mutants)
+        # (neither is GCS's doing: the comparison stops there, as it does for the log)
+        self.put("e2e-master/etcd.log", b"etcd, uploaded again\n")
+        self.put("e2e-master/serial-1.log", b"serial, uploaded again\n")
+        real = frl.temp_path
+
+        def full(path):
+            if os.path.basename(path).startswith("e2e-master.etcd.log"):
+                raise OSError(28, "No space left on device")
+            return real(path)
+        for failing, what in ((mock.patch.object(frl, "temp_path", full), "LocalIOError"),
+                              (self.bug("e2e-master/etcd.log"), "TypeError: a bug")):
+            with self.subTest(what), failing:
+                self.assertEqual(self.fetch("--gzip"), 1)
+                self.assertIn(f"comparing the archived copy with GCS failed: {what}", self.runs()[-1]["errors"][0]["error"])
+                self.assertEqual(self.stored("e2e-master.serial-1.log"), b"serial\n")
+
+    def test_the_failure_it_says_is_the_first(self):  # (kills three mutants)
+        # (of those comparing its copies, then of those taking the others, each in the order of their names)
+        other = "e2e-minion-group-gh78/kube-node-installation.log"
+        self.srv.route(f"{self.base}/artifacts/e2e-master/containerd.log", (503, {}, b""))
+        self.srv.route(f"{self.base}/artifacts/e2e-master/etcd.log", (403, {}, b""))
+        self.srv.route(f"{self.base}/artifacts/e2e-minion-group-ef56/kube-node-installation.log", (403, {}, b""))
+        self.srv.route(f"{self.base}/artifacts/{other}", (503, {}, b""))
+        self.listed("e2e-master/containerd.log", "e2e-master/etcd.log", "e2e-minion-group-ef56/kube-node-installation.log",
+                    other)
+        self.assertEqual(self.fetch("--gzip"), 1)
+        self.assertIn("failed: HTTPError: HTTP Error 503", self.runs()[-1]["errors"][0]["error"])
+        self.put("e2e-master/containerd.log", b"containerd\n")
+        self.put("e2e-master/etcd.log", b"etcd\n")
+        self.assertEqual(self.fetch("--gzip"), 1)
+        self.assertIn("failed: HTTPError: HTTP Error 403", self.runs()[-1]["errors"][0]["error"])
+
     def test_what_it_took_before_gcs_failed_is_in_place(self):
         # (one GCS changed, taken again before a listing that fails: the comparison fails, the copy taken stays)
         self.put("e2e-master/etcd.log", b"etcd, uploaded again\n")
@@ -823,6 +977,17 @@ class UpFailedCompared(UpFailedWorld):
         self.assertEqual([self.stored(n) for n in ("e2e-master.containerd.log", "e2e-master.etcd.log")],
                          [b"containerd\n", b"etcd, uploaded again\n"])
         self.assertEqual(len(m["artifacts"]), len(self.LOGS) + 1)
+
+    def test_cross_check_notes_a_changed_one_of_a_build_given_up_on(self):  # (kills a mutant)
+        # (as one of its other files: what GCS holds of it is only noted)
+        since = time.time() - 15 * DAY
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(
+            self.meta(), final=True, comparison_given_up="HTTPError: HTTP Error 503: Service Unavailable",
+            comparison_failing_since=since, created=min(self.meta()["created"], since - DAY)))
+        self.put("e2e-master/etcd.log", b"etcd, uploaded again\n")
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertIn(f"{self.key} e2e-master.etcd.log.gz: GCS changed since it was archived", out)
 
     def test_a_listing_that_fails_fails_the_comparison(self):
         # (as one of its podinfo.json: an error, the next run compares it again, and the runs give up on it after
