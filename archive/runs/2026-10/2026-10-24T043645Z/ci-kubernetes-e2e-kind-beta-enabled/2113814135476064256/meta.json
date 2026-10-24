@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2113814135476064256",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1792807569,
+  "created": 1792807537,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test phase transition timestamp multiple updates",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-4pl4k\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 10/24/26 02:18:12.201\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792809166,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2113814135476064256",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2113814135476064256/build-log.txt",
+  "log": {
+    "bytes": 132641,
+    "md5": "c66c878eaf1b65204f9d60f3058a37a5",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21854,
+    "gcs": {
+      "generation": "1792809182725047",
+      "md5": "c66c878eaf1b65204f9d60f3058a37a5",
+      "crc32c": "711fa6b8",
+      "bytes": 132641,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95267,
+    "md5": "b1a4a1f2c3728fda5f98cffc1492c08f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12681,
+    "gcs": {
+      "generation": "1792809184982359",
+      "md5": "b1a4a1f2c3728fda5f98cffc1492c08f",
+      "crc32c": "f8770069",
+      "bytes": 95267,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-24T043645Z",
+  "archived_at": 1792816605.0,
+  "settled": true,
+  "final": false
+}

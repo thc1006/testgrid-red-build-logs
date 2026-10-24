@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2113783686406082560",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1792800517,
+  "created": 1792800277,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs should create a non-pre-bound PV and PVC: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-8hjwq\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 10/24/26 00:20:59.034\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792802122,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2113783686406082560",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2113783686406082560/build-log.txt",
+  "log": {
+    "bytes": 134523,
+    "md5": "88fac8e45a54e75ceecb452352be782a",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21969,
+    "gcs": {
+      "generation": "1792802143702823",
+      "md5": "88fac8e45a54e75ceecb452352be782a",
+      "crc32c": "9ef86574",
+      "bytes": 134523,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 140932,
+    "md5": "6f47f951ecf2c1e4e9f06ccab54ec968",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 15676,
+    "gcs": {
+      "generation": "1792802146391719",
+      "md5": "6f47f951ecf2c1e4e9f06ccab54ec968",
+      "crc32c": "9eefb1ba",
+      "bytes": 140932,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-24T043645Z",
+  "archived_at": 1792816605.0,
+  "settled": true,
+  "final": false
+}
