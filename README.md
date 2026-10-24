@@ -54,7 +54,10 @@ archive/runs/<YYYY-MM>/<run>/<job>/<build>/
   `kube-master-configuration.log`, `etcd.log`, `containerd.log` and
   `serial-1.log`, and `kube-apiserver.log` when the log says
   `Cluster failed to initialize`. Those of the other nodes:
-  `kube-node-installation.log` and `kube-node-configuration.log`. Read one with
+  `kube-node-installation.log` and `kube-node-configuration.log`. With them,
+  `cluster-info.log.gz`: kubetest2's dump of the cluster
+  (`kubectl cluster-info dump`, with the logs of its `kube-system` pods), when
+  GCS has one in `artifacts/cluster-logs/`. Read one with
   `gzip -dc`. A build archived before the runs kept these logs has none, unless
   a later run repaired a damaged copy of its files.
 - `meta.json`: the tabs, the red tests (it says when some are left out),

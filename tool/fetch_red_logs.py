@@ -58,6 +58,8 @@ under --archive:
                                     (podinfo.json.gz with --gzip)
     <job>/<build>/<node>.<file>     for a build whose cluster did not come up, a log of one of its nodes
                                     (see NODE_LOGS; <node>.<file>.gz with --gzip)
+    <job>/<build>/cluster-info.log  for such a build, kubetest2's dump of its cluster's state (see CLUSTER_INFO;
+                                    cluster-info.log.gz with --gzip)
     <job>/<build>/<file>.000, ...   a file larger than --max-file-mb, in numbered parts
     <job>/<build>/meta.json         tabs, red cells, TestGrid messages, result, GCS identity
   charts/*.svg                      trend charts shown in INDEX.md
@@ -138,8 +140,12 @@ PART_RE = re.compile("(" + "|".join(re.escape(name) + r"(?:\.gz)?" for _, name i
 # of CONTROL_PLANE_LOGS of the control plane's node, which kube-up names <instance prefix>-master (its log dump names
 # the node's folder so), and those of WORKER_LOGS of the others; kube-apiserver.log of the control plane, much
 # larger than the others, only when the build's log says CLUSTER_INIT_FAILED (kube-up gave up waiting for the
-# apiserver). A build whose cluster another of kubetest2's deployers brought up, as kops, keeps none: none of its
-# nodes is named so, and none has the logs of WORKER_LOGS. See store().
+# apiserver). A build whose cluster another of kubetest2's deployers brought up, as kops, keeps none of these: none
+# of its nodes is named so, and none has the logs of WORKER_LOGS. See store(). With them it keeps CLUSTER_INFO, the
+# dump of the cluster's state that kubetest2's GCE deployer writes after its log dump (`kubectl cluster-info dump`,
+# which holds the logs of the kube-system pods too), if GCS has it at CLUSTER_INFO_PATH: the build folder names its
+# copy so, as no <node>.<file> is named (no file of NODE_LOGS is "log"), and it is read as one of them (see
+# node_log_name, copy_of).
 UP_TESTS = ("kubetest.Up", "kubetest2.Up")
 CONTROL_PLANE_LOGS = ("kube-master-installation.log", "kube-master-configuration.log", "etcd.log", "containerd.log",
                       "serial-1.log")
@@ -147,12 +153,14 @@ APISERVER_LOG = "kube-apiserver.log"
 WORKER_LOGS = ("kube-node-installation.log", "kube-node-configuration.log")
 NODE_LOGS = CONTROL_PLANE_LOGS + (APISERVER_LOG,) + WORKER_LOGS
 CLUSTER_INIT_FAILED = b"Cluster failed to initialize"
+CLUSTER_INFO = "cluster-info.log"
+CLUSTER_INFO_PATH = "artifacts/cluster-logs/" + CLUSTER_INFO
 NODE = r"[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?"  # (the pattern of a GCE instance's name, RFC 1035's)
 LOG_OF_NODE = "(" + "|".join(re.escape(name) for name in NODE_LOGS) + ")"  # (the pattern of a name of NODE_LOGS)
-# a node log's path in the build's folder in GCS, and the name of a copy of it in the build folder, whole or a part
-# (see PART_RE); kubetest2's cluster-logs/ is no node's folder
+# a node log's path in the build's folder in GCS, and the name of a copy of it, or of CLUSTER_INFO, in the build
+# folder, whole or a part (see PART_RE); kubetest2's cluster-logs/ is no node's folder
 NODE_LOG_PATH_RE = re.compile(rf"artifacts/(?:cluster-logs/)?(?!cluster-logs/)({NODE})/{LOG_OF_NODE}")
-NODE_LOG_COPY_RE = re.compile(rf"((?!cluster-logs\.){NODE}\.{LOG_OF_NODE})(?:\.gz)?(?:\.[0-9]{{3}})?")
+NODE_LOG_COPY_RE = re.compile(rf"((?!cluster-logs\.){NODE}\.{LOG_OF_NODE}|{re.escape(CLUSTER_INFO)})(?:\.gz)?(?:\.[0-9]{{3}})?")
 RUN_FILES = {"run.json", "README.md", "verification.json"}  # in a run folder, next to its job folders
 # verification.json's outcomes (cross_check.py --record): "incomplete" until the verification ends
 VERIFICATION_OUTCOMES = ("incomplete", "ok", "problems", "timed out", "interrupted", "stopped")
@@ -1489,9 +1497,9 @@ def remove(path):
 
 
 class Staged:
-    """A verified copy of a build's file (name: build-log.txt, podinfo.json or a node's <node>.<file>, see NODE_LOGS)
-    in temp files of its folder, for put_in_place: temps, [(temp file, the name it takes)], one for the file whole or
-    one per part (see split_parts); info, what meta.json records of it."""
+    """A verified copy of a build's file (name: build-log.txt, podinfo.json, a node's <node>.<file>, see NODE_LOGS, or
+    kubetest2's cluster-info.log, see CLUSTER_INFO) in temp files of its folder, for put_in_place: temps, [(temp file,
+    the name it takes)], one for the file whole or one per part (see split_parts); info, what meta.json records of it."""
 
     def __init__(self, name, info, temps):
         self.name, self.info, self.temps = name, info, temps
@@ -1724,8 +1732,9 @@ def file_records(meta):
 
 
 def node_log_records(meta):
-    """(name, record) of each log of its cluster's nodes a build's meta.json lists (see NODE_LOGS), in its order:
-    name, the log's <node>.<file>, None for a record whose path is not that of such a log."""
+    """(name, record) of each log of its cluster's nodes a build's meta.json lists (see NODE_LOGS, CLUSTER_INFO), in
+    its order: name, the log's <node>.<file> (or CLUSTER_INFO), None for a record whose path is not that of such a
+    log."""
     listed = meta.get("artifacts")
     return [(node_log_name(info.get("path") if isinstance(info, dict) else None), info)
             for info in (listed if isinstance(listed, list) else [])]
@@ -1733,7 +1742,9 @@ def node_log_records(meta):
 
 def node_log_name(path):
     """<node>.<file>, the name in a build folder of the node log GCS has at path, in the build's folder (see
-    NODE_LOGS); None for a path that is not such a log's."""
+    NODE_LOGS), or CLUSTER_INFO for kubetest2's dump at CLUSTER_INFO_PATH; None for a path that is not such a log's."""
+    if path == CLUSTER_INFO_PATH:
+        return CLUSTER_INFO
     m = NODE_LOG_PATH_RE.fullmatch(path) if isinstance(path, str) else None
     return f"{m.group(1)}.{m.group(2)}" if m else None
 
@@ -1872,10 +1883,10 @@ def log_says(target, log, staged=None, text=CLUSTER_INIT_FAILED):
 
 
 def listed_node_logs(objects, folder):
-    """{name: path in the build's folder} of the logs of nodes (see NODE_LOGS) a listing of a build's folder's
-    artifacts/ in GCS has (see list_objects; folder: the build's folder in the bucket), of the objects GCS has
-    bytes of (one that is empty is as none). Of two of one name (from kube-up's folder and kubetest2's), the first
-    by path."""
+    """{name: path in the build's folder} of the logs of nodes (see NODE_LOGS, CLUSTER_INFO) a listing of a build's
+    folder's artifacts/ in GCS has (see list_objects; folder: the build's folder in the bucket), of the objects GCS
+    has bytes of (one that is empty is as none). Of two of one name (from kube-up's folder and kubetest2's), the
+    first by path."""
     found = {}
     for obj, (size, *_) in sorted(objects.items()):
         name = node_log_name(obj[len(folder) + 1:] if obj.startswith(folder + "/") else None)
@@ -1887,12 +1898,12 @@ def listed_node_logs(objects, folder):
 def node_logs_wanted(listed, apiserver):
     """Those of listed (see listed_node_logs) a build folder keeps, of a build whose cluster did not come up: of the
     control plane's node, those of CONTROL_PLANE_LOGS, and kube-apiserver.log if apiserver; of the others, those of
-    WORKER_LOGS."""
+    WORKER_LOGS; and CLUSTER_INFO."""
     wanted = {}
     for name, path in listed.items():
         node, file = name.split(".", 1)
-        if file in (CONTROL_PLANE_LOGS + ((APISERVER_LOG,) if apiserver else ()) if node.endswith("-master")
-                    else WORKER_LOGS):
+        if name == CLUSTER_INFO or file in (CONTROL_PLANE_LOGS + ((APISERVER_LOG,) if apiserver else ())
+                                            if node.endswith("-master") else WORKER_LOGS):
             wanted[name] = path
     return wanted
 
@@ -1945,8 +1956,8 @@ def take_node_logs(gcs, where, base, target, compress, max_bytes, apiserver, who
 
 
 def copy_of(n):
-    """The file a build folder's file named n is a stored copy of (see STORED and NODE_LOGS: as it came or
-    gzipped, whole or in parts, as build-log.txt.gz.000 is of build-log.txt), else None."""
+    """The file a build folder's file named n is a stored copy of (see STORED, NODE_LOGS and CLUSTER_INFO: as it came
+    or gzipped, whole or in parts, as build-log.txt.gz.000 is of build-log.txt), else None."""
     m = PART_RE.fullmatch(n)
     whole = m.group(1) if m else n
     if whole in LOG_FILES:
@@ -4429,7 +4440,7 @@ def index_entry(job, build, meta, now, rel=None):
         "backfilled": bool(meta.get("backfilled")),
         "has_log": bool(meta.get("log")),
         "in_parts": any((info or {}).get("parts") for _, info in stored),
-        # (it keeps logs of its cluster's nodes too, see NODE_LOGS)
+        # (it keeps logs of its cluster's nodes too, or kubetest2's cluster-info.log: see NODE_LOGS, CLUSTER_INFO)
         **({"node_logs": True} if any(isinstance(info, dict) for _, info in node_log_records(meta)) else {}),
         # red only by TestGrid's rule applied to GCS: meta.json keeps no sighting of it on TestGrid (see merge_tabs)
         "from_gcs": bool(meta.get("backfilled")) and all(
@@ -5343,8 +5354,8 @@ def main(argv=None):
     p.add_argument("--run-timeout-minutes", type=positive(float), default=45,
                    help="stop waiting for downloads after this long; unfinished builds are retried next run")
     p.add_argument("--gzip", action="store_true",
-                   help="store each file gzipped, as build-log.txt.gz, podinfo.json.gz and <node>.<file>.gz (meta.json "
-                        "keeps each raw file's md5 and size)")
+                   help="store each file gzipped, as build-log.txt.gz, podinfo.json.gz, <node>.<file>.gz and "
+                        "cluster-info.log.gz (meta.json keeps each raw file's md5 and size)")
     p.add_argument("--max-file-mb", type=positive(float), default=95,
                    help="store a file larger than this (MiB) as numbered parts of this size, as GitHub rejects "
                         "files over 100 MB (default: 95)")
