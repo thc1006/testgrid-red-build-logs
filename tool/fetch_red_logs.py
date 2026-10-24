@@ -5143,7 +5143,8 @@ def main(argv=None):
     p.add_argument("--run-timeout-minutes", type=positive(float), default=45,
                    help="stop waiting for downloads after this long; unfinished builds are retried next run")
     p.add_argument("--gzip", action="store_true",
-                   help="store logs as build-log.txt.gz (meta.json keeps the raw log's md5 and size)")
+                   help="store each file gzipped, as build-log.txt.gz and podinfo.json.gz (meta.json keeps each raw "
+                        "file's md5 and size)")
     p.add_argument("--max-file-mb", type=positive(float), default=95,
                    help="store a file larger than this (MiB) as numbered parts of this size, as GitHub rejects "
                         "files over 100 MB (default: 95)")
