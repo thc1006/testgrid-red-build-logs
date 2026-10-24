@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2113927383395340288",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1792834539,
+  "created": 1792834537,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update nodePort: udp [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failure validating that node port service STOPPED removed pro...kubernetes/test/e2e/network/networking.go:408 @ 10/24/26 09:47:20.056\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792837613,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2113927383395340288",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2113927383395340288/build-log.txt",
+  "log": {
+    "bytes": 154652,
+    "md5": "b187dc8ab09d5b737743e37a847ccfaf",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24134,
+    "gcs": {
+      "generation": "1792837620983233",
+      "md5": "b187dc8ab09d5b737743e37a847ccfaf",
+      "crc32c": "d6eebaf9",
+      "bytes": 154652,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85721,
+    "md5": "bed8651fa982d6d15ee42769082974e1",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11626,
+    "gcs": {
+      "generation": "1792837623114783",
+      "md5": "bed8651fa982d6d15ee42769082974e1",
+      "crc32c": "778fc945",
+      "bytes": 85721,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-24T155720Z",
+  "archived_at": 1792857440.0,
+  "settled": true,
+  "final": false
+}

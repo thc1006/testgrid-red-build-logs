@@ -1,5 +1,189 @@
 [
   {
+    "time": 1792853704,
+    "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+    "build": "2114007662306791424",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-slow-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-gce-cos-slow-master/2114007662306791424",
+    "run": "2026-10-24T155720Z",
+    "files": [
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-gce-cos-slow-master/2114007662306791424/build-log.txt.gz",
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-gce-cos-slow-master/2114007662306791424/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 236608,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2114007662306791424"
+  },
+  {
+    "time": 1792844805,
+    "job": "ci-node-e2e-containerd-2-1-cos-dra",
+    "build": "2113970417352839168",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#ci-node-e2e-containerd-2-1-cos-dra"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Health [FeatureGate:ResourceHealthStatus] must reuse one gRPC connection for service and health-monitoring calls [Beta] [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Health [FeatureGate:ResourceHealthStatus] should handle concurrent DRA operations and health monitoring without connection issues [Beta] [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Health [FeatureGate:ResourceHealthStatus] should update health to Unknown when plugin stops and recover upon restart [Beta] [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must be functional after service reconnect 1 common socket [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must retry NodeUnprepareResources after Kubelet restart [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must run pod if NodePrepareResources fails and then succeeds [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must prepare and unprepare resources [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must run pod if NodePrepareResources fails for one plugin and then succeeds [Serial]",
+      "kubetest2.Test",
+      "ci-node-e2e-containerd-2-1-cos-dra.Overall"
+    ],
+    "red_test_count": 10,
+    "dir": "runs/2026-10/2026-10-24T155720Z/ci-node-e2e-containerd-2-1-cos-dra/2113970417352839168",
+    "run": "2026-10-24T155720Z",
+    "files": [
+      "runs/2026-10/2026-10-24T155720Z/ci-node-e2e-containerd-2-1-cos-dra/2113970417352839168/build-log.txt.gz",
+      "runs/2026-10/2026-10-24T155720Z/ci-node-e2e-containerd-2-1-cos-dra/2113970417352839168/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 1023694,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-cos-dra/2113970417352839168"
+  },
+  {
+    "time": 1792841618,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2113957079059271680",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs should create a non-pre-bound PV and PVC: test write access",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-gci-gce/2113957079059271680",
+    "run": "2026-10-24T155720Z",
+    "files": [
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-gci-gce/2113957079059271680/build-log.txt.gz",
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-gci-gce/2113957079059271680/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 214504,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2113957079059271680"
+  },
+  {
+    "time": 1792839165,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2113946760912048128",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 1,
+    "dir": "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-capz-master-windows/2113946760912048128",
+    "run": "2026-10-24T155720Z",
+    "files": [
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-capz-master-windows/2113946760912048128/build-log.txt.gz",
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-capz-master-windows/2113946760912048128/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 107401,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2113946760912048128"
+  },
+  {
+    "time": 1792834863,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2113928641158057984",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.queueing",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-integration-master/2113928641158057984",
+    "run": "2026-10-24T155720Z",
+    "files": [
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-integration-master/2113928641158057984/build-log.txt.gz",
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-integration-master/2113928641158057984/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 310082,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2113928641158057984"
+  },
+  {
+    "time": 1792834539,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2113927383395340288",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update nodePort: udp [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-gci-gce-slow/2113927383395340288",
+    "run": "2026-10-24T155720Z",
+    "files": [
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-gci-gce-slow/2113927383395340288/build-log.txt.gz",
+      "runs/2026-10/2026-10-24T155720Z/ci-kubernetes-e2e-gci-gce-slow/2113927383395340288/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 240373,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2113927383395340288"
+  },
+  {
     "time": 1792810687,
     "job": "ci-kubernetes-unit",
     "build": "2113827221691961344",
@@ -20,7 +204,7 @@
     ],
     "remote": [],
     "bytes": 380725,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -1279,7 +1463,7 @@
     "remote": [],
     "bytes": 3950582,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1312,7 +1496,7 @@
     "remote": [],
     "bytes": 2097277,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1341,7 +1525,7 @@
     "remote": [],
     "bytes": 122481,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1370,7 +1554,7 @@
     "remote": [],
     "bytes": 127744,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1399,7 +1583,7 @@
     "remote": [],
     "bytes": 264429,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1429,7 +1613,7 @@
     "remote": [],
     "bytes": 234749,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1458,7 +1642,7 @@
     "remote": [],
     "bytes": 310875,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1487,7 +1671,7 @@
     "remote": [],
     "bytes": 3156284,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

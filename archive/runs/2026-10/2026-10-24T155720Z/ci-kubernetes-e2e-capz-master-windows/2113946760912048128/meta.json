@@ -1,0 +1,57 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2113946760912048128",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1792839165,
+  "created": 1792839157,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792839260,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2113946760912048128",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2113946760912048128/build-log.txt",
+  "log": {
+    "bytes": 12599,
+    "md5": "07ea31396d940949f59d8e0e5796498f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 3359,
+    "gcs": {
+      "generation": "1792839261334341",
+      "md5": "07ea31396d940949f59d8e0e5796498f",
+      "crc32c": "51bd0486",
+      "bytes": 12599,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94802,
+    "md5": "34048261ab283519591aea26d9af808b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13567,
+    "gcs": {
+      "generation": "1792839262989411",
+      "md5": "34048261ab283519591aea26d9af808b",
+      "crc32c": "b420d7e6",
+      "bytes": 94802,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-24T155720Z",
+  "archived_at": 1792857440.0,
+  "settled": true,
+  "final": false
+}

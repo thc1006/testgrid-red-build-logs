@@ -1,0 +1,102 @@
+{
+  "job": "ci-node-e2e-containerd-2-1-cos-dra",
+  "build": "2113970417352839168",
+  "query": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-cos-dra",
+  "started": 1792844805,
+  "created": 1792844797,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ci-node-e2e-containerd-2-1-cos-dra",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Health [FeatureGate:ResourceHealthStatus] must reuse one gRPC connection for service and health-monitoring calls [Beta] [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected Pod to be in <v1.PodPhase>....io/kubernetes/test/e2e_node/dra_test.go:1877 @ 10/24/26 13:12:30.189\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Health [FeatureGate:ResourceHealthStatus] should handle concurrent DRA operations and health monitoring without connection issues [Beta] [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Pod 0 should be running: Timed out after 300.001s.\nExpected P...s.io/kubernetes/test/e2e_node/dra_test.go:1064 @ 10/24/26 12:38:54.87\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Health [FeatureGate:ResourceHealthStatus] should update health to Unknown when plugin stops and recover upon restart [Beta] [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected Pod to be in <v1.PodPhase>....io/kubernetes/test/e2e_node/dra_test.go:1877 @ 10/24/26 12:58:50.294\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must be functional after service reconnect 1 common socket [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected Pod to be in <v1.PodPhase>...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must retry NodeUnprepareResources after Kubelet restart [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 120.001s.\nExpected:\n    <[]app.GRPCCall | len...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must run pod if NodePrepareResources fails and then succeeds [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.000s.\nexpected pod to be Succeeded or Fai...s.io/kubernetes/test/e2e_node/dra_test.go:246 @ 10/24/26 12:52:36.728\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must prepare and unprepare resources [Serial]",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must run pod if NodePrepareResources fails for one plugin and then succeeds [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be Succeeded or Fai...s.io/kubernetes/test/e2e_node/dra_test.go:677 @ 10/24/26 13:05:06.567\n"
+        },
+        {
+          "test": "ci-node-e2e-containerd-2-1-cos-dra.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792848548,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-cos-dra/2113970417352839168",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-cos-dra/2113970417352839168/build-log.txt",
+  "log": {
+    "bytes": 950655,
+    "md5": "0e4f83d0a8207595c89b8cec03b93242",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 150460,
+    "gcs": {
+      "generation": "1792848549012309",
+      "md5": "0e4f83d0a8207595c89b8cec03b93242",
+      "crc32c": "9d619b9d",
+      "bytes": 950655,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 73039,
+    "md5": "b633a9a4dad98ac01907a881d51b774e",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10928,
+    "gcs": {
+      "generation": "1792848551587290",
+      "md5": "b633a9a4dad98ac01907a881d51b774e",
+      "crc32c": "43dc3d33",
+      "bytes": 73039,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-24T155720Z",
+  "archived_at": 1792857440.0,
+  "settled": true,
+  "final": false
+}
