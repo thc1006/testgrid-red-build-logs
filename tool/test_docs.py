@@ -2,8 +2,9 @@
 
 The tests check README.md, AGENTS.md, THIRD_PARTY_NOTICES.md and tool/oracle/README.md, as GitHub shows them (see
 Page): their links and anchors, and those of the pages a run writes; HTML comments and code fences that could hide
-text; the oracle's files; the versions the ported files come from; and the days INDEX.md says red builds are given
-up on after. The test workflow runs on a change to any file they read.
+text; the README's numbers, against the constants and workflow settings they come from; the oracle's files; the
+versions the ported files come from; and the days INDEX.md says red builds are given up on after. The test
+workflow runs on a change to any file they read.
 
 Run: cd tool && uv run python -m unittest test_docs -v
 """
@@ -33,7 +34,9 @@ from cmarkgfm.cmark import Options
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
+import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
+import report  # noqa: E402
 
 DOCS = ["README.md", "AGENTS.md", "THIRD_PARTY_NOTICES.md", "tool/oracle/README.md"]
 # (the docs, and the other files outside tool/ that the tests read)
@@ -298,6 +301,101 @@ class Templates(unittest.TestCase):
         with mock.patch.object(frl, "GIVE_UP_DAYS", 9):
             rows = frl.holdings([], [], None)
         self.assertIn("| Red builds given up on (after 9 days) | 0 |", rows)  # fails: (after 14 days)
+
+
+class ReadmeNumbers(unittest.TestCase):
+    """Each number written in digits in README.md's prose (as GitHub shows it: see prose) is the code's, the
+    workflow's or LICENSE's, in the words bound to it below, or one no test can bind (GitHub's, or the README's own
+    advice): UNBOUND lists them, to be checked by hand. Each of those words must be in the README: a change that
+    deletes or rewords the sentence that holds one changes them here too. (Numbers written as words, "step N" and a
+    number right after a letter, such as md5's 5, are not checked.)"""
+
+    NUMBER = re.compile(r"(?<![^\W_])\d+")  # (in digits, after no letter or digit)
+
+    UNBOUND = ["GitHub shows at most 100 results", "after 60 days without activity", "a ping about every 12 hours"]
+
+    def prose(self, text=None):
+        """README.md's prose (or text's), as GitHub shows it (see Page): its text and its images' alt text, but not
+        its code, footnotes' marks, bare URLs, nor "step N", "step N.M" and "steps N and M" (not "step-by-step N").
+        (A list's numbers are not a page's text.)"""
+        text = Page(read("README.md") if text is None else text).text("text", "alt")
+        text = re.sub(r"\bhttps?://[^\s<>\"']+", "", text)
+        text = re.sub(r"(?i)(?<![\w-])steps?\s+\d+(?:\.\d+)*(?:\s+and\s+\d+(?:\.\d+)*)?\b", "", text)
+        return " ".join(text.split())
+
+    def test_control_the_prose(self):
+        # (what GitHub shows of each form, GitHubsReading checks; these check what prose keeps of it)
+        self.assertEqual(self.prose('1. In step 3, [a](b.md) `c 5` and Step\n   4 <img alt="d 6" src="e">, steps 2 and\n   3.'),
+                         "In , a and d 6, .")
+        self.assertEqual(self.prose("[f][7] at https://x.example/8 [^9] g\n\n[7]: https://x.example/10\n[^9]: h 11\n\n"
+                                    '<a href="https://x.example/12">i</a> j 13\n'), "f at g i j 13 h 11 \u21a9")
+        self.assertEqual(self.prose("a <24 hours, b -> c, <br/>d <img src=\"e\" alt=\"f 7\">\n"), "a <24 hours, b -> c, d f 7")
+        self.assertEqual(self.prose("95&nbsp;MiB, a&#8212;b, _14_ days, x step-by-step 17 days, as in _step 3_\n\n"
+                                    "    an indented 5\n\n```\nfenced 6\n```\n<!-- a 7 -->\n"),
+                         "95 MiB, a\u2014b, 14 days, x step-by-step 17 days, as in")
+        self.assertEqual(self.prose('see "https://x.example/a", 7 days, step 4.1 and step\n4.2.\n'), 'see "", 7 days, and .')
+        # (HTML blocks next to each other, and with a paragraph between them: their text in order, a space between)
+        self.assertEqual(self.prose('<picture>\n<img alt="a" src="b">\n</picture>\n\n<picture>\n<img alt="30 days" '
+                                    'src="c">\n</picture>\n\n<div>over the last</div>\n\nd\n\n<div>14 days</div>\n'),
+                         "a 30 days over the last d 14 days")
+
+    def hours(self, seconds):
+        hours, rest = divmod(int(seconds), 3600)
+        self.assertEqual(rest, 0, seconds)
+        return hours
+
+    def bound(self):
+        """README.md's words as the code's and the workflow's numbers make them."""
+        workflow = read(".github/workflows/red-build-logs.yml")
+        every = re.search(r'cron: "\d+ \*/(\d+) \* \* \*"', workflow).group(1)
+        half = self.hours(re.search(r"now / (\d+) \* \1\b", workflow).group(1))
+        due = re.search(r'"\$age" -ge \$\(\((\d+) \* 3600\)\)', workflow).group(1)
+        late = self.hours(re.search(r"fromJSON\(needs\.due\.outputs\.age\) > (\d+)", workflow).group(1))
+        days = frl.GIVE_UP_DAYS
+        license_version = re.match(r"\s*Apache License\s+Version\s+(\d+\.\d+),", read("LICENSE")).group(1)
+        return [f"red builds of the last {report.HEAT_DAYS} days", f"per tab over the last {report.HEAT_DAYS} days",
+                f"a log over {frl.MAX_FILE_MB} MiB after gzip", f"GitHub blocks files over {cc.GITHUB_MAX_BYTES >> 20} MiB",
+                f"One still waiting {frl.HELD_DAYS} days after it was made", f"at most {days} days after that run",
+                f"been unlisted for {frl.UNLISTED_DAYS} days",
+                f"the part of the gap in the last {days} days and {days} days more in the run that finds it, then "
+                f"{days} days more in each later run",
+                f"until {frl.RECHECK_HOURS} hours after it finished", f"compared until {days} days after it was archived",
+                f"failed for {days} days", f"scheduled every {every} hours", f"(00:00 to {half:02d}:00, {half:02d}:00 to 24:00)",
+                f"less than {due} hours before", f"more than {late} hours old", f"Apache License {license_version}"]
+
+    def test_each_number_bound_to_the_code_is_its(self):
+        prose, bound = self.prose(), self.bound()  # fails: AttributeError: no MAX_FILE_MB
+        why = ("README.md does not say it: if the code's, the workflow's or LICENSE's number changed, change the README's "
+               "sentence to say the new one; if the sentence was reworded or deleted, change ReadmeNumbers' words with it")
+        for words in bound + self.UNBOUND:
+            with self.subTest(words):
+                self.assertTrue(words in prose, why)
+
+    def test_the_commit_steps_limit_is_the_split_size(self):
+        # (the README's 95 MiB: the fetch stores larger files in parts; the commit step's limit, its messages and its
+        # comment say the same size; test_review_round24's CommitStep checks that it refuses a file over it)
+        workflow = read(".github/workflows/red-build-logs.yml")
+        said = re.findall(r'-gt \$\(\((\d+) << 20\)\)', workflow) + re.findall(r"(?:larger than|none over) (\d+) MiB",
+                                                                                 workflow)
+        self.assertEqual((len(said), set(map(int, said))), (4, {frl.MAX_FILE_MB}),  # fails: AttributeError: no MAX_FILE_MB
+                         "(the count, the numbers): the commit step's limit ($((N << 20))), comment (none over N MiB) and "
+                         "two messages (larger than N MiB) say MAX_FILE_MB; change the 4 with a mention added or removed")
+        steps = [s for job in yaml.safe_load(workflow)["jobs"].values() for s in job.get("steps", [])]
+        fetch = [s["run"] for s in steps if s.get("id") == "fetch"]
+        self.assertEqual(len(fetch), 1)
+        self.assertIn("fetch_red_logs.py", fetch[0])
+        self.assertNotIn("--max-f", fetch[0])  # (it splits at its default; argparse takes any unambiguous prefix)
+
+    def test_control_number(self):
+        self.assertEqual(self.NUMBER.findall("_14_ __15__ *3* md5 v17 2x a1 (6)"), ["14", "15", "3", "2", "6"])
+
+    def test_no_other_number(self):
+        prose, bound = self.prose(), self.bound()  # fails: AttributeError: no MAX_FILE_MB
+        for words in bound + self.UNBOUND:
+            prose = prose.replace(words, "")
+        found = [prose[max(0, m.start() - 40):m.end() + 20] for m in self.NUMBER.finditer(prose)]
+        self.assertEqual(found, [], "numbers in README.md's prose that bound() does not bind nor UNBOUND list: bind or "
+                         "list each (if test_each_number_bound_to_the_code_is_its fails too, its message says what to change)")
 
 
 class Links(unittest.TestCase):
