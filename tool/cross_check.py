@@ -2,8 +2,9 @@
 """Independently verify an archive written by fetch_red_logs.py.
 
 For one run (default: the latest):
-  integrity  every archived file (build-log.txt, podinfo.json or a log of a
-             node of its cluster, or its parts) still has the md5 and length
+  integrity  every archived file (build-log.txt, podinfo.json, a log of a
+             node of its cluster or kubetest2's cluster-info.log, or its
+             parts) still has the md5 and length
              in its meta.json, however old, and no other stored file sits next
              to it; and GCS still holds the content it was taken from, checked
              for the builds of the last

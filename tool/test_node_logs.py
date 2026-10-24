@@ -199,6 +199,24 @@ class NodeLogNames(unittest.TestCase):
             with self.subTest(n):
                 self.assertEqual(frl.copy_of(n), of)  # fails: None
 
+    def test_cluster_info_log_s_and_those_of_a_node_named_cluster_info(self):
+        # (an instance's name: of a node so named, a log is <node>.<file>, as any node's)
+        info = "cluster-info.log"
+        for n, of in [("cluster-info.log", info), ("cluster-info.log.gz", info), ("cluster-info.log.gz.002", info),
+                      ("cluster-info.log.001", info), ("cluster-info.etcd.log", "cluster-info.etcd.log"),
+                      ("cluster-info.kube-node-installation.log.gz", "cluster-info.kube-node-installation.log"),
+                      ("cluster-info.log.part", None), ("cluster-info.logs", None), ("cluster-info.log.gz.0001", None),
+                      ("x.cluster-info.log", None), ("cluster-logs.cluster-info.log", None), ("cluster-info", None)]:
+            with self.subTest(n):
+                self.assertEqual(frl.copy_of(n), of)  # fails: None
+        for path, name in [("artifacts/cluster-logs/cluster-info.log", info),
+                           ("artifacts/cluster-logs/cluster-info/etcd.log", "cluster-info.etcd.log"),
+                           ("artifacts/cluster-info/etcd.log", "cluster-info.etcd.log"), ("artifacts/cluster-info.log", None),
+                           ("artifacts/cluster-logs/kt2-a1-master/cluster-info.log", None),
+                           ("artifacts/cluster-logs/cluster-info/cluster-info.log", None)]:
+            with self.subTest(path):
+                self.assertEqual(frl.node_log_name(path), name)  # fails: None
+
     def test_its_name_by_its_path(self):
         self.assertEqual(frl.node_log_name(MASTER), name_of(MASTER))  # fails: AttributeError: no node_log_name
         self.assertEqual(frl.node_log_name(NODE), name_of(NODE))
@@ -374,7 +392,6 @@ class UpFailed(UpFailedWorld):
             del self.srv.httpd.routes[f"{self.base}/artifacts/{path}"]
         self.put("cluster-logs/kt2-a1-master/etcd.log", b"etcd\n")
         self.put("cluster-logs/kt2-a1-minion-group-ab12/kube-node-installation.log", b"node\n")
-        self.put("cluster-logs/cluster-info.log", b"info\n")
         self.show([self.build], {"job.Overall": ([12], ["boom"]), "kubetest2.Up": ([12], [""])})
         self.assertEqual(self.fetch("--gzip"), 0)
         self.assertEqual([r["path"] for r in self.meta()["artifacts"]],  # fails: KeyError: 'artifacts'
@@ -1025,6 +1042,135 @@ class UpFailedNotRead(UpFailedWorld):
         self.assertEqual((self.runs()[-1]["outcomes"], m["refreshed"], m["final"]),
                          ({"refreshed": [self.key]}, self.names(self.LOGS), True))
         self.assertEqual(self.check()[0], 0)
+
+
+# (as `kubectl cluster-info dump` writes it: its objects as JSON, then the logs of each pod's containers)
+INFO = (b'{\n    "kind": "NodeList",\n    "items": []\n}\n'
+        b"==== START logs for container etcd-container of pod kube-system/etcd-server-kt2-a1-master ====\n")
+
+
+class ClusterInfo(UpFailedWorld):
+    """A build whose cluster kubetest2 did not bring up: of what its GCE deployer gave under artifacts/cluster-logs/,
+    a log of its control plane, and its dump of the cluster's state, cluster-info.log, which the build folder keeps
+    with the logs of its nodes (see fetch_red_logs.CLUSTER_INFO)."""
+
+    def setUp(self):
+        super().setUp()
+        for path in [*self.LOGS, *self.OTHERS]:
+            del self.srv.httpd.routes[f"{self.base}/artifacts/{path}"]
+        self.show([self.build], {"job.Overall": ([12], ["boom"]), "kubetest2.Up": ([12], [""])})
+        self.put("cluster-logs/kt2-a1-master/etcd.log", b"etcd\n")
+        self.put("cluster-logs/cluster-info.log", INFO)
+
+    def index(self):
+        with open(os.path.join(self.root, "INDEX.md"), encoding="utf-8") as f:
+            return f.read()
+
+    def test_it_is_kept(self):
+        # (as a log of a node: taken, checked, linked and counted with them)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]],
+                         ["artifacts/cluster-logs/cluster-info.log", "artifacts/cluster-logs/kt2-a1-master/etcd.log"])
+        # fails: etcd.log's only
+        self.assertEqual((self.stored("cluster-info.log"), self.runs()[-1]["bytes_downloaded"]),
+                         (INFO, len(b"log\n" + INFO + b"etcd\n")))
+        self.assertEqual(sorted(os.listdir(self.bdir())),
+                         ["build-log.txt.gz", "cluster-info.log.gz", "kt2-a1-master.etcd.log.gz", "meta.json"])
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertIn("\n  inventory: 1 build: 1 with a log, 1 with control-plane or node logs,", out)
+        self.assertIn("[cluster-info.log.gz](", self.index())
+
+    def test_and_the_logs_of_a_node_named_cluster_info(self):
+        # (a GCE instance's name: its logs are <node>.<file>, as any node's, and none is the dump's copy)
+        self.put("cluster-logs/cluster-info/kube-node-installation.log", b"a node named so\n")
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]],
+                         ["artifacts/cluster-logs/cluster-info.log",
+                          "artifacts/cluster-logs/cluster-info/kube-node-installation.log",
+                          "artifacts/cluster-logs/kt2-a1-master/etcd.log"])  # fails: no cluster-info.log
+        self.assertEqual([self.stored(n) for n in ("cluster-info.log", "cluster-info.kube-node-installation.log")],
+                         [INFO, b"a node named so\n"])
+        self.assertEqual(frl.stray_files(self.bdir(), self.meta()), [])
+        self.assertTrue(frl.intact(self.bdir(), self.meta(), deep=True))
+        self.assertEqual(self.check()[0], 0)
+
+    def test_control_an_empty_one_is_as_none(self):
+        # (kubetest2 makes the file before kubectl writes to it: it stays empty if the apiserver does not answer)
+        self.put("cluster-logs/cluster-info.log", b"")
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]], ["artifacts/cluster-logs/kt2-a1-master/etcd.log"])
+
+    def test_control_nor_one_out_of_cluster_logs(self):
+        # (kubetest2's dump is in artifacts/cluster-logs/ only)
+        del self.srv.httpd.routes[f"{self.base}/artifacts/cluster-logs/cluster-info.log"]
+        self.put("cluster-info.log", INFO)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]], ["artifacts/cluster-logs/kt2-a1-master/etcd.log"])
+
+    def test_nor_one_gcs_cannot_serve(self):
+        # (as a node's log GCS cannot serve: the others are kept, the build is not final, and the next run takes it)
+        self.srv.route(f"{self.base}/artifacts/cluster-logs/cluster-info.log", (403, {}, b""))
+        self.listed("cluster-logs/cluster-info.log")
+        self.finished(ago=3 * DAY)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        m = self.meta()
+        self.assertEqual(([r["path"] for r in m["artifacts"]], m["final"]),
+                         (["artifacts/cluster-logs/kt2-a1-master/etcd.log"], False))  # fails: final True
+        self.put("cluster-logs/cluster-info.log", INFO)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        run, m = self.runs()[-1], self.meta()
+        self.assertEqual((run["outcomes"], m["refreshed"], m["final"], self.stored("cluster-info.log")),
+                         ({"refreshed": [self.key]}, ["cluster-info.log"], True, INFO))
+
+    def test_one_it_does_not_list_is_a_stray(self):
+        self.assertEqual(self.fetch("--gzip"), 0)
+        with open(os.path.join(self.bdir(), "cluster-info.log.gz.000"), "wb") as f:
+            f.write(b"x")
+        code, out = self.check()
+        self.assertEqual(code, 1)  # fails: 0
+        self.assertIn(f"{self.key} cluster-info.log.gz.000: not listed in its meta.json", out)
+        self.assertEqual(self.fetch("--gzip"), 0)  # (the cleanup at its start removes it)
+        self.assertNotIn("cluster-info.log.gz.000", os.listdir(self.bdir()))
+
+    def test_one_gcs_changed_is_reported_then_taken_again(self):
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.put("cluster-logs/cluster-info.log", INFO + b"more\n")
+        code, out = self.check()
+        self.assertEqual(code, 1)  # fails: 0
+        self.assertIn(f"{self.key} cluster-info.log.gz: GCS changed since it was archived", out)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual((self.meta()["refreshed"], self.stored("cluster-info.log")), (["cluster-info.log"], INFO + b"more\n"))
+
+    def test_a_damaged_copy_is_taken_again(self):
+        self.assertEqual(self.fetch("--gzip"), 0)
+        with open(os.path.join(self.bdir(), "cluster-info.log.gz"), "ab") as f:
+            f.write(b"damage")
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual((self.runs()[-1]["outcomes"], self.meta().get("repaired")),
+                         ({"repaired": [self.key]}, ["cluster-info.log"]))  # fails: ({'already-archived': [...]}, None)
+        self.assertEqual(self.stored("cluster-info.log"), INFO)
+
+    def test_one_of_a_folder_whose_meta_json_cannot_be_read_stays_if_gcs_no_longer_has_it(self):
+        # (as a node's log there: the copy and the meta.json are left as they are)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        with open(os.path.join(self.bdir(), "meta.json"), "w") as f:
+            f.write("{not json")
+        del self.srv.httpd.routes[f"{self.base}/artifacts/cluster-logs/cluster-info.log"]
+        self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0
+        self.assertIn("GCS no longer has cluster-info.log, of which its folder holds a copy",
+                      self.runs()[-1]["errors"][0]["error"])
+        self.assertIn("cluster-info.log.gz", os.listdir(self.bdir()))
+
+    def test_one_with_it_alone_is_counted_with_those_with_node_logs(self):
+        # (its dump holds the logs of the cluster's kube-system pods, its control plane's among them: see INFO)
+        del self.srv.httpd.routes[f"{self.base}/artifacts/cluster-logs/kt2-a1-master/etcd.log"]
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertIn("| … with control-plane or node logs (its cluster did not come up) | 1 |", self.index())
+        # fails: | 0 |
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertIn("1 with control-plane or node logs", out)
 
 
 if __name__ == "__main__":
