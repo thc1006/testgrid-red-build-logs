@@ -3,8 +3,8 @@
 The tests check README.md, AGENTS.md, THIRD_PARTY_NOTICES.md and tool/oracle/README.md, as GitHub shows them (see
 Page): their links and anchors, and those of the pages a run writes; HTML comments and code fences that could hide
 text; the README's numbers, against the constants and workflow settings they come from; the oracle's files; the
-versions the ported files come from; and the days INDEX.md says red builds are given up on after. The test
-workflow runs on a change to any file they read.
+versions the ported files come from; the days INDEX.md says red builds are given up on after; and the raw HTML
+tags, each one GitHub shows. The test workflow runs on a change to any file they read.
 
 Run: cd tool && uv run python -m unittest test_docs -v
 """
@@ -245,6 +245,35 @@ class Page(HTMLParser):
 def anchors(text):
     """The anchors of a Markdown page (see Page)."""
     return Page(text).anchors
+
+
+class TagNames(HTMLParser):
+    """The tags of HTML, as "<name>" or "</name>", in order, but those in its comments (see comments)."""
+
+    def __init__(self, html):
+        super().__init__(convert_charrefs=True)
+        self.names = []
+        self.feed(uncommented(html))
+        self.close()
+
+    def handle_starttag(self, tag, attrs):
+        self.names.append(f"<{tag}>")
+
+    def handle_endtag(self, tag):
+        self.names.append(f"</{tag}>")
+
+
+def raw_tags(markdown):
+    """The tags of a Markdown page's raw HTML, as "<name>" or "</name>", in order: those cmark-gfm's HTML of it holds
+    more of than its HTML with raw HTML left out. Of a name both hold, the first are taken as cmark-gfm's."""
+    made = TagNames(cmarkgfm.github_flavored_markdown_to_html(markdown, options=OPTIONS & ~Options.CMARK_OPT_UNSAFE)).names
+    out = []
+    for name in TagNames(cmarkgfm.github_flavored_markdown_to_html(markdown, options=OPTIONS)).names:
+        if name in made:
+            made.remove(name)
+        else:
+            out.append(name)
+    return out
 
 
 OUTSIDE = object()  # (where a link one level out of the repository leads: a page GitHub does not serve)
@@ -643,6 +672,33 @@ class Hiding(unittest.TestCase):
                             ("````\na\n```\n", [1]), ("1. ```\n   a\n   ```\n", []), ("~~~\na\n````\n", [1]),
                             ("   ```\na\n   ```\n", []), ("```\na\n``` x\n", [1]), ("> ```\n> a\n> ```\n", [])):
             self.assertEqual(Page(text).unclosed, lines, text)
+
+
+class Tags(unittest.TestCase):
+    """The docs' raw HTML tags (see raw_tags) are ones GitHub shows. Its sanitizer drops some, such as abbr and the
+    notices' old "<year>", and keeps others, such as kbd and details. SHOWN holds the tags the docs use, each one a
+    case of GITHUB shows GitHub keeping."""
+
+    SHOWN = {"img", "picture", "source"}
+
+    def dropped(self, text):
+        """The raw HTML tags of Markdown text that GitHub may drop (not in SHOWN)."""
+        return [t for t in raw_tags(text) if t.strip("</>") not in self.SHOWN]
+
+    def test_control_dropped(self):
+        self.assertEqual(self.dropped("[a](<b c.md>) x\n\n[d]: <e f.md>\n\n\\<year> <IMG src=x> <kbd>k</kbd> `<g>` <YEAR>"),
+                         ["<kbd>", "</kbd>", "<year>"])
+        self.assertEqual(self.dropped("Copyright \\\\<year> X"), ["<year>"])  # (an escaped backslash, then a tag)
+        self.assertEqual(self.dropped("<picture>\n<source srcset=a.svg>\n<img src=b.svg>\n</picture>\n\n<!-- <year> -->"), [])
+        self.assertEqual(self.dropped("a\n\n<p>b</p>\n"), ["<p>", "</p>"])  # (a raw tag cmark-gfm makes too, counted)
+        # (a comment ends at "--!>", and "<!-->" is a whole one though a "-->" follows)
+        self.assertEqual(self.dropped("<div><!--> <kbd>k</kbd> --></div>\n\n<!-- a --!> <b>c</b>\n-->\n"),
+                         ["<div>", "<kbd>", "</kbd>", "</div>", "<b>", "</b>"])
+
+    def test_each_is_one_github_shows(self):
+        found = [(doc, tag) for doc in DOCS for tag in self.dropped(read(doc))]
+        self.assertEqual(found, [], "GitHub may drop these tags: write each in code, or check that GitHub shows "
+                         "it and add it to SHOWN")  # fails: the notices' <year>, 3 times
 
 
 class OracleReadme(unittest.TestCase):
