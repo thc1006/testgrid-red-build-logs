@@ -121,8 +121,8 @@ BUILD_RE = re.compile(r"[0-9]{1,20}")
 # <bucket>/<path>/<job>: plain segments only, so it cannot step out of the bucket in a URL.
 QUERY_RE = re.compile(r"[a-z0-9][a-z0-9._-]*(?:/(?!\.\.?(?:/|$))[A-Za-z0-9._-]+)+")
 # the files a build folder stores, the log first: meta.json's key for each, and its name in GCS and in the folder (as
-# it came, or gzipped as <name>.gz). What reads a folder's files reads them by it (see file_records); store() and
-# recheck() take each from GCS in code of its own.
+# it came, or gzipped as <name>.gz). What reads a folder's files reads them by it (see file_records, copy_of); store()
+# and recheck() take each from GCS in code of its own.
 STORED = (("log", "build-log.txt"), ("podinfo", "podinfo.json"))
 LOG_FILES = {n for _, name in STORED for n in (name, name + ".gz")}
 # a stored file too large for one file in git is kept as numbered parts: <file>.000, <file>.001, ...
@@ -1793,6 +1793,14 @@ def take_copy(base, target, compress, max_bytes, name="build-log.txt"):
     return download(f"{base}/{name}", os.path.join(target, name), compress, max_bytes)
 
 
+def copy_of(n):
+    """The file a build folder's file named n is a stored copy of (see STORED: as it came or gzipped, whole or
+    in parts, as build-log.txt.gz.000 is of build-log.txt), else None."""
+    m = PART_RE.fullmatch(n)
+    whole = m.group(1) if m else n
+    return whole.removesuffix(".gz") if whole in LOG_FILES else None
+
+
 def drop_other_copies(target, name, info):
     """Remove the stored copies of name in a build folder (as it came or gzipped, whole or in parts) other
     than info's. One that cannot be removed (or listed) stays, a stray the cleanup removes or reports (see
@@ -1803,8 +1811,7 @@ def drop_other_copies(target, name, info):
     except OSError:
         names = []
     for n in names:
-        m = PART_RE.fullmatch(n)
-        if (m.group(1) if m else n) in (name, name + ".gz") and n not in keep:
+        if copy_of(n) == name and n not in keep:
             with contextlib.suppress(OSError):
                 remove(os.path.join(target, n))
 
@@ -1858,7 +1865,7 @@ def stray_files(target, meta):
                 listed += names
             else:
                 listed.append(name)
-    return sorted(n for n in listdir(target) if (n in LOG_FILES or PART_RE.fullmatch(n)) and n not in set(listed))
+    return sorted(n for n in listdir(target) if copy_of(n) and n not in set(listed))
 
 
 class RecheckError(Exception):
@@ -3384,11 +3391,7 @@ def left_as_it_is(name, base, error=None):
 def holds_copy(target, name):
     """Whether a build folder holds a stored copy of name (build-log.txt or podinfo.json): as it came,
     gzipped, or in parts."""
-    for n in listdir(target):
-        m = PART_RE.fullmatch(n)
-        if (m.group(1) if m else n) in (name, name + ".gz"):
-            return True
-    return False
+    return any(copy_of(n) == name for n in listdir(target))
 
 
 def settle_flags(meta, checked, now):
@@ -4070,8 +4073,7 @@ def clean_partial_builds(root, warnings):
     Only files a download writes are removed; a folder holding anything else is reported, not touched.
     """
     def downloaded(target, n):  # (a file a download writes: one of such a name, not a folder or link)
-        return bool(n in LOG_FILES or PART_RE.fullmatch(n) or (n.startswith(".") and n.endswith(".part"))) \
-            and file_or_gone(os.path.join(target, n))
+        return bool(copy_of(n) or (n.startswith(".") and n.endswith(".part"))) and file_or_gone(os.path.join(target, n))
     for run_rel in run_dirs(root):
         run_abs = os.path.join(root, run_rel)
         for job in listdir(run_abs):
