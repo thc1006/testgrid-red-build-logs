@@ -58,8 +58,8 @@ in [`third_party/unicode/LICENSE`](third_party/unicode/LICENSE).
 
 github.com/GoogleCloudPlatform/testgrid at `f15bfa4808a4`, under the Apache
 License 2.0, the license of this repository ([`LICENSE`](LICENSE)). Each file
-below carries "Copyright <year> The TestGrid Authors" (TG) or "Copyright <year>
-The Kubernetes Authors" (K8s), with the year shown, but the protos
+below carries `Copyright <year> The TestGrid Authors` (TG) or `Copyright <year>
+The Kubernetes Authors` (K8s), with the year shown, but the protos
 (`pb/config/config.proto`, `pb/custom_evaluator/custom_evaluator.proto` and
 `pb/test_status/test_status.proto`), which carry none.
 
@@ -111,7 +111,7 @@ below carry 2014 or 2016.
 ## Google Cloud Storage client
 
 cloud.google.com/go/storage v1.31.0, under the Apache License 2.0
-([`LICENSE`](LICENSE)). Each file below carries "Copyright <year> Google LLC",
+([`LICENSE`](LICENSE)). Each file below carries `Copyright <year> Google LLC`,
 with the year shown.
 
 - `tool/testgrid_rule.py` uses its error text for a missing object
