@@ -2,10 +2,11 @@
 """Independently verify an archive written by fetch_red_logs.py.
 
 For one run (default: the latest):
-  integrity  every archived file (build-log.txt or podinfo.json, or its parts)
-             still has the md5 and length in its meta.json, however old, and
-             no other stored file sits next to it; and GCS still holds the
-             content it was taken from, checked for the builds of the last
+  integrity  every archived file (build-log.txt, podinfo.json or a log of a
+             node of its cluster, or its parts) still has the md5 and length
+             in its meta.json, however old, and no other stored file sits next
+             to it; and GCS still holds the content it was taken from (but for
+             the logs of nodes), checked for the builds of the last
              --hours and a seventh of the older ones for each day since the
              last run done with its own (so each at least once a week, even
              when a run is cut off or its verification finds a difference; the
@@ -404,7 +405,7 @@ def check_file(root, rel, m, info, default, remote=True):
     name = default if info.get("omitted") else info.get("file", default)
     label = f"{m['job']}/{m['build']} {name}"
     if not info.get("omitted"):  # a file too large to store is only compared with GCS
-        if name not in frl.LOG_FILES:
+        if name not in frl.copy_names(default):
             return LocalDamage(f"{label}: unexpected file name in meta.json")
         try:
             md5, size, on_disk = local_digest(root, rel, name, info)
@@ -455,10 +456,14 @@ def inventory(archived, root):
         counts[what] = counts.get(what, 0) + 1
     for _, m in archived.values():
         log, pod = (m.get(k) if isinstance(m.get(k), dict) else None for k in ("log", "podinfo"))
-        count("with a log" if log else "with only podinfo.json" if pod else "without files")
+        nodes = any(isinstance(i, dict) for _, i in frl.node_log_records(m))  # (as INDEX.md counts them)
+        if log or not nodes:  # (one without a log that has logs of its nodes is neither of the others)
+            count("with a log" if log else "with only podinfo.json" if pod else "without files")
         records = [i for _, i in frl.file_records(m) if isinstance(i, dict)]
         if any(i.get("parts") for i in records):
             count("with a file stored in parts")
+        if nodes:
+            count("with control-plane or node logs")
         if any(i.get("omitted") for i in records):
             count("with a file not stored (an older record: too large)")
         if log and m.get("finished") is None:
@@ -605,12 +610,16 @@ def check(args, problems, notes, record):
         other."""
         given_up = frl.given_up_on(m)
         files = [(default, info) for default, info in frl.file_records(m) if info]
-        found = [check_file(root, rel, m, info, default, remote and not given_up) for default, info in files]
+        # (the logs of its nodes only on disk: the fetch does not compare them with GCS)
+        found = [check_file(root, rel, m, info, default, remote and not given_up and default in frl.STORED_NAMES)
+                 for default, info in files]
         # a stored file its meta.json does not list (`cat <file>.*` would take a stray part in),
         # or one GitHub would refuse
         folder = os.path.join(root, rel)
         found += [LocalDamage(f"{m['job']}/{m['build']} {n}: not listed in its meta.json")
                   for n in frl.stray_files(folder, m)]
+        if "artifacts" in m and not isinstance(m["artifacts"], list):  # (stray_files() cannot tell their copies then)
+            found.append(LocalDamage(f"{m['job']}/{m['build']} meta.json: its \"artifacts\" is not a list"))
         found += [LocalDamage(f"{m['job']}/{m['build']} {n}: {os.path.getsize(os.path.join(folder, n))} bytes, "
                               "more than GitHub accepts in one file")
                   for n in frl.listdir(folder) if not n.startswith(".")  # (not a temp file git ignores)
@@ -620,7 +629,7 @@ def check(args, problems, notes, record):
         noted = []
         if remote and given_up:
             try:
-                noted = [gcs_change(m, info, default) for default, info in files]
+                noted = [gcs_change(m, info, default) for default, info in files if default in frl.STORED_NAMES]
                 noted += [] if m.get("log") else [gcs_log_appeared(m)]
             except Exception as e:
                 noted = [f"{m['job']}/{m['build']}: cannot read GCS: {type(e).__name__}: {e}"]
