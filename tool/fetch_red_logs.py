@@ -1656,15 +1656,20 @@ def remove_build_dir(target):
     remove_if_empty(target)
 
 
-def file_digest(path, parts=None):
-    """(md5, length) of a file's raw content, read from its parts when it has them; a
-    .gz file is gunzipped strictly, in bounded steps."""
+def file_content(path, parts=None):
+    """A stored file's raw content, in chunks: read from its parts when it has them; a .gz file is gunzipped
+    strictly, in bounded steps."""
     def data():
         for p in parts or [path]:
             with open(p, "rb") as f:
                 yield from iter(lambda f=f: f.read(1 << 20), b"")
+    return gunzipped(data()) if path.endswith(".gz") else data()
+
+
+def file_digest(path, parts=None):
+    """(md5, length) of a file's raw content (see file_content)."""
     md5, size = hashlib.md5(), 0
-    for chunk in gunzipped(data()) if path.endswith(".gz") else data():
+    for chunk in file_content(path, parts):
         md5.update(chunk)
         size += len(chunk)
     return md5.hexdigest(), size
