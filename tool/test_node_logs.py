@@ -403,7 +403,7 @@ class UpFailed(UpFailedWorld):
                          ({"repaired": [self.key]}, ["build-log.txt"], False))
 
     def test_nor_one_gcs_cannot_serve(self):
-        # (but the others are kept)
+        # (but the others are kept, and the next run takes only it)
         self.srv.route(f"{self.base}/artifacts/e2e-master/serial-1.log", (403, {}, b""))
         self.listed("e2e-master/serial-1.log")
         self.finished(ago=3 * DAY)
@@ -415,6 +415,31 @@ class UpFailed(UpFailedWorld):
         self.assertEqual(sorted(os.listdir(self.bdir())),
                          ["build-log.txt.gz"] + [n + ".gz" for n in self.names(others)] + ["meta.json"])
         self.assertEqual((self.runs()[-1]["outcomes"], self.runs()[-1]["errors"]), ({"archived": [self.key]}, []))
+        self.put("e2e-master/serial-1.log", b"serial\n")
+        self.assertEqual(self.fetch("--gzip"), 0)
+        run, m = self.runs()[-1], self.meta()
+        self.assertEqual((run["outcomes"], run["bytes_downloaded"]), ({"refreshed": [self.key]}, len(b"serial\n")))
+        # fails: ({'already-archived': [...]}, 0)
+        self.assertEqual((m["refreshed"], m["final"], self.stored("e2e-master.serial-1.log")),
+                         (["e2e-master.serial-1.log"], True, b"serial\n"))
+
+    def test_nor_one_gcs_keeps_refusing_once_the_runs_give_up_on_the_build(self):
+        # (each run's comparison fails, as for a podinfo.json GCS keeps refusing, until the runs give up on it after
+        # GIVE_UP_DAYS: the others stay)
+        self.srv.route(f"{self.base}/artifacts/e2e-master/serial-1.log", (403, {}, b""))
+        self.listed("e2e-master/serial-1.log")
+        self.finished(ago=3 * DAY)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0
+        self.assertIn("comparing the archived copy with GCS failed: HTTPError: HTTP Error 403",
+                      self.runs()[-1]["errors"][0]["error"])
+        since = time.time() - 15 * DAY
+        frl.write_json(os.path.join(self.bdir(), "meta.json"),
+                       dict(self.meta(), comparison_failing_since=since, created=min(self.meta()["created"], since - DAY)))
+        self.assertEqual(self.fetch("--gzip"), 1)
+        m = self.meta()
+        self.assertEqual((self.runs()[-1]["outcomes"], m["final"]), ({"comparison-given-up": [self.key]}, True))
+        self.assertEqual([r["path"] for r in m["artifacts"]], self.paths(p for p in self.LOGS if "serial-1" not in p))
 
     def test_one_gone_since_it_was_listed_is_as_none(self):
         del self.srv.httpd.routes[f"{self.base}/artifacts/e2e-master/etcd.log"]
@@ -693,6 +718,148 @@ class UpFailedRepaired(UpFailedWorld):
         self.assertEqual(([r["path"] for r in m["artifacts"]], m["final"]), (self.paths(self.LOGS), False))
         # fails: KeyError: 'artifacts'
         self.assertEqual(self.runs()[-1]["outcomes"], {"repaired": [self.key]})
+
+
+class UpFailedCompared(UpFailedWorld):
+    """As UpFailed, archived: each later run compares its nodes' logs with GCS, as its other files, until it is
+    final, and lists GCS again for those it has no copy of."""
+
+    def setUp(self):
+        super().setUp()
+        self.assertEqual(self.fetch("--gzip"), 0)
+
+    def test_one_gcs_changed_is_reported_then_taken_again(self):
+        self.put("e2e-master/etcd.log", b"etcd, uploaded again\n")
+        code, out = self.check()
+        self.assertEqual(code, 1)  # fails: 0
+        self.assertIn(f"{self.key} e2e-master.etcd.log.gz: GCS changed since it was archived", out)
+        hits = dict(self.srv.httpd.hits)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        run = self.runs()[-1]
+        self.assertEqual((run["outcomes"], run["bytes_downloaded"]), ({"refreshed": [self.key]}, len(b"etcd, uploaded again\n")))
+        self.assertEqual((self.meta()["refreshed"], self.stored("e2e-master.etcd.log")),
+                         (["e2e-master.etcd.log"], b"etcd, uploaded again\n"))
+        again = {p: n - hits.get(p, 0) for p, n in self.srv.httpd.hits.items() if "/artifacts/" in p and n != hits.get(p, 0)}
+        self.assertEqual(again, {f"{self.base}/artifacts/{p}": 2 if p == "e2e-master/etcd.log" else 1 for p in self.LOGS})
+        # (a HEAD of each, and a GET of the one GCS changed)
+        self.assertEqual(self.check()[0], 0)
+
+    def test_of_one_taken_again_and_then_from_where_gcs_lists_it_first_the_copy_its_record_names(self):
+        # (GCS changed it, so it is taken again at its path; GCS lists it first at kubetest2's cluster-logs/ now, so it
+        # is taken from there too, in the other form: both put in place would remove each other)
+        self.put("e2e-master/etcd.log", os.urandom(300))  # (in parts of 104 bytes, once taken)
+        self.put("cluster-logs/e2e-master/etcd.log", b"kubetest2's\n")
+        self.assertEqual(self.fetch("--gzip", "--max-file-mb", "0.0001"), 0)
+        m = self.meta()
+        record, = (r for r in m["artifacts"] if name_of(r["path"]) == "e2e-master.etcd.log")
+        self.assertEqual(record["path"], "artifacts/cluster-logs/e2e-master/etcd.log")  # fails: artifacts/e2e-master/...
+        self.assertEqual((m["refreshed"], self.stored("e2e-master.etcd.log")), (["e2e-master.etcd.log"], b"kubetest2's\n"))
+        self.assertTrue(frl.intact(self.bdir(), m, deep=True))
+        self.assertEqual([n for n in os.listdir(self.bdir()) if n.endswith(".part")], [])
+
+    def test_one_gcs_has_later_is_taken_by_the_next_comparison(self):
+        self.put("e2e-minion-group-ef56/kube-node-installation.log", b"a node that came up late\n")
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"refreshed": [self.key]})  # fails: {'already-archived': [...]}
+        self.assertEqual(self.meta()["refreshed"], ["e2e-minion-group-ef56.kube-node-installation.log"])
+        self.assertEqual(self.stored("e2e-minion-group-ef56.kube-node-installation.log"), b"a node that came up late\n")
+        self.assertEqual(self.check()[0], 0)
+
+    def test_the_apiserver_log_once_a_log_taken_again_says_the_cluster_failed_to_initialize(self):
+        self.log(b"log, uploaded again\n" + INIT_FAILED)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(self.meta()["refreshed"], ["build-log.txt", "e2e-master.kube-apiserver.log"])  # fails: log only
+        self.assertEqual(self.stored("e2e-master.kube-apiserver.log"), b"apiserver\n")
+
+    def test_a_log_it_cannot_read_then_is_a_disk_error(self):
+        # (its copy damaged once the run found the build intact, as the disk could damage it: the comparison fails, but
+        # not on GCS's side, so it starts no failures to give up on the build after; the next run repairs it)
+        real = frl.recheck
+
+        def damaging(old, rec, target, *args, **kwargs):
+            with open(os.path.join(target, "build-log.txt.gz"), "ab") as f:
+                f.write(b"damage")
+            return real(old, rec, target, *args, **kwargs)
+        with mock.patch.object(frl, "recheck", damaging):
+            self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0
+        self.assertNotIn("comparison_failing_since", self.meta())
+        error = self.runs()[-1]["errors"][0]["error"]
+        self.assertTrue(error.startswith("comparing the archived copy with GCS failed: LocalIOError: "), error)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual((self.runs()[-1]["outcomes"], self.meta()["repaired"]), ({"repaired": [self.key]}, ["build-log.txt"]))
+        self.assertNotIn("comparison_failing_since", self.meta())
+
+    def test_control_one_gcs_no_longer_has_stays(self):
+        del self.srv.httpd.routes[f"{self.base}/artifacts/e2e-master/etcd.log"]
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
+        self.assertEqual(self.stored("e2e-master.etcd.log"), b"etcd\n")
+        self.assertEqual(self.check()[0], 0)
+
+    def test_what_it_took_before_gcs_failed_is_in_place(self):
+        # (one GCS changed, taken again before a listing that fails: the comparison fails, the copy taken stays)
+        self.put("e2e-master/etcd.log", b"etcd, uploaded again\n")
+        self.refuse_listing()
+        self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0
+        run, m = self.runs()[-1], self.meta()
+        self.assertIn("comparing the archived copy with GCS failed: HTTPError: HTTP Error 503", run["errors"][0]["error"])
+        self.assertEqual((run["outcomes"], m["refreshed"], m["comparison_failing_since"]),
+                         ({"refreshed": [self.key]}, ["e2e-master.etcd.log"], run["started"]))
+        self.assertEqual(self.stored("e2e-master.etcd.log"), b"etcd, uploaded again\n")
+        self.assertEqual([n for n in os.listdir(self.bdir()) if n.endswith(".part")], [])
+        self.assertTrue(frl.intact(self.bdir(), self.meta(), deep=True))
+
+    def test_one_gcs_cannot_compare_keeps_none_of_the_others_from_being_compared(self):
+        # (its copy stays as it is; of the others, one GCS changed is taken again, and one GCS has later is taken)
+        self.srv.route(f"{self.base}/artifacts/e2e-master/containerd.log", (503, {}, b""))
+        self.listed("e2e-master/containerd.log")
+        self.put("e2e-master/etcd.log", b"etcd, uploaded again\n")
+        self.put("e2e-minion-group-ef56/kube-node-installation.log", b"a node that came up late\n")
+        self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0
+        self.assertIn("comparing the archived copy with GCS failed: HTTPError: HTTP Error 503",
+                      self.runs()[-1]["errors"][0]["error"])
+        m = self.meta()
+        self.assertEqual(m["refreshed"], ["e2e-master.etcd.log", "e2e-minion-group-ef56.kube-node-installation.log"])
+        self.assertEqual([self.stored(n) for n in ("e2e-master.containerd.log", "e2e-master.etcd.log")],
+                         [b"containerd\n", b"etcd, uploaded again\n"])
+        self.assertEqual(len(m["artifacts"]), len(self.LOGS) + 1)
+
+    def test_a_listing_that_fails_fails_the_comparison(self):
+        # (as one of its podinfo.json: an error, the next run compares it again, and the runs give up on it after
+        # GIVE_UP_DAYS of failures)
+        self.refuse_listing()
+        self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0
+        run = self.runs()[-1]
+        self.assertIn("comparing the archived copy with GCS failed: HTTPError: HTTP Error 503", run["errors"][0]["error"])
+        self.assertEqual(self.meta()["comparison_failing_since"], run["started"])
+        since = time.time() - 15 * DAY
+        path = os.path.join(self.bdir(), "meta.json")
+        frl.write_json(path, dict(self.meta(), comparison_failing_since=since, created=min(self.meta()["created"], since - DAY)))
+        self.assertEqual(self.fetch("--gzip"), 1)
+        self.assertEqual((self.runs()[-1]["outcomes"], self.meta()["final"]), ({"comparison-given-up": [self.key]}, True))
+        self.assertIn("HTTP Error 503", self.meta()["comparison_given_up"])
+
+
+class UpFailedNotRead(UpFailedWorld):
+    """As UpFailed, archived when GCS refused a listing of its artifacts: without the logs of its nodes, not final."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * DAY)
+        listing = self.srv.httpd.prefix_routes[LISTING]
+        self.refuse_listing()
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual((self.meta()["artifacts"], self.meta()["final"]), ([], False))
+        self.srv.httpd.prefix_routes[LISTING] = listing
+
+    def test_the_next_run_takes_them(self):
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set()):  # (not in the run's sevenths)
+            self.assertEqual(self.fetch("--gzip"), 0)
+        m = self.meta()
+        self.assertEqual([r["path"] for r in m["artifacts"]], self.paths(self.LOGS))  # fails: []
+        self.assertEqual((self.runs()[-1]["outcomes"], m["refreshed"], m["final"]),
+                         ({"refreshed": [self.key]}, self.names(self.LOGS), True))
+        self.assertEqual(self.check()[0], 0)
 
 
 if __name__ == "__main__":
