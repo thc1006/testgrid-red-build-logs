@@ -302,6 +302,16 @@ class PodInfoGzipped(ArchiveWorld):
         self.assertEqual(code, 1)
         self.assertIn(f"{self.key} {stray}: not listed in its meta.json", out)
 
+    def test_one_in_parts_beside_a_log_kept_whole_is_counted(self):  # (kills a mutant)
+        # (by cross_check's inventory as by INDEX.md: the build has a file stored in parts, though not its log)
+        self.assertEqual(self.fetch("--gzip", "--max-file-mb", "0.00005"), 0)  # (52 bytes: more than the log takes)
+        self.assertEqual((self.meta()["log"].get("parts"), len(self.meta()["podinfo"]["parts"]) > 1), (None, True))
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertIn("inventory: 1 build: 1 with a log, 1 with a file stored in parts,", out)
+        with open(os.path.join(self.root, "INDEX.md"), encoding="utf-8") as f:
+            self.assertIn("| … with a file stored in parts (too large for one file in git) | 1 |", f.read())
+
     def test_one_kept_in_parts_leaves_no_part_once_taken_whole(self):
         # (in parts as it came, then gzipped once GCS changes it: the parts go with the copy they were)
         self.without_a_log()
