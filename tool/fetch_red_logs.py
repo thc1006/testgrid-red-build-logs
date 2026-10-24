@@ -3669,6 +3669,51 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                     meta = new
                 except NotFound:
                     pass
+            # The logs of its cluster's nodes, of a build store() keeps them for (see NODE_LOGS): each compared
+            # with GCS and taken again if GCS holds another copy now, as the log is; then those GCS has that it has
+            # no copy of are taken (one store() could not read, or GCS did not have yet), as a podinfo.json it lacks.
+            # GCS failing on one of them, or on their listing, keeps none of the others from being compared or
+            # taken: what it took goes in place, and then the failure fails the comparison, as the log's does.
+            if isinstance(meta.get("artifacts"), list):
+                records, taken, failure = {}, [], None
+                try:
+                    for name, info in node_log_records(meta):  # (all of such logs: the copy is intact)
+                        records[name] = info
+                        try:
+                            if unchanged_in_gcs(node_log_url(base, info["path"]), info):
+                                continue
+                            taken.append(download(node_log_url(base, info["path"]), os.path.join(target, name),
+                                                  compress, max_bytes))
+                        except (Abandoned, LocalIOError, *BUGS):
+                            raise
+                        except Exception as e:  # (GCS's doing: the copy stays as it is, not compared now)
+                            failure = e if failure is None else failure
+                            continue
+                        records[name] = dict({"path": info["path"]}, **taken[-1].info)
+                        if taken[-1].info["md5"] != info.get("md5"):
+                            changed.append(name)
+                    says = bool(meta.get("log")) and log_says(target, meta["log"])  # (kube-apiserver.log is one to keep)
+                    logs, failed, _ = take_node_logs(gcs, where, base, target, compress, max_bytes, says, records, (), taken)
+                    failure = failed if failure is None else failure
+                    changed += [name for name in (node_log_name(info["path"]) for info in logs) if name not in records]
+                    new = dict(meta, artifacts=logs, **({"refreshed_by_run": run_id, "refreshed": list(changed)}
+                                                         if changed else {}))
+                    # (of one taken again at its path, then from another GCS now lists first, only the copy its record
+                    # names goes in place: put_in_place() would remove each copy in the other's form)
+                    last = {c.name: c for c in taken}
+                    for c in taken:
+                        if last[c.name] is not c:
+                            c.discard()
+                    taken[:] = last.values()
+                    if new != meta:
+                        put_in_place(target, new, taken)
+                        meta = new
+                except BaseException:
+                    for c in taken:
+                        c.discard()
+                    raise
+                if failure is not None:
+                    raise failure  # (what it took is in place now)
         except Abandoned:
             raise
         except (LocalIOError, *BUGS) as e:  # (not GCS's doing: an error that neither starts nor ends its failures)
@@ -3906,10 +3951,10 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
                     raise  # (the build's only file: archived once it can be read)
                 unread = not isinstance(e, NotFound)
         # None of them is a reason to leave the build out: if GCS cannot list them, or serve one, the build is
-        # archived with the copies of them it has intact and those it could take, and not final, as when its
-        # podinfo.json cannot be read. But if GCS cannot give it one it is to take again (one damaged, or one a
-        # folder whose meta.json cannot be read holds a copy of), the folder stays as it is, for the next run to take
-        # it again.
+        # archived with the copies of them it has intact and those it could take, and not final, so the next run
+        # reads the others again (see recheck), as a podinfo.json it cannot read. But if GCS cannot give it one it
+        # is to take again (one damaged, or one a folder whose meta.json cannot be read holds a copy of), the folder
+        # stays as it is, for the next run to take it again.
         if keeps_logs:
             taken, again = len(copies), set(mine) - set(whole_logs) | held_logs
             try:
@@ -3974,7 +4019,7 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
         meta.update({k: old[k] for k in (COMPARISON_FAILING, COMPARISON_GIVEN_UP) if k in old})
         if given_up_on(old):
             meta["final"] = True  # (as the run that gave up left it: compared in its seventh, which tries again a
-            # podinfo.json left unread, once GCS serves the log)
+            # podinfo.json, or logs of its nodes, left unread, once GCS serves the log)
             if not meta.get("note") and isinstance(old.get("note"), str) and old["note"].startswith(OLD_GAVE_UP_NOTE):
                 meta["note"] = old["note"]
     put_in_place(target, meta, copies)

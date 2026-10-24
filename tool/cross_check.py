@@ -5,8 +5,8 @@ For one run (default: the latest):
   integrity  every archived file (build-log.txt, podinfo.json or a log of a
              node of its cluster, or its parts) still has the md5 and length
              in its meta.json, however old, and no other stored file sits next
-             to it; and GCS still holds the content it was taken from (but for
-             the logs of nodes), checked for the builds of the last
+             to it; and GCS still holds the content it was taken from, checked
+             for the builds of the last
              --hours and a seventh of the older ones for each day since the
              last run done with its own (so each at least once a week, even
              when a run is cut off or its verification finds a difference; the
@@ -422,7 +422,8 @@ def gcs_change(m, info, default):
     """A "GCS changed" message if GCS holds another copy of one archived file (`default`, as m records it: info)
     than the one archived, else None (none either if GCS no longer has it). Raises if GCS cannot be read."""
     label = f"{m['job']}/{m['build']} {default if info.get('omitted') else info.get('file', default)}"
-    url = m["log_url"].rsplit("/", 1)[0] + "/" + default
+    folder = m["log_url"].rsplit("/", 1)[0]
+    url = f"{folder}/{default}" if default in frl.STORED_NAMES else frl.node_log_url(folder, info["path"])
     try:
         headers = request(url, consume=lambda r: r.headers, method="HEAD", headers={"Accept-Encoding": "gzip"})
     except NotFound:
@@ -610,9 +611,7 @@ def check(args, problems, notes, record):
         other."""
         given_up = frl.given_up_on(m)
         files = [(default, info) for default, info in frl.file_records(m) if info]
-        # (the logs of its nodes only on disk: the fetch does not compare them with GCS)
-        found = [check_file(root, rel, m, info, default, remote and not given_up and default in frl.STORED_NAMES)
-                 for default, info in files]
+        found = [check_file(root, rel, m, info, default, remote and not given_up) for default, info in files]
         # a stored file its meta.json does not list (`cat <file>.*` would take a stray part in),
         # or one GitHub would refuse
         folder = os.path.join(root, rel)
@@ -629,7 +628,7 @@ def check(args, problems, notes, record):
         noted = []
         if remote and given_up:
             try:
-                noted = [gcs_change(m, info, default) for default, info in files if default in frl.STORED_NAMES]
+                noted = [gcs_change(m, info, default) for default, info in files]
                 noted += [] if m.get("log") else [gcs_log_appeared(m)]
             except Exception as e:
                 noted = [f"{m['job']}/{m['build']}: cannot read GCS: {type(e).__name__}: {e}"]
