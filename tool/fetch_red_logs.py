@@ -56,6 +56,8 @@ under --archive:
                                     (build-log.txt.gz with --gzip; meta.json keeps the raw md5)
     <job>/<build>/podinfo.json      Prow's record of the build's pod and node, when GCS has one
                                     (podinfo.json.gz with --gzip)
+    <job>/<build>/<node>.<file>     for a build whose cluster did not come up, a log of one of its nodes
+                                    (see NODE_LOGS; <node>.<file>.gz with --gzip)
     <job>/<build>/<file>.000, ...   a file larger than --max-file-mb, in numbered parts
     <job>/<build>/meta.json         tabs, red cells, TestGrid messages, result, GCS identity
   charts/*.svg                      trend charts shown in INDEX.md
@@ -131,9 +133,20 @@ PART_RE = re.compile("(" + "|".join(re.escape(name) + r"(?:\.gz)?" for _, name i
 # The logs of its cluster's nodes a build folder can store too, after those of STORED: GCS has each as
 # artifacts/<node>/<file> (artifacts/cluster-logs/<node>/<file> from kubetest2), <node> the name of a GCE instance,
 # and the folder as <node>.<file> (as it came, or gzipped as <node>.<file>.gz), which says both, as an instance's
-# name has no ".". meta.json lists them under "artifacts", each with its path in GCS (see node_log_records).
-NODE_LOGS = ("kube-master-installation.log", "kube-master-configuration.log", "etcd.log", "containerd.log",
-             "serial-1.log", "kube-apiserver.log", "kube-node-installation.log", "kube-node-configuration.log")
+# name has no ".". meta.json lists them under "artifacts", each with its path in GCS (see node_log_records). It
+# keeps them for a build whose cluster did not come up (one of UP_TESTS red: kubetest's or kubetest2's Up): those
+# of CONTROL_PLANE_LOGS of the control plane's node, which kube-up names <instance prefix>-master (its log dump names
+# the node's folder so), and those of WORKER_LOGS of the others; kube-apiserver.log of the control plane, much
+# larger than the others, only when the build's log says CLUSTER_INIT_FAILED (kube-up gave up waiting for the
+# apiserver). A build whose cluster another of kubetest2's deployers brought up, as kops, keeps none: none of its
+# nodes is named so, and none has the logs of WORKER_LOGS. See store().
+UP_TESTS = ("kubetest.Up", "kubetest2.Up")
+CONTROL_PLANE_LOGS = ("kube-master-installation.log", "kube-master-configuration.log", "etcd.log", "containerd.log",
+                      "serial-1.log")
+APISERVER_LOG = "kube-apiserver.log"
+WORKER_LOGS = ("kube-node-installation.log", "kube-node-configuration.log")
+NODE_LOGS = CONTROL_PLANE_LOGS + (APISERVER_LOG,) + WORKER_LOGS
+CLUSTER_INIT_FAILED = b"Cluster failed to initialize"
 NODE = r"[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?"  # (the pattern of a GCE instance's name, RFC 1035's)
 LOG_OF_NODE = "(" + "|".join(re.escape(name) for name in NODE_LOGS) + ")"  # (the pattern of a name of NODE_LOGS)
 # a node log's path in the build's folder in GCS, and the name of a copy of it in the build folder, whole or a part
@@ -1476,9 +1489,9 @@ def remove(path):
 
 
 class Staged:
-    """A verified copy of a build's file (name: build-log.txt or podinfo.json) in temp files of its folder,
-    for put_in_place: temps, [(temp file, the name it takes)], one for the file whole or one per part (see
-    split_parts); info, what meta.json records of it."""
+    """A verified copy of a build's file (name: build-log.txt, podinfo.json or a node's <node>.<file>, see NODE_LOGS)
+    in temp files of its folder, for put_in_place: temps, [(temp file, the name it takes)], one for the file whole or
+    one per part (see split_parts); info, what meta.json records of it."""
 
     def __init__(self, name, info, temps):
         self.name, self.info, self.temps = name, info, temps
@@ -1832,6 +1845,103 @@ def take_copy(base, target, compress, max_bytes, name="build-log.txt"):
     """A Staged copy of the build's build-log.txt (or `name`, as podinfo.json) from GCS, at base, in temp
     files of its folder, target (see download)."""
     return download(f"{base}/{name}", os.path.join(target, name), compress, max_bytes)
+
+
+def up_failed(tabs):
+    """Whether a build's cluster did not come up, by its red cells on its tabs (see UP_TESTS)."""
+    return any(isinstance(c, dict) and c.get("test") in UP_TESTS for t in tabs for c in t.get("red_cells") or [])
+
+
+def log_says(target, log, staged=None, text=CLUSTER_INIT_FAILED):
+    """Whether a build's log holds text: its copy in its folder, target, as log records it, or the Staged copy of it
+    there not put in place yet. A copy it cannot read, or gunzip, is a disk error (LocalIOError)."""
+    if log.get("omitted"):
+        return False  # (an older record: verified but not stored, as too large for git)
+    path = os.path.join(target, log.get("file", "build-log.txt"))
+    parts = [tmp for tmp, _ in staged.temps] if staged else \
+        part_paths(target, os.path.basename(path), log["parts"]) if "parts" in log else None
+    tail = b""
+    try:
+        for chunk in file_content(path, parts):
+            if text in tail + chunk:
+                return True
+            tail = (tail + chunk)[1 - len(text):]
+    except (OSError, IntegrityError) as e:  # (a copy the run has checked, or written: not GCS's doing)
+        raise LocalIOError(f"{path}: {e}") from None
+    return False
+
+
+def listed_node_logs(objects, folder):
+    """{name: path in the build's folder} of the logs of nodes (see NODE_LOGS) a listing of a build's folder's
+    artifacts/ in GCS has (see list_objects; folder: the build's folder in the bucket), of the objects GCS has
+    bytes of (one that is empty is as none). Of two of one name (from kube-up's folder and kubetest2's), the first
+    by path."""
+    found = {}
+    for obj, (size, *_) in sorted(objects.items()):
+        name = node_log_name(obj[len(folder) + 1:] if obj.startswith(folder + "/") else None)
+        if name and size and name not in found:
+            found[name] = obj[len(folder) + 1:]
+    return found
+
+
+def node_logs_wanted(listed, apiserver):
+    """Those of listed (see listed_node_logs) a build folder keeps, of a build whose cluster did not come up: of the
+    control plane's node, those of CONTROL_PLANE_LOGS, and kube-apiserver.log if apiserver; of the others, those of
+    WORKER_LOGS."""
+    wanted = {}
+    for name, path in listed.items():
+        node, file = name.split(".", 1)
+        if file in (CONTROL_PLANE_LOGS + ((APISERVER_LOG,) if apiserver else ()) if node.endswith("-master")
+                    else WORKER_LOGS):
+            wanted[name] = path
+    return wanted
+
+
+def node_log_url(base, path):
+    """The URL of the node log GCS has at path in a build's folder, at base (see NODE_LOGS)."""
+    return base + "".join("/" + quote(part) for part in path.split("/"))
+
+
+def take_node_logs(gcs, where, base, target, compress, max_bytes, apiserver, whole, again, copies):
+    """(records, error, refused): the records, by path, of the logs of its cluster's nodes a build folder keeps (see
+    node_logs_wanted), as GCS lists them in the build's folder, where ("bucket/path", at base): taken from GCS, their
+    Staged copies added to copies, but those of whole ({name: record} of the copies it has that are intact), which
+    stay as they are unless GCS has the log at another path now. Those named in again (copies it has that are
+    damaged, or not known to be its own) are taken again where GCS has them, even if they are not ones to keep now.
+    A log GCS no longer has (gone since it was listed, too) is not taken, nor is one GCS cannot serve now, but the
+    others are: error is the first failure of GCS's, serving one or listing them (then none is taken), else None;
+    refused, {name: GCS's failure} of each it could not take for one (each of again, if GCS could not list them).
+    A disk error or a bug (BUGS) raises."""
+    bucket, folder = where.split("/", 1)
+    refused = {}
+    try:
+        listed, error = listed_node_logs(list_objects(gcs, bucket, f"{folder}/artifacts/"), folder), None
+    except (Abandoned, LocalIOError, *BUGS):
+        raise
+    except Exception as e:  # (GCS's doing)
+        listed, error = {}, e
+        refused = dict.fromkeys(again, e)
+    wanted = node_logs_wanted(listed, apiserver)
+    wanted.update({name: listed[name] for name in again if name in listed})
+    records = {}
+    for name, path in sorted(wanted.items()):
+        if name in whole and whole[name]["path"] == path:
+            records[name] = whole[name]
+            continue
+        try:
+            copies.append(download(node_log_url(base, path), os.path.join(target, name), compress, max_bytes))
+        except NotFound:
+            continue
+        except (Abandoned, LocalIOError, *BUGS):
+            raise
+        except Exception as e:  # (GCS's doing)
+            refused[name] = e
+            error = e if error is None else error
+            continue
+        records[name] = dict({"path": path}, **copies[-1].info)
+    for name, info in whole.items():
+        records.setdefault(name, info)  # (GCS no longer has it where it was, or at all: the copy stays)
+    return sorted(records.values(), key=lambda info: info["path"]), error, refused
 
 
 def copy_of(n):
@@ -3626,7 +3736,7 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
     base = f"{gcs}/{where}"
     if not rec.get("watch"):
         return store(rec, target, existed, old, read_finished(base), base, run_id, now, max_job_hours, compress,
-                     max_bytes, where)
+                     max_bytes, gcs, where)
     # from a history gap, not decided when last looked at
     state, tabs, partial = judge_in_tabs(gcs, rec, tab_rules or {}, timelines)
     if state != "red":
@@ -3642,7 +3752,7 @@ def archive(rec, target, gcs, run_id, now, max_job_hours, compress=False, max_by
     rec["backfilled"] = backfill_note(tabs, partial)
     try:
         return store(rec, target, existed, old, read_finished(base), base, run_id, now, max_job_hours, compress,
-                     max_bytes, where)
+                     max_bytes, gcs, where)
     except Exception as e:
         e.red_rec = rec  # now known to be red: retried and given up on like any other red build
         raise
@@ -3720,34 +3830,44 @@ def backfill_note(tabs, partial=None):
             + (f"; {partial}, so its failing tests are not listed" if partial else ""))
 
 
-def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours, compress, max_bytes, where=None):
+def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours, compress, max_bytes, gcs, where=None):
     """Take a red build's files from GCS, and put them in place in `target` with its meta.json (see
-    put_in_place). where: the folder ("bucket/path") of its files in GCS, under base (see build_folder; else
-    query/build)."""
+    put_in_place). gcs: where GCS lists them (base without where); where: the folder ("bucket/path") of its files
+    in GCS, under base (see build_folder; else query/build)."""
     where = where or f"{rec['query']}/{rec['build']}"
     # A folder whose meta.json cannot be read as this build's (held: the copies it holds): no copy is known
     # to be intact, and a new meta.json lists only what this run takes from GCS (the end of the run removes
     # the rest). So a copy of a file it cannot take (GCS no longer has it, or cannot serve it) stays, and so
     # does the meta.json. GCS is asked first (a HEAD), not to download the others for nothing.
     held = {name for _, name in STORED if holds_copy(target, name)} if existed and not old else set()
+    held_logs = {copy_of(n) for n in listdir(target)} - STORED_NAMES - {None} if existed and not old else set()
     for _, name in STORED:
         if name in held and not in_gcs(f"{base}/{name}"):
             raise left_as_it_is(name, base)
     os.makedirs(target, exist_ok=True)
-    podinfo = note = None
+    podinfo = note = log_copy = None
     unread = False  # (its podinfo.json could not be read: the next run compares the build, and reads it again)
     # A repair takes again only the files it has no intact copy of: one intact stays, unasked of GCS,
     # which may have none now (it deletes old builds' files).
     kept = {key: (old or {}).get(key) for key, _ in STORED}
     whole = {key: bool(kept[key]) and intact(target, {key: kept[key]}, deep=True) for key in kept}
     copies = []  # (what it takes from GCS: put in place with the new meta.json, once all are taken)
+    tabs = merge_tabs(old["tabs"], rec["tabs"])[0] if old else rec["tabs"]
+    # The logs of its cluster's nodes (see NODE_LOGS): of a build whose cluster did not come up, or whose folder
+    # holds copies of them (held, as above), or whose meta.json lists them (as recheck reads it, whatever its tabs
+    # show now). A repair keeps those it has intact copies of, without taking them again, as it does its other
+    # files (a record of a log of no such path goes).
+    keeps_logs = up_failed(tabs) or bool(held_logs) or isinstance((old or {}).get("artifacts"), list)
+    logs, logs_unread = [], False
+    mine = {name: info for name, info in node_log_records(old or {}) if name}
+    whole_logs = {name: info for name, info in mine.items() if intact(target, {"artifacts": [info]}, deep=True)}
     try:
         if whole["log"]:
             log = kept["log"]
         else:
             try:
                 copies.append(take_copy(base, target, compress, max_bytes))
-                log = copies[-1].info
+                log, log_copy = copies[-1].info, copies[-1]
             except NotFound:
                 if kept["log"]:
                     raise RuntimeError(f"the archived log is damaged and GCS no longer has it ({base})") from None
@@ -3785,12 +3905,46 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
                 if log is None and not isinstance(e, NotFound):
                     raise  # (the build's only file: archived once it can be read)
                 unread = not isinstance(e, NotFound)
+        # None of them is a reason to leave the build out: if GCS cannot list them, or serve one, the build is
+        # archived with the copies of them it has intact and those it could take, and not final, as when its
+        # podinfo.json cannot be read. But if GCS cannot give it one it is to take again (one damaged, or one a
+        # folder whose meta.json cannot be read holds a copy of), the folder stays as it is, for the next run to take
+        # it again.
+        if keeps_logs:
+            taken, again = len(copies), set(mine) - set(whole_logs) | held_logs
+            try:
+                says = log is not None and log_says(target, log, log_copy)  # (kube-apiserver.log is one to keep)
+                logs, error, refused = take_node_logs(gcs, where, base, target, compress, max_bytes, says, whole_logs,
+                                                      again, copies)
+            except (Abandoned, LocalIOError):
+                raise
+            except Exception as e:
+                if existed and isinstance(e, BUGS):
+                    raise  # (as for podinfo.json)
+                for c in copies[taken:]:
+                    c.discard()
+                del copies[taken:]
+                logs, error = sorted(whole_logs.values(), key=lambda info: info["path"]), e
+                refused = dict.fromkeys(again, e)  # (none taken, as when GCS cannot list them)
+            stored = {node_log_name(info["path"]) for info in logs}
+            # (one to take again that GCS failed to serve, or to list: the error is that failure, as for the log; where
+            # the meta.json cannot be read, it is said of that copy, see left_as_it_is; one GCS no longer has is said
+            # below)
+            unserved = sorted(again & set(refused))
+            if unserved:
+                name = unserved[0]
+                raise left_as_it_is(name, base, refused[name]) if held_logs else refused[name]
+            lost = sorted(name for name in mine if name not in stored)
+            if lost:
+                raise RuntimeError(f"the archived {lost[0]} is damaged and GCS no longer has it ({base})")
+            if held_logs - stored:
+                raise left_as_it_is(min(held_logs - stored), base)
+            logs_unread = error is not None
     except Exception:
         for c in copies:
             c.discard()
         remove_build_dir(target)
         raise
-    tabs = merge_tabs(old["tabs"], rec["tabs"])[0] if old else rec["tabs"]
     home = os.path.basename(os.path.dirname(os.path.dirname(target)))  # the run folder that holds it
     meta = dict(rec,
                 tabs=tabs,
@@ -3800,6 +3954,7 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
                 log_url=base + "/build-log.txt",
                 log=log,
                 podinfo=podinfo,
+                **({"artifacts": logs} if keeps_logs else {}),
                 archived_by_run=home,
                 archived_at=folder_time(home) or now)
     if where != f"{rec['query']}/{rec['build']}":
@@ -3811,11 +3966,11 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     if existed:
         meta.update(repaired_by_run=run_id, repaired=[c.name for c in copies])
     meta["settled"], meta["final"] = settle_flags(meta, time.time(), now)
-    if unread:
-        meta["final"] = False  # (the next run compares it, and so reads its podinfo.json again)
+    if unread or logs_unread:
+        meta["final"] = False  # (the next run compares it, and so reads its podinfo.json, or its nodes' logs, again)
     # (a copy kept, not compared with GCS, or a file GCS did not serve now: what the runs know of its comparisons
     # failing stays, see COMPARISON_FAILING)
-    if old and (any(whole.values()) or unread):
+    if old and (any(whole.values()) or unread or whole_logs or logs_unread):
         meta.update({k: old[k] for k in (COMPARISON_FAILING, COMPARISON_GIVEN_UP) if k in old})
         if given_up_on(old):
             meta["final"] = True  # (as the run that gave up left it: compared in its seventh, which tries again a
@@ -5143,8 +5298,8 @@ def main(argv=None):
     p.add_argument("--run-timeout-minutes", type=positive(float), default=45,
                    help="stop waiting for downloads after this long; unfinished builds are retried next run")
     p.add_argument("--gzip", action="store_true",
-                   help="store each file gzipped, as build-log.txt.gz and podinfo.json.gz (meta.json keeps each raw "
-                        "file's md5 and size)")
+                   help="store each file gzipped, as build-log.txt.gz, podinfo.json.gz and <node>.<file>.gz (meta.json "
+                        "keeps each raw file's md5 and size)")
     p.add_argument("--max-file-mb", type=positive(float), default=95,
                    help="store a file larger than this (MiB) as numbered parts of this size, as GitHub rejects "
                         "files over 100 MB (default: 95)")
