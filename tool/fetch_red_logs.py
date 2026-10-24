@@ -124,9 +124,22 @@ QUERY_RE = re.compile(r"[a-z0-9][a-z0-9._-]*(?:/(?!\.\.?(?:/|$))[A-Za-z0-9._-]+)
 # it came, or gzipped as <name>.gz). What reads a folder's files reads them by it (see file_records, copy_of); store()
 # and recheck() take each from GCS in code of its own.
 STORED = (("log", "build-log.txt"), ("podinfo", "podinfo.json"))
+STORED_NAMES = {name for _, name in STORED}
 LOG_FILES = {n for _, name in STORED for n in (name, name + ".gz")}
 # a stored file too large for one file in git is kept as numbered parts: <file>.000, <file>.001, ...
 PART_RE = re.compile("(" + "|".join(re.escape(name) + r"(?:\.gz)?" for _, name in STORED) + r")\.([0-9]{3})")
+# The logs of its cluster's nodes a build folder can store too, after those of STORED: GCS has each as
+# artifacts/<node>/<file> (artifacts/cluster-logs/<node>/<file> from kubetest2), <node> the name of a GCE instance,
+# and the folder as <node>.<file> (as it came, or gzipped as <node>.<file>.gz), which says both, as an instance's
+# name has no ".". meta.json lists them under "artifacts", each with its path in GCS (see node_log_records).
+NODE_LOGS = ("kube-master-installation.log", "kube-master-configuration.log", "etcd.log", "containerd.log",
+             "serial-1.log", "kube-apiserver.log", "kube-node-installation.log", "kube-node-configuration.log")
+NODE = r"[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?"  # (the pattern of a GCE instance's name, RFC 1035's)
+LOG_OF_NODE = "(" + "|".join(re.escape(name) for name in NODE_LOGS) + ")"  # (the pattern of a name of NODE_LOGS)
+# a node log's path in the build's folder in GCS, and the name of a copy of it in the build folder, whole or a part
+# (see PART_RE); kubetest2's cluster-logs/ is no node's folder
+NODE_LOG_PATH_RE = re.compile(rf"artifacts/(?:cluster-logs/)?(?!cluster-logs/)({NODE})/{LOG_OF_NODE}")
+NODE_LOG_COPY_RE = re.compile(rf"((?!cluster-logs\.){NODE}\.{LOG_OF_NODE})(?:\.gz)?(?:\.[0-9]{{3}})?")
 RUN_FILES = {"run.json", "README.md", "verification.json"}  # in a run folder, next to its job folders
 # verification.json's outcomes (cross_check.py --record): "incomplete" until the verification ends
 VERIFICATION_OUTCOMES = ("incomplete", "ok", "problems", "timed out", "interrupted", "stopped")
@@ -1692,9 +1705,32 @@ def file_md5(path):
 
 
 def file_records(meta):
-    """(name, record) of each file a build folder stores (see STORED), as its meta.json records it (None for one
-    it records none of), the log first."""
-    return [(name, meta.get(key)) for key, name in STORED]
+    """(name, record) of each file a build folder stores, as its meta.json records it: those of STORED, the log
+    first (None for one it records none of), then the logs of nodes it lists (see node_log_records)."""
+    return [(name, meta.get(key)) for key, name in STORED] + node_log_records(meta)
+
+
+def node_log_records(meta):
+    """(name, record) of each log of its cluster's nodes a build's meta.json lists (see NODE_LOGS), in its order:
+    name, the log's <node>.<file>, None for a record whose path is not that of such a log."""
+    listed = meta.get("artifacts")
+    return [(node_log_name(info.get("path") if isinstance(info, dict) else None), info)
+            for info in (listed if isinstance(listed, list) else [])]
+
+
+def node_log_name(path):
+    """<node>.<file>, the name in a build folder of the node log GCS has at path, in the build's folder (see
+    NODE_LOGS); None for a path that is not such a log's."""
+    m = NODE_LOG_PATH_RE.fullmatch(path) if isinstance(path, str) else None
+    return f"{m.group(1)}.{m.group(2)}" if m else None
+
+
+def copy_names(name):
+    """The names a record of the file `name` (see file_records) can give its copy in the build folder, whole: as it
+    came, or gzipped (for a file of STORED, any of LOG_FILES, as code before took them)."""
+    if name in STORED_NAMES:
+        return LOG_FILES
+    return {name, name + ".gz"} if name else set()
 
 
 def intact(target, meta, deep=False):
@@ -1706,7 +1742,7 @@ def intact(target, meta, deep=False):
                 if info.get("omitted"):
                     continue  # (an older record: verified but not stored, as too large for git)
                 name = info.get("file", default)
-                if name not in LOG_FILES:
+                if name not in copy_names(default):
                     return False
                 path = os.path.join(target, name)
                 parts = part_paths(target, name, info["parts"]) if "parts" in info else None
@@ -1799,11 +1835,14 @@ def take_copy(base, target, compress, max_bytes, name="build-log.txt"):
 
 
 def copy_of(n):
-    """The file a build folder's file named n is a stored copy of (see STORED: as it came or gzipped, whole or
-    in parts, as build-log.txt.gz.000 is of build-log.txt), else None."""
+    """The file a build folder's file named n is a stored copy of (see STORED and NODE_LOGS: as it came or
+    gzipped, whole or in parts, as build-log.txt.gz.000 is of build-log.txt), else None."""
     m = PART_RE.fullmatch(n)
     whole = m.group(1) if m else n
-    return whole.removesuffix(".gz") if whole in LOG_FILES else None
+    if whole in LOG_FILES:
+        return whole.removesuffix(".gz")
+    m = NODE_LOG_COPY_RE.fullmatch(n)
+    return m.group(1) if m else None
 
 
 def drop_other_copies(target, name, info):
@@ -1853,14 +1892,17 @@ def put_in_place(target, meta, copies=()):
 def stray_files(target, meta):
     """Stored-file names in a build folder that its meta.json does not list: what a copy
     cut off part-way leaves (parts of a newer copy, or a copy in the other form). None at all
-    if the meta.json names a file otherwise than intact() reads names: it cannot say which are its own."""
+    if the meta.json names a file otherwise than intact() reads names, or lists the logs of
+    nodes otherwise than in a list: it cannot say which are its own."""
+    if "artifacts" in meta and not isinstance(meta["artifacts"], list):  # (read as none, see node_log_records)
+        return []
     listed = []
     for default, info in file_records(meta):
         if info and not isinstance(info, dict):  # (one intact() cannot read)
             return []
         if info and not info.get("omitted"):  # (as intact() reads it)
             name = info.get("file", default)
-            if not isinstance(name, str) or name not in LOG_FILES:
+            if not isinstance(name, str) or name not in copy_names(default):
                 return []
             if "parts" in info:  # (name.000, name.001, ..., as part_paths() reads them)
                 parts = info["parts"]
@@ -4187,6 +4229,8 @@ def index_entry(job, build, meta, now, rel=None):
         "backfilled": bool(meta.get("backfilled")),
         "has_log": bool(meta.get("log")),
         "in_parts": any((info or {}).get("parts") for _, info in stored),
+        # (it keeps logs of its cluster's nodes too, see NODE_LOGS)
+        **({"node_logs": True} if any(isinstance(info, dict) for _, info in node_log_records(meta)) else {}),
         # red only by TestGrid's rule applied to GCS: meta.json keeps no sighting of it on TestGrid (see merge_tabs)
         "from_gcs": bool(meta.get("backfilled")) and all(
             t.get("judged_from_gcs") or not (t.get("red_cells") or cells_left_out(t)) for t in meta["tabs"]),
@@ -4460,9 +4504,11 @@ def holdings(entries, waiting, current_run):
     watched = watched if is_int(watched) else len(((current_run or {}).get("outcomes") or {}).get("watching") or [])
     rows = [("Archived builds", len(entries)),
             ("… with a log", count(lambda e: e["has_log"])),
-            ("… with only podinfo.json (the pod never ran)", count(lambda e: not e["has_log"] and e["files"])),
+            ("… with only podinfo.json (the pod never ran)",  # (its files, without a log or logs of its nodes)
+             count(lambda e: not e["has_log"] and e["files"] and not e.get("node_logs"))),
             ("… without a file (GCS had none)", count(lambda e: not e["has_log"] and not e["files"] and not e["remote"])),
             ("… with a file stored in parts (too large for one file in git)", count(lambda e: e["in_parts"])),
+            ("… with control-plane or node logs (its cluster did not come up)", count(lambda e: e.get("node_logs"))),
             ("… provisional (perhaps taken before Prow finished uploading)",
              count(lambda e: e["settled"] is False and e["final"] is not True)),
             ("… still compared with GCS on every run", count(lambda e: e["final"] is not True)),
