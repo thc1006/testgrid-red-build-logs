@@ -12,6 +12,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "actionlint-py>=1.7.12.25",
+    "cmarkgfm>=2025.10.22",
     "hypothesis>=6.169",
     "ruff",
     "shellcheck-py>=0.11.0.1",
