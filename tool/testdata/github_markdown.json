@@ -1,0 +1,551 @@
+{
+ "about": "Markdown, and the HTML GitHub's renderer returned for it (its REST API, POST /markdown, mode markdown): test_docs.GitHubsReading reads both and compares them",
+ "recorded": "2026-10-24",
+ "cases": [
+  {
+   "name": "b01-fence-lines-in-an-html-block",
+   "markdown": "<img src=\"I0.svg\">\n```\n-->\n- <!--\n2. \n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<p><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"I0.svg\"><img src=\"I0.svg\" style=\"max-width: 100%;\"></a></p>\n```\n--&gt;\n- "
+  },
+  {
+   "name": "b02-comment-block-with-more-after",
+   "markdown": "<!-- c -->-->``y``<!--<!--\n- \n# \n\n## Limits\n\n\nEND-MARK\n",
+   "html": "--&gt;``y``"
+  },
+  {
+   "name": "c01-comment-leaves-its-item",
+   "markdown": "- item\n  <!-- two\nlines -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>item\n</li>\n</ul>"
+  },
+  {
+   "name": "c02-comment-leaves-its-quote",
+   "markdown": "> <!-- a\nb -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<blockquote>\n</blockquote>"
+  },
+  {
+   "name": "c03-comment-in-item-blank-lines",
+   "markdown": "1. a\n\n   <!-- b\n\n   c -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ol>\n<li>\n<p>a</p>\n\n</li>\n</ol>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c04-then-heading",
+   "markdown": "<!-->\n# B\n\n\nEND-MARK\n",
+   "html": "\n<div class=\"markdown-heading\"><h1 class=\"heading-element\">B</h1><a id=\"user-content-b\" class=\"anchor\" aria-label=\"Permalink: B\" href=\"#b\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c05-then-heading",
+   "markdown": "<!--->\n# B\n\n\nEND-MARK\n",
+   "html": "\n<div class=\"markdown-heading\"><h1 class=\"heading-element\">B</h1><a id=\"user-content-b\" class=\"anchor\" aria-label=\"Permalink: B\" href=\"#b\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c06-mid-line-comment-never-ends",
+   "markdown": "x <!-- y\n\n# C\n\n\nEND-MARK\n",
+   "html": "<p>x &lt;!-- y</p>\n<div class=\"markdown-heading\"><h1 class=\"heading-element\">C</h1><a id=\"user-content-c\" class=\"anchor\" aria-label=\"Permalink: C\" href=\"#c\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c07-top-level-indented-comment",
+   "markdown": "  <!-- a\nb -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "  \n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c08-quote-in-item-quoted",
+   "markdown": "- > <!-- a\n  > b -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<blockquote>\n\n</blockquote>\n</li>\n</ul>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c09-quote-in-item-unquoted",
+   "markdown": "- > <!-- a\n  b -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<blockquote>\n</blockquote>\n</li>\n</ul>"
+  },
+  {
+   "name": "c10-quote-blank-line-unquoted",
+   "markdown": "> <!-- a\n\n> b -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<blockquote>\n</blockquote>"
+  },
+  {
+   "name": "c11-quote-blank-line-quoted",
+   "markdown": "> <!-- a\n>\n> b -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<blockquote>\n\n</blockquote>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c12-item-indented",
+   "markdown": "- <!-- a\n  b -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n\n</li>\n</ul>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c13-item-after-tab",
+   "markdown": "-\t<!-- a\n\tb -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n\n</li>\n</ul>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c14-comment-holds-a-list-marker",
+   "markdown": "<!-- a\n- MID-MARK <!-- b\nc -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c15-second-mid-line-comment-never-ends",
+   "markdown": "a <!-- b --> c <!-- d\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<p>a  c &lt;!-- d</p>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c16-comment-after-a-code-span-in-an-item",
+   "markdown": "- `podinfo.json.gz` <!-- TODO: list the fields\n  -->: Prow's record\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<code>podinfo.json.gz</code> : Prow's record</li>\n</ul>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c17-comment-after-a-code-span",
+   "markdown": "`cross_check.py` <!-- see #20\nfor why --> x\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<p><code>cross_check.py</code>  x</p>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c18-nested-item-never-ends",
+   "markdown": "- a\n  - b\n    - <!-- c\n# D\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>a\n<ul>\n<li>b\n<ul>\n<li>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>"
+  },
+  {
+   "name": "c19-quote-never-ends",
+   "markdown": "# A\n> <!-- never ended\n# B\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h1 class=\"heading-element\">A</h1><a id=\"user-content-a\" class=\"anchor\" aria-label=\"Permalink: A\" href=\"#a\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<blockquote>\n</blockquote>"
+  },
+  {
+   "name": "c20-item-comment-never-ends",
+   "markdown": "1. x\n\n   <!-- never\n\n# B\n\n\nEND-MARK\n",
+   "html": "<ol>\n<li>\n<p>x</p>\n</li>\n</ol>"
+  },
+  {
+   "name": "c21-indented-past-item-text",
+   "markdown": "- a\n\n    <!-- x\n  y -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<p>a</p>\n  \n</li>\n</ul>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c22-quote-with-extra-space",
+   "markdown": ">  <!-- a\n> b -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<blockquote>\n \n</blockquote>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c23-item-one-space-short",
+   "markdown": "- <!-- a\n b -->\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n</li>\n</ul>"
+  },
+  {
+   "name": "c24-comment-leaves-its-quote-ended-later",
+   "markdown": "> a\n> <!-- b\nc -->\n\nMID-MARK\n\n<!-- d -->\n\n\nEND-MARK\n",
+   "html": "<blockquote>\n<p>a</p>\n\n<p>END-MARK</p>\n</blockquote>"
+  },
+  {
+   "name": "c25-comment-leaves-its-item-ended-later",
+   "markdown": "- item\n  <!-- two\nlines -->\n\n## Hidden\n\nMID-MARK [x](x.md)\n\n<!-- later -->\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>item\n\n<p>END-MARK</p>\n</li>\n</ul>"
+  },
+  {
+   "name": "c26-comment-ends-at-bang",
+   "markdown": "<!-- a --!> shown <kbd>k</kbd>\n-->\n\n\nEND-MARK\n",
+   "html": " shown <kbd>k</kbd>\n--&gt;\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c27-whole-comment-then-an-end",
+   "markdown": "<div><!--> shown <kbd>k</kbd> --></div>\n\n\nEND-MARK\n",
+   "html": "<div>\n shown <kbd>k</kbd> --&gt;</div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c28-mistyped-end-ended-later",
+   "markdown": "# Notes\n\n<!-- keep this short ->\n\n## Section A\n\nMID-MARK, [a link](x.md#y).\n\n<!-- note -->\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h1 class=\"heading-element\">Notes</h1><a id=\"user-content-notes\" class=\"anchor\" aria-label=\"Permalink: Notes\" href=\"#notes\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c29-comment-leaves-a-tight-item-ended-later",
+   "markdown": "- a\n  - b\n    <!-- c\n  MID-MARK <!-- e -->\n- f\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>a\n<ul>\n<li>b\n\n</li>\n<li>f</li>\n</ul>\n<p>END-MARK</p>\n</li>\n</ul>"
+  },
+  {
+   "name": "c30-comment-leaves-its-item-ended-in-raw-html",
+   "markdown": "- a\n  <!-- b\n<div>\nMID-MARK\n-->\n</div>\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>a\n\n\n<p>END-MARK</p>\n</li>\n</ul>"
+  },
+  {
+   "name": "c31-comment-leaves-its-quote-ended-in-raw-html",
+   "markdown": "> a\n> <!-- b\n\n<picture>\n  <img alt=\"MID-MARK\" src=\"x.svg\">\n</picture>\n\n<div>--></div>\n\n\nEND-MARK\n",
+   "html": "<blockquote>\n<p>a</p>\n\n<p>END-MARK</p>\n</blockquote>"
+  },
+  {
+   "name": "c32-comment-opens-with-a-bang",
+   "markdown": "<!--!> a --> shown <kbd>k</kbd>\n\n<!---!> b --> also\n\n\nEND-MARK\n",
+   "html": " shown <kbd>k</kbd>\n also\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c33-comment-leaves-a-raw-block-past-a-paragraph",
+   "markdown": "<div>\n<!-- a\n\nMID-MARK\n\n<div>--></div>\n\n\nEND-MARK\n",
+   "html": "<div>\n\n</div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c34-mistyped-end-closed-by-an-arrow",
+   "markdown": "# Notes\n\n<!-- keep this short ->\n\n## Section A\n\nMID-MARK: fetch --> verify --> publish.\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h1 class=\"heading-element\">Notes</h1><a id=\"user-content-notes\" class=\"anchor\" aria-label=\"Permalink: Notes\" href=\"#notes\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n verify --&gt; publish.\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c35-mistyped-end-closed-in-a-mermaid-block",
+   "markdown": "# Notes\n\n<!-- keep this short ->\n\n## Section A\n\nMID-MARK\n\n```mermaid\ngraph LR\n  A --> B\n```\n\nText C.\n\n```sh\nmake test\n```\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h1 class=\"heading-element\">Notes</h1><a id=\"user-content-notes\" class=\"anchor\" aria-label=\"Permalink: Notes\" href=\"#notes\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n B\n<pre><code>\nText C.\n\n```sh\nmake test\n</code></pre>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c36-mistyped-end-closed-by-an-arrow-ending-the-next-line",
+   "markdown": "# Notes\n\n<!-- keep this short ->\nMID-MARK: the flow is fetch -->\nverify.\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h1 class=\"heading-element\">Notes</h1><a id=\"user-content-notes\" class=\"anchor\" aria-label=\"Permalink: Notes\" href=\"#notes\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n\n<p>verify.</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c37-comment-names-an-end-tag",
+   "markdown": "<!-- The charts: keep each </picture> on its own line. -->\n# Title\n\nMID-MARK\n\n\nEND-MARK\n",
+   "html": "\n<div class=\"markdown-heading\"><h1 class=\"heading-element\">Title</h1><a id=\"user-content-title\" class=\"anchor\" aria-label=\"Permalink: Title\" href=\"#title\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>MID-MARK</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "c38-inline-comment-names-an-end-tag",
+   "markdown": "A note <!-- an inline aside naming </details> --> and MID-MARK\n\n\nEND-MARK\n",
+   "html": "<p>A note  and MID-MARK</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "f01-fence-in-list-items",
+   "markdown": "- ```sh\n  cd tool\n  uv sync --locked\n  ```\n- Then run it.\n\n## License\n\n[x](LICENSE)\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<div class=\"highlight highlight-source-shell\"><pre><span class=\"pl-c1\">cd</span> tool\nuv sync --locked</pre></div>\n</li>\n<li>Then run it.</li>\n</ul>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">License</h2><a id=\"user-content-license\" class=\"anchor\" aria-label=\"Permalink: License\" href=\"#license\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p><a href=\"LICENSE\">x</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "f02-four-backticks-three-close",
+   "markdown": "````\na\n```\n[b](b.md)\n\n\nEND-MARK\n",
+   "html": "<pre><code>a\n```\n[b](b.md)\n\n\nEND-MARK\n</code></pre>\n"
+  },
+  {
+   "name": "f03-backtick-in-info-string",
+   "markdown": "```a `b` c\nd\n[x](x.md)\n\n\nEND-MARK\n",
+   "html": "<p>```a <code>b</code> c\nd\n<a href=\"x.md\">x</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "f04-closer-with-text",
+   "markdown": "```\na\n``` x\n[y](y.md)\n\n\nEND-MARK\n",
+   "html": "<pre><code>a\n``` x\n[y](y.md)\n\n\nEND-MARK\n</code></pre>\n"
+  },
+  {
+   "name": "f05-tilde-not-closed-by-backticks",
+   "markdown": "~~~\na\n```\n[z](z.md)\n\n\nEND-MARK\n",
+   "html": "<pre><code>a\n```\n[z](z.md)\n\n\nEND-MARK\n</code></pre>\n"
+  },
+  {
+   "name": "f06-never-closed",
+   "markdown": "```\n[a](a.md)\n\n\nEND-MARK\n",
+   "html": "<pre><code>[a](a.md)\n\n\nEND-MARK\n</code></pre>\n"
+  },
+  {
+   "name": "f07-fence-in-ordered-item",
+   "markdown": "1. ```\n   a\n   ```\n2. [b](b.md)\n\n\nEND-MARK\n",
+   "html": "<ol>\n<li>\n<pre><code>a\n</code></pre>\n</li>\n<li><a href=\"b.md\">b</a></li>\n</ol>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "f08-fence-in-quote",
+   "markdown": "> ```\n> a\n> ```\n[c](c.md)\n\n\nEND-MARK\n",
+   "html": "<blockquote>\n<pre><code>a\n</code></pre>\n</blockquote>\n<p><a href=\"c.md\">c</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "f09-fence-its-item-ends",
+   "markdown": "- ```\n  a\n- [b](b.md)\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<pre><code>a\n</code></pre>\n</li>\n<li><a href=\"b.md\">b</a></li>\n</ul>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "f10-indented-fences",
+   "markdown": "   ```\n[x](x.md)\n   ```\n[y](y.md)\n\n\nEND-MARK\n",
+   "html": "<pre><code>[x](x.md)\n</code></pre>\n<p><a href=\"y.md\">y</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "f11-closer-with-trailing-spaces",
+   "markdown": "```\na\n```  \n[z](z.md)\n\n\nEND-MARK\n",
+   "html": "<pre><code>a\n</code></pre>\n<p><a href=\"z.md\">z</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "f12-comment-in-an-item-s-fence",
+   "markdown": "- ```html\n  <!-- example\n  ```\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<div class=\"highlight highlight-text-html-basic\"><pre>&lt;!-- example</pre></div>\n</li>\n</ul>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "f13-two-item-fences-link-between",
+   "markdown": "- ```\n  a\n  ```\n- see [n](nope.md), 7 days\n- ```\n  b\n  ```\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<pre><code>a\n</code></pre>\n</li>\n<li>see <a href=\"nope.md\">n</a>, 7 days</li>\n<li>\n<pre><code>b\n</code></pre>\n</li>\n</ul>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "h01-headings",
+   "markdown": "# A\n## When TestGrid's production manifests move\n## `tool/` and x.py\n## A\n## _Limits_ and [it](x)\n## `_private_`\nSetext\n---\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h1 class=\"heading-element\">A</h1><a id=\"user-content-a\" class=\"anchor\" aria-label=\"Permalink: A\" href=\"#a\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">When TestGrid's production manifests move</h2><a id=\"user-content-when-testgrids-production-manifests-move\" class=\"anchor\" aria-label=\"Permalink: When TestGrid's production manifests move\" href=\"#when-testgrids-production-manifests-move\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">\n<code>tool/</code> and x.py</h2><a id=\"user-content-tool-and-xpy\" class=\"anchor\" aria-label=\"Permalink: tool/ and x.py\" href=\"#tool-and-xpy\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">A</h2><a id=\"user-content-a-1\" class=\"anchor\" aria-label=\"Permalink: A\" href=\"#a-1\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">\n<em>Limits</em> and <a href=\"x\">it</a>\n</h2><a id=\"user-content-limits-and-it\" class=\"anchor\" aria-label=\"Permalink: Limits and it\" href=\"#limits-and-it\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\"><code>_private_</code></h2><a id=\"user-content-_private_\" class=\"anchor\" aria-label=\"Permalink: _private_\" href=\"#_private_\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Setext</h2><a id=\"user-content-setext\" class=\"anchor\" aria-label=\"Permalink: Setext\" href=\"#setext\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "h02-heading-with-a-named-anchor",
+   "markdown": "## <a name=\"x\"></a>Title\n## Title\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h2 class=\"heading-element\">\n<a name=\"user-content-x\"></a>Title</h2><a id=\"user-content-title\" class=\"anchor\" aria-label=\"Permalink: Title\" href=\"#title\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Title</h2><a id=\"user-content-title-1\" class=\"anchor\" aria-label=\"Permalink: Title\" href=\"#title-1\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "h03-heading-with-numbers",
+   "markdown": "## 1. Build\n## Step 4: a/b\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h2 class=\"heading-element\">1. Build</h2><a id=\"user-content-1-build\" class=\"anchor\" aria-label=\"Permalink: 1. Build\" href=\"#1-build\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Step 4: a/b</h2><a id=\"user-content-step-4-ab\" class=\"anchor\" aria-label=\"Permalink: Step 4: a/b\" href=\"#step-4-ab\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "h04-heading-with-a-comment",
+   "markdown": "## Limits <!-- linked from elsewhere -->\n\n## Notes <!-- a\nb -->\n\n## Café <!-- c -->\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits \n</h2><a id=\"user-content-limits-\" class=\"anchor\" aria-label=\"Permalink: Limits \" href=\"#limits-\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Notes &lt;!-- a</h2><a id=\"user-content-notes----a\" class=\"anchor\" aria-label=\"Permalink: Notes &lt;!-- a\" href=\"#notes----a\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>b --&gt;</p>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Café \n</h2><a id=\"user-content-café-\" class=\"anchor\" aria-label=\"Permalink: Café \" href=\"#café-\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "h05-heading-with-html-at-its-ends",
+   "markdown": "## <a name=\"x\"></a> Title\n\n## Second <a name=\"y\"></a>\n\n## <img src=\"a.png\"> Pic\n\nLine one\nline two\n---\n\n## Tail&nbsp;\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h2 class=\"heading-element\">\n<a name=\"user-content-x\"></a> Title</h2><a id=\"user-content--title\" class=\"anchor\" aria-label=\"Permalink:  Title\" href=\"#-title\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Second <a name=\"user-content-y\"></a>\n</h2><a id=\"user-content-second-\" class=\"anchor\" aria-label=\"Permalink: Second \" href=\"#second-\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">\n<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"a.png\"><img src=\"a.png\" style=\"max-width: 100%;\"></a> Pic</h2><a id=\"user-content--pic\" class=\"anchor\" aria-label=\"Permalink:  Pic\" href=\"#-pic\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Line one\nline two</h2><a id=\"user-content-line-oneline-two\" class=\"anchor\" aria-label=\"Permalink: Line one\nline two\" href=\"#line-oneline-two\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Tail </h2><a id=\"user-content-tail\" class=\"anchor\" aria-label=\"Permalink: Tail \" href=\"#tail\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "l01-unquoted-attributes",
+   "markdown": "<img alt=x src=a.svg> <source srcset=b.svg> <a href=c.md>x</a>\n\n\nEND-MARK\n",
+   "html": "<p><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"a.svg\"><img alt=\"x\" src=\"a.svg\" style=\"max-width: 100%;\"></a> <source srcset=\"b.svg\"> <a href=\"c.md\">x</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "l02-link-forms",
+   "markdown": "[a](<b c.md>) [d](e.md \"title\") [r](f(1).md) [j][k]\n\n[k]: l.md\n\n\nEND-MARK\n",
+   "html": "<p><a href=\"b%20c.md\">a</a> <a href=\"e.md\" title=\"title\">d</a> <a href=\"f(1).md\">r</a> <a href=\"l.md\">j</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "l03-query-in-a-link",
+   "markdown": "see [the thread](https://x.com/search?q=testgrid&src=typed_query) and <https://example.com/?href=docs>\n\n\nEND-MARK\n",
+   "html": "<p>see <a href=\"https://x.com/search?q=testgrid&amp;src=typed_query\" rel=\"nofollow\">the thread</a> and <a href=\"https://example.com/?href=docs\" rel=\"nofollow\">https://example.com/?href=docs</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "l04-name-in-prose",
+   "markdown": "set name=limits in the job\n\n\nEND-MARK\n",
+   "html": "<p>set name=limits in the job</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "l05-a-name-and-id",
+   "markdown": "<a name=\"n\"></a> <a id='y'></a>\n\n\nEND-MARK\n",
+   "html": "<p><a name=\"user-content-n\"></a> <a id=\"user-content-y\"></a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "l06-picture",
+   "markdown": "<picture>\n  <source media=\"(prefers-color-scheme: dark)\" srcset=\"d.svg\">\n  <img alt=\"Red builds\" src=\"l.svg\">\n</picture>\n\n\nEND-MARK\n",
+   "html": "<themed-picture data-catalyst-inline=\"true\"><picture>\n  <source media=\"(prefers-color-scheme: dark)\" srcset=\"d.svg\">\n  <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"l.svg\"><img alt=\"Red builds\" src=\"l.svg\" style=\"max-width: 100%;\"></a>\n</picture></themed-picture>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "l07-anchor-case",
+   "markdown": "[a](#Limits) [b](#limits)\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<p><a href=\"#Limits\">a</a> <a href=\"#limits\">b</a></p>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Limits</h2><a id=\"user-content-limits\" class=\"anchor\" aria-label=\"Permalink: Limits\" href=\"#limits\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "l08-percent-encoded-anchor",
+   "markdown": "## Café\n\n[a](#café) [b](#caf%C3%A9)\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h2 class=\"heading-element\">Café</h2><a id=\"user-content-café\" class=\"anchor\" aria-label=\"Permalink: Café\" href=\"#café\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p><a href=\"#caf%C3%A9\">a</a> <a href=\"#caf%C3%A9\">b</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "s01-span-into-a-comment-line",
+   "markdown": "`a\n<!-- b\n`c\n\n## Limits\n\n\nEND-MARK\n",
+   "html": "<p>`a</p>\n"
+  },
+  {
+   "name": "s02-span-after-escaped-backtick",
+   "markdown": "a \\``[c](c.md)`, [d](d.md) and `e`\n\n\nEND-MARK\n",
+   "html": "<p>a `<code>[c](c.md)</code>, <a href=\"d.md\">d</a> and <code>e</code></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "s03-escaped-backslash-then-span",
+   "markdown": "a \\\\`[c](c.md)` [d](d.md)\n\n\nEND-MARK\n",
+   "html": "<p>a \\<code>[c](c.md)</code> <a href=\"d.md\">d</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "s04-span-over-a-blank-line",
+   "markdown": "`a\n\n[b](c.md)`\n\n\nEND-MARK\n",
+   "html": "<p>`a</p>\n<p><a href=\"c.md\">b</a>`</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "s05-double-backticks",
+   "markdown": "a `` b `[c](c.md)` [d](d.md)\n\n\nEND-MARK\n",
+   "html": "<p>a `` b <code>[c](c.md)</code> <a href=\"d.md\">d</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "s06-escaped-backticks",
+   "markdown": "a \\`[c](c.md)\\` d `e` [f](f.md)\n\n\nEND-MARK\n",
+   "html": "<p>a `<a href=\"c.md\">c</a>` d <code>e</code> <a href=\"f.md\">f</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "s07-span-over-a-b-line",
+   "markdown": "`a\n#b [c](d.md)` [e](f.md)\n\n\nEND-MARK\n",
+   "html": "<p><code>a #b [c](d.md)</code> <a href=\"f.md\">e</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "s08-span-with-a-backtick",
+   "markdown": "``d`[e](f.md)``\n\n\nEND-MARK\n",
+   "html": "<p><code>d`[e](f.md)</code></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "t01-a-tag-github-drops",
+   "markdown": "Copyright <year> The TestGrid Authors\n\n\nEND-MARK\n",
+   "html": "<p>Copyright  The TestGrid Authors</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "t02-numbers",
+   "markdown": "a log over 95&nbsp;MiB after gzip, x _14_ y *3* md5 v17\n\n\nEND-MARK\n",
+   "html": "<p>a log over 95 MiB after gzip, x <em>14</em> y <em>3</em> md5 v17</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "t03-that-opens-no-tag",
+   "markdown": "x <y z 18 -> w, x <a b\nc 19 -> w\n\n\nEND-MARK\n",
+   "html": "<p>x &lt;y z 18 -&gt; w, x &lt;a b\nc 19 -&gt; w</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "t04-steps-and-alt",
+   "markdown": "1. In step 3, [a](b.md) `c 5` and Step\n   4 <img alt=\"d 6\" src=\"e\">\n\n\nEND-MARK\n",
+   "html": "<ol>\n<li>In step 3, <a href=\"b.md\">a</a> <code>c 5</code> and Step\n4 <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"e\"><img alt=\"d 6\" src=\"e\" style=\"max-width: 100%;\"></a>\n</li>\n</ol>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "t05-adjacent-html-blocks",
+   "markdown": "<picture>\n  <img alt=\"Red builds per day\" src=\"a.svg\">\n</picture>\n\n<picture>\n  <img alt=\"30 days of red builds\" src=\"b.svg\">\n</picture>\n\n<div>a 1</div>\n\n<div>2 b</div>\n\nc\n\n<div>d</div>\n\n\nEND-MARK\n",
+   "html": "<themed-picture data-catalyst-inline=\"true\"><picture>\n  <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"a.svg\"><img alt=\"Red builds per day\" src=\"a.svg\" style=\"max-width: 100%;\"></a>\n</picture></themed-picture>\n<themed-picture data-catalyst-inline=\"true\"><picture>\n  <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"b.svg\"><img alt=\"30 days of red builds\" src=\"b.svg\" style=\"max-width: 100%;\"></a>\n</picture></themed-picture>\n<div>a 1</div>\n<div>2 b</div>\n<p>c</p>\n<div>d</div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v01-inline",
+   "markdown": "a <!--> b\n\n\nEND-MARK\n",
+   "html": "<p>a  b</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v02-inline",
+   "markdown": "a <!---> b\n\n\nEND-MARK\n",
+   "html": "<p>a  b</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v03-inline-comment-with",
+   "markdown": "a <!-- -- --> b\n\n\nEND-MARK\n",
+   "html": "<p>a  b</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v04-inline-x",
+   "markdown": "a <!--- b --> c\n\n\nEND-MARK\n",
+   "html": "<p>a  c</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v05-block-comment-with",
+   "markdown": "<!-- a -- b -->\n\n# H\n\n\nEND-MARK\n",
+   "html": "\n<div class=\"markdown-heading\"><h1 class=\"heading-element\">H</h1><a id=\"user-content-h\" class=\"anchor\" aria-label=\"Permalink: H\" href=\"#h\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v06-mid-line-unended",
+   "markdown": "x <!-- a\n\n# H\n\n\nEND-MARK\n",
+   "html": "<p>x &lt;!-- a</p>\n<div class=\"markdown-heading\"><h1 class=\"heading-element\">H</h1><a id=\"user-content-h\" class=\"anchor\" aria-label=\"Permalink: H\" href=\"#h\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v07-link-destination-with",
+   "markdown": "[a](<b>c>) [d](<e f.md>)\n\n\nEND-MARK\n",
+   "html": "<p>[a](<b>c&gt;) <a href=\"e%20f.md\">d</a></b></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v08-emphasis",
+   "markdown": "*a* **b** _c_ __d__ ***e*** a*b*c a_b_c\n\n\nEND-MARK\n",
+   "html": "<p><em>a</em> <strong>b</strong> <em>c</em> <strong>d</strong> <em><strong>e</strong></em> a<em>b</em>c a_b_c</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v09-list-numbers",
+   "markdown": "1. a\n1. b\n\n1234567890. c\n\n\nEND-MARK\n",
+   "html": "<ol>\n<li>a</li>\n<li>b</li>\n</ol>\n<p>1234567890. c</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v10-tabs-in-a-list",
+   "markdown": "-\ta\n\n\tb\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<p>a</p>\n<p>b</p>\n</li>\n</ul>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v11-details-block",
+   "markdown": "<details>\n<summary>S</summary>\n\n## Inside\n\n[x](x.md)\n\n</details>\n\n\nEND-MARK\n",
+   "html": "<details>\n<summary>S</summary>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Inside</h2><a id=\"user-content-inside\" class=\"anchor\" aria-label=\"Permalink: Inside\" href=\"#inside\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p><a href=\"x.md\">x</a></p>\n</details>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v12-table",
+   "markdown": "| a | b |\n|---|---|\n| [x](x.md) | `y` |\n\n\nEND-MARK\n",
+   "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><a href=\"x.md\">x</a></td>\n<td><code>y</code></td>\n</tr>\n</tbody>\n</table>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v13-autolinks",
+   "markdown": "www.example.com and https://x.y/z and foo@bar.com\n\n\nEND-MARK\n",
+   "html": "<p><a href=\"http://www.example.com\" rel=\"nofollow\">www.example.com</a> and <a href=\"https://x.y/z\" rel=\"nofollow\">https://x.y/z</a> and <a href=\"mailto:foo@bar.com\">foo@bar.com</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v14-strikethrough",
+   "markdown": "~~del~~ and ~single~\n\n\nEND-MARK\n",
+   "html": "<p><del>del</del> and <del>single</del></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v15-task-list",
+   "markdown": "- [ ] task\n- [x] done\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>[ ] task</li>\n<li>[x] done</li>\n</ul>\n<p>END-MARK</p>\n",
+   "compare": [
+    "hidden",
+    "links",
+    "anchors"
+   ]
+  },
+  {
+   "name": "v16-footnote",
+   "markdown": "Footnote[^1].\n\n[^1]: Note [n](n.md).\n\n\nEND-MARK\n",
+   "html": "<p>Footnote<sup><a href=\"#fn-1\" id=\"user-content-fnref-1\" data-footnote-ref=\"\">1</a></sup>.</p>\n<p>END-MARK</p>\n<section data-footnotes=\"\">\n<ol>\n<li id=\"user-content-fn-1\">\n<p>Note <a href=\"n.md\">n</a>. <a href=\"#fnref-1\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\">↩</a></p>\n</li>\n</ol>\n</section>\n"
+  },
+  {
+   "name": "v17-alert",
+   "markdown": "> [!NOTE]\n> alert [a](a.md)\n\n\nEND-MARK\n",
+   "html": "<blockquote>\n<p>[!NOTE]\nalert <a href=\"a.md\">a</a></p>\n</blockquote>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v18-math",
+   "markdown": "Inline $x^2$ and\n\n$$\ny\n$$\n\n\nEND-MARK\n",
+   "html": "<p>Inline $x^2$ and</p>\n<p>$$\ny\n$$</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v19-emoji",
+   "markdown": "A :+1: and :smile: here\n\n\nEND-MARK\n",
+   "html": "<p>A 👍 and 😄 here</p>\n<p>END-MARK</p>\n",
+   "compare": [
+    "hidden",
+    "links",
+    "anchors"
+   ]
+  },
+  {
+   "name": "v20-inline-tags",
+   "markdown": "<kbd>Ctrl</kbd> <sup>1</sup> <sub>2</sub> <ins>i</ins> <del>d</del> <abbr title=\"t\">A</abbr>\n\n\nEND-MARK\n",
+   "html": "<p><kbd>Ctrl</kbd> <sup>1</sup> <sub>2</sub> <ins>i</ins> <del>d</del> A</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v21-setext-and-rules",
+   "markdown": "Setext\n===\n\nNot setext\n- - -\n\nAlso\n***\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h1 class=\"heading-element\">Setext</h1><a id=\"user-content-setext\" class=\"anchor\" aria-label=\"Permalink: Setext\" href=\"#setext\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>Not setext</p>\n<hr>\n<p>Also</p>\n<hr>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v22-escaped-tag",
+   "markdown": "\\<a href=\"x.md\"> and \\<!-- not -->\n\n\nEND-MARK\n",
+   "html": "<p>&lt;a href=\"x.md\"&gt; and &lt;!-- not --&gt;</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v23-inline-html-over-a-blank-line",
+   "markdown": "<a href=\"x.md\">a\n\nb</a>\n\n\nEND-MARK\n",
+   "html": "<p><a href=\"x.md\">a</a></p>\n<p>b</p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v24-heading-anchors",
+   "markdown": "## Trailing hashes ##\n## Emoji :smile: heading\n## Ünïcödé Heading\n## dup\n## dup\n## a_b-c.d (e)\n## `code` *em*\n\n\nEND-MARK\n",
+   "html": "<div class=\"markdown-heading\"><h2 class=\"heading-element\">Trailing hashes</h2><a id=\"user-content-trailing-hashes\" class=\"anchor\" aria-label=\"Permalink: Trailing hashes\" href=\"#trailing-hashes\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Emoji 😄 heading</h2><a id=\"user-content-emoji-smile-heading\" class=\"anchor\" aria-label=\"Permalink: Emoji :smile: heading\" href=\"#emoji-smile-heading\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">Ünïcödé Heading</h2><a id=\"user-content-ünïcödé-heading\" class=\"anchor\" aria-label=\"Permalink: Ünïcödé Heading\" href=\"#ünïcödé-heading\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">dup</h2><a id=\"user-content-dup\" class=\"anchor\" aria-label=\"Permalink: dup\" href=\"#dup\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">dup</h2><a id=\"user-content-dup-1\" class=\"anchor\" aria-label=\"Permalink: dup\" href=\"#dup-1\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">a_b-c.d (e)</h2><a id=\"user-content-a_b-cd-e\" class=\"anchor\" aria-label=\"Permalink: a_b-c.d (e)\" href=\"#a_b-cd-e\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">\n<code>code</code> <em>em</em>\n</h2><a id=\"user-content-code-em\" class=\"anchor\" aria-label=\"Permalink: codeem\" href=\"#code-em\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>END-MARK</p>\n",
+   "compare": [
+    "hidden",
+    "links",
+    "anchors"
+   ]
+  },
+  {
+   "name": "v25-anchor-links",
+   "markdown": "[a](x.md#Sect) and [b](#user-content-x) and [c](#dup-1)\n\n\nEND-MARK\n",
+   "html": "<p><a href=\"x.md#Sect\">a</a> and <a href=\"#user-content-x\">b</a> and <a href=\"#dup-1\">c</a></p>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v26-loose-list",
+   "markdown": "- `tool/a.py`: x\n\n- `tool/b.py`: y\n\n  a second paragraph\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<p><code>tool/a.py</code>: x</p>\n</li>\n<li>\n<p><code>tool/b.py</code>: y</p>\n<p>a second paragraph</p>\n</li>\n</ul>\n<p>END-MARK</p>\n"
+  },
+  {
+   "name": "v27-loose-items-opening-with-a-block",
+   "markdown": "- - a\n\n  b\n\n- ## C\n\n  d\n\n- | e |\n  |---|\n  | f |\n\n  g\n\n\nEND-MARK\n",
+   "html": "<ul>\n<li>\n<ul>\n<li>a</li>\n</ul>\n<p>b</p>\n</li>\n<li>\n<div class=\"markdown-heading\"><h2 class=\"heading-element\">C</h2><a id=\"user-content-c\" class=\"anchor\" aria-label=\"Permalink: C\" href=\"#c\"><span aria-hidden=\"true\" class=\"octicon octicon-link\"></span></a></div>\n<p>d</p>\n</li>\n<li>\n<table>\n<thead>\n<tr>\n<th>e</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>f</td>\n</tr>\n</tbody>\n</table>\n<p>g</p>\n</li>\n</ul>\n<p>END-MARK</p>\n"
+  }
+ ]
+}
