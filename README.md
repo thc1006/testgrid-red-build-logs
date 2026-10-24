@@ -47,6 +47,16 @@ archive/runs/<YYYY-MM>/<run>/<job>/<build>/
   each container ended (an `OOMKilled`, say), and the node it ran on. Read it
   with `gzip -dc podinfo.json.gz`. Some builds archived earlier without a log
   have it as `podinfo.json`.
+- `<node>.<file>.gz`, such as `bootstrap-e2e-master.etcd.log.gz`: for a build
+  whose cluster did not come up (`kubetest.Up` or `kubetest2.Up` red), the
+  logs of its nodes that GCS has in `artifacts/`. Those of the control plane
+  (the node kube-up names `<prefix>-master`): `kube-master-installation.log`,
+  `kube-master-configuration.log`, `etcd.log`, `containerd.log` and
+  `serial-1.log`, and `kube-apiserver.log` when the log says
+  `Cluster failed to initialize`. Those of the other nodes:
+  `kube-node-installation.log` and `kube-node-configuration.log`. Read one with
+  `gzip -dc`. A build archived before the runs kept these logs has none, unless
+  a later run repaired a damaged copy of its files.
 - `meta.json`: the tabs, the red tests (it says when some are left out),
   TestGrid's messages and the log's md5. A build GCS had no file for has only
   this.
