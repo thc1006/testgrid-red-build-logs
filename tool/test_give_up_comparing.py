@@ -530,29 +530,25 @@ class WithPodinfo(World):
         self.assertEqual(self.fetch_in(), 0)  # fails: 1
         self.assertEqual(self.runs()[-1]["outcomes"], {"given-up-still-failing": [self.key]})  # fails: {}
 
-    def test_a_repair_that_cannot_read_its_podinfo_keeps_its_failures(self):
-        # (both copies damaged here: the log is taken again, but GCS refuses its podinfo.json; it stays final, and
-        # is read again when the build's seventh is compared)
-        since = self.given_up()
+    def test_a_repair_that_cannot_read_its_podinfo_leaves_the_folder_as_it_is(self):
+        # (both copies damaged here: GCS serves the log, but refuses its podinfo.json, so the repair fails and both
+        # copies stay, as for a damaged log GCS refuses; once GCS serves it, a repair takes both again, which ends its
+        # failures)
+        self.given_up()
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.srv.route(self.base + "/podinfo.json", (403, {}, b""))
         for name in ("build-log.txt", "podinfo.json"):
             with open(os.path.join(self.bdir(), name), "ab") as f:
                 f.write(b"damage")
-        self.assertEqual(self.fetch_in(), 0)
-        m = self.meta()
-        self.assertEqual(self.runs()[-1]["outcomes"], {"repaired": [self.key]})
-        self.assertEqual((m.get(SINCE), m.get(GIVEN_UP), m["final"], m["podinfo"]), (since, ERR403, True, None))
-        # fails: (None, None, False, None)
-        self.assertIn("| … still compared with GCS on every run | 0 |", self.index())  # fails: 1, not 0
-        self.assertEqual(self.fetch_in(set()), 0)  # fails: 1
-        self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})  # fails: {}
-        self.assertEqual(self.fetch_in(), 0)  # fails: 1
-        self.assertEqual(self.runs()[-1]["outcomes"], {"given-up-still-failing": [self.key]})  # fails: {}
+        before = {n: self.read(n) for n in os.listdir(self.bdir())}
+        self.assertEqual(self.fetch_in(), 1)  # fails: 0
+        self.assertIn(ERR403, self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual({n: self.read(n) for n in os.listdir(self.bdir())}, before)
         self.srv.route(self.base + "/podinfo.json", obj(b'{"pod": {}}'))
         self.assertEqual(self.fetch_in(), 0)
         m = self.meta()
-        self.assertEqual((self.runs()[-1]["outcomes"], SINCE in m, GIVEN_UP in m), ({"refreshed": [self.key]}, False, False))
+        self.assertEqual((self.runs()[-1]["outcomes"], m["repaired"], SINCE in m, GIVEN_UP in m),
+                         ({"repaired": [self.key]}, ["build-log.txt", "podinfo.json"], False, False))
         self.assertEqual(self.read("podinfo.json"), b'{"pod": {}}')
 
     def test_a_log_taken_again_by_the_run_that_gives_up_is_reported(self):

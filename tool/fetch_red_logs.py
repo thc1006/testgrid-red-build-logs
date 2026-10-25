@@ -3954,8 +3954,10 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
             except Exception as e:
                 if existed and isinstance(e, BUGS):
                     raise  # (a repair keeps the copy it has: a bug fails it, not taken for GCS refusing the file)
-                if kept["podinfo"] and isinstance(e, NotFound):
-                    raise RuntimeError(f"the archived podinfo.json is damaged and GCS no longer has it ({base})") from None
+                if kept["podinfo"]:  # (a damaged copy: the folder stays as it is, for the next run to take it again)
+                    if isinstance(e, NotFound):
+                        raise RuntimeError(f"the archived podinfo.json is damaged and GCS no longer has it ({base})") from None
+                    raise
                 if "podinfo.json" in held:
                     raise left_as_it_is("podinfo.json", base, e) from None
                 if log is None and not isinstance(e, NotFound):
