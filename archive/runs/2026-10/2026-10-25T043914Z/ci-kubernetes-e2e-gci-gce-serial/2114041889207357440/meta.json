@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2114041889207357440",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1792861838,
+  "created": 1792861838,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-2 [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be display pod resi...o/kubernetes/test/e2e/node/pod_resize.go:1423 @ 10/24/26 20:10:50.907\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792877640,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2114041889207357440",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2114041889207357440/build-log.txt",
+  "log": {
+    "bytes": 127647,
+    "md5": "d4b2ecbdd932dbd45d18c58eeb43720d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21770,
+    "gcs": {
+      "generation": "1792877666412027",
+      "md5": "d4b2ecbdd932dbd45d18c58eeb43720d",
+      "crc32c": "8cf1312f",
+      "bytes": 127647,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 64930,
+    "md5": "4d5ae2891a2ee2ed4ad17c561c1c7138",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10221,
+    "gcs": {
+      "generation": "1792877668819273",
+      "md5": "4d5ae2891a2ee2ed4ad17c561c1c7138",
+      "crc32c": "41e9f755",
+      "bytes": 64930,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-25T043914Z",
+  "archived_at": 1792903154.0,
+  "settled": true,
+  "final": false
+}

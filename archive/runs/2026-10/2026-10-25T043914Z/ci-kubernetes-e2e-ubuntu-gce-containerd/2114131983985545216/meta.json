@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2114131983985545216",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1792883318,
+  "created": 1792883318,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] AdmissionWebhook [Privileged:ClusterAdmin] should honor timeout [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Internal error occurred: failed calling webhook \"allow-config...ernetes/test/e2e/apimachinery/webhook.go:2570 @ 10/24/26 23:29:59.695\n"
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792885683,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2114131983985545216",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2114131983985545216/build-log.txt",
+  "log": {
+    "bytes": 208746,
+    "md5": "8932faf448dc588469c3cced850495b2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 30857,
+    "gcs": {
+      "generation": "1792885696004912",
+      "md5": "8932faf448dc588469c3cced850495b2",
+      "crc32c": "8c8f88d3",
+      "bytes": 208746,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 88016,
+    "md5": "a166c0c289414f527d3a617b054ab00f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11892,
+    "gcs": {
+      "generation": "1792885698287000",
+      "md5": "a166c0c289414f527d3a617b054ab00f",
+      "crc32c": "f237442a",
+      "bytes": 88016,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-25T043914Z",
+  "archived_at": 1792903154.0,
+  "settled": true,
+  "final": false
+}

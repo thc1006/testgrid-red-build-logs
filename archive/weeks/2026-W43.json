@@ -1,5 +1,345 @@
 [
   {
+    "time": 1792896998,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2114189361372205056",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "kubetest.Up",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2114189361372205056",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2114189361372205056/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2114189361372205056/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 124155,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2114189361372205056"
+  },
+  {
+    "time": 1792895500,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2114183070486630400",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "kubetest.Up",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-gci-gce-slow/2114183070486630400",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-gci-gce-slow/2114183070486630400/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-gci-gce-slow/2114183070486630400/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 122950,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2114183070486630400"
+  },
+  {
+    "time": 1792888066,
+    "job": "ci-node-e2e-containerd-2-1-cos-dra",
+    "build": "2114151864722264064",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#ci-node-e2e-containerd-2-1-cos-dra"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Health [FeatureGate:ResourceHealthStatus] should update health to Unknown when plugin stops and recover upon restart [Beta] [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must call NodeUnprepareResources for deleted pod [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must process pod created when kubelet is not running [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must retry NodePrepareResources after Kubelet restart [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must run pod if NodeUnprepareResources fails and then succeeds [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must call NodeUnprepareResources again if it's in progress for one plugin when Kubelet restarts [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must prepare and unprepare resources [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must provide metrics [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must run pod if NodePrepareResources fails for one plugin and then succeeds [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must run pod if NodeUnprepareResources fails for one plugin and then succeeds [Serial]",
+      "kubetest2.Test",
+      "ci-node-e2e-containerd-2-1-cos-dra.Overall"
+    ],
+    "red_test_count": 12,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-node-e2e-containerd-2-1-cos-dra/2114151864722264064",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-node-e2e-containerd-2-1-cos-dra/2114151864722264064/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-node-e2e-containerd-2-1-cos-dra/2114151864722264064/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 1027000,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-cos-dra/2114151864722264064"
+  },
+  {
+    "time": 1792886646,
+    "job": "ci-kubernetes-unit",
+    "build": "2114145824500879360",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-kubernetes-unit"
+    ],
+    "red_tests": [
+      "[sig-scheduling] k8s.io/kubernetes/pkg/scheduler/framework.preemption",
+      "ci-kubernetes-unit.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-unit/2114145824500879360",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-unit/2114145824500879360/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-unit/2114145824500879360/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 379402,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2114145824500879360"
+  },
+  {
+    "time": 1792883318,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2114131983985545216",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] AdmissionWebhook [Privileged:ClusterAdmin] should honor timeout [Conformance]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2114131983985545216",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2114131983985545216/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2114131983985545216/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 296762,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2114131983985545216"
+  },
+  {
+    "time": 1792874466,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2114094737525837824",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.eventhandler",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-integration-master/2114094737525837824",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-integration-master/2114094737525837824/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-integration-master/2114094737525837824/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 310252,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2114094737525837824"
+  },
+  {
+    "time": 1792870864,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2114079637821722625",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/apiextensions-apiserver/test.integration",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-integration-master/2114079637821722625",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-integration-master/2114079637821722625/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-integration-master/2114079637821722625/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 266404,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2114079637821722625"
+  },
+  {
+    "time": 1792866405,
+    "job": "ci-node-e2e-containerd-2-1-cos-dra",
+    "build": "2114061016122789888",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#ci-node-e2e-containerd-2-1-cos-dra"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Health [FeatureGate:ResourceHealthStatus] should automatically reconnect both DRA and Health API after connection drop [Beta] [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Health [FeatureGate:ResourceHealthStatus] should handle concurrent DRA operations and health monitoring without connection issues [Beta] [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must be functional after service reconnect 1 common socket [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must report gRPC serving error for DRA service [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must retry NodePrepareResources after Kubelet restart [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must run pod if NodePrepareResources fails and then succeeds [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Resource Kubelet Plugin must run pod if NodeUnprepareResources fails and then succeeds [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must call NodeUnprepareResources again if it's in progress for one plugin when Kubelet restarts [Serial]",
+      "E2eNode Suite.[It] [sig-node] [DRA] [Feature:DynamicResourceAllocation] Two resource Kubelet Plugins must run pod if NodePrepareResources fails for one plugin and then succeeds [Serial]",
+      "kubetest2.Test",
+      "ci-node-e2e-containerd-2-1-cos-dra.Overall"
+    ],
+    "red_test_count": 11,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-node-e2e-containerd-2-1-cos-dra/2114061016122789888",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-node-e2e-containerd-2-1-cos-dra/2114061016122789888/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-node-e2e-containerd-2-1-cos-dra/2114061016122789888/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 990588,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-cos-dra/2114061016122789888"
+  },
+  {
+    "time": 1792865164,
+    "job": "ci-kubernetes-e2e-kind-beta-enabled",
+    "build": "2114055729395535872",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-beta-enabled"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Variable Expansion allow almost all printable ASCII characters as environment variable names",
+      "ci-kubernetes-e2e-kind-beta-enabled.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-kind-beta-enabled/2114055729395535872",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-kind-beta-enabled/2114055729395535872/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-kind-beta-enabled/2114055729395535872/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 223887,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2114055729395535872"
+  },
+  {
+    "time": 1792861838,
+    "job": "ci-kubernetes-e2e-gci-gce-serial",
+    "build": "2114041889207357440",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-serial"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-2 [Serial]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-serial.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-gci-gce-serial/2114041889207357440",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-gci-gce-serial/2114041889207357440/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-gci-gce-serial/2114041889207357440/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 192577,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2114041889207357440"
+  },
+  {
+    "time": 1792860765,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2114037359216431104",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] PreStop should call prestop when killing a pod [Conformance]",
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-capz-master-windows/2114037359216431104",
+    "run": "2026-10-25T043914Z",
+    "files": [
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-capz-master-windows/2114037359216431104/build-log.txt.gz",
+      "runs/2026-10/2026-10-25T043914Z/ci-kubernetes-e2e-capz-master-windows/2114037359216431104/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 347168,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2114037359216431104"
+  },
+  {
     "time": 1792853704,
     "job": "ci-kubernetes-e2e-gce-cos-slow-master",
     "build": "2114007662306791424",
@@ -21,7 +361,7 @@
     ],
     "remote": [],
     "bytes": 236608,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -999,7 +1339,7 @@
     "remote": [],
     "bytes": 308971,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1028,7 +1368,7 @@
     "remote": [],
     "bytes": 231177,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1057,7 +1397,7 @@
     "remote": [],
     "bytes": 232481,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1087,7 +1427,7 @@
     "remote": [],
     "bytes": 241071,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1116,7 +1456,7 @@
     "remote": [],
     "bytes": 123561,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1145,7 +1485,7 @@
     "remote": [],
     "bytes": 115555,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1174,7 +1514,7 @@
     "remote": [],
     "bytes": 310925,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1203,7 +1543,7 @@
     "remote": [],
     "bytes": 123663,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1231,7 +1571,7 @@
     "remote": [],
     "bytes": 3543677,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1261,7 +1601,7 @@
     "remote": [],
     "bytes": 239588,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1290,7 +1630,7 @@
     "remote": [],
     "bytes": 120645,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1319,7 +1659,7 @@
     "remote": [],
     "bytes": 132903,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1348,7 +1688,7 @@
     "remote": [],
     "bytes": 242187,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1376,7 +1716,7 @@
     "remote": [],
     "bytes": 201635,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1405,7 +1745,7 @@
     "remote": [],
     "bytes": 125253,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1435,7 +1775,7 @@
     "remote": [],
     "bytes": 255298,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
