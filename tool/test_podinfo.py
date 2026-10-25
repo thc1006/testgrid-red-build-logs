@@ -452,6 +452,19 @@ class PodInfoDamaged(ArchiveWorld):
                           self.runs()[-1]["errors"][0]["error"])
         self.assertEqual(self.srv.hits(self.base + "/build-log.txt"), asked)
 
+    def test_nor_when_gcs_cannot_serve_it_now(self):
+        # (its copy is not dropped, to be lost if GCS then has none: the folder stays as it is, as for a damaged log GCS
+        # cannot serve, and the next run takes it again)
+        self.srv.route(self.base + "/podinfo.json", (503, {}, b""))
+        before = {n: self.read(n) for n in os.listdir(self.bdir())}
+        self.assertEqual(self.fetch("--gzip"), 1)  # fails: 0
+        self.assertIn("HTTPError: HTTP Error 503", self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual({n: self.read(n) for n in os.listdir(self.bdir())}, before)
+        self.srv.route(self.base + "/podinfo.json", obj(POD))
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual((self.runs()[-1]["outcomes"], gzip.decompress(self.read("podinfo.json.gz"))),
+                         ({"repaired": [self.key]}, POD))
+
 
 class PodInfoInOlderRunReadmes(ArchiveWorld):
     """A build a run archived 3.8 days ago, past the runs whose READMEs every run writes again (those of
