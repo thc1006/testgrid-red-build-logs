@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2114377100373790720",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1792941759,
+  "created": 1792941758,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update endpoints: http",
+          "status": "FAIL",
+          "message": "[FAILED] failed dialing endpoint (recovery), received unexpected respo...kubernetes/test/e2e/network/networking.go:338 @ 10/25/26 15:45:18.107\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792943897,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2114377100373790720",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2114377100373790720/build-log.txt",
+  "log": {
+    "bytes": 148568,
+    "md5": "f9e17dcc4e8ab2bac744c78d0a6709c6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23916,
+    "gcs": {
+      "generation": "1792943910472394",
+      "md5": "f9e17dcc4e8ab2bac744c78d0a6709c6",
+      "crc32c": "3815a810",
+      "bytes": 148568,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86944,
+    "md5": "2944d7cca1c930515e3684eae3f3c824",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12029,
+    "gcs": {
+      "generation": "1792943913098137",
+      "md5": "2944d7cca1c930515e3684eae3f3c824",
+      "crc32c": "68154b0e",
+      "bytes": 86944,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-25T161715Z",
+  "archived_at": 1792945035.0,
+  "settled": false,
+  "final": false
+}

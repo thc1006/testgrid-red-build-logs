@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2114357219200864256",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1792937019,
+  "created": 1792937018,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourceDefinition resources [Privileged:ClusterAdmin] Simple CustomResourceDefinition creating/deleting custom resource definition objects works [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] deleting CustomResourceDefinition: context deadline exceeded\n...apimachinery/custom_resource_definition.go:76 @ 10/25/26 14:10:42.258\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792939305,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114357219200864256",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114357219200864256/build-log.txt",
+  "log": {
+    "bytes": 118152,
+    "md5": "4ba711b20967a87a5178299334df6f40",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19920,
+    "gcs": {
+      "generation": "1792939322040672",
+      "md5": "4ba711b20967a87a5178299334df6f40",
+      "crc32c": "ee82359b",
+      "bytes": 118152,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85700,
+    "md5": "2458871a3db9acfcfefb6bf80834309b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11701,
+    "gcs": {
+      "generation": "1792939326473341",
+      "md5": "2458871a3db9acfcfefb6bf80834309b",
+      "crc32c": "a9c5471d",
+      "bytes": 85700,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-25T161715Z",
+  "archived_at": 1792945035.0,
+  "settled": false,
+  "final": false
+}

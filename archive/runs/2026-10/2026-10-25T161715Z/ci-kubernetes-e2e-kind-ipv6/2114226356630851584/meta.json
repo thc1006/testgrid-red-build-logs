@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2114226356630851584",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1792905847,
+  "created": 1792905818,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Inline-volume (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-inlinevolume-t68c\" success: Ti...s/test/e2e/framework/pod/output/output.go:263 @ 10/25/26 05:40:25.764\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792907436,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2114226356630851584",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2114226356630851584/build-log.txt",
+  "log": {
+    "bytes": 156514,
+    "md5": "24078e2619e8f5b40b7e1aa120b6d5e5",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24599,
+    "gcs": {
+      "generation": "1792907453118202",
+      "md5": "24078e2619e8f5b40b7e1aa120b6d5e5",
+      "crc32c": "58f4fcc9",
+      "bytes": 156514,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94281,
+    "md5": "ed0a36da1f946e1e1198936b18541503",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12418,
+    "gcs": {
+      "generation": "1792907455406050",
+      "md5": "ed0a36da1f946e1e1198936b18541503",
+      "crc32c": "362f1a99",
+      "bytes": 94281,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-25T161715Z",
+  "archived_at": 1792945035.0,
+  "settled": true,
+  "final": false
+}

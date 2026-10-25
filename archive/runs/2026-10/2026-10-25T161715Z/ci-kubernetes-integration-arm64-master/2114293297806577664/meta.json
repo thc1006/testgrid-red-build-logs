@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2114293297806577664",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1792922077,
+  "created": 1792921778,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-node] k8s.io/kubernetes/test/integration.pods",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestPodTopologyLabels/subdomains_of_topology.kubernet...lient connection is closing\"}\n--- FAIL: TestPodTopologyLabels (1.98s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792924448,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2114293297806577664",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2114293297806577664/build-log.txt",
+  "log": {
+    "bytes": 309147,
+    "md5": "dad607b25b56cad627a584e5fdcaf3f7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 26845,
+    "gcs": {
+      "generation": "1792924453988033",
+      "md5": "dad607b25b56cad627a584e5fdcaf3f7",
+      "crc32c": "b091a1d7",
+      "bytes": 309147,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 113776,
+    "md5": "11b69c8ca1ed49c8e70edab4349de131",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13430,
+    "gcs": {
+      "generation": "1792924463460265",
+      "md5": "11b69c8ca1ed49c8e70edab4349de131",
+      "crc32c": "f0da09e7",
+      "bytes": 113776,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-25T161715Z",
+  "archived_at": 1792945035.0,
+  "settled": true,
+  "final": false
+}

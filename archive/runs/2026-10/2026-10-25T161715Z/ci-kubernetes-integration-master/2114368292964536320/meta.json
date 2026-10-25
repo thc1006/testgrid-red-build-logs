@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2114368292964536320",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1792939687,
+  "created": 1792939658,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.storage",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCorrectness/cacher_small_history\n{\"level\":\"warn\",...(3.03s)\n\n=== RUN   TestCorrectness\n--- FAIL: TestCorrectness (47.10s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792941927,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2114368292964536320",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2114368292964536320/build-log.txt",
+  "log": {
+    "bytes": 177256,
+    "md5": "8d839ae5c4551c92a9f137e79cfcbaa8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 13905,
+    "gcs": {
+      "generation": "1792941931540716",
+      "md5": "8d839ae5c4551c92a9f137e79cfcbaa8",
+      "crc32c": "0c44ba3e",
+      "bytes": 177256,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95902,
+    "md5": "90430420609fd5649f1876402c887cb1",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12283,
+    "gcs": {
+      "generation": "1792941934663305",
+      "md5": "90430420609fd5649f1876402c887cb1",
+      "crc32c": "921feeca",
+      "bytes": 95902,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-25T161715Z",
+  "archived_at": 1792945035.0,
+  "settled": false,
+  "final": false
+}

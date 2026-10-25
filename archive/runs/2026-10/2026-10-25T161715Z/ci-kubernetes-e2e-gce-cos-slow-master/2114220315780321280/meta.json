@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+  "build": "2114220315780321280",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master",
+  "started": 1792904406,
+  "created": 1792904378,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-slow-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-slow-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should work for type=LoadBalancer [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] timed out waiting for the condition\nIn [It] at: k8s.io/kubernetes/test/e2e/network/loadbalancer.go:1069 @ 10/25/26 05:27:08.959\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792907470,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2114220315780321280",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2114220315780321280/build-log.txt",
+  "log": {
+    "bytes": 138968,
+    "md5": "f5c3a05011eb3d7866c705e3e7392d27",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23189,
+    "gcs": {
+      "generation": "1792907477676440",
+      "md5": "f5c3a05011eb3d7866c705e3e7392d27",
+      "crc32c": "b8498fab",
+      "bytes": 138968,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95534,
+    "md5": "07e0f60a613ca00d50a1948311f64ed9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12274,
+    "gcs": {
+      "generation": "1792907480133691",
+      "md5": "07e0f60a613ca00d50a1948311f64ed9",
+      "crc32c": "9406cd8c",
+      "bytes": 95534,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-25T161715Z",
+  "archived_at": 1792945035.0,
+  "settled": true,
+  "final": false
+}
