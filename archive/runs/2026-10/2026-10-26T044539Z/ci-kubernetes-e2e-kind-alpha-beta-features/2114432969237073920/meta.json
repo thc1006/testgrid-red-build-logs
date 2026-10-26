@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2114432969237073920",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1792955113,
+  "created": 1792955078,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with multiple PVs and PVCs all in same ns should create 2 PVs and 4 PVCs: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-kbt98\" did not exit with Success: pod \"pvc-te...es/test/e2e/storage/persistent_volumes.go:340 @ 10/25/26 19:19:29.036\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792956727,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2114432969237073920",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2114432969237073920/build-log.txt",
+  "log": {
+    "bytes": 149336,
+    "md5": "b0664c7159957409545a3444c7edd747",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22900,
+    "gcs": {
+      "generation": "1792956747543939",
+      "md5": "b0664c7159957409545a3444c7edd747",
+      "crc32c": "cf6ff901",
+      "bytes": 149336,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 106620,
+    "md5": "62109614ea5668be94f8b62844e2d653",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13278,
+    "gcs": {
+      "generation": "1792956750135647",
+      "md5": "62109614ea5668be94f8b62844e2d653",
+      "crc32c": "32c572f6",
+      "bytes": 106620,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-26T044539Z",
+  "archived_at": 1792989939.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2114551250010771456",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1792983325,
+  "created": 1792983279,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should support inline execution and attach",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...netes/test/e2e/framework/kubectl/builder.go:97 @ 10/26/26 03:55:41.32\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792987004,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2114551250010771456",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2114551250010771456/build-log.txt",
+  "log": {
+    "bytes": 138741,
+    "md5": "e5c39a9cf20a3d5c4507444846d1b08f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22952,
+    "gcs": {
+      "generation": "1792987020066679",
+      "md5": "e5c39a9cf20a3d5c4507444846d1b08f",
+      "crc32c": "e0680844",
+      "bytes": 138741,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 69950,
+    "md5": "8f20071a9a8e04b586a3a42aa4967cb3",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10941,
+    "gcs": {
+      "generation": "1792987022562961",
+      "md5": "8f20071a9a8e04b586a3a42aa4967cb3",
+      "crc32c": "d32f1d0b",
+      "bytes": 69950,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-26T044539Z",
+  "archived_at": 1792989939.0,
+  "settled": false,
+  "final": false
+}

@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "build": "2114425419577954304",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "started": 1792953395,
+  "created": 1792953278,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Pre-provisioned PV (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-preprovisionedpv-l6bl\" success...s/test/e2e/framework/pod/output/output.go:263 @ 10/25/26 19:02:16.327\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792955007,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2114425419577954304",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2114425419577954304/build-log.txt",
+  "log": {
+    "bytes": 151304,
+    "md5": "195d7671a0b825db106331f01f94a117",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23349,
+    "gcs": {
+      "generation": "1792955023818357",
+      "md5": "195d7671a0b825db106331f01f94a117",
+      "crc32c": "b5f60b08",
+      "bytes": 151304,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 108334,
+    "md5": "9ca904ad52055bd987c88ff96bf137e0",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13547,
+    "gcs": {
+      "generation": "1792955027453528",
+      "md5": "9ca904ad52055bd987c88ff96bf137e0",
+      "crc32c": "39bfdfab",
+      "bytes": 108334,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-26T044539Z",
+  "archived_at": 1792989939.0,
+  "settled": true,
+  "final": false
+}

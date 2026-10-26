@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2114383895351791616",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1792943412,
+  "created": 1792943378,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration.examples",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestAggregatedAPIServer/WithoutWardleFeatureGateAtV1....  TestAggregatedAPIServer\n--- FAIL: TestAggregatedAPIServer (265.91s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792945763,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2114383895351791616",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2114383895351791616/build-log.txt",
+  "log": {
+    "bytes": 549052,
+    "md5": "0163d030f7bffbcaf5786cc4b9ea66b5",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 64167,
+    "gcs": {
+      "generation": "1792945767743179",
+      "md5": "0163d030f7bffbcaf5786cc4b9ea66b5",
+      "crc32c": "00386bd6",
+      "bytes": 549052,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94304,
+    "md5": "048eb3b8b1bd73877e5fa48e6c80819f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12151,
+    "gcs": {
+      "generation": "1792945769553373",
+      "md5": "048eb3b8b1bd73877e5fa48e6c80819f",
+      "crc32c": "aeaa3d91",
+      "bytes": 94304,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-26T044539Z",
+  "archived_at": 1792989939.0,
+  "settled": true,
+  "final": false
+}

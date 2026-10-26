@@ -1,0 +1,89 @@
+[
+  {
+    "time": 1792983325,
+    "job": "ci-kubernetes-e2e-kind",
+    "build": "2114551250010771456",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should support inline execution and attach",
+      "ci-kubernetes-e2e-kind.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-26T044539Z/ci-kubernetes-e2e-kind/2114551250010771456",
+    "run": "2026-10-26T044539Z",
+    "files": [
+      "runs/2026-10/2026-10-26T044539Z/ci-kubernetes-e2e-kind/2114551250010771456/build-log.txt.gz",
+      "runs/2026-10/2026-10-26T044539Z/ci-kubernetes-e2e-kind/2114551250010771456/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 208691,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2114551250010771456"
+  },
+  {
+    "time": 1792974466,
+    "job": "ci-node-e2e-containerd-2-1-cos-dra",
+    "build": "2114514255670677504",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#ci-node-e2e-containerd-2-1-cos-dra"
+    ],
+    "red_tests": [
+      "kubetest2.Test",
+      "ci-node-e2e-containerd-2-1-cos-dra.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-26T044539Z/ci-node-e2e-containerd-2-1-cos-dra/2114514255670677504",
+    "run": "2026-10-26T044539Z",
+    "files": [
+      "runs/2026-10/2026-10-26T044539Z/ci-node-e2e-containerd-2-1-cos-dra/2114514255670677504/build-log.txt.gz",
+      "runs/2026-10/2026-10-26T044539Z/ci-node-e2e-containerd-2-1-cos-dra/2114514255670677504/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 1096335,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-cos-dra/2114514255670677504"
+  },
+  {
+    "time": 1792973484,
+    "job": "ci-kubernetes-e2e-kind-beta-enabled",
+    "build": "2114509977715478528",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-beta-enabled"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test write access",
+      "ci-kubernetes-e2e-kind-beta-enabled.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-26T044539Z/ci-kubernetes-e2e-kind-beta-enabled/2114509977715478528",
+    "run": "2026-10-26T044539Z",
+    "files": [
+      "runs/2026-10/2026-10-26T044539Z/ci-kubernetes-e2e-kind-beta-enabled/2114509977715478528/build-log.txt.gz",
+      "runs/2026-10/2026-10-26T044539Z/ci-kubernetes-e2e-kind-beta-enabled/2114509977715478528/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 227771,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2114509977715478528"
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "job": "ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "build": "2114405790679830528",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "started": 1792948628,
+  "created": 1792948598,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "sig-network-kind, loadbalancer",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-kind-cloud-provider-loadbalancer.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792948980,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2114405790679830528",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2114405790679830528/build-log.txt",
+  "log": {
+    "bytes": 993911,
+    "md5": "be052bce280a05ef5679b2b11e8533e1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23821,
+    "gcs": {
+      "generation": "1792948981104826",
+      "md5": "be052bce280a05ef5679b2b11e8533e1",
+      "crc32c": "b030d49b",
+      "bytes": 993911,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 99503,
+    "md5": "294d0b3c702ae1bebd74e554635311a2",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12508,
+    "gcs": {
+      "generation": "1792948983607129",
+      "md5": "294d0b3c702ae1bebd74e554635311a2",
+      "crc32c": "1c7295c9",
+      "bytes": 99503,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-26T044539Z",
+  "archived_at": 1792989939.0,
+  "settled": true,
+  "final": false
+}

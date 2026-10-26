@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2114453605456023552",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1792959999,
+  "created": 1792959998,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] HostPathType Character Device Should fail on mounting character device 'achardev' when HostPathType is HostPathSocket [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] command: \"mknod /mnt/test/achardev c 89 1\", stdout: \nstderr: ...rnetes/test/e2e/storage/host_path_type.go:273 @ 10/25/26 20:36:57.876\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792963062,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2114453605456023552",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2114453605456023552/build-log.txt",
+  "log": {
+    "bytes": 118310,
+    "md5": "d4721efbe8aae64f4a51ca4eb921cd30",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20622,
+    "gcs": {
+      "generation": "1792963069701856",
+      "md5": "d4721efbe8aae64f4a51ca4eb921cd30",
+      "crc32c": "8bd3fd34",
+      "bytes": 118310,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85252,
+    "md5": "23b31fe116e1ebca35330717622c1321",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11633,
+    "gcs": {
+      "generation": "1792963071976112",
+      "md5": "23b31fe116e1ebca35330717622c1321",
+      "crc32c": "7cb34ff3",
+      "bytes": 85252,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-26T044539Z",
+  "archived_at": 1792989939.0,
+  "settled": true,
+  "final": false
+}

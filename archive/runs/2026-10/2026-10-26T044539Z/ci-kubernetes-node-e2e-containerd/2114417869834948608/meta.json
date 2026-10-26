@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-node-e2e-containerd",
+  "build": "2114417869834948608",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd",
+  "started": 1792951507,
+  "created": 1792951478,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-node-e2e",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-node-e2e-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Node Tests",
+          "status": "FAIL",
+          "message": "error during go run /home/prow/go/src/k8s.io/kubernetes/test/e2e_node/...o/test-infra/jobs/e2e_node/containerd/image-config.yaml: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792953641,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2114417869834948608",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2114417869834948608/build-log.txt",
+  "log": {
+    "bytes": 2960580,
+    "md5": "eafaa0c4f53acbce8ac4b8f7a7f89b8a",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 363832,
+    "gcs": {
+      "generation": "1792953643259665",
+      "md5": "eafaa0c4f53acbce8ac4b8f7a7f89b8a",
+      "crc32c": "bccfe666",
+      "bytes": 2960580,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96694,
+    "md5": "b4a01112aa3537bcf337fc484708902b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12339,
+    "gcs": {
+      "generation": "1792953673375874",
+      "md5": "b4a01112aa3537bcf337fc484708902b",
+      "crc32c": "9cc68b4c",
+      "bytes": 96694,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-26T044539Z",
+  "archived_at": 1792989939.0,
+  "settled": true,
+  "final": false
+}

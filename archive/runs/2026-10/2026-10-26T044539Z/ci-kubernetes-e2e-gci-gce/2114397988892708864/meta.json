@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2114397988892708864",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1792946739,
+  "created": 1792946738,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should verify ResourceQuota with best effort scope using scope-selectors.",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected:\n    <*v1.ResourceQuota | .../test/e2e/apimachinery/resource_quota.go:1495 @ 10/25/26 17:15:18.912\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1792949163,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114397988892708864",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114397988892708864/build-log.txt",
+  "log": {
+    "bytes": 138135,
+    "md5": "fb8a4f517f1798a7be5d8771b6ef29de",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22790,
+    "gcs": {
+      "generation": "1792949179161162",
+      "md5": "fb8a4f517f1798a7be5d8771b6ef29de",
+      "crc32c": "7c1f313c",
+      "bytes": 138135,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85757,
+    "md5": "6eb0c0aee2698d50cb9d0f525a6c5d5b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11689,
+    "gcs": {
+      "generation": "1792949181254867",
+      "md5": "6eb0c0aee2698d50cb9d0f525a6c5d5b",
+      "crc32c": "dbc99e6c",
+      "bytes": 85757,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-26T044539Z",
+  "archived_at": 1792989939.0,
+  "settled": true,
+  "final": false
+}
