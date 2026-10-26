@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2114661226104492032",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793009500,
+  "created": 1793009499,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] Discovery Custom resource should have storage version hash",
+          "status": "FAIL",
+          "message": "[FAILED] failed to delete CustomResourceDefinition(e2e-test-discovery-....io/kubernetes/test/utils/crd/crd_util.go:107 @ 10/26/26 10:30:54.375\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793011595,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114661226104492032",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114661226104492032/build-log.txt",
+  "log": {
+    "bytes": 134347,
+    "md5": "92761af4a88bc826b55a02ac020fae3f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22177,
+    "gcs": {
+      "generation": "1793011612748895",
+      "md5": "92761af4a88bc826b55a02ac020fae3f",
+      "crc32c": "899d3690",
+      "bytes": 134347,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85209,
+    "md5": "ba70d6c13394da55d298741c86c424b9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11677,
+    "gcs": {
+      "generation": "1793011617200323",
+      "md5": "ba70d6c13394da55d298741c86c424b9",
+      "crc32c": "7f3e294a",
+      "bytes": 85209,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-26T125954Z",
+  "archived_at": 1793019594.0,
+  "settled": true,
+  "final": false
+}
