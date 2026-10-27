@@ -1,0 +1,77 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2115080745381793792",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793109521,
+  "created": 1793109520,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should verify ResourceQuota with terminating scopes through scope selectors.",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected:\n    <*v1.ResourceQuota | .../test/e2e/apimachinery/resource_quota.go:1558 @ 10/27/26 14:33:01.984\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should return command exit codes should handle in-cluster config",
+          "status": "FAIL",
+          "message": "[FAILED] error running /workspace/kubernetes/platforms/linux/amd64/kub...etes/test/e2e/framework/kubectl/builder.go:97 @ 10/27/26 14:09:57.105\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] MutableCSINodeAllocatableCount [FeatureGate:MutableCSINodeAllocatableCount] Attach Limit Exceeded should transition pod to failed state when attachment limit exceeded",
+          "status": "FAIL",
+          "message": "[FAILED] Pod did not fail with VolumeAttachmentLimitExceeded: Timed ou...ge/csimock/mutable_csinode_allocatable.go:178 @ 10/27/26 14:21:50.352\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793112097,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115080745381793792",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115080745381793792/build-log.txt",
+  "log": {
+    "bytes": 423382,
+    "md5": "63fbf89429496a75fee5b661ae70ba51",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 58743,
+    "gcs": {
+      "generation": "1793112115331325",
+      "md5": "63fbf89429496a75fee5b661ae70ba51",
+      "crc32c": "f8138617",
+      "bytes": 423382,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86137,
+    "md5": "4ca1baa9fc6dee539a8dfc4e726e48c2",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11741,
+    "gcs": {
+      "generation": "1793112117465417",
+      "md5": "4ca1baa9fc6dee539a8dfc4e726e48c2",
+      "crc32c": "d1f337ff",
+      "bytes": 86137,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-27T152244Z",
+  "archived_at": 1793114564.0,
+  "settled": false,
+  "final": false
+}

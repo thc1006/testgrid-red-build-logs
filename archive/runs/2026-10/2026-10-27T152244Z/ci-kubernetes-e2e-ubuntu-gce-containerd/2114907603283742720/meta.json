@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2114907603283742720",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793068240,
+  "created": 1793068240,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl rollout undo undo should rollback and update deployment env",
+          "status": "FAIL",
+          "message": "[FAILED] kubectl failed to rollback deployment\nIn [It] at: k8s.io/kubernetes/test/e2e/kubectl/rollout.go:115 @ 10/27/26 02:39:48.219\n"
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793070534,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2114907603283742720",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2114907603283742720/build-log.txt",
+  "log": {
+    "bytes": 136164,
+    "md5": "5faea2db5d1a9599918adfc4aca29a6d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22478,
+    "gcs": {
+      "generation": "1793070549583718",
+      "md5": "5faea2db5d1a9599918adfc4aca29a6d",
+      "crc32c": "a9b9c71d",
+      "bytes": 136164,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87157,
+    "md5": "7ace2b55992b266e11df0560a0ffaf29",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11990,
+    "gcs": {
+      "generation": "1793070551474638",
+      "md5": "7ace2b55992b266e11df0560a0ffaf29",
+      "crc32c": "eff80861",
+      "bytes": 87157,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-27T152244Z",
+  "archived_at": 1793114564.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2115009776147501056",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793092600,
+  "created": 1793092600,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] AdmissionWebhook [Privileged:ClusterAdmin] should honor timeout [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Internal error occurred: failed calling webhook \"allow-config...ernetes/test/e2e/apimachinery/webhook.go:2570 @ 10/27/26 09:26:47.678\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793094677,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115009776147501056",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115009776147501056/build-log.txt",
+  "log": {
+    "bytes": 194858,
+    "md5": "ca3e73e79eca4abb2483f6642918bc75",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 27793,
+    "gcs": {
+      "generation": "1793094693775934",
+      "md5": "ca3e73e79eca4abb2483f6642918bc75",
+      "crc32c": "1f987780",
+      "bytes": 194858,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86260,
+    "md5": "bf930cdcc7229dc2549ef27bddf357ac",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11700,
+    "gcs": {
+      "generation": "1793094695841381",
+      "md5": "bf930cdcc7229dc2549ef27bddf357ac",
+      "crc32c": "de946663",
+      "bytes": 86260,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-27T152244Z",
+  "archived_at": 1793114564.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2114993167387332608",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793088736,
+  "created": 1793088640,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Prepare",
+          "status": "FAIL",
+          "message": "--provider=gce boskos failed to acquire project: resources not found"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793089085,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114993167387332608",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114993167387332608/build-log.txt",
+  "log": {
+    "bytes": 8199,
+    "md5": "229e4b811653e46a1a258b581dd7dcdb",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 2759,
+    "gcs": {
+      "generation": "1793089085808161",
+      "md5": "229e4b811653e46a1a258b581dd7dcdb",
+      "crc32c": "a89fa5e4",
+      "bytes": 8199,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 114366,
+    "md5": "6f8ec0bb364284d0f44a263dd3c3a78f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13773,
+    "gcs": {
+      "generation": "1793089091398939",
+      "md5": "6f8ec0bb364284d0f44a263dd3c3a78f",
+      "crc32c": "ad4d4eed",
+      "bytes": 114366,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-27T152244Z",
+  "archived_at": 1793114564.0,
+  "settled": true,
+  "final": false
+}
