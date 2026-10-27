@@ -1650,6 +1650,7 @@ class ArchiveLinks(ArchiveWorld):
         run.json, and INDEX.md's table of days named its dashboard."""
         name = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime(time.time() - DAY))
         self.outside_run(self.elsewhere, name)
+        os.makedirs(os.path.join(self.root, "runs", name[:7]), exist_ok=True)  # (on the 1st, yesterday's month: no run yet)
         os.symlink(os.path.join(self.elsewhere, name), os.path.join(self.root, "runs", name[:7], name))
         self.next_fetch()
         self.assertNotIn("OUTSIDEDASH", self.index())  # fails: | Day (UTC) | OUTSIDEDASH | dash |
