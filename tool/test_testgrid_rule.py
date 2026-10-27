@@ -15,6 +15,7 @@ import fetch_red_logs as frl  # noqa: E402
 import testgrid_config as tgc  # noqa: E402
 import testgrid_rule as tr  # noqa: E402
 from test_fetch_red_logs import FakeServer  # noqa: E402
+from test_integrity import HOUR, snowflake  # noqa: E402
 
 GOLDEN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testdata", "testgrid_rule_golden.jsonl.gz")
 FOLDER = "logs/job/1/"  # where the oracle put each build
@@ -244,8 +245,8 @@ class GcsColumnTest(unittest.TestCase):
         self.srv = FakeServer()
         self.addCleanup(self.srv.close)
         frl.BACKOFF = 0
-        self.build = "2109000000000000000"
         now = int(time.time())
+        self.build = snowflake(now - 12 * HOUR)  # (made 12 hours ago: TestGrid shows the last DAYS_OF_RESULTS days)
         self.put("started.json", json.dumps({"timestamp": frl.created(self.build)}).encode())
         self.put("finished.json", json.dumps({"timestamp": now - 60, "passed": True}).encode())
 

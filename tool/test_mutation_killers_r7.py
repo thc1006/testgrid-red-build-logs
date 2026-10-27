@@ -252,8 +252,8 @@ class Listing(unittest.TestCase):
         self.srv = FakeServer()
         self.addCleanup(self.srv.close)
         frl.BACKOFF = 0
-        self.build = "2109000000000000000"
         now = int(time.time())
+        self.build = snowflake(now - 12 * HOUR)  # (made 12 hours ago: TestGrid shows the last DAYS_OF_RESULTS days)
         self.put("started.json", json.dumps({"timestamp": frl.created(self.build)}).encode())
         self.put("finished.json", json.dumps({"timestamp": now - 60, "passed": True}).encode())
 

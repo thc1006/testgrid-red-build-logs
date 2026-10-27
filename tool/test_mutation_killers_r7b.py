@@ -59,7 +59,8 @@ class JunitAtTheLimit(unittest.TestCase):
         srv = FakeServer()
         self.addCleanup(srv.close)
         frl.BACKOFF = 0
-        build, now = "2109000000000000000", int(time.time())
+        now = int(time.time())
+        build = snowflake(now - 12 * HOUR)  # (made 12 hours ago: TestGrid shows the last DAYS_OF_RESULTS days)
         base = f"/bucket/logs/job/{build}"
         failing = b'<testsuite><testcase name="t"><failure/></testcase></testsuite>'
         srv.route(base + "/started.json", (200, {}, json.dumps({"timestamp": frl.created(build)}).encode()))
