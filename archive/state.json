@@ -1,13 +1,13 @@
 {
   "tabs": {
     "sig-release-master-blocking#Conformance - GCE - master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791725034,
+      "scan": 1793060846.4280686,
+      "oldest": 1791768254,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-gce-conformance-latest",
       "current_job_hours": 3.0,
       "job_hours": {
-        "3": 1793030394.4145017
+        "3": 1793071646.4280686
       },
       "rows": {
         "overall": true,
@@ -15,13 +15,13 @@
       }
     },
     "sig-release-master-blocking#build-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791723491,
+      "scan": 1793060846.4280686,
+      "oldest": 1791761831,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-build",
       "current_job_hours": 2.5,
       "job_hours": {
-        "2.5": 1793028594.4145017
+        "2.5": 1793069846.4280686
       },
       "rows": {
         "overall": true,
@@ -29,13 +29,13 @@
       }
     },
     "sig-release-master-blocking#build-master-fast": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791723368,
+      "scan": 1793060846.4280686,
+      "oldest": 1791764169,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-build-fast",
       "current_job_hours": 2.5,
       "job_hours": {
-        "2.5": 1793028594.4145017
+        "2.5": 1793069846.4280686
       },
       "rows": {
         "overall": true,
@@ -43,13 +43,13 @@
       }
     },
     "sig-release-master-blocking#ci-kubernetes-unit": {
-      "scan": 1793019594.4145017,
-      "oldest": 1792934030,
+      "scan": 1793060846.4280686,
+      "oldest": 1792973535,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
       "current_job_hours": 2.5,
       "job_hours": {
-        "2.5": 1793028594.4145017
+        "2.5": 1793069846.4280686
       },
       "rows": {
         "overall": true,
@@ -57,13 +57,13 @@
       }
     },
     "sig-release-master-blocking#ci-node-crio-conformance": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791723190,
+      "scan": 1793060846.4280686,
+      "oldest": 1791763027,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-node-crio-conformance",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -71,13 +71,13 @@
       }
     },
     "sig-release-master-blocking#ci-node-e2e": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791723372,
+      "scan": 1793060846.4280686,
+      "oldest": 1791766812,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd",
       "current_job_hours": 2.0,
       "job_hours": {
-        "2": 1793026794.4145017
+        "2": 1793068046.4280686
       },
       "rows": {
         "overall": true,
@@ -85,13 +85,13 @@
       }
     },
     "sig-release-master-blocking#cmd-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791721394,
+      "scan": 1793060846.4280686,
+      "oldest": 1791764714,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-cmd-master",
       "current_job_hours": 2.5,
       "job_hours": {
-        "2.5": 1793028594.4145017
+        "2.5": 1793069846.4280686
       },
       "rows": {
         "overall": true,
@@ -99,13 +99,13 @@
       }
     },
     "sig-release-master-blocking#conformance-ga-only": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791722467,
+      "scan": 1793060846.4280686,
+      "oldest": 1791765729,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-conformance-kind-ga-only",
       "current_job_hours": 3.0,
       "job_hours": {
-        "3": 1793030394.4145017
+        "3": 1793071646.4280686
       },
       "rows": {
         "overall": true,
@@ -113,13 +113,13 @@
       }
     },
     "sig-release-master-blocking#gce-cos-alphafeatures-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791721329,
+      "scan": 1793060846.4280686,
+      "oldest": 1791764649,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
       "current_job_hours": 2.83,
       "job_hours": {
-        "2.83": 1793029782.4145017
+        "2.83": 1793071034.4280686
       },
       "rows": {
         "overall": true,
@@ -127,13 +127,13 @@
       }
     },
     "sig-release-master-blocking#gce-cos-default-master": {
-      "scan": 1793019594.4145017,
+      "scan": 1793060846.4280686,
       "oldest": 1792169473,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
       "current_job_hours": 2.83,
       "job_hours": {
-        "2.83": 1793029782.4145017
+        "2.83": 1793071034.4280686
       },
       "rows": {
         "overall": true,
@@ -141,13 +141,13 @@
       }
     },
     "sig-release-master-blocking#gce-cos-master-default": {
-      "scan": 1793019594.4145017,
+      "scan": 1793060846.4280686,
       "oldest": 1792860938,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
       "current_job_hours": 2.83,
       "job_hours": {
-        "2.83": 1793029782.4145017
+        "2.83": 1793071034.4280686
       },
       "rows": {
         "overall": true,
@@ -155,13 +155,13 @@
       }
     },
     "sig-release-master-blocking#gce-device-plugin-gpu-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791725468,
+      "scan": 1793060846.4280686,
+      "oldest": 1791768669,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
       "current_job_hours": 1.83,
       "job_hours": {
-        "1.83": 1793026182.4145017
+        "1.83": 1793067434.4280686
       },
       "rows": {
         "overall": true,
@@ -169,13 +169,13 @@
       }
     },
     "sig-release-master-blocking#gce-master-scale-performance-100": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791724031,
+      "scan": 1793060846.4280686,
+      "oldest": 1791764710,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -183,13 +183,13 @@
       }
     },
     "sig-release-master-blocking#gce-ubuntu-master-containerd": {
-      "scan": 1793019594.4145017,
+      "scan": 1793060846.4280686,
       "oldest": 1792693637,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
       "current_job_hours": 2.25,
       "job_hours": {
-        "2.25": 1793027694.4145017
+        "2.25": 1793068946.4280686
       },
       "rows": {
         "overall": true,
@@ -197,13 +197,13 @@
       }
     },
     "sig-release-master-blocking#integration-arm64-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791724121,
+      "scan": 1793060846.4280686,
+      "oldest": 1791763933,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
       "current_job_hours": 2.5,
       "job_hours": {
-        "2.5": 1793028594.4145017
+        "2.5": 1793069846.4280686
       },
       "rows": {
         "overall": true,
@@ -211,13 +211,13 @@
       }
     },
     "sig-release-master-blocking#integration-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791720130,
+      "scan": 1793060846.4280686,
+      "oldest": 1791759848,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
       "current_job_hours": 2.5,
       "job_hours": {
-        "2.5": 1793028594.4145017
+        "2.5": 1793069846.4280686
       },
       "rows": {
         "overall": true,
@@ -225,13 +225,13 @@
       }
     },
     "sig-release-master-blocking#kind-ipv6-master": {
-      "scan": 1793019594.4145017,
+      "scan": 1793060846.4280686,
       "oldest": 1792673506,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -239,13 +239,13 @@
       }
     },
     "sig-release-master-blocking#kind-master": {
-      "scan": 1793019594.4145017,
+      "scan": 1793060846.4280686,
       "oldest": 1792607086,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -253,13 +253,13 @@
       }
     },
     "sig-release-master-blocking#kind-master-beta-features": {
-      "scan": 1793019594.4145017,
+      "scan": 1793060846.4280686,
       "oldest": 1792648389,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -267,13 +267,13 @@
       }
     },
     "sig-release-master-blocking#sig-network-kind, loadbalancer": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791723430,
+      "scan": 1793060846.4280686,
+      "oldest": 1791763388,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer",
       "current_job_hours": 1.0,
       "job_hours": {
-        "1": 1793023194.4145017
+        "1": 1793064446.4280686
       },
       "rows": {
         "overall": true,
@@ -281,13 +281,13 @@
       }
     },
     "sig-release-master-blocking#skew-cluster-latest-kubectl-stable2-gce": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791734081,
+      "scan": 1793060846.4280686,
+      "oldest": 1791777283,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-master-new-gci-kubectl-skew",
       "current_job_hours": 2.83,
       "job_hours": {
-        "2.83": 1793029782.4145017
+        "2.83": 1793071034.4280686
       },
       "rows": {
         "overall": true,
@@ -295,13 +295,13 @@
       }
     },
     "sig-release-master-blocking#verify-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791723272,
+      "scan": 1793060846.4280686,
+      "oldest": 1791763327,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-verify-master",
       "current_job_hours": 2.5,
       "job_hours": {
-        "2.5": 1793028594.4145017
+        "2.5": 1793069846.4280686
       },
       "rows": {
         "overall": true,
@@ -309,13 +309,13 @@
       }
     },
     "sig-release-master-informing#Conformance - EC2 - arm64 - master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791735852,
+      "scan": 1793060846.4280686,
+      "oldest": 1791779114,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-ec2-arm64-conformance-latest",
       "current_job_hours": 4.5,
       "job_hours": {
-        "4.5": 1793035794.4145017
+        "4.5": 1793077046.4280686
       },
       "rows": {
         "overall": true,
@@ -323,13 +323,13 @@
       }
     },
     "sig-release-master-informing#Conformance - EC2 - master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791726496,
+      "scan": 1793060846.4280686,
+      "oldest": 1791769693,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-ec2-conformance-latest",
       "current_job_hours": 4.5,
       "job_hours": {
-        "4.5": 1793035794.4145017
+        "4.5": 1793077046.4280686
       },
       "rows": {
         "overall": true,
@@ -337,13 +337,13 @@
       }
     },
     "sig-release-master-informing#capz-windows-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791724788,
+      "scan": 1793060846.4280686,
+      "oldest": 1791768108,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
       "current_job_hours": 4.5,
       "job_hours": {
-        "4.5": 1793035794.4145017
+        "4.5": 1793077046.4280686
       },
       "rows": {
         "overall": true,
@@ -351,13 +351,13 @@
       }
     },
     "sig-release-master-informing#ci-kind-dra": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791731383,
+      "scan": 1793060846.4280686,
+      "oldest": 1791774581,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kind-dra",
       "current_job_hours": 2.0,
       "job_hours": {
-        "2": 1793026794.4145017
+        "2": 1793068046.4280686
       },
       "rows": {
         "overall": true,
@@ -365,13 +365,13 @@
       }
     },
     "sig-release-master-informing#ci-node-crio-dra": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791729047,
+      "scan": 1793060846.4280686,
+      "oldest": 1791772247,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-node-crio-dra",
       "current_job_hours": 2.0,
       "job_hours": {
-        "2": 1793026794.4145017
+        "2": 1793068046.4280686
       },
       "rows": {
         "overall": true,
@@ -381,39 +381,41 @@
     "sig-release-master-informing#ci-node-e2e-containerd-2-1-cos-dra": {
       "scan": 1793019594.4145017,
       "oldest": 1791742368,
-      "margin": 6,
+      "rows": {
+        "overall": true,
+        "pod": true
+      },
       "query": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-cos-dra",
       "current_job_hours": 2.0,
       "job_hours": {
         "2": 1793026794.4145017
       },
-      "rows": {
-        "overall": true,
-        "pod": true
-      }
+      "margin": 6,
+      "missing_since": 1793060846.4280686
     },
     "sig-release-master-informing#ci-node-e2e-containerd-2-1-ubuntu-dra": {
       "scan": 1793019594.4145017,
       "oldest": 1791742368,
-      "margin": 6,
+      "rows": {
+        "overall": true,
+        "pod": true
+      },
       "query": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-ubuntu-dra",
       "current_job_hours": 2.0,
       "job_hours": {
         "2": 1793026794.4145017
       },
-      "rows": {
-        "overall": true,
-        "pod": true
-      }
+      "margin": 6,
+      "missing_since": 1793060846.4280686
     },
     "sig-release-master-informing#ec2-master-scale-performance-5000": {
-      "scan": 1793019594.4145017,
+      "scan": 1793060846.4280686,
       "oldest": 1790146943,
       "margin": 8.5,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000",
       "current_job_hours": 8.5,
       "job_hours": {
-        "8.5": 1793050194.4145017
+        "8.5": 1793091446.4280686
       },
       "rows": {
         "overall": true,
@@ -421,13 +423,13 @@
       }
     },
     "sig-release-master-informing#gce-cos-master-alpha-features": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791722261,
+      "scan": 1793060846.4280686,
+      "oldest": 1791762761,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-alpha-features",
       "current_job_hours": 3.83,
       "job_hours": {
-        "3.83": 1793033382.4145017
+        "3.83": 1793074634.4280686
       },
       "rows": {
         "overall": true,
@@ -435,13 +437,13 @@
       }
     },
     "sig-release-master-informing#gce-cos-master-serial": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791734442,
+      "scan": 1793060846.4280686,
+      "oldest": 1791765161,
       "margin": 9.17,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
       "current_job_hours": 9.17,
       "job_hours": {
-        "9.17": 1793052606.4145017
+        "9.17": 1793093858.4280686
       },
       "rows": {
         "overall": true,
@@ -449,13 +451,13 @@
       }
     },
     "sig-release-master-informing#gce-cos-master-slow": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791724181,
+      "scan": 1793060846.4280686,
+      "oldest": 1791760421,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
       "current_job_hours": 3.33,
       "job_hours": {
-        "3.33": 1793031582.4145017
+        "3.33": 1793072834.4280686
       },
       "rows": {
         "overall": true,
@@ -463,13 +465,13 @@
       }
     },
     "sig-release-master-informing#gce-cos-serial-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791721329,
+      "scan": 1793060846.4280686,
+      "oldest": 1791765137,
       "margin": 11.83,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
       "current_job_hours": 11.83,
       "job_hours": {
-        "11.83": 1793062182.4145017
+        "11.83": 1793103434.4280686
       },
       "rows": {
         "overall": true,
@@ -477,13 +479,13 @@
       }
     },
     "sig-release-master-informing#gce-cos-slow-master": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791720610,
+      "scan": 1793060846.4280686,
+      "oldest": 1791763931,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master",
       "current_job_hours": 3.33,
       "job_hours": {
-        "3.33": 1793031582.4145017
+        "3.33": 1793072834.4280686
       },
       "rows": {
         "overall": true,
@@ -491,13 +493,13 @@
       }
     },
     "sig-release-master-informing#gce-master-scale-correctness": {
-      "scan": 1793019594.4145017,
-      "oldest": 1790442112,
+      "scan": 1793060846.4280686,
+      "oldest": 1790614913,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness",
       "current_job_hours": 5.0,
       "job_hours": {
-        "5": 1793037594.4145017
+        "5": 1793078846.4280686
       },
       "rows": {
         "overall": false,
@@ -505,13 +507,13 @@
       }
     },
     "sig-release-master-informing#gce-master-scale-performance-5000": {
-      "scan": 1793019594.4145017,
-      "oldest": 1787850148,
+      "scan": 1793060846.4280686,
+      "oldest": 1788022948,
       "margin": 8.0,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-5000",
       "current_job_hours": 8.0,
       "job_hours": {
-        "8": 1793048394.4145017
+        "8": 1793089646.4280686
       },
       "rows": {
         "overall": true,
@@ -519,13 +521,13 @@
       }
     },
     "sig-release-master-informing#kind-master-alpha-beta-enabled": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791783488,
+      "scan": 1793060846.4280686,
+      "oldest": 1792736627,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -533,13 +535,13 @@
       }
     },
     "sig-release-master-informing#kind-master-alpha-beta-enabled-conformance": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791720131,
+      "scan": 1793060846.4280686,
+      "oldest": 1791763552,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-conformance",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -547,13 +549,13 @@
       }
     },
     "sig-release-master-informing#kind-master-alpha-beta-features": {
-      "scan": 1793019594.4145017,
+      "scan": 1793060846.4280686,
       "oldest": 1792449444,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -561,13 +563,13 @@
       }
     },
     "sig-release-master-informing#kind-master-beta-enabled": {
-      "scan": 1793019594.4145017,
+      "scan": 1793060846.4280686,
       "oldest": 1791926653,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -575,13 +577,13 @@
       }
     },
     "sig-release-master-informing#kind-master-beta-enabled-conformance": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791724448,
+      "scan": 1793060846.4280686,
+      "oldest": 1791760630,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled-conformance",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -589,13 +591,13 @@
       }
     },
     "sig-release-master-informing#kubeadm-kinder-latest": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791725113,
+      "scan": 1793060846.4280686,
+      "oldest": 1791761174,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -603,13 +605,13 @@
       }
     },
     "sig-release-master-informing#kubeadm-kinder-latest-on-1-37": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791721933,
+      "scan": 1793060846.4280686,
+      "oldest": 1791765252,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -617,13 +619,13 @@
       }
     },
     "sig-release-master-informing#kubeadm-kinder-upgrade-1-37-latest": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791721693,
+      "scan": 1793060846.4280686,
+      "oldest": 1791765072,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
       "current_job_hours": 1.5,
       "job_hours": {
-        "1.5": 1793024994.4145017
+        "1.5": 1793066246.4280686
       },
       "rows": {
         "overall": true,
@@ -631,13 +633,41 @@
       }
     },
     "sig-release-master-informing#periodic-kubernetes-e2e-kind-kms": {
-      "scan": 1793019594.4145017,
-      "oldest": 1791738848,
+      "scan": 1793060846.4280686,
+      "oldest": 1791782108,
       "margin": 6,
       "query": "kubernetes-ci-logs/logs/periodic-kubernetes-e2e-kind-kms",
       "current_job_hours": 3.0,
       "job_hours": {
-        "3": 1793030394.4145017
+        "3": 1793071646.4280686
+      },
+      "rows": {
+        "overall": true,
+        "pod": true
+      }
+    },
+    "sig-release-master-informing#ci-node-e2e-containerd-2-4-cos-dra": {
+      "scan": 1793060846.4280686,
+      "oldest": 1793028048,
+      "margin": 6,
+      "query": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra",
+      "current_job_hours": 2.0,
+      "job_hours": {
+        "2": 1793068046.4280686
+      },
+      "rows": {
+        "overall": true,
+        "pod": true
+      }
+    },
+    "sig-release-master-informing#ci-node-e2e-containerd-2-4-ubuntu-dra": {
+      "scan": 1793060846.4280686,
+      "oldest": 1793028048,
+      "margin": 6,
+      "query": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-ubuntu-dra",
+      "current_job_hours": 2.0,
+      "job_hours": {
+        "2": 1793068046.4280686
       },
       "rows": {
         "overall": true,
@@ -660,7 +690,7 @@
         },
         "test_group": "ci-kubernetes-gce-conformance-latest"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#build-master": {
       "config": {
@@ -673,7 +703,7 @@
         },
         "test_group": "ci-kubernetes-build"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#build-master-fast": {
       "config": {
@@ -686,7 +716,7 @@
         },
         "test_group": "ci-kubernetes-build-fast"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#ci-kubernetes-unit": {
       "config": {
@@ -699,7 +729,7 @@
         },
         "test_group": "ci-kubernetes-unit"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#ci-node-crio-conformance": {
       "config": {
@@ -712,7 +742,7 @@
         },
         "test_group": "ci-node-crio-conformance"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#ci-node-e2e": {
       "config": {
@@ -725,7 +755,7 @@
         },
         "test_group": "ci-kubernetes-node-e2e-containerd"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#cmd-master": {
       "config": {
@@ -738,7 +768,7 @@
         },
         "test_group": "ci-kubernetes-cmd-master"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#conformance-ga-only": {
       "config": {
@@ -751,7 +781,7 @@
         },
         "test_group": "ci-kubernetes-conformance-kind-ga-only"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#gce-cos-alphafeatures-master": {
       "config": {
@@ -764,7 +794,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gce-cos-alphafeatures-master"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#gce-cos-default-master": {
       "config": {
@@ -777,7 +807,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gce-cos-default-master"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#gce-cos-master-default": {
       "config": {
@@ -790,7 +820,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gci-gce"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#gce-device-plugin-gpu-master": {
       "config": {
@@ -803,7 +833,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gce-device-plugin-gpu"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#gce-master-scale-performance-100": {
       "config": {
@@ -816,7 +846,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gce-scale-performance-100"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#gce-ubuntu-master-containerd": {
       "config": {
@@ -829,7 +859,7 @@
         },
         "test_group": "ci-kubernetes-e2e-ubuntu-gce-containerd"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#integration-arm64-master": {
       "config": {
@@ -842,7 +872,7 @@
         },
         "test_group": "ci-kubernetes-integration-arm64-master"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#integration-master": {
       "config": {
@@ -855,7 +885,7 @@
         },
         "test_group": "ci-kubernetes-integration-master"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#kind-ipv6-master": {
       "config": {
@@ -868,7 +898,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kind-ipv6"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#kind-master": {
       "config": {
@@ -881,7 +911,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kind"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#kind-master-beta-features": {
       "config": {
@@ -894,7 +924,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kind-beta-features"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#sig-network-kind, loadbalancer": {
       "config": {
@@ -907,7 +937,7 @@
         },
         "test_group": "ci-kubernetes-kind-cloud-provider-loadbalancer"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#skew-cluster-latest-kubectl-stable2-gce": {
       "config": {
@@ -920,7 +950,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gce-master-new-gci-kubectl-skew"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-blocking#verify-master": {
       "config": {
@@ -933,7 +963,7 @@
         },
         "test_group": "ci-kubernetes-verify-master"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#Conformance - EC2 - arm64 - master": {
       "config": {
@@ -946,7 +976,7 @@
         },
         "test_group": "ci-kubernetes-ec2-arm64-conformance-latest"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#Conformance - EC2 - master": {
       "config": {
@@ -959,7 +989,7 @@
         },
         "test_group": "ci-kubernetes-ec2-conformance-latest"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#capz-windows-master": {
       "config": {
@@ -972,7 +1002,7 @@
         },
         "test_group": "ci-kubernetes-e2e-capz-master-windows"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#ci-kind-dra": {
       "config": {
@@ -985,7 +1015,7 @@
         },
         "test_group": "ci-kind-dra"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#ci-node-crio-dra": {
       "config": {
@@ -998,7 +1028,7 @@
         },
         "test_group": "ci-node-crio-dra"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#ci-node-e2e-containerd-2-1-cos-dra": {
       "config": {
@@ -1026,6 +1056,32 @@
       },
       "read": 1793019594.4145017
     },
+    "sig-release-master-informing#ci-node-e2e-containerd-2-4-cos-dra": {
+      "config": {
+        "base_options": "",
+        "group": {
+          "days_of_results": 15,
+          "gcs_prefix": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra",
+          "name": "ci-node-e2e-containerd-2-4-cos-dra",
+          "use_kubernetes_client": true
+        },
+        "test_group": "ci-node-e2e-containerd-2-4-cos-dra"
+      },
+      "read": 1793060846.4280686
+    },
+    "sig-release-master-informing#ci-node-e2e-containerd-2-4-ubuntu-dra": {
+      "config": {
+        "base_options": "",
+        "group": {
+          "days_of_results": 15,
+          "gcs_prefix": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-ubuntu-dra",
+          "name": "ci-node-e2e-containerd-2-4-ubuntu-dra",
+          "use_kubernetes_client": true
+        },
+        "test_group": "ci-node-e2e-containerd-2-4-ubuntu-dra"
+      },
+      "read": 1793060846.4280686
+    },
     "sig-release-master-informing#ec2-master-scale-performance-5000": {
       "config": {
         "base_options": "",
@@ -1037,7 +1093,7 @@
         },
         "test_group": "ci-kubernetes-e2e-ec2-scale-performance-5000"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#gce-cos-master-alpha-features": {
       "config": {
@@ -1050,7 +1106,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gci-gce-alpha-features"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#gce-cos-master-serial": {
       "config": {
@@ -1063,7 +1119,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gci-gce-serial"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#gce-cos-master-slow": {
       "config": {
@@ -1076,7 +1132,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gci-gce-slow"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#gce-cos-serial-master": {
       "config": {
@@ -1089,7 +1145,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gce-cos-serial-master"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#gce-cos-slow-master": {
       "config": {
@@ -1102,7 +1158,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gce-cos-slow-master"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#gce-master-scale-correctness": {
       "config": {
@@ -1115,7 +1171,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gce-scale-correctness"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#gce-master-scale-performance-5000": {
       "config": {
@@ -1128,7 +1184,7 @@
         },
         "test_group": "ci-kubernetes-e2e-gce-scale-performance-5000"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#kind-master-alpha-beta-enabled": {
       "config": {
@@ -1141,7 +1197,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kind-alpha-beta-enabled"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#kind-master-alpha-beta-enabled-conformance": {
       "config": {
@@ -1154,7 +1210,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kind-alpha-beta-conformance"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#kind-master-alpha-beta-features": {
       "config": {
@@ -1167,7 +1223,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kind-alpha-beta-features"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#kind-master-beta-enabled": {
       "config": {
@@ -1180,7 +1236,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kind-beta-enabled"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#kind-master-beta-enabled-conformance": {
       "config": {
@@ -1193,7 +1249,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kind-beta-enabled-conformance"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#kubeadm-kinder-latest": {
       "config": {
@@ -1206,7 +1262,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kubeadm-kinder-latest"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#kubeadm-kinder-latest-on-1-37": {
       "config": {
@@ -1219,7 +1275,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#kubeadm-kinder-upgrade-1-37-latest": {
       "config": {
@@ -1232,7 +1288,7 @@
         },
         "test_group": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     },
     "sig-release-master-informing#periodic-kubernetes-e2e-kind-kms": {
       "config": {
@@ -1245,19 +1301,19 @@
         },
         "test_group": "periodic-kubernetes-e2e-kind-kms"
       },
-      "read": 1793019594.4145017
+      "read": 1793060846.4280686
     }
   },
   "testgrid_config": {
     "source": {
-      "test_infra": "fb5e2ff7f3e715aa837dcc3ba841c6cab9221e41",
-      "committed": 1792981326,
+      "test_infra": "6e1e4f504eddf79e81ae5e64be1d0bc5b40a76d8",
+      "committed": 1793043315,
       "image": "gcr.io/k8s-staging-test-infra/configurator:v20261016-5ec6cc834c",
       "digest": "sha256:2ab6a23acb4d5eea0c6bc34a12aa1eaae44fcbc77d322c5fb126e46fcde2d010",
-      "upload": "2114543073429032960",
-      "uploaded": 1792981344
+      "upload": "2114803073804144640",
+      "uploaded": 1793043331
     },
-    "read": 1793019594.4145017
+    "read": 1793060846.4280686
   },
   "config_uploads": [
     {
@@ -4331,6 +4387,94 @@
       "tabs": {},
       "config_digest": "17483a05e54a51f7",
       "group_changes": {}
+    },
+    {
+      "build": "2114724282901729280",
+      "commit": "0f0a1f29ff539cd72821f9e04a23cc5abfd7a79b",
+      "started": 1793024549,
+      "finished": 1793024554,
+      "listed": 1793060846.4280686,
+      "recipe": "0f0a1f29ff53-3ec357da2f56",
+      "built": {
+        "committed": 1793024530,
+        "image": "gcr.io/k8s-staging-test-infra/configurator:v20261016-5ec6cc834c",
+        "digest": "sha256:2ab6a23acb4d5eea0c6bc34a12aa1eaae44fcbc77d322c5fb126e46fcde2d010"
+      },
+      "tabs": {},
+      "config_digest": "17483a05e54a51f7",
+      "group_changes": {}
+    },
+    {
+      "build": "2114730327288057856",
+      "commit": "bf7c5dc8d045498c4427cd856ce085c38608bf48",
+      "started": 1793025983,
+      "finished": 1793025988,
+      "listed": 1793060846.4280686,
+      "recipe": "bf7c5dc8d045-32550d61afe2",
+      "built": {
+        "committed": 1793025971,
+        "image": "gcr.io/k8s-staging-test-infra/configurator:v20261016-5ec6cc834c",
+        "digest": "sha256:2ab6a23acb4d5eea0c6bc34a12aa1eaae44fcbc77d322c5fb126e46fcde2d010"
+      },
+      "tabs": {},
+      "config_digest": "17483a05e54a51f7",
+      "group_changes": {}
+    },
+    {
+      "build": "2114738889649295360",
+      "commit": "6915251c4fefe7b0404d0c6d30cfd509a1565a43",
+      "started": 1793028024,
+      "finished": 1793028028,
+      "listed": 1793060846.4280686,
+      "recipe": "6915251c4fef-a2a1c5ade4df",
+      "built": {
+        "committed": 1793028012,
+        "image": "gcr.io/k8s-staging-test-infra/configurator:v20261016-5ec6cc834c",
+        "digest": "sha256:2ab6a23acb4d5eea0c6bc34a12aa1eaae44fcbc77d322c5fb126e46fcde2d010"
+      },
+      "tabs": {
+        "sig-release-master-informing#ci-node-e2e-containerd-2-1-cos-dra": null,
+        "sig-release-master-informing#ci-node-e2e-containerd-2-1-ubuntu-dra": null,
+        "sig-release-master-informing#ci-node-e2e-containerd-2-4-cos-dra": "445456bef0225597",
+        "sig-release-master-informing#ci-node-e2e-containerd-2-4-ubuntu-dra": "3763d90547af5265"
+      },
+      "config_digest": "251f57533a232f28",
+      "group_changes": {
+        "ci-node-e2e-containerd-2-4-cos-dra": "new",
+        "ci-node-e2e-containerd-2-4-ubuntu-dra": "new"
+      }
+    },
+    {
+      "build": "2114753467191922688",
+      "commit": "17501c114db64c8d02404d582b2dc7590ecfc188",
+      "started": 1793031499,
+      "finished": 1793031504,
+      "listed": 1793060846.4280686,
+      "recipe": "17501c114db6-95e67314c25d",
+      "built": {
+        "committed": 1793031488,
+        "image": "gcr.io/k8s-staging-test-infra/configurator:v20261016-5ec6cc834c",
+        "digest": "sha256:2ab6a23acb4d5eea0c6bc34a12aa1eaae44fcbc77d322c5fb126e46fcde2d010"
+      },
+      "tabs": {},
+      "config_digest": "251f57533a232f28",
+      "group_changes": {}
+    },
+    {
+      "build": "2114803073804144640",
+      "commit": "6e1e4f504eddf79e81ae5e64be1d0bc5b40a76d8",
+      "started": 1793043326,
+      "finished": 1793043331,
+      "listed": 1793060846.4280686,
+      "recipe": "6e1e4f504edd-5188fbcc90dc",
+      "built": {
+        "committed": 1793043315,
+        "image": "gcr.io/k8s-staging-test-infra/configurator:v20261016-5ec6cc834c",
+        "digest": "sha256:2ab6a23acb4d5eea0c6bc34a12aa1eaae44fcbc77d322c5fb126e46fcde2d010"
+      },
+      "tabs": {},
+      "config_digest": "251f57533a232f28",
+      "group_changes": {}
     }
   ],
   "config_entries": {
@@ -4839,6 +4983,28 @@
       },
       "group_digest": "15c9ca015991e8de997127816f34c66c492a0e98d89e2d361568b2a539ea206e",
       "test_group": "periodic-kubernetes-e2e-kind-kms"
+    },
+    "445456bef0225597": {
+      "base_options": "",
+      "group": {
+        "days_of_results": 15,
+        "gcs_prefix": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra",
+        "name": "ci-node-e2e-containerd-2-4-cos-dra",
+        "use_kubernetes_client": true
+      },
+      "group_digest": "57d8c5404d15abddb50833f626e4bec55955418d9e0baaa834f5353138681d52",
+      "test_group": "ci-node-e2e-containerd-2-4-cos-dra"
+    },
+    "3763d90547af5265": {
+      "base_options": "",
+      "group": {
+        "days_of_results": 15,
+        "gcs_prefix": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-ubuntu-dra",
+        "name": "ci-node-e2e-containerd-2-4-ubuntu-dra",
+        "use_kubernetes_client": true
+      },
+      "group_digest": "23c0e883f99d6e016d421e881fda948cb5fa0c9b1e471a45196db2293a507cd0",
+      "test_group": "ci-node-e2e-containerd-2-4-ubuntu-dra"
     }
   }
 }

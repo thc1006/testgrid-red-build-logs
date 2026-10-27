@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2114859031301459968",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1793056687,
+  "created": 1793056659,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "k8s.io/kubernetes/pkg/registry/core/configmap.storage",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestWatch\n    resttest.go:1600: unexpected result fro...40669: use of closed network connection\"}\n--- FAIL: TestWatch (3.73s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793058040,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2114859031301459968",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2114859031301459968/build-log.txt",
+  "log": {
+    "bytes": 286108,
+    "md5": "69e1e3706865d4cb07ab34f8827154d4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 35426,
+    "gcs": {
+      "generation": "1793058040524924",
+      "md5": "69e1e3706865d4cb07ab34f8827154d4",
+      "crc32c": "86a5fb3d",
+      "bytes": 286108,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 90536,
+    "md5": "a4d0fb6df55c67290b253a851d2fb500",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11581,
+    "gcs": {
+      "generation": "1793058043525832",
+      "md5": "a4d0fb6df55c67290b253a851d2fb500",
+      "crc32c": "e3a2cf79",
+      "bytes": 90536,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-27T002726Z",
+  "archived_at": 1793060846.0,
+  "settled": false,
+  "final": false
+}

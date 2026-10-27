@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2114701743894827008",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793019160,
+  "created": 1793019159,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container burstable pods - extended resize with equivalents [MinimumKubeletVersion:1.34] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] verify container cgroup values for Pod \"resize-test-4pg95\": [...netes/test/e2e/common/node/pod_resize.go:1273 @ 10/26/26 13:16:42.975\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793021697,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114701743894827008",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2114701743894827008/build-log.txt",
+  "log": {
+    "bytes": 142750,
+    "md5": "98b21aa0f3f1b00a8478394c230fdb2e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23644,
+    "gcs": {
+      "generation": "1793021761907700",
+      "md5": "98b21aa0f3f1b00a8478394c230fdb2e",
+      "crc32c": "73fe7fc9",
+      "bytes": 142750,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85467,
+    "md5": "14029a435fd3c2c89864a3288601cc5e",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11707,
+    "gcs": {
+      "generation": "1793021765435038",
+      "md5": "14029a435fd3c2c89864a3288601cc5e",
+      "crc32c": "1da523ef",
+      "bytes": 85467,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-27T002726Z",
+  "archived_at": 1793060846.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2114768182471299072",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1793035031,
+  "created": 1793034999,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] ReplicaSet should surface a failure condition on a common issue like exceeded quota",
+          "status": "FAIL",
+          "message": "[FAILED] verify the controller failure condition for \"condition-test\" ...o/kubernetes/test/e2e/apps/replica_set.go:286 @ 10/26/26 17:36:03.538\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793037612,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2114768182471299072",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2114768182471299072/build-log.txt",
+  "log": {
+    "bytes": 138168,
+    "md5": "dbd74ff7653fcba3ab1a39421ea6cf78",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22832,
+    "gcs": {
+      "generation": "1793037632919989",
+      "md5": "dbd74ff7653fcba3ab1a39421ea6cf78",
+      "crc32c": "b060d104",
+      "bytes": 138168,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95164,
+    "md5": "d44f369b3555504ab6e79264d5d57ce2",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12282,
+    "gcs": {
+      "generation": "1793037642177375",
+      "md5": "d44f369b3555504ab6e79264d5d57ce2",
+      "crc32c": "bbc61b9a",
+      "bytes": 95164,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-27T002726Z",
+  "archived_at": 1793060846.0,
+  "settled": true,
+  "final": false
+}
