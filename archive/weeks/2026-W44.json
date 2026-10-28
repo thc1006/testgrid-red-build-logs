@@ -1,5 +1,123 @@
 [
   {
+    "time": 1793185929,
+    "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+    "build": "2115401108884033536",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-slow-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should work for type=LoadBalancer [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gce-cos-slow-master/2115401108884033536",
+    "run": "2026-10-28T125300Z",
+    "files": [
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gce-cos-slow-master/2115401108884033536/build-log.txt.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gce-cos-slow-master/2115401108884033536/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 231428,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2115401108884033536"
+  },
+  {
+    "time": 1793169461,
+    "job": "ci-kubernetes-e2e-gci-gce-serial",
+    "build": "2115332154471747584",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-serial"
+    ],
+    "red_tests": [
+      "kubetest.Up",
+      "ci-kubernetes-e2e-gci-gce-serial.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584",
+    "run": "2026-10-28T125300Z",
+    "files": [
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/build-log.txt.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 144586,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584"
+  },
+  {
+    "time": 1793165828,
+    "job": "ci-kubernetes-e2e-kind-ipv6",
+    "build": "2115316802555744256",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-ipv6-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and use it multiple times in a single pod",
+      "ci-kubernetes-e2e-kind-ipv6.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-kind-ipv6/2115316802555744256",
+    "run": "2026-10-28T125300Z",
+    "files": [
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-kind-ipv6/2115316802555744256/build-log.txt.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-kind-ipv6/2115316802555744256/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 234376,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2115316802555744256"
+  },
+  {
+    "time": 1793164481,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2115311265822806016",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a custom resource.",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce/2115311265822806016",
+    "run": "2026-10-28T125300Z",
+    "files": [
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce/2115311265822806016/build-log.txt.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce/2115311265822806016/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 219674,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115311265822806016"
+  },
+  {
     "time": 1793157251,
     "job": "ci-kubernetes-e2e-kind",
     "build": "2115280815616167936",
@@ -1377,7 +1495,7 @@
     "remote": [],
     "bytes": 196284,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1407,7 +1525,7 @@
     "remote": [],
     "bytes": 221198,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1437,7 +1555,7 @@
     "remote": [],
     "bytes": 219556,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1466,7 +1584,7 @@
     "remote": [],
     "bytes": 326591,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1494,7 +1612,7 @@
     "remote": [],
     "bytes": 196190,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1523,7 +1641,7 @@
     "remote": [],
     "bytes": 382471,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1552,7 +1670,7 @@
     "remote": [],
     "bytes": 315729,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1582,7 +1700,7 @@
     "remote": [],
     "bytes": 232887,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1621,7 +1739,7 @@
     "remote": [],
     "bytes": 1128265,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

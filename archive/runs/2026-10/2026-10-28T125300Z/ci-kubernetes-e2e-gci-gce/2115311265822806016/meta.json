@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2115311265822806016",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793164481,
+  "created": 1793164481,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a custom resource.",
+          "status": "FAIL",
+          "message": "[FAILED] context deadline exceeded\nIn [It] at: k8s.io/kubernetes/test/e2e/apimachinery/resource_quota.go:681 @ 10/28/26 05:28:14.25\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793167058,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115311265822806016",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115311265822806016/build-log.txt",
+  "log": {
+    "bytes": 134426,
+    "md5": "c34c798eb4234e6eb9fd96ec4b02684c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21929,
+    "gcs": {
+      "generation": "1793167077118870",
+      "md5": "c34c798eb4234e6eb9fd96ec4b02684c",
+      "crc32c": "8c087c0d",
+      "bytes": 134426,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85248,
+    "md5": "3a105b1fe61a3d6d009fa6044137d086",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11740,
+    "gcs": {
+      "generation": "1793167079673716",
+      "md5": "3a105b1fe61a3d6d009fa6044137d086",
+      "crc32c": "07b9bbeb",
+      "bytes": 85248,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-28T125300Z",
+  "archived_at": 1793191980.0,
+  "settled": true,
+  "final": false
+}
