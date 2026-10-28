@@ -351,7 +351,7 @@ class EndToEndTest(unittest.TestCase):
         self.assertIn("charts/trend-light.svg", md)
         self.assertIn("## Not archived yet", md)  # job-b/2001 is pending
         self.assertIn(f"[build-log.txt](../{self.rel('job-a', '1004', 'build-log.txt')})", self.week_pages())
-        week = frl.week_of(OLD // 1000)
+        week = frl.week_of(meta["started"] or meta["created"])  # (hours before OLD: it can be the week before OLD's)
         self.assertIn(f"- [{week}](weeks/{week}.md)", md)
         # The run has its own folder: its report, a README, and the builds it archived.
         (folder,) = frl.run_dirs(self.root)
