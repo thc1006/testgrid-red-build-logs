@@ -1,0 +1,87 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2115079235155529728",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793109161,
+  "created": 1793109160,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should return command exit codes should handle in-cluster config",
+          "status": "FAIL",
+          "message": "[FAILED] error running /workspace/kubernetes/platforms/linux/amd64/kub...etes/test/e2e/framework/kubectl/builder.go:97 @ 10/27/26 14:16:14.407\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] DNS HostNetwork should resolve DNS of partial qualified names for services on hostNetwork pods with dnsPolicy: ClusterFirstWithHostNet [LinuxOnly]",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to read 10.0.230.175_tcp@PTR from pod hostnetworkdns-8...kubernetes/test/e2e/network/dns_common.go:476 @ 10/27/26 14:20:13.004\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Mock fsgroup as mount option Delegate FSGroup to CSI driver [LinuxOnly] should pass FSGroup to CSI driver if it is set in pod and driver supports VOLUME_MOUNT_GROUP",
+          "status": "FAIL",
+          "message": "[FAILED] failed to start pod: Timed out after 300.001s.\nExpected Pod t...t/e2e/storage/csimock/csi_fsgroup_mount.go:73 @ 10/27/26 14:20:24.242\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: local] [LocalVolumeType: dir] [Testpattern: Pre-provisioned PV (default fs)] subPath should support existing single file [LinuxOnly]",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...etes/test/e2e/framework/pod/pod_client.go:237 @ 10/27/26 15:12:43.412\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...r=/logs/artifacts --disable-log-dump=true (interrupted): exit status 1"
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793114438,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115079235155529728",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115079235155529728/build-log.txt",
+  "log": {
+    "bytes": 498272,
+    "md5": "ed5d55120c212b1bb8ad3e31b4b80818",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 71576,
+    "gcs": {
+      "generation": "1793114457129244",
+      "md5": "ed5d55120c212b1bb8ad3e31b4b80818",
+      "crc32c": "4b04e1e5",
+      "bytes": 498272,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 67232,
+    "md5": "ac1d3e1d5858c3b8d8c8eff2b05c1bc5",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10356,
+    "gcs": {
+      "generation": "1793114459043430",
+      "md5": "ac1d3e1d5858c3b8d8c8eff2b05c1bc5",
+      "crc32c": "34aa49ad",
+      "bytes": 67232,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-28T054136Z",
+  "archived_at": 1793166096.0,
+  "settled": true,
+  "final": false
+}

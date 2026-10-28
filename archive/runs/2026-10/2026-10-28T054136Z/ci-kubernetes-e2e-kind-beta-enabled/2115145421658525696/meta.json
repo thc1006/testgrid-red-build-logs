@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2115145421658525696",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1793125002,
+  "created": 1793124940,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl rollout undo undo should rollback and update deployment env",
+          "status": "FAIL",
+          "message": "[FAILED] kubectl failed to rollback deployment\nIn [It] at: k8s.io/kubernetes/test/e2e/kubectl/rollout.go:115 @ 10/27/26 18:29:04.312\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793126455,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2115145421658525696",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2115145421658525696/build-log.txt",
+  "log": {
+    "bytes": 128485,
+    "md5": "525675e7d0588760e89171ba20919b54",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20509,
+    "gcs": {
+      "generation": "1793126474795764",
+      "md5": "525675e7d0588760e89171ba20919b54",
+      "crc32c": "6392ac0b",
+      "bytes": 128485,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94583,
+    "md5": "e8e73d7c7b8f4ab010835e713c3b8852",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12530,
+    "gcs": {
+      "generation": "1793126476696554",
+      "md5": "e8e73d7c7b8f4ab010835e713c3b8852",
+      "crc32c": "b94571d4",
+      "bytes": 94583,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-28T054136Z",
+  "archived_at": 1793166096.0,
+  "settled": true,
+  "final": false
+}

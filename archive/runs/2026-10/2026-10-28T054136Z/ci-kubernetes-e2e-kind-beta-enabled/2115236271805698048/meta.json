@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2115236271805698048",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1793146631,
+  "created": 1793146601,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-preprovisionedpv-9gqx\" success...s/test/e2e/framework/pod/output/output.go:263 @ 10/28/26 00:32:14.649\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793148205,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2115236271805698048",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2115236271805698048/build-log.txt",
+  "log": {
+    "bytes": 151496,
+    "md5": "28d96403772f18a50935b6f566de7547",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24138,
+    "gcs": {
+      "generation": "1793148225160570",
+      "md5": "28d96403772f18a50935b6f566de7547",
+      "crc32c": "2aeb0c28",
+      "bytes": 151496,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95729,
+    "md5": "5fba21aeca7d2dd0f4e60f69c1a127b6",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12680,
+    "gcs": {
+      "generation": "1793148248682095",
+      "md5": "5fba21aeca7d2dd0f4e60f69c1a127b6",
+      "crc32c": "43149465",
+      "bytes": 95729,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-28T054136Z",
+  "archived_at": 1793166096.0,
+  "settled": true,
+  "final": false
+}

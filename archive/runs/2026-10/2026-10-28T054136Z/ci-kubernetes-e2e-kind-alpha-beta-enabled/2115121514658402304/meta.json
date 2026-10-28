@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "build": "2115121514658402304",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "started": 1793119322,
+  "created": 1793119240,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics Ephemeral should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 10/27/26 17:32:05.087\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793122404,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2115121514658402304",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2115121514658402304/build-log.txt",
+  "log": {
+    "bytes": 170110,
+    "md5": "0fe30babd6e8bcb4715431ddc913c720",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22454,
+    "gcs": {
+      "generation": "1793122420194637",
+      "md5": "0fe30babd6e8bcb4715431ddc913c720",
+      "crc32c": "5c3d08d6",
+      "bytes": 170110,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 101810,
+    "md5": "aad07c3af49a6dc17307bed08b988beb",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13488,
+    "gcs": {
+      "generation": "1793122426230126",
+      "md5": "aad07c3af49a6dc17307bed08b988beb",
+      "crc32c": "16b7ead8",
+      "bytes": 101810,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-28T054136Z",
+  "archived_at": 1793166096.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2115204561726607360",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1793139070,
+  "created": 1793139040,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics Ephemeral should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] New latency count 1 should be more than old count 1 for actio...ernetes/test/e2e/storage/volume_metrics.go:666 @ 10/27/26 22:31:37.89\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793140632,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2115204561726607360",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2115204561726607360/build-log.txt",
+  "log": {
+    "bytes": 176099,
+    "md5": "722155fc55fe535ca6c0d666eb05725e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24589,
+    "gcs": {
+      "generation": "1793140651027292",
+      "md5": "722155fc55fe535ca6c0d666eb05725e",
+      "crc32c": "6a911d97",
+      "bytes": 176099,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 93786,
+    "md5": "686280be60a33004b8904cfd561f2a2b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12430,
+    "gcs": {
+      "generation": "1793140662698984",
+      "md5": "686280be60a33004b8904cfd561f2a2b",
+      "crc32c": "766ebed9",
+      "bytes": 93786,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-28T054136Z",
+  "archived_at": 1793166096.0,
+  "settled": true,
+  "final": false
+}

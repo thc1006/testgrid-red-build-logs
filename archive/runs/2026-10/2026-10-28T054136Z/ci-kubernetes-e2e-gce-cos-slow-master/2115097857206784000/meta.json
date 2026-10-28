@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+  "build": "2115097857206784000",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master",
+  "started": 1793113628,
+  "created": 1793113600,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-slow-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-slow-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793116726,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2115097857206784000",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2115097857206784000/build-log.txt",
+  "log": {
+    "bytes": 56086,
+    "md5": "8b4809edd1fa4b4dc9688e2c46fed646",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 11243,
+    "gcs": {
+      "generation": "1793116733540292",
+      "md5": "8b4809edd1fa4b4dc9688e2c46fed646",
+      "crc32c": "68128659",
+      "bytes": 56086,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95741,
+    "md5": "ba883b586ae3be17b897e13d8dd9cfac",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12332,
+    "gcs": {
+      "generation": "1793116764786364",
+      "md5": "ba883b586ae3be17b897e13d8dd9cfac",
+      "crc32c": "7e1576c9",
+      "bytes": 95741,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-28T054136Z",
+  "archived_at": 1793166096.0,
+  "settled": true,
+  "final": false
+}
