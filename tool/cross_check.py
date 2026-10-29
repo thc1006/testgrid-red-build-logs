@@ -2,19 +2,17 @@
 """Independently verify an archive written by fetch_red_logs.py.
 
 For one run (default: the latest):
-  integrity  every archived file (build-log.txt, podinfo.json, a log of a
-             node of its cluster or kubetest2's cluster-info.log, or its
-             parts) still has the md5 and length
-             in its meta.json, however old, and no other stored file sits next
-             to it; and GCS still holds the content it was taken from, checked
-             for the builds of the last
+  integrity  every archived file (build-log.txt, podinfo.json, a log of a node
+             of its cluster or kubetest2's cluster-info.log, or its parts)
+             still has the md5 and length in its meta.json, however old, and
+             no other stored file sits next to it; and GCS still holds the
+             content it was taken from, checked for the builds of the last
              --hours and a seventh of the older ones for each day since the
              last run done with its own (so each at least once a week, even
              when a run is cut off or its verification finds a difference; the
              run's fetch compares the same ones, see
-             fetch_red_logs.gcs_sevenths); a
-             build archived without a log still has none in GCS. Then what
-             the archive holds, by kind.
+             fetch_red_logs.gcs_sevenths); a build archived without a log
+             still has none in GCS. Then what the archive holds, by kind.
   testgrid   every column TestGrid paints red now, whose build finished well
              before the run, is archived (red cells recomputed here)
   gcs        every build of the dashboards' jobs from the last --hours that
@@ -401,8 +399,7 @@ def remote_raw_md5(url):
 
 def check_file(root, rel, m, info, default, remote=True):
     """What is wrong with one archived file, `default` as meta.json m records it (info: see frl.file_records): a
-    LocalDamage or a "GCS changed" message, or None. Without `remote`, only the
-    copy on disk is checked."""
+    LocalDamage or a "GCS changed" message, or None. Without `remote`, only the copy on disk is checked."""
     name = default if info.get("omitted") else info.get("file", default)
     label = f"{m['job']}/{m['build']} {name}"
     if not info.get("omitted"):  # a file too large to store is only compared with GCS
