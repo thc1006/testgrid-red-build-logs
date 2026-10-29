@@ -1605,6 +1605,22 @@ class CrossCheckRobustnessTest(ArchiveWorld):
         self.assertNotIn("MISSED", out)
         self.assertIn("1 not settled at run time", out)
 
+    def test_one_whose_finished_json_has_no_time_is_said_to_have_none(self):
+        # (it is judged by when it started, as one without finished.json is)
+        start = int(time.time()) - 600
+        build = snowflake(start)
+        self.show([build], {"job.Overall": ([12], [""])}, start=start)
+        self.srv.route(f"/bucket/logs/job/{build}/finished.json", (200, {}, {"result": "FAILURE"}))
+        self.fetch("--list-only")
+        rel = frl.new_run_dir(self.root, time.time())[1]
+        frl.write_json(os.path.join(self.root, rel, "run.json"),
+                       dict(run_record(time.time(), [{"dashboard": "dash", "tab": "t", "query": "bucket/logs/job",
+                                                      "oldest": start}]), run="r", finished=time.time()))
+        code, out = self.check()
+        self.assertIn("1 not settled at run time (finished <60 min before it, or started recently with no finish time), "
+                      "0 missed", out)  # fails: or no finished.json
+        self.assertNotIn("MISSED", out)
+
     def test_old_windows_keep_modern_build_ids(self):
         ids = [snowflake(time.time() - HOUR), snowflake(time.time() - 2 * HOUR)]
         self.srv.gcs_listing("bucket", [f"logs/job/{b}/finished.json" for b in ids])
