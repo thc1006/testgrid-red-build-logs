@@ -719,7 +719,8 @@ def check(args, problems, notes, record):
     print(f"  testgrid: {frl.count_text(len(red_now), 'red build')} in window, "
           f"{len(red_now) - len(unarchived) - len(taken_out)} archived, "
           + (f"{len(taken_out)} taken out ({frl.EXCLUDED}), " if taken_out else "") +
-          f"{late} not settled at run time (finished <{args.lag_minutes:.0f} min before it, or no finished.json), "
+          f"{late} not settled at run time (finished <{args.lag_minutes:.0f} min before it, or started recently with no "
+          "finish time), "
           f"{len(unarchived) - late} missed")
     record.scope(red_on_testgrid=len(red_now), red_not_settled=late)
 
