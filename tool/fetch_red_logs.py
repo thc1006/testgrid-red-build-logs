@@ -206,6 +206,9 @@ FUTURE_SLACK = 86400  # timestamps more than a day ahead are rejected as bogus
 MAX_ASSET_BYTES = 1 << 30  # a larger asset is refused: its upload could outlast a step
 ASSET_PRESET = 9  # xz's preset for an asset of a build's artifacts/ (see pack_artifacts)
 ASSET_FILES_BYTES = 2 << 30  # a build whose artifacts/ hold this many bytes of files is never packed
+MAX_ASSET_MEMBERS = 10000  # nor one whose artifacts/ hold more files than this (see take_asset)
+ASSET_SECONDS = 900  # a run starts packing no asset after this long (see take_assets) ...
+ASSET_BYTES = 8 << 30  # ... nor once it has packed this many bytes of files
 
 
 def _umask():
@@ -2000,8 +2003,8 @@ def take_node_logs(gcs, where, base, target, compress, max_bytes, apiserver, who
 
 
 class AssetTooLarge(Exception):
-    """An asset of a build's artifacts/ of ASSET_FILES_BYTES of files or more, or of more than MAX_ASSET_BYTES,
-    which a run does not upload; files, the bytes of files it counted."""
+    """An asset of a build's artifacts/ of ASSET_FILES_BYTES of files or more, of more than MAX_ASSET_MEMBERS
+    files, or of more than MAX_ASSET_BYTES, which a run does not upload; files, the bytes of files it counted."""
 
     def __init__(self, message, files):
         super().__init__(message)
@@ -2010,6 +2013,14 @@ class AssetTooLarge(Exception):
 
 class AssetRefused(IntegrityError):
     """A file of a build's artifacts/ whose name would not be a plain one in an asset (see member_name)."""
+
+
+class AssetLost(Exception):
+    """A member of a build's pending asset that GCS no longer has: its record says it is lost (see take_asset)."""
+
+
+class AssetGivenUp(Exception):
+    """The packs of a build's artifacts/ failed on GCS's side for GIVE_UP_DAYS: its record says so (see take_asset)."""
 
 
 def member_name(path):
@@ -2107,6 +2118,153 @@ def pack_artifacts(base, members, work, out, mtime):
         with contextlib.suppress(FileNotFoundError):
             os.remove(tmp)
     return {"bytes": size, "sha256": sha.hexdigest(), "members": records}
+
+
+def asset_due(meta):
+    """Whether a run packs a build's artifacts/ (see take_asset): a node e2e build, settled or final, whose
+    meta.json has no "artifacts_asset" yet, one only failing so far, or one neither uploaded, lost, too large,
+    refused nor given up on."""
+    record = meta.get("artifacts_asset")
+    if meta.get("node_e2e") is not True or not (meta.get("settled") or meta.get("final")):
+        return False
+    return record is None or isinstance(record, dict) and ("name" in record or "failing_since" in record) \
+        and not record.get("uploaded") and not record.get("lost") and not {"too_large", "refused", "given_up"} & record.keys()
+
+
+def pack_failed(target, meta, old, error, now):
+    """Raise error, a pack's failure on GCS's side (see take_asset), once meta.json records when the first run it
+    failed in began ("failing_since"); GIVE_UP_DAYS after that, raise AssetGivenUp, once it records "given_up"."""
+    since = old.get("failing_since")
+    if not plausible_time(since, now):
+        put_in_place(target, dict(meta, artifacts_asset=dict(old, failing_since=now)))
+    elif now - since > GIVE_UP_DAYS * 86400:
+        given_up = f"{type(error).__name__}: {error}"[:300]
+        put_in_place(target, dict(meta, artifacts_asset=dict(old, given_up=given_up)))
+        raise AssetGivenUp(given_up) from None
+    raise error
+
+
+def take_asset(gcs, target, meta, assets, run_id, now):
+    """Pack a due build's artifacts/ (see asset_due) into the folder assets, and record it in its meta.json
+    ("artifacts_asset"), pending upload: (the record, the bytes of files packed). A rebuild packs the members
+    recorded; else those GCS lists. A build whose artifacts/ has no node's folder records no members, and no
+    asset. One of ASSET_FILES_BYTES of files or more, of more than MAX_ASSET_MEMBERS files (a pack takes them one
+    at a time), or whose asset is over MAX_ASSET_BYTES, records "too_large" (the bytes of files it counted) and
+    raises AssetTooLarge; one with a name member_name refuses records "refused" and raises AssetRefused; one of
+    whose recorded members GCS no longer has records it lost, and raises AssetLost. None of them is packed again.
+    Another failure on GCS's side is an error of the run, until the runs give up (see pack_failed). Its
+    "pending_since" is when it was first packed: a rebuild keeps it."""
+    where = stored_folder(meta) or f"{meta['query']}/{meta['build']}"
+    base, old = f"{gcs}/{where}", meta.get("artifacts_asset") or {}
+    recorded = old.get("members") or []
+    if not isinstance(recorded, list) or not all(isinstance(m, dict) for m in recorded):
+        raise IntegrityError(f"{target}: its meta.json's artifacts_asset lists a member that is not one")
+    members = [m.get("path") for m in recorded]
+    run = RUN_RE.fullmatch(str(meta.get("archived_by_run")))
+    record = {"name": f"{meta['job']}_{meta['build']}.tar.xz",
+              "month": old.get("month") or (run.group(1) if run else run_id[:7])}
+    finished = meta.get("finished")
+    work = tempfile.mkdtemp(dir=assets, prefix=".work-")
+    try:
+        if not members:
+            bucket, folder = where.split("/", 1)
+            listed = {name[len(folder) + 1:]: size for name, (size, _, _) in
+                      list_objects(gcs, bucket, f"{folder}/artifacts/").items()
+                      if not name.endswith("/")}  # (a folder's placeholder object holds no file)
+            members, files = list(listed), sum(listed.values())
+            if not any("/" in m.removeprefix("artifacts/") for m in members):
+                record = {"members": []}  # (only junit_runner.xml and such, or nothing GCS still has)
+                put_in_place(target, dict(meta, artifacts_asset=record))
+                return record, 0
+            if files >= ASSET_FILES_BYTES:
+                raise AssetTooLarge(f"its artifacts/ hold {files} bytes of files, a run packs less than {ASSET_FILES_BYTES}",
+                                    files)
+            if len(members) > MAX_ASSET_MEMBERS:
+                raise AssetTooLarge(f"its artifacts/ hold {len(members)} files, a run packs at most {MAX_ASSET_MEMBERS}",
+                                    files)
+        record.update(pack_artifacts(base, members, work, os.path.join(assets, record["name"]),
+                                     finished if is_int(finished) and finished > 0 else meta["created"]))
+    except AssetTooLarge as e:
+        put_in_place(target, dict(meta, artifacts_asset=dict(old, too_large=e.files)))
+        raise
+    except AssetRefused as e:
+        put_in_place(target, dict(meta, artifacts_asset=dict(old, refused=str(e))))
+        raise
+    except NotFound as e:
+        if not recorded:  # (GCS listed it just now, and changed the folder since: the next run lists it again)
+            pack_failed(target, meta, old, e, now)
+        lost = urllib.parse.unquote(str(e).removeprefix(base + "/"))
+        put_in_place(target, dict(meta, artifacts_asset=dict(old, **record, lost=lost)))
+        raise AssetLost(str(e)) from None
+    except (Abandoned, LocalIOError, *BUGS):  # (not GCS's doing)
+        raise
+    except Exception as e:
+        if time.monotonic() > context().deadline:  # (the run's deadline may have stopped it)
+            raise
+        pack_failed(target, meta, old, e, now)
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+    record.update(built_by_run=run_id, pending_since=old.get("pending_since") or now)
+    put_in_place(target, dict(meta, artifacts_asset=record))
+    return record, sum(m["bytes"] for m in record["members"])
+
+
+def take_assets(root, gcs, assets, run_id, now, deadline):
+    """Pack the artifacts/ of each due build of the archive (see asset_due), oldest first, min(4, CPUs) at a time,
+    until ASSET_SECONDS have passed (or the run's deadline) or ASSET_BYTES are packed: (the manifest's entries of the
+    assets built, oldest first, {build: the error of one that failed}, how many are left for later, the bytes of
+    files packed, interrupted). Those going on at the run's deadline are stopped."""
+    due, running, packed, entries, errors, interrupted = [], {}, 0, [], {}, False
+    workers = min(4, cpu_count())
+    pool = cf.ThreadPoolExecutor(workers, initializer=bind_context, initargs=(context(),))
+    try:
+        for key, rel in archived_builds(root)[0].items():
+            try:
+                meta = read_json(os.path.join(root, rel, "meta.json"))
+            except (ValueError, OSError):
+                continue  # reported as unreadable by the index
+            if valid_meta(meta) and f"{meta.get('job')}/{meta.get('build')}" == key and is_int(meta.get("created")) \
+                    and asset_due(meta):
+                due.append((meta["created"], key, rel, meta))
+        due.sort(key=operator.itemgetter(0, 1))
+        stop = min(time.monotonic() + ASSET_SECONDS, deadline)
+        while due or running:
+            while due and len(running) < workers and time.monotonic() < stop and packed < ASSET_BYTES:
+                created, key, rel, meta = due.pop(0)
+                running[pool.submit(take_asset, gcs, os.path.join(root, rel), meta, assets, run_id, now)] = created, key
+            if not running:
+                break
+            done, _ = cf.wait(running, timeout=max(0, deadline - time.monotonic()), return_when=cf.FIRST_COMPLETED)
+            if not done:
+                context().abandon()  # (the packs going on stop at their next read, and write nothing)
+                break
+            for fut in done:
+                created, key = running.pop(fut)
+                try:
+                    record, n = fut.result()
+                except AssetLost as e:
+                    errors[key] = f"GCS no longer has {e}: its artifacts/ cannot be packed whole, and are marked lost"
+                    continue
+                except (AssetTooLarge, AssetRefused) as e:
+                    errors[key] = f"{e}: never packed"
+                    continue
+                except AssetGivenUp as e:
+                    errors[key] = f"packing its artifacts/ failed for {GIVE_UP_DAYS} days, given up: {e}"
+                    continue
+                except Exception as e:
+                    errors[key] = f"packing its artifacts/ failed: {type(e).__name__}: {e}"
+                    continue
+                packed += n
+                if "name" in record:
+                    entries.append((created, key, {k: record[k] for k in ("name", "month", "bytes", "sha256")}))
+    except KeyboardInterrupt:
+        interrupted = True
+        with contextlib.suppress(KeyboardInterrupt):
+            context().abandon()  # (the packs going on stop at their next read, and write nothing)
+    finally:
+        pool.shutdown(wait=not context().abandoned.is_set(), cancel_futures=True)
+    entries = [entry for *_, entry in sorted(entries, key=operator.itemgetter(0, 1))]
+    return entries, errors, len(due) + len(running), packed, interrupted
 
 
 def copy_of(n):
@@ -4180,6 +4338,8 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
         meta["gcs_path"] = where  # (a pull request job's build: where Prow's index links it)
     if (old or {}).get("backfilled"):
         meta["backfilled"] = old["backfilled"]
+    if "artifacts_asset" in (old or {}):
+        meta["artifacts_asset"] = old["artifacts_asset"]  # (its asset is not a file of the folder: see take_asset)
     if note:
         meta["note"] = note
     if existed:
@@ -5536,6 +5696,10 @@ def main(argv=None):
                       help="only remove what cut-off downloads and killed runs left (temp files, build folders without "
                            "meta.json, stored files their meta.json does not list), as a run does at its start (the "
                            "workflow does this before it commits, for a fetch killed before its end)")
+    p.add_argument("--assets", metavar="DIR",
+                   help="pack the artifacts/ of red node e2e builds into DIR, outside the archive, each as "
+                        "<job>_<build>.tar.xz, for the upload step, which DIR/manifest.json lists them for (see "
+                        "take_assets); meta.json records them as pending upload")
     p.add_argument("--testgrid", default=TESTGRID)
     p.add_argument("--gcs", default=GCS)
     args = p.parse_args(argv)
@@ -5549,6 +5713,13 @@ def main(argv=None):
                                     or args.clean_partial):
         print(f"ERROR {root} is not a folder: no archive is there", file=sys.stderr)
         return 1
+    if args.assets is not None:
+        here = os.path.realpath(args.assets)
+        if os.path.commonpath([here, os.path.realpath(root)]) == os.path.realpath(root):
+            print(f"ERROR --assets {args.assets} is in the archive: it must be outside, as git must not commit it",
+                  file=sys.stderr)
+            return 1
+        os.makedirs(here, exist_ok=True)
     if args.show_verifications or args.clean_partial:
         lock = lock_archive(root)
         if lock is None:
@@ -6317,6 +6488,17 @@ def run(args, root, run_start, pool, deadline):
             else:
                 unresolved[key] = {"rec": b, "first_seen": first, "last_error": message}
             errors.append({"build": key, "error": message})
+    built, assets_left = [], 0
+    if args.assets is not None:  # (a run stopped packs none, and counts those due)
+        started, stopped = time.time(), ctx.abandoned.is_set() or interrupted
+        built, failed, assets_left, packed, cut = take_assets(root, args.gcs, args.assets, run_id, run_start,
+                                                              -math.inf if stopped else deadline)
+        downloaded += packed
+        timings["assets"] = round(time.time() - started, 2)
+        errors += [{"build": key, "error": error} for key, error in sorted(failed.items())]
+        interrupted = interrupted or cut
+    if args.assets is not None:  # (the upload step's list: none if the run had no time for them)
+        write_json(os.path.join(args.assets, "manifest.json"), {"run": run_id, "assets": built})
     for names in outcomes.values():
         names.sort()
     errors.sort(key=lambda e: e["build"] or "")
@@ -6351,7 +6533,8 @@ def run(args, root, run_start, pool, deadline):
     left = {"gap_parts": {k: t["unsearched"] for k, t in sorted(tab_scans.items()) if "unsearched" in t},
             "config_ranges": {k: {"ranges": len(t["changed_pending"]),
                                   "oldest_scan": min(p["since"] for p in t["changed_pending"])}
-                              for k, t in sorted(tab_scans.items()) if t.get("changed_pending")}}
+                              for k, t in sorted(tab_scans.items()) if t.get("changed_pending")},
+            "artifacts_assets": assets_left}
     left["unlisted"] = {k: tab_scans[k]["missing_since"] for k in sorted(set(left["gap_parts"]) | set(left["config_ranges"]))
                         if tab_scans[k].get("missing_since")}  # (when TestGrid stopped listing the tab)
     report_ = {"run": run_id, "dir": run_rel, "started": run_start, "tool": tool_version(), "github": github_run(),
@@ -6366,7 +6549,8 @@ def run(args, root, run_start, pool, deadline):
                "gcs_compared": not (uncompared or recheck_failed or interrupted),
                # (why the comparison of each of those failed again, see NotCompared)
                **({"given_up_still_failing": dict(sorted(still_failing.items()))} if still_failing else {}),
-               "left_for_later": {k: v for k, v in left.items() if v}}
+               "left_for_later": {k: v for k, v in left.items() if v},
+               **({"assets_built": [a["name"] for a in built]} if args.assets is not None else {})}
     run_json = os.path.join(root, run_rel, "run.json")
     # Save what the next run needs before drawing the pages and charts: a failure
     # there must not lose a build that is about to scroll off TestGrid.
@@ -6434,8 +6618,9 @@ def run(args, root, run_start, pool, deadline):
           f"{rechecks} archived builds not shown red now compared with GCS again, "
           f"{len(outcomes.get('backfilled', []))} taken from GCS by TestGrid's rule: "
           f"{', '.join(counts)}; archive holds {len(entries) if entries is not None else '?'} builds")
+    packing = f"assets {timings['assets']:.1f}s, " if "assets" in timings else ""
     print(f"  {downloaded / 1e6:.1f} MB in {elapsed:.1f}s ({downloaded / 1e6 / max(elapsed, 1e-9):.1f} MB/s; scan "
-          f"{timings['scan']:.1f}s, downloads {timings['downloads']:.1f}s, index {timings['index']:.1f}s); CPU "
+          f"{timings['scan']:.1f}s, downloads {timings['downloads']:.1f}s, {packing}index {timings['index']:.1f}s); CPU "
           f"{final['cpu_seconds']:.1f}s on {concurrency['cpus']} cores ({final['cpu_seconds'] / max(elapsed, 1e-9):.0%} of one)")
     for origin, c in concurrency["origins"].items():
         print(f"  {origin}: in-flight requests start {concurrency['start']}, peak {c['peak']}, final {c['final']} "
