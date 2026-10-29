@@ -32,11 +32,11 @@ A matching md5 only proves the copy equals what GCS held at that moment, and
 Prow can upload a log again (its sidecar uploads once when told to stop and
 again when the test exits). So every archived build is compared with GCS on
 every run until RECHECK_HOURS after it finished (GIVE_UP_DAYS after it was
-archived, for one without a log or finished.json), and fetched again whenever
-GCS holds different content. After that (it is final), it is compared at least
-once a week: each run compares the seventh of the archive for its UTC day, and
-those of the days since the last run done with its own (it compared them all,
-and its verification found none differing: see gcs_sevenths), as
+archived, for one without a log or a usable finished.json), and fetched again
+whenever GCS holds different content. After that (it is final), it is compared
+at least once a week: each run compares the seventh of the archive for its UTC
+day, and those of the days since the last run done with its own (it compared
+them all, and its verification found none differing: see gcs_sevenths), as
 cross_check.py does. So one a run cut off did not get to is compared by the
 next run. A comparison that fails is an error, and is made again by the next
 run; once a build's comparisons have failed for GIVE_UP_DAYS, the runs give up
@@ -3569,9 +3569,9 @@ def settle_flags(meta, checked, now):
     settled: the copy was taken or confirmed SETTLE_HOURS after the build
     finished, when Prow had stopped uploading. final: it was confirmed
     RECHECK_HOURS after that, so later runs compare it only in its seventh of
-    the archive (see gcs_sevenths). A build without finished.json, or without a
-    log, keeps being checked for a late one on every run until GIVE_UP_DAYS after
-    it was first archived.
+    the archive (see gcs_sevenths). A build without a usable finished.json, or
+    without a log, keeps being checked for a late one on every run until
+    GIVE_UP_DAYS after it was first archived.
     """
     fin = meta.get("finished")
     if not plausible_time(fin, now) or fin < meta["created"] - 86400:
