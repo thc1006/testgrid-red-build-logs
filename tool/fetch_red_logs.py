@@ -2209,11 +2209,12 @@ def take_asset(gcs, target, meta, assets, run_id, now):
     return record, sum(m["bytes"] for m in record["members"])
 
 
-def take_assets(root, gcs, assets, run_id, now, deadline):
-    """Pack the artifacts/ of each due build of the archive (see asset_due), oldest first, min(4, CPUs) at a time,
-    until ASSET_SECONDS have passed (or the run's deadline) or ASSET_BYTES are packed: (the manifest's entries of the
-    assets built, oldest first, {build: the error of one that failed}, how many are left for later, the bytes of
-    files packed, interrupted). Those going on at the run's deadline are stopped."""
+def take_assets(root, gcs, assets, run_id, now, deadline, excluded=()):
+    """Pack the artifacts/ of each due build of the archive (see asset_due) but those excluded (taken out, and still
+    there for a removal that failed), oldest first, min(4, CPUs) at a time, until ASSET_SECONDS have passed (or the
+    run's deadline) or ASSET_BYTES are packed: (the manifest's entries of the assets built, oldest first, {build: the
+    error of one that failed}, how many are left for later, the bytes of files packed, interrupted). Those going on
+    at the run's deadline are stopped."""
     due, running, packed, entries, errors, interrupted = [], {}, 0, [], {}, False
     workers = min(4, cpu_count())
     pool = cf.ThreadPoolExecutor(workers, initializer=bind_context, initargs=(context(),))
@@ -2224,7 +2225,7 @@ def take_assets(root, gcs, assets, run_id, now, deadline):
             except (ValueError, OSError):
                 continue  # reported as unreadable by the index
             if valid_meta(meta) and f"{meta.get('job')}/{meta.get('build')}" == key and is_int(meta.get("created")) \
-                    and asset_due(meta):
+                    and asset_due(meta) and key not in excluded:
                 due.append((meta["created"], key, rel, meta))
         due.sort(key=operator.itemgetter(0, 1))
         stop = min(time.monotonic() + ASSET_SECONDS, deadline)
@@ -2269,6 +2270,23 @@ def take_assets(root, gcs, assets, run_id, now, deadline):
 
 ASSET_NAME_RE = re.compile(rf"({JOB_RE.pattern})_({BUILD_RE.pattern})\.tar\.xz")
 RELEASE_RE = re.compile(r"node-logs-(?:[a-z0-9-]+-)?[0-9]{4}-[0-9]{2}(?:-[0-9]+)?")  # (see upload_assets.py)
+
+
+def keep_to_delete(root, names):
+    """Add the names of assets of builds taken out to state.json's "assets_to_delete" now, before their folders go:
+    the upload step deletes them, and --record-uploads drops them (see record_uploads)."""
+    path = os.path.join(root, "state.json")
+    try:
+        state = read_json(path) if not os.path.islink(path) else None
+    except ValueError:
+        state = None
+    state = state if isinstance(state, dict) else {}
+    write_json(path, dict(state, assets_to_delete=sorted(set(asset_names(state.get("assets_to_delete"))) | set(names))))
+
+
+def asset_names(value):
+    """The names of assets in value, a list of state.json's (see keep_to_delete); [] for one that is no list."""
+    return sorted({n for n in value if isinstance(n, str) and ASSET_NAME_RE.fullmatch(n)}) if isinstance(value, list) else []
 
 
 def record_uploads(root, path):
@@ -2321,6 +2339,19 @@ def record_uploads(root, path):
         if record.get("uploaded") != uploaded:
             put_in_place(os.path.join(root, rel), dict(meta, artifacts_asset=dict(record, uploaded=uploaded)))
             done += 1
+    # (the assets of builds taken out it deleted, or found none of: the runs no longer ask for them)
+    gone = {n for n, outcome in got["deleted"].items() if outcome in ("deleted", "absent")} \
+        if isinstance(got.get("deleted"), dict) else set()
+    state_path = os.path.join(root, "state.json")
+    try:
+        state = read_json(state_path) if gone and not os.path.islink(state_path) else None
+    except ValueError:
+        state = None
+    names = asset_names(state.get("assets_to_delete")) if isinstance(state, dict) else []
+    if gone & set(names):
+        left = [n for n in names if n not in gone]
+        write_json(state_path, {k: v for k, v in state.items() if k != "assets_to_delete"}
+                   | ({"assets_to_delete": left} if left else {}))
     return done, [w for n, w in notes if n in listed]  # (of releases.json's, only those it records are said)
 
 
@@ -5429,12 +5460,17 @@ def load_state(root, warnings):
                                                                     for k, v in lacked.items())):
         warnings.append("state.json: dropped a malformed lacking_tabs record")
         lacked = None
+    # names of the assets of builds taken out, for the upload step to delete (see keep_to_delete)
+    to_delete = asset_names(state.get("assets_to_delete"))
+    if to_delete != state.get("assets_to_delete", []):
+        warnings.append("state.json: dropped a malformed assets_to_delete record")
     # Older archives also kept "no_log" here; the builds' own meta.json now says what to re-check.
     # (ConfigHistory checks the config history.)
     return {"tabs": tabs, "unresolved": entries("unresolved"), "given_up": entries("given_up"),
             "watch": entries("watch"), "tab_configs": configs, **({"testgrid_config": read} if read else {}),
             "config_uploads": state.get("config_uploads"), "config_entries": state.get("config_entries"),
-            "config_relist_after": state.get("config_relist_after"), **({"lacking_tabs": lacked} if lacked else {})}
+            "config_relist_after": state.get("config_relist_after"), **({"lacking_tabs": lacked} if lacked else {}),
+            "assets_to_delete": to_delete}
 
 
 def valid_rec(rec, now):
@@ -5888,6 +5924,11 @@ def run(args, root, run_start, pool, deadline):
     known, duplicates = archived_builds(root)
     # builds taken out for good (excluded.json): their folders go, and they are never fetched again
     taken_out, take_out_errors = sorted(k for k in excluded if k in known), []
+    # (by name: one may be there without a record in its meta.json)
+    found = {"{}_{}.tar.xz".format(*key.split("/", 1)) for key in taken_out}
+    if found and not args.list_only:
+        keep_to_delete(root, found)
+    to_delete = sorted(set(state["assets_to_delete"]) | (found if not args.list_only else set()))
     for key in taken_out:
         rel = known.pop(key)
         while rel is not None and not args.list_only:  # (each copy: two run folders can hold one build)
@@ -5905,6 +5946,10 @@ def run(args, root, run_start, pool, deadline):
             rel = archived_builds(root)[0].get(key)
     if taken_out and not args.list_only:
         duplicates = archived_builds(root)[1]  # (as left: a copy taken out is no longer one of two)
+    # (every build taken out's too: a run whose push failed may have uploaded one the archive lacks)
+    deletes = sorted(set(to_delete) | {"{}_{}.tar.xz".format(*key.split("/", 1)) for key in excluded})
+    if args.assets is not None and not args.list_only:  # (its deletes, if the run stops before its end)
+        write_json(os.path.join(args.assets, "manifest.json"), {"run": None, "assets": [], "delete": deletes})
     # the archived builds in this run's sevenths: compared with GCS even if final (cross_check.py
     # compares them too), see gcs_sevenths
     sevenths = gcs_sevenths(root, run_start)
@@ -6558,13 +6603,13 @@ def run(args, root, run_start, pool, deadline):
     if args.assets is not None:  # (a run stopped packs none, and counts those due)
         started, stopped = time.time(), ctx.abandoned.is_set() or interrupted
         built, failed, assets_left, packed, cut = take_assets(root, args.gcs, args.assets, run_id, run_start,
-                                                              -math.inf if stopped else deadline)
+                                                              -math.inf if stopped else deadline, excluded)
         downloaded += packed
         timings["assets"] = round(time.time() - started, 2)
         errors += [{"build": key, "error": error} for key, error in sorted(failed.items())]
         interrupted = interrupted or cut
     if args.assets is not None:  # (the upload step's list: none if the run had no time for them)
-        write_json(os.path.join(args.assets, "manifest.json"), {"run": run_id, "assets": built})
+        write_json(os.path.join(args.assets, "manifest.json"), {"run": run_id, "assets": built, "delete": deletes})
     for names in outcomes.values():
         names.sort()
     errors.sort(key=lambda e: e["build"] or "")
@@ -6641,7 +6686,8 @@ def run(args, root, run_start, pool, deadline):
                 "tab_configs": tab_configs, **({"testgrid_config": config_record} if config_record else {}),
                 **({"lacking_tabs": lacked} if lacked else {}),
                 **({"config_uploads": uploads, "config_entries": entries} if uploads else {}),
-                **({"config_relist_after": history.relist_after} if history.relist_after is not None else {})})
+                **({"config_relist_after": history.relist_after} if history.relist_after is not None else {}),
+                **({"assets_to_delete": to_delete} if to_delete else {})})
     # What failed or cut-off downloads left (a build folder without meta.json, stored files
     # a meta.json does not list, an empty job folder) goes now, so it is not committed;
     # those builds are fetched again. Abandoned workers can no longer write (see abandon()).
