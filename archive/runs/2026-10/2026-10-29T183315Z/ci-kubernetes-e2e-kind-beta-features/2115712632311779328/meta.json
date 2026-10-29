@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2115712632311779328",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1793260205,
+  "created": 1793260174,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Probing restartable init container should *not* be restarted by liveness probe because startup probe delays it [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] pod container-probe-2771/startup-sidecar-26840dbf-d5db-429e-a.../test/e2e/common/node/container_probe.go:2139 @ 10/29/26 08:11:15.485\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Mock workload info CSI workload information using mock driver contain ephemeral=true when using inline volume",
+          "status": "FAIL",
+          "message": "[FAILED] could not load CSI driver logs: an error on the server (\"unkn.../test/e2e/storage/csimock/csi_workload.go:153 @ 10/29/26 08:08:38.316\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793261758,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2115712632311779328",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2115712632311779328/build-log.txt",
+  "log": {
+    "bytes": 253947,
+    "md5": "569485b1b482bcf3761c60af7ccfa059",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 34804,
+    "gcs": {
+      "generation": "1793261775918281",
+      "md5": "569485b1b482bcf3761c60af7ccfa059",
+      "crc32c": "a5c7bf2b",
+      "bytes": 253947,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94805,
+    "md5": "8d615888b67f0c3dc8d12f8141f3193b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12758,
+    "gcs": {
+      "generation": "1793261779527211",
+      "md5": "8d615888b67f0c3dc8d12f8141f3193b",
+      "crc32c": "b5877f5a",
+      "bytes": 94805,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T183315Z",
+  "archived_at": 1793298795.0,
+  "settled": true,
+  "final": false
+}

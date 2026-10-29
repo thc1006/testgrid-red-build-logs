@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2115736790668152832",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1793265963,
+  "created": 1793265934,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Inline-volume (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.068s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 10/29/26 09:54:48.127\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793268327,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2115736790668152832",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2115736790668152832/build-log.txt",
+  "log": {
+    "bytes": 156721,
+    "md5": "81d7f900cb1012ef2b26be51d25771b6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25593,
+    "gcs": {
+      "generation": "1793268346614295",
+      "md5": "81d7f900cb1012ef2b26be51d25771b6",
+      "crc32c": "bfe69ead",
+      "bytes": 156721,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96368,
+    "md5": "a8c76673f31d40652426f164c6d09f2d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12439,
+    "gcs": {
+      "generation": "1793268348504049",
+      "md5": "a8c76673f31d40652426f164c6d09f2d",
+      "crc32c": "15f78093",
+      "bytes": 96368,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T183315Z",
+  "archived_at": 1793298795.0,
+  "settled": true,
+  "final": false
+}

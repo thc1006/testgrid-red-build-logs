@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2115825879350251520",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1793287211,
+  "created": 1793287174,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler/podgroup.topology_aware_scheduling",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCPGTopologyAwareScheduling/CPG_schedules_on_a_sin...ogyAwareScheduling\n--- FAIL: TestCPGTopologyAwareScheduling (106.03s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793289588,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2115825879350251520",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2115825879350251520/build-log.txt",
+  "log": {
+    "bytes": 228375,
+    "md5": "6ff0aff3b931006a87704cc6b73544d8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21144,
+    "gcs": {
+      "generation": "1793289593179543",
+      "md5": "6ff0aff3b931006a87704cc6b73544d8",
+      "crc32c": "580e766f",
+      "bytes": 228375,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94846,
+    "md5": "4b0014bcbf4332cd5172ef0995ebbc9f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12379,
+    "gcs": {
+      "generation": "1793289595657540",
+      "md5": "4b0014bcbf4332cd5172ef0995ebbc9f",
+      "crc32c": "51851fb1",
+      "bytes": 94846,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T183315Z",
+  "archived_at": 1793298795.0,
+  "settled": true,
+  "final": false
+}

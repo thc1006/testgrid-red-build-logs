@@ -1,0 +1,72 @@
+{
+  "job": "ci-node-crio-conformance",
+  "build": "2115687465757970432",
+  "query": "kubernetes-ci-logs/logs/ci-node-crio-conformance",
+  "started": 1793254204,
+  "created": 1793254174,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-node-crio-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "E2eNode Suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secrets-29d850ff-cdc4-4e90-bbac-20d064f681a...s/test/e2e/framework/pod/output/output.go:263 @ 10/29/26 06:40:41.261\n"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-configmaps-2f0cd630-31c6-4681-870a-a3d428a6...s/test/e2e/framework/pod/output/output.go:263 @ 10/29/26 06:25:53.364\n"
+        },
+        {
+          "test": "ci-node-crio-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793256236,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115687465757970432",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115687465757970432/build-log.txt",
+  "log": {
+    "bytes": 2003740,
+    "md5": "dc17e58f85112dd3a9554beb5f1505fb",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 254190,
+    "gcs": {
+      "generation": "1793256238075396",
+      "md5": "dc17e58f85112dd3a9554beb5f1505fb",
+      "crc32c": "e609996e",
+      "bytes": 2003740,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 100052,
+    "md5": "17213270e7420ebe4056b52afcbe423a",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12946,
+    "gcs": {
+      "generation": "1793256240509708",
+      "md5": "17213270e7420ebe4056b52afcbe423a",
+      "crc32c": "5e07396a",
+      "bytes": 100052,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T183315Z",
+  "archived_at": 1793298795.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,77 @@
+{
+  "job": "ci-kubernetes-cmd-master",
+  "build": "2115783599641858048",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-cmd-master",
+  "started": 1793277127,
+  "created": 1793277094,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "cmd-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-cmd-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "test-cmd.run_ambiguous_shortname_tests",
+          "status": "FAIL",
+          "message": "\nError from server (AlreadyExists): error when creating \"STDIN\": custo...!!! [1029 12:34:29]  5: hack/make-rules/test-cmd.sh:184 runTests(...)\n"
+        },
+        {
+          "test": "test-cmd.run_assert_singular_name_tests",
+          "status": "FAIL",
+          "message": "\nNo resources found in namespace-1793277266-15042 namespace.\nerror: er...!!! [1029 12:34:26]  5: hack/make-rules/test-cmd.sh:184 runTests(...)\n"
+        },
+        {
+          "test": "test-cmd.run_crd_tests",
+          "status": "FAIL",
+          "message": "\n!!! [1029 12:36:26] Call tree:\n!!! [1029 12:36:26]  1: /home/prow/go/...!!! [1029 12:36:26]  7: hack/make-rules/test-cmd.sh:184 runTests(...)\n"
+        },
+        {
+          "test": "test-cmd.run_kubectl_apply_tests",
+          "status": "FAIL",
+          "message": "\nW1029 12:34:51.163928   27792 prune.go:71] Deprecated: kubectl apply ...!!! [1029 12:35:22]  6: hack/make-rules/test-cmd.sh:184 runTests(...)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793277498,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-cmd-master/2115783599641858048",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-cmd-master/2115783599641858048/build-log.txt",
+  "log": {
+    "bytes": 881301,
+    "md5": "0ca66d0e0e7922f1278117a4798b1c70",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 97753,
+    "gcs": {
+      "generation": "1793277498755853",
+      "md5": "0ca66d0e0e7922f1278117a4798b1c70",
+      "crc32c": "22836d46",
+      "bytes": 881301,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 81646,
+    "md5": "0c5dcccc39a8f7fffe3c5028cb267458",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11400,
+    "gcs": {
+      "generation": "1793277501214601",
+      "md5": "0c5dcccc39a8f7fffe3c5028cb267458",
+      "crc32c": "4a175897",
+      "bytes": 81646,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T183315Z",
+  "archived_at": 1793298795.0,
+  "settled": true,
+  "final": false
+}

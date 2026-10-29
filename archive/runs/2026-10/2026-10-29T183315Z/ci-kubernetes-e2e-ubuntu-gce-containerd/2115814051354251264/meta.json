@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2115814051354251264",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793284355,
+  "created": 1793284354,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota [FeatureGate:VolumeAttributesClass] should verify ResourceQuota's volume attributes class scope (quota set to pvc count: 1) against a pvc with different volume attributes class.",
+          "status": "FAIL",
+          "message": "[FAILED] persistentvolumeclaims \"test-claim\" is forbidden: exceeded qu.../test/e2e/apimachinery/resource_quota.go:1387 @ 10/29/26 14:51:40.651\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793286633,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115814051354251264",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115814051354251264/build-log.txt",
+  "log": {
+    "bytes": 138858,
+    "md5": "d28c229a70d119ba18499380e2080e56",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23109,
+    "gcs": {
+      "generation": "1793286650415018",
+      "md5": "d28c229a70d119ba18499380e2080e56",
+      "crc32c": "7fccbf70",
+      "bytes": 138858,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86197,
+    "md5": "90b70eab822976ccb80d7ca8234afa73",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11995,
+    "gcs": {
+      "generation": "1793286653205947",
+      "md5": "90b70eab822976ccb80d7ca8234afa73",
+      "crc32c": "58cd3286",
+      "bytes": 86197,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T183315Z",
+  "archived_at": 1793298795.0,
+  "settled": true,
+  "final": false
+}

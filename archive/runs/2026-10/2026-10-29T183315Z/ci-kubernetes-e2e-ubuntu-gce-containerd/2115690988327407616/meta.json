@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2115690988327407616",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793255014,
+  "created": 1793255013,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Connectivity Pod Lifecycle should be able to connect to other Pod from a terminating Pod",
+          "status": "FAIL",
+          "message": "[FAILED] error running /workspace/kubernetes/platforms/linux/amd64/kub...8s.io/kubernetes/test/e2e/network/util.go:182 @ 10/29/26 06:36:05.633\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793257212,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115690988327407616",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115690988327407616/build-log.txt",
+  "log": {
+    "bytes": 178601,
+    "md5": "2b4a1ddfa899c6a1d7e264b0d68d30ec",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23995,
+    "gcs": {
+      "generation": "1793257227158998",
+      "md5": "2b4a1ddfa899c6a1d7e264b0d68d30ec",
+      "crc32c": "57910cf3",
+      "bytes": 178601,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87015,
+    "md5": "66073cd5852635a6adcd9e897fa0ff8b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11958,
+    "gcs": {
+      "generation": "1793257229673954",
+      "md5": "66073cd5852635a6adcd9e897fa0ff8b",
+      "crc32c": "f0638882",
+      "bytes": 87015,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T183315Z",
+  "archived_at": 1793298795.0,
+  "settled": true,
+  "final": false
+}

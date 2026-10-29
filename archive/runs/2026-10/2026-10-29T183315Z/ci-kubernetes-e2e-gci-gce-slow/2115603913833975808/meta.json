@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2115603913833975808",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1793234254,
+  "created": 1793234253,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach UDP service through 34.173.7.248:80 after 2m0...io/kubernetes/test/e2e/network/service.go:569 @ 10/29/26 01:03:26.706\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should only target nodes with endpoints [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 35.232.177.213:8081 afte...ernetes/test/e2e/framework/service/util.go:49 @ 10/29/26 01:03:18.324\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793237097,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2115603913833975808",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2115603913833975808/build-log.txt",
+  "log": {
+    "bytes": 228526,
+    "md5": "f48c5fe4c02c6360f6f5227fc112a112",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 34562,
+    "gcs": {
+      "generation": "1793237105427585",
+      "md5": "f48c5fe4c02c6360f6f5227fc112a112",
+      "crc32c": "1b070667",
+      "bytes": 228526,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86005,
+    "md5": "2ee1173ba7b23958ee6bd90127e4472b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11704,
+    "gcs": {
+      "generation": "1793237107727472",
+      "md5": "2ee1173ba7b23958ee6bd90127e4472b",
+      "crc32c": "5dcb968c",
+      "bytes": 86005,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T183315Z",
+  "archived_at": 1793298795.0,
+  "settled": true,
+  "final": false
+}
