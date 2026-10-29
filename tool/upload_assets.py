@@ -10,11 +10,14 @@ file or PYTHON* variable is read with the token present.
   GITHUB_TOKEN=... GITHUB_REPOSITORY=owner/repo GITHUB_REF_NAME=main python3 -I -S tool/upload_assets.py DIR
 
 The release of a month is node-logs-<YYYY-MM> on the default branch, and a prerelease node-logs-<branch>-<YYYY-MM>
-on another (see branch_prefix); a full one (MAX_ASSETS) continues in <tag>-2, <tag>-3, ... DIR/uploaded.json gets
-each asset as it is uploaded (or found there already), so a step cut off keeps those; DIR/releases.json, at the end,
-the start of the branch's tags and every asset of its node-logs releases. A wait GitHub asks for that would outlast
-the step (SECONDS), a rate limit that outlasts a request's tries, or the step's time running out, stops the run; an
-upload that could outlast the step (at RATE) is left for the next, unless it is the run's first.
+on another (see branch_prefix); a full one (MAX_ASSETS) continues in <tag>-2, <tag>-3, ... First, each asset of a
+build taken out of the archive (the manifest's "delete" names them) is deleted: on the default branch from every
+node-logs release, every branch's, and on another from its own; then again in the releases as listed at the end (see
+TakeOut). DIR/uploaded.json gets each asset as it is uploaded (or found there already) and each it deleted, so a step
+cut off keeps those; DIR/releases.json, at the end, the start of the branch's tags and every asset of its node-logs
+releases. A wait GitHub asks for that would outlast the step (SECONDS), a rate limit that outlasts a request's tries,
+or the step's time running out, stops the run; an upload that could outlast the step (at RATE) is left for the next,
+unless it is the run's first.
 """
 import argparse
 import hashlib
@@ -384,6 +387,46 @@ def upload(gh, release, entry):
     raise AssertionError("not reached")
 
 
+class TakeOut:
+    """The deletes of each asset named one of names, of builds taken out of the archive, whatever its digest (a
+    build's asset has its name): on the default branch from every node-logs release, every branch's, and on another
+    from its own; in the run's first listing, then in its last (a listing paged by offset skips an asset when another
+    run deletes one before it meanwhile)."""
+
+    def __init__(self, names):
+        self.names, self.deleted, self.failed, self.listings = names, set(), {}, 0  # (failed: {id: (name, error)})
+
+    def of(self, listed):
+        """Delete each asset of names listed (a Releases) holds; Failed, after the others, if a release's assets
+        could not be listed."""
+        own, unlisted = re.compile(re.escape(listed.prefix) + r"[0-9]{4}-[0-9]{2}(?:-[0-9]+)?"), []
+        for tag in sorted(t for t in listed.all if not listed.prerelease or own.fullmatch(t)):
+            try:
+                assets = listed.assets_of(tag)
+            except Failed as e:  # (the others are still read)
+                unlisted.append(e)
+                continue
+            for name in self.names:
+                if name in assets:
+                    try:
+                        delete(listed.gh, assets[name])
+                    except Failed as e:
+                        self.failed[assets[name]["id"]] = name, f"{name}: {e}"
+                        continue
+                    self.failed.pop(assets.pop(name)["id"], None)
+                    self.deleted.add(name)
+        if unlisted:
+            raise unlisted[0]
+        self.listings += 1
+
+    def outcomes(self):
+        """({name: "deleted"; "failed" if a delete of one failed and no later one did (it may be gone already);
+        "absent" once both listings lacked one}, the errors of those that failed)."""
+        errors = dict(self.failed.values())
+        out = {n: "failed" if n in errors else "deleted" if n in self.deleted else "absent" for n in self.names}
+        return {n: o for n, o in out.items() if o != "absent" or self.listings == 2}, list(errors.values())
+
+
 def release_assets(gh, release):
     return {a["name"]: a for a in map(an_asset, gh.listing(f"/repos/{gh.repo}/releases/{release['id']}/assets"))}
 
@@ -422,7 +465,8 @@ def main(argv=None, env=None):
         print(f"no {args.folder}: the fetch packed nothing")
         return 0
     gh = GitHub(args.api.rstrip("/"), args.uploads.rstrip("/"), repo, token, time.monotonic() + SECONDS)
-    done, errors, out = {"run": None, "uploaded": {}}, [], os.path.join(args.folder, "uploaded.json")
+    done, errors, out = {"run": None, "uploaded": {}, "deleted": {}}, [], os.path.join(args.folder, "uploaded.json")
+    taking = TakeOut([])
     try:  # (one there already is not this run's, and the record step reads it)
         os.remove(os.path.join(args.folder, "releases.json"))
     except FileNotFoundError:
@@ -448,9 +492,28 @@ def main(argv=None, env=None):
         prefix = branch_prefix(branch, default)
         # (its tags go on the default branch: a branch's run may push nothing)
         releases, seen = Releases(gh, prefix, branch != default, default), set()
+        # (first the assets of builds taken out, which must not stay public)
+        deletes = manifest.get("delete", [])
+        if not isinstance(deletes, list):
+            errors.append("manifest.json's delete is not a list")
+            deletes = []
+        names = [n for n in deletes if isinstance(n, str) and NAME_RE.fullmatch(n)]
+        errors += [f"not an asset to delete: {str(n)[:100]!r}" for n in deletes if n not in names]
+        taking = TakeOut(names)
+        if names:
+            gh.in_time()
+            try:
+                taking.of(releases)
+            except Failed as e:
+                errors.append(str(e))
+            finally:
+                done["deleted"] = taking.outcomes()[0]
+                write_json(out, done)
         for entry in entries:
             gh.in_time()
             try:
+                if isinstance(entry, dict) and entry.get("name") in deletes:
+                    raise Failed(f"{str(entry['name'])[:100]}: of a build taken out; not uploaded")
                 entry = checked(entry, args.folder, seen)
                 try:
                     done["uploaded"][entry["name"]] = put(gh, releases, entry)
@@ -466,12 +529,21 @@ def main(argv=None, env=None):
             write_json(out, done)
         tag_re = re.compile(re.escape(prefix) + r"[0-9]{4}-[0-9]{2}(?:-[0-9]+)?")
         now = Releases(gh, prefix, branch != default, default)  # (listed again: what they hold at the end)
+        if names:
+            try:
+                taking.of(now)
+            except Failed as e:
+                errors.append(str(e))
+            finally:
+                done["deleted"] = taking.outcomes()[0]
+                write_json(out, done)
         write_json(os.path.join(args.folder, "releases.json"), {"prefix": prefix, "releases": {
             tag: {"id": r["id"], "draft": r.get("draft"), "prerelease": r.get("prerelease"),
                   "assets": sorted((asset_info(a) for a in now.assets_of(tag).values()), key=lambda a: a["name"])}
             for tag, r in sorted(now.all.items()) if tag_re.fullmatch(tag)}})
     except (Failed, OutOfTime) as e:
         errors.append(str(e))
+    errors += taking.outcomes()[1]
     for e in errors:
         print("ERROR", e, file=sys.stderr)
     return 1 if errors else 0

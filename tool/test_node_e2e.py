@@ -348,7 +348,8 @@ class Assets(AssetWorld):
         with tarfile.open(fileobj=io.BytesIO(data), mode="r:xz") as tar:
             self.assertEqual(sorted(tar.getnames()), sorted(p.removeprefix("artifacts/") for p in self.FILES))
         self.assertEqual(self.manifest(), {"run": run["run"], "assets": [
-            {"name": name, "month": record["month"], "bytes": len(data), "sha256": record["sha256"]}]})
+            {"name": name, "month": record["month"], "bytes": len(data), "sha256": record["sha256"]}],
+            "delete": []})  # fails: no "delete"
         self.assertEqual(run["assets_built"], [name])
         self.assertEqual(run["bytes_downloaded"], len(b"log\n") + sum(map(len, self.FILES.values())))  # (packing too)
         self.assertIn("assets", run["timings"])
@@ -726,6 +727,8 @@ class Assets(AssetWorld):
         self.assertNotIn("artifacts_asset", self.meta())
         self.assertNotIn("assets_built", self.runs()[-1])
         self.assertEqual(os.listdir(self.assets), [])
+        self.assertEqual(self.fetch("--list-only", "--assets", self.assets), 0)
+        self.assertEqual(os.listdir(self.assets), [])
 
     def test_nor_for_a_build_that_is_not_node_e2e(self):
         self.srv.route(self.base + "/prowjob.json", (200, {}, prowjob(KUBETEST_GCE)))
@@ -858,6 +861,151 @@ class Uploads(AssetWorld):
         self.assertEqual(self.manifest()["assets"], [])  # (not packed, and replaced, again)
         self.assertEqual((self.upload(), self.record()), (0, 0))  # (releases.json lists it with its digest now)
         self.assertEqual(self.read("meta.json"), before)
+
+    def take_out(self):
+        frl.write_json(os.path.join(self.root, "excluded.json"), {self.key: {"reason": "a log that must not stay public"}})
+
+    def state(self):
+        return frl.read_json(os.path.join(self.root, "state.json"))
+
+    def test_the_asset_of_a_build_taken_out_is_deleted(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        record = self.meta()["artifacts_asset"]
+        self.assertEqual((self.upload(), self.record()), (0, 0))
+        self.take_out()
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertIsNone(self.bdir())
+        self.assertEqual(self.state().get("assets_to_delete"), [record["name"]])  # fails: None
+        self.assertEqual(self.manifest()["delete"], [record["name"]])
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.gh.held("node-logs-" + record["month"]), {})
+        self.assertEqual(self.record(), 0, self.warnings)
+        self.assertNotIn("assets_to_delete", self.state())
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.manifest()["delete"], [record["name"]])  # (asked for while excluded.json lists it)
+
+    def test_a_delete_that_failed_is_asked_for_again(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        record = self.meta()["artifacts_asset"]  # (pending: a run whose commit was lost may have uploaded it)
+        self.assertEqual(self.upload(), 0)
+        self.take_out()
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.gh.delete_faults = [500] * ua.RETRIES * 2  # (tried in both listings)
+        self.assertEqual(self.upload(), 1)  # fails: 0
+        self.assertEqual(self.record(), 0)
+        self.assertEqual(self.state()["assets_to_delete"], [record["name"]])
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.manifest()["delete"], [record["name"]])
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.record(), 0)
+        self.assertNotIn("assets_to_delete", self.state())
+
+    def test_one_never_uploaded_is_asked_for_once(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # (pending, and the upload step never ran)
+        self.take_out()
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.record(), 0)
+        self.assertNotIn("assets_to_delete", self.state())
+
+    def test_a_malformed_name_to_delete_is_dropped(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        frl.write_json(os.path.join(self.root, "state.json"),
+                       dict(self.state(), assets_to_delete=["job_1.tar.xz", "../x_1.tar.xz", 7]))
+        # (a serious warning, as for any of state.json)
+        self.assertEqual(self.fetch("--assets", self.assets), 1)  # fails: (kept) 0
+        self.assertIn("state.json: dropped a malformed assets_to_delete record", self.runs()[-1]["warnings"])
+        self.assertEqual(self.manifest()["delete"], ["job_1.tar.xz"])
+
+    def test_names_kept_before_and_malformed_ones_as_one_is_taken_out(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        name = self.meta()["artifacts_asset"]["name"]
+        frl.write_json(os.path.join(self.root, "state.json"),
+                       dict(self.state(), assets_to_delete=[7, {}, "x", "job_1.tar.xz"]))
+        self.take_out()
+        self.assertEqual(self.fetch("--assets", self.assets), 1)  # fails: 0
+        self.assertIn("state.json: dropped a malformed assets_to_delete record", self.runs()[-1]["warnings"])
+        self.assertEqual(self.state()["assets_to_delete"], sorted(["job_1.tar.xz", name]))
+        self.assertEqual(self.manifest()["delete"], sorted(["job_1.tar.xz", name]))
+
+    def test_the_name_is_kept_before_the_folder_goes(self):
+        # (a run killed as it takes the build out: the next one still asks for the asset)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        record = self.meta()["artifacts_asset"]
+        frl.write_json(os.path.join(self.root, "state.json"), dict(self.state(), assets_to_delete=["job_1.tar.xz"]))
+        self.take_out()
+        with mock.patch.object(frl, "remove_build", side_effect=KeyboardInterrupt):
+            self.assertEqual(self.fetch("--assets", self.assets), 130)
+        self.assertEqual(self.state()["assets_to_delete"], sorted(["job_1.tar.xz", record["name"]]))  # fails: ['job_1.tar.xz']
+
+    def test_deleted_though_the_fetch_stops_after_the_take_out(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        record = self.meta()["artifacts_asset"]
+        self.assertEqual((self.upload(), self.record()), (0, 0))
+        tags, reason = self.gh.tags(), {"reason": "a log that must not stay public"}
+        frl.write_json(os.path.join(self.root, "excluded.json"), {self.key: reason, "job/1": reason})  # (job/1: not archived)
+        self.new_assets()
+        with mock.patch.object(frl, "gcs_sevenths", side_effect=KeyboardInterrupt):
+            self.assertEqual(self.fetch("--assets", self.assets), 130)
+        deletes = sorted(["job_1.tar.xz", record["name"]])
+        self.assertEqual(self.manifest(), {"run": None, "assets": [], "delete": deletes})  # fails: None
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.gh.held("node-logs-" + record["month"]), {})
+        self.assertEqual(self.gh.tags(), tags)
+        self.assertEqual(frl.read_json(os.path.join(self.assets, "uploaded.json")),
+                         {"run": None, "uploaded": {}, "deleted": {record["name"]: "deleted", "job_1.tar.xz": "absent"}})
+        self.assertEqual(self.record(), 0)
+        self.assertNotIn("assets_to_delete", self.state())
+
+    def test_a_record_step_drops_what_is_not_a_name_to_delete(self):
+        frl.write_json(os.path.join(self.root, "state.json"), {"assets_to_delete": [{}, "job_1.tar.xz", "job_2.tar.xz"]})
+        frl.write_json(os.path.join(self.assets, "uploaded.json"),
+                       {"run": "x", "uploaded": {}, "deleted": {"job_1.tar.xz": "deleted"}})
+        self.assertEqual(self.record(), 0)
+        self.assertEqual(self.state()["assets_to_delete"], ["job_2.tar.xz"])  # fails: [{}, 'job_1.tar.xz', 'job_2.tar.xz']
+
+    def test_one_whose_folder_stays_is_not_packed_again(self):
+        # (its removal failed: the asset is deleted all the same, and the folder is not packed and uploaded again)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        name = self.meta()["artifacts_asset"]["name"]
+        self.assertEqual((self.upload(), self.record()), (0, 0))
+        meta = self.meta()
+        del meta["artifacts_asset"]["uploaded"]  # (pending again, as one GCS changed is)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        self.take_out()
+        with mock.patch.object(frl, "remove_build", side_effect=PermissionError("denied")):
+            self.assertEqual(self.fetch("--assets", self.assets), 1)
+        self.assertIn("taking it out (excluded.json) failed", self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual((self.manifest()["assets"], self.manifest()["delete"]), ([], [name]))  # fails: KeyError
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.gh.held("node-logs-" + meta["artifacts_asset"]["month"]), {})
+
+    def test_one_uploaded_without_a_record_is_deleted_by_its_name(self):
+        # (a run whose commit was lost uploaded it: no meta.json records it)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        record = self.meta()["artifacts_asset"]
+        self.assertEqual(self.upload(), 0)
+        meta = self.meta()
+        del meta["artifacts_asset"]
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        self.take_out()
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.manifest()["delete"], [record["name"]])  # fails: KeyError
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.gh.held("node-logs-" + record["month"]), {})
+
+    def test_one_a_run_whose_push_failed_uploaded_is_deleted(self):
+        # (taken out before a run archived the build again: neither its meta.json nor state.json names the asset)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        record = self.meta()["artifacts_asset"]
+        self.assertEqual(self.upload(), 0)
+        self.addCleanup(shutil.rmtree, self.root)
+        self.root = tempfile.mkdtemp()
+        self.take_out()
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.manifest()["delete"], [record["name"]])  # fails: KeyError: 'delete'
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.gh.held("node-logs-" + record["month"]), {})
 
     def test_a_record_step_without_uploads(self):
         self.assertEqual(self.fetch("--assets", self.assets), 0)

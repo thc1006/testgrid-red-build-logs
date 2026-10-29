@@ -43,7 +43,7 @@ class FakeGitHub:
     def __init__(self, default_branch="main"):
         self.default_branch, self.releases, self.assets, self.next_id = default_branch, {}, {}, 100
         self.upload_faults, self.wrong_digest, self.requests, self.lock = [], False, [], threading.Lock()
-        self.faults = []
+        self.faults, self.delete_faults = [], []
         fake = self
 
         class Handler(http.server.BaseHTTPRequestHandler):
@@ -145,6 +145,8 @@ class FakeGitHub:
             if rid is None:
                 return 404, {"message": "Not Found"}
             if method == "DELETE":
+                if self.delete_faults:
+                    return self.delete_faults.pop(0), {"message": "fault"}
                 del self.assets[rid][name]
                 return 204, None
             return 200, self.hidden(dict(self.assets[rid][name], **(
@@ -211,9 +213,10 @@ class Upload(unittest.TestCase):
         self.entries.append(dict({"name": name, "month": month, "bytes": len(data), "sha256": sha(data)}, **extra))
         return self.entries[-1]
 
-    def upload(self, branch="main", entries=None):
+    def upload(self, branch="main", entries=None, delete=None):
         with open(os.path.join(self.dir, "manifest.json"), "w") as f:
-            json.dump({"run": "2026-10-30T051234Z", "assets": self.entries if entries is None else entries}, f)
+            json.dump({"run": "2026-10-30T051234Z", "assets": self.entries if entries is None else entries,
+                       **({"delete": delete} if delete is not None else {})}, f)
         env = dict(ENV, GITHUB_REF_NAME=branch)
         with mock.patch("sys.stdout") as out, mock.patch("sys.stderr") as err:
             code = ua.main([self.dir, "--api", self.gh.url, "--uploads", self.gh.url], env)
@@ -221,9 +224,9 @@ class Upload(unittest.TestCase):
         self.errors = "".join(c.args[0] for c in err.write.call_args_list)
         return code
 
-    def uploaded(self):
+    def uploaded(self, key="uploaded"):
         with open(os.path.join(self.dir, "uploaded.json")) as f:
-            return json.load(f)["uploaded"]
+            return json.load(f).get(key)
 
     def releases(self):
         with open(os.path.join(self.dir, "releases.json")) as f:
@@ -622,6 +625,199 @@ class Upload(unittest.TestCase):
         self.assertIn("job_1.tar.xz: not a size GitHub takes: 'True'", self.errors)
         self.assertIn("not an asset's name: 'jjjj", self.errors)  # (256 characters: more than GitHub's 255)
         self.assertEqual(sum(1 for m, p, _ in self.gh.requests if m == "POST" and "/assets?" in p), 1)  # (none tried)
+
+    def test_the_asset_of_a_build_taken_out_is_deleted(self):
+        # (whatever its digest, from every branch's releases: a build's asset has its name)
+        self.gh.release("node-logs-2026-09", [("job_1.tar.xz", b"x")])
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"packed by another liblzma"), ("job_2.tar.xz", b"y")])
+        self.gh.release("node-logs-test-0123abcd-2026-10", [("job_1.tar.xz", b"x")], prerelease=True)
+        self.gh.release("v1.0", [("job_1.tar.xz", b"x")])  # (not one of node logs)
+        self.assertEqual(self.upload(delete=["job_1.tar.xz", "job_3.tar.xz"]), 0, self.errors)
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "deleted", "job_3.tar.xz": "absent"})  # fails: None
+        self.assertEqual([list(self.gh.held(t)) for t in ("node-logs-2026-09", "node-logs-2026-10",
+                                                         "node-logs-test-0123abcd-2026-10", "v1.0")],
+                         [[], ["job_2.tar.xz"], [], ["job_1.tar.xz"]])
+        self.assertEqual(self.releases()["node-logs-2026-09"]["assets"], [])
+
+    def test_on_another_branch_only_from_its_own_releases(self):
+        mine = ua.branch_prefix("fault-inject", "main") + "2026-10"
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x")])
+        self.gh.release(ua.branch_prefix("other", "main") + "2026-10", [("job_1.tar.xz", b"x")], prerelease=True)
+        self.gh.release(mine, [("job_1.tar.xz", b"x")], prerelease=True)
+        self.assertEqual(self.upload(branch="fault-inject", delete=["job_1.tar.xz"]), 0, self.errors)
+        self.assertEqual(self.gh.held(mine), {})  # fails: (kept) job_1.tar.xz
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "deleted"})
+        self.assertEqual([list(self.gh.held(t)) for t in self.gh.tags() if t != mine], [["job_1.tar.xz"]] * 2)
+
+    def test_absent_only_if_a_second_listing_lacks_it_too(self):
+        # (a listing paged by offset: another run deletes an asset of page 1 while page 2 is asked for)
+        names = [f"a_{i}.tar.xz" for i in range(100)] + ["job_1.tar.xz"] + [f"b_{i}.tar.xz" for i in range(49)]
+        rid, serve = self.gh.release("node-logs-2026-10", [(n, b"x") for n in names]), self.gh.serve
+
+        def racing(method, path, body, headers):
+            got = serve(method, path, body, headers)
+            if method == "GET" and f"/releases/{rid}/assets?" in path and "&page=1" in path:
+                self.gh.assets[rid].pop("a_0.tar.xz", None)
+            return got
+        with mock.patch.object(self.gh, "serve", side_effect=racing):
+            self.assertEqual(self.upload(delete=["job_1.tar.xz"]), 0, self.errors)
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "deleted"})  # fails: None
+        self.assertNotIn("job_1.tar.xz", self.gh.held("node-logs-2026-10"))
+
+    def test_every_copy_though_one_was_found(self):
+        # (main's, and one in a branch's prerelease that a delete by another run hides from its paged listing)
+        names = [f"a_{i}.tar.xz" for i in range(100)] + ["job_1.tar.xz"]
+        rid, serve = self.gh.release(ua.branch_prefix("b", "main") + "2026-10", [(n, b"x") for n in names], True), self.gh.serve
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x")])
+
+        def racing(method, path, body, headers):
+            got = serve(method, path, body, headers)
+            if method == "GET" and f"/releases/{rid}/assets?" in path and "&page=1" in path:
+                self.gh.assets[rid].pop("a_0.tar.xz", None)
+            return got
+        with mock.patch.object(self.gh, "serve", side_effect=racing):
+            self.assertEqual(self.upload(delete=["job_1.tar.xz"]), 0, self.errors)
+        self.assertEqual([t for t in self.gh.tags() if "job_1.tar.xz" in self.gh.held(t)], [])  # fails: (kept) both
+
+    def test_two_listings_for_all_the_names(self):
+        for month in range(1, 7):
+            self.gh.release(f"node-logs-2026-0{month}", [(f"a{month}_{i}.tar.xz", b"x") for i in range(250)])
+        names = [f"job_{i}.tar.xz" for i in range(20)]
+        self.assertEqual(self.upload(delete=names), 0, self.errors)
+        self.assertEqual(self.uploaded("deleted"), dict.fromkeys(names, "absent"))  # fails: None
+        # (the repo, then two listings, each of the releases and their assets, 3 pages each: the first, and the last)
+        self.assertEqual(sum(1 for m, _, _ in self.gh.requests if m == "GET"), 1 + 2 * (1 + 6 * 3))
+        self.gh.requests.clear()
+        self.assertEqual(self.upload(delete=[]), 0, self.errors)  # (none to delete: only the last lists the assets)
+        self.assertEqual(sum(1 for m, _, _ in self.gh.requests if m == "GET"), 1 + 1 + (1 + 6 * 3))
+
+    def test_none_once_the_steps_time_is_up(self):
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x")])
+        with mock.patch.object(ua, "SECONDS", -1):
+            self.assertEqual(self.upload(delete=["job_1.tar.xz"]), 1)  # fails: 0
+        self.assertIn("the step's time is up", self.errors)
+        self.assertEqual([m for m, _, _ in self.gh.requests], ["GET", "GET"])  # (the repo, the releases)
+
+    def test_those_deleted_before_the_step_was_cut_off(self):
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x")])
+        self.asset("job_2.tar.xz", b"y")
+        with mock.patch.object(ua, "put", side_effect=ua.OutOfTime("the step's time is up")):
+            self.assertEqual(self.upload(delete=["job_1.tar.xz", "job_3.tar.xz"]), 1)
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "deleted"})  # fails: None
+        self.assertEqual(self.gh.held("node-logs-2026-10"), {})
+
+    def test_those_deleted_before_the_step_was_cut_off_in_a_listing(self):
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x"), ("job_2.tar.xz", b"y")])
+        delete = ua.delete
+
+        def deleting(gh, asset):  # (a rate limit on the second)
+            if asset["name"] == "job_2.tar.xz":
+                raise ua.OutOfTime("a rate limit outlasted the tries")
+            return delete(gh, asset)
+        with mock.patch.object(ua, "delete", side_effect=deleting):
+            self.assertEqual(self.upload(delete=["job_1.tar.xz", "job_2.tar.xz"]), 1)  # fails: 0
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "deleted"})
+        self.assertEqual(list(self.gh.held("node-logs-2026-10")), ["job_2.tar.xz"])
+
+    def test_and_in_the_last_listing(self):
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x"), ("job_2.tar.xz", b"y")])
+        delete, calls = ua.delete, []
+
+        def deleting(gh, asset):  # (both fail in the first listing; in the last, a rate limit on the second)
+            calls.append(asset["name"])
+            if len(calls) <= 2:
+                raise ua.Failed("HTTP 500")
+            if len(calls) == 4:
+                raise ua.OutOfTime("a rate limit outlasted the tries")
+            return delete(gh, asset)
+        with mock.patch.object(ua, "delete", side_effect=deleting):
+            self.assertEqual(self.upload(delete=["job_1.tar.xz", "job_2.tar.xz"]), 1)  # fails: 0
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "deleted", "job_2.tar.xz": "failed"})
+        self.assertEqual(list(self.gh.held("node-logs-2026-10")), ["job_2.tar.xz"])
+
+    def test_absent_only_once_every_release_was_listed(self):
+        self.gh.release("node-logs-2026-09")
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x")])
+        rid, serve = self.gh.release("node-logs-2026-11"), self.gh.serve
+
+        def failing(method, path, body, headers):  # (the listing of one release's assets)
+            return (500, {"message": "fault"}) if f"/releases/{rid}/assets" in path else serve(method, path, body, headers)
+        with mock.patch.object(self.gh, "serve", side_effect=failing):
+            self.assertEqual(self.upload(delete=["job_3.tar.xz"]), 1)
+        self.assertEqual(self.uploaded("deleted"), {})  # fails: None
+
+    def test_a_release_not_listed_stops_none_of_the_others(self):
+        rid, serve = self.gh.release("node-logs-2026-01"), self.gh.serve
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x")])
+
+        def failing(method, path, body, headers):  # (the assets of the release sorted first)
+            if f"/releases/{rid}/assets" in path:
+                return 403, {"message": "Resource not accessible by integration"}
+            return serve(method, path, body, headers)
+        with mock.patch.object(self.gh, "serve", side_effect=failing):
+            self.assertEqual(self.upload(delete=["job_1.tar.xz", "job_3.tar.xz"]), 1)
+        self.assertEqual(self.gh.held("node-logs-2026-10"), {})  # fails: (kept) job_1.tar.xz
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "deleted"})  # (job_3: not "absent")
+
+    def test_a_delete_that_fails_says_so(self):
+        # (the archive keeps asking for it: see fetch_red_logs.record_uploads)
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x")])
+        self.gh.delete_faults = [500] * ua.RETRIES * 2  # (tried in both listings)
+        self.assertEqual(self.upload(delete=["job_1.tar.xz"]), 1)  # fails: 0
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "failed"})
+        self.assertIn("ERROR job_1.tar.xz: DELETE", self.errors)
+        self.assertEqual(list(self.gh.held("node-logs-2026-10")), ["job_1.tar.xz"])
+
+    def test_one_deleted_when_tried_again_is_deleted(self):
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x")])
+        self.gh.delete_faults = [500] * ua.RETRIES  # (the run's listing's tries: the new listing's delete passes)
+        self.assertEqual(self.upload(delete=["job_1.tar.xz"]), 0, self.errors)
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "deleted"})  # fails: None
+        self.assertEqual(self.gh.held("node-logs-2026-10"), {})
+
+    def test_nor_stops_the_others(self):
+        # (one copy of job_1 refused for good: its other copy and job_2 go, and job_1 has failed)
+        rid, serve = self.gh.release("node-logs-2026-09", [("job_1.tar.xz", b"x")]), self.gh.serve
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x"), ("job_2.tar.xz", b"y")])
+        refused = self.gh.assets[rid]["job_1.tar.xz"]["id"]
+
+        def refusing(method, path, body, headers):
+            if method == "DELETE" and path.endswith(f"/assets/{refused}"):
+                return 403, {"message": "Resource not accessible by integration"}
+            return serve(method, path, body, headers)
+        with mock.patch.object(self.gh, "serve", side_effect=refusing):
+            self.assertEqual(self.upload(delete=["job_1.tar.xz", "job_2.tar.xz"]), 1)  # fails: 0
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "failed", "job_2.tar.xz": "deleted"})
+        self.assertEqual(self.errors.count("ERROR"), 1)
+        self.assertEqual([self.gh.held(t) for t in self.gh.tags()], [{"job_1.tar.xz": "sha256:" + sha(b"x")}, {}])
+
+    def test_every_name_held(self):
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x"), ("job_2.tar.xz", b"y")])
+        self.assertEqual(self.upload(delete=["job_1.tar.xz", "job_2.tar.xz"]), 0, self.errors)
+        self.assertEqual(self.uploaded("deleted"), {"job_1.tar.xz": "deleted", "job_2.tar.xz": "deleted"})  # fails: None
+        self.assertEqual(self.gh.held("node-logs-2026-10"), {})
+
+    def test_a_deleted_one_leaves_room(self):
+        self.gh.release("node-logs-2026-10", [("job_1.tar.xz", b"x"), ("job_2.tar.xz", b"y")])
+        self.asset("job_3.tar.xz", b"z")
+        with mock.patch.object(ua, "MAX_ASSETS", 2):
+            self.assertEqual(self.upload(delete=["job_1.tar.xz"]), 0, self.errors)
+            self.assertEqual(self.uploaded()["job_3.tar.xz"]["release"], "node-logs-2026-10")  # fails: node-logs-2026-10-2
+            self.entries, self.gh.delete_faults = [self.asset("job_4.tar.xz", b"w")], [422] * 2
+            self.assertEqual(self.upload(delete=["job_2.tar.xz"]), 1)
+        self.assertEqual(self.uploaded()["job_4.tar.xz"]["release"], "node-logs-2026-10-2")  # (one not deleted leaves none)
+
+    def test_entries_to_delete_it_does_not_take(self):
+        for delete in (["../x_1.tar.xz"], [{"name": "job_1.tar.xz"}], [None], {"job_1.tar.xz": sha(b"x")}):
+            with self.subTest(delete):
+                self.assertEqual(self.upload(delete=delete), 1)  # fails: 0
+                self.assertIn("ERROR", self.errors)
+
+    def test_nor_is_one_uploaded(self):
+        self.asset("job_1.tar.xz", b"x")
+        self.assertEqual(self.upload(delete=["job_1.tar.xz"]), 1)  # fails: 0
+        self.assertIn("job_1.tar.xz: of a build taken out; not uploaded", self.errors)
+        self.assertEqual((self.gh.tags(), self.uploaded()), ([], {}))
 
     def test_a_manifest_it_cannot_read(self):
         for name in ("releases.json", "uploaded.json"):  # (not this run's: the record step must not read them)
