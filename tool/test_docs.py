@@ -386,6 +386,8 @@ class ReadmeNumbers(unittest.TestCase):
                 f"a log over {frl.MAX_FILE_MB} MiB after gzip", f"GitHub blocks files over {cc.GITHUB_MAX_BYTES >> 20} MiB",
                 f"One still waiting {frl.HELD_DAYS} days after it was made", f"at most {days} days after that run",
                 f"been unlisted for {frl.UNLISTED_DAYS} days", f"is searched only {days} days back",
+                f"log is over {frl.MAX_DOWNLOAD_BYTES / (1 << 30):g} GiB", f"given up on {days} days after the first run",
+                f"lists it for at least {frl.GIVEN_UP_KEEP_DAYS} days more",
                 f"the part of the gap in the last {days} days and {days} days more in the run that finds it, then "
                 f"{days} days more in each later run",
                 f"until {frl.RECHECK_HOURS} hours after it finished", f"compared until {days} days after it was archived",
