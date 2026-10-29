@@ -109,6 +109,8 @@ from GCS.
   run. A tab TestGrid no longer lists
   is not searched; once it has been unlisted for 30 days, the run fails with a
   warning that red builds in the rest of its gap may be missing.
+- On a tab new to the archive, or one it forgot after the tab was unlisted, GCS
+  is searched only 14 days back for builds the tab no longer shows.
 
 ### Builds taken from GCS that may never have shown red
 
