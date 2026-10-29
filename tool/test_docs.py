@@ -3,7 +3,7 @@
 The tests check README.md, AGENTS.md, THIRD_PARTY_NOTICES.md and tool/oracle/README.md, as GitHub shows them (see
 Page): their links and anchors, and those of the pages a run writes; HTML comments and code fences that could hide
 text; the oracle's files; the versions the ported files come from; and the days INDEX.md says red builds are given
-up on after.
+up on after. The test workflow runs on a change to any file they read.
 
 Run: cd tool && uv run python -m unittest test_docs -v
 """
@@ -27,6 +27,7 @@ from html.parser import HTMLParser
 from unittest import mock
 
 import cmarkgfm
+import yaml
 from cmarkgfm.cmark import Options
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -35,6 +36,9 @@ sys.path.insert(0, HERE)
 import fetch_red_logs as frl  # noqa: E402
 
 DOCS = ["README.md", "AGENTS.md", "THIRD_PARTY_NOTICES.md", "tool/oracle/README.md"]
+# (the docs, and the other files outside tool/ that the tests read)
+READ = DOCS + ["LICENSE", "third_party/go/LICENSE", "third_party/unicode/LICENSE", ".gitignore",
+               ".github/workflows/red-build-logs.yml", ".github/workflows/test.yml", ".github/workflows/oracle.yml"]
 # (cmark-gfm's options: raw HTML, footnotes and each block's lines; cmark-gfm is GitHub's fork of CommonMark's parser)
 OPTIONS = Options.CMARK_OPT_UNSAFE | Options.CMARK_OPT_FOOTNOTES | Options.CMARK_OPT_SOURCEPOS
 GITHUB = os.path.join(HERE, "testdata", "github_markdown.json")
@@ -271,6 +275,22 @@ def target(link, page, root, archive=None):
     return (os.path.join(archive, inside) if archive and not inside.startswith("..") else full), anchor
 
 
+def unread(linked, root=ROOT):
+    """Of the files and folders under `root` that `linked` names, outside tool/ and archive/, those not known
+    to run the tests when they change: a file READ does not hold (TestWorkflowPaths checks that each one READ
+    holds does), a folder with no file of READ in it."""
+    out = []
+    for path in sorted(linked):
+        rel = os.path.relpath(path, root).replace(os.sep, "/")
+        if rel.split("/")[0] in ("tool", "archive"):
+            continue
+        if os.path.isdir(path) and (rel == "." or any(r.startswith(rel + "/") for r in READ)):
+            continue
+        if rel not in READ:
+            out.append(rel)
+    return out
+
+
 class Templates(unittest.TestCase):
     """INDEX.md's row of red builds given up on prints GIVE_UP_DAYS, not a 14 of its own."""
 
@@ -347,10 +367,11 @@ class Links(unittest.TestCase):
 
     def check_page(self, link, page, tmp):
         """A link of a page written in tmp/archive/: into the archive, checked there; out of it, into the
-        repository, there."""
+        repository, there (and a change to what it leads to runs the tests: see unread)."""
         file, anchor = target(link, page, tmp)
         if file not in (None, OUTSIDE) and os.path.relpath(file, os.path.join(tmp, "archive")).startswith(".."):
             file = os.path.join(ROOT, os.path.relpath(file, tmp))
+            self.assertEqual(unread({file}), [])
         self.leads(link, file, anchor)  # (OUTSIDE, or None for two levels out, there too)
 
     def test_control_a_pages_links_out_of_the_archive(self):
@@ -360,6 +381,9 @@ class Links(unittest.TestCase):
             for link in ("../../README.md", "../README.md#nowhere"):
                 with self.subTest(link), self.assertRaises(AssertionError):
                     self.check_page(link, index, tmp)
+            # (one outside tool/ and archive/ the tests are not known to run on a change to)
+            with mock.patch(f"{__name__}.READ", [r for r in READ if r != ".gitignore"]), self.assertRaises(AssertionError):
+                self.check_page("../.gitignore", index, tmp)
 
     def test_control_the_links_and_anchors_are_githubs(self):
         self.assertEqual(anchors("# A\n## When TestGrid's production manifests move\n## `tool/` and x.py\n## A\n"
@@ -570,6 +594,19 @@ class OracleReadme(unittest.TestCase):
         places = [os.path.join(HERE, "oracle"), os.path.join(HERE, "oracle", "fuzz"), HERE, ROOT]
         self.assertEqual(self.missing(named, places), [], "tool/oracle/README.md names these, but they are not there: "
                          "fix the name or add the file")
+        # (one found only at the root: not in archive/, and one the tests are known to run on a change to)
+        self.assertEqual(self.root_names_unread(self.at_root(named, places[:3])), [],
+                         "tool/oracle/README.md names these at the root: name none in archive/, add the others to READ")
+
+    def at_root(self, named, places):
+        """Of named, those at the root but at none of places."""
+        return sorted(n for n in named if os.path.exists(os.path.join(ROOT, n))
+                      and not any(os.path.exists(os.path.join(p, n)) for p in places))
+
+    def test_control_at_root(self):
+        places = [os.path.join(HERE, "oracle"), HERE]
+        self.assertEqual(self.at_root({".jsonl", "README.md", ".gitignore", "AGENTS.md", "nope.py"}, places),
+                         [".gitignore", "AGENTS.md"])
 
     def test_control_a_comment_names_no_local_file(self):
         real = read
@@ -586,6 +623,14 @@ class OracleReadme(unittest.TestCase):
     def test_control_missing(self):
         self.assertEqual(self.missing({".jsonl", "nope.py", "README.md", ".github/nope.yml"}, [ROOT]),
                          [".github/nope.yml", "nope.py"])
+
+    def root_names_unread(self, names):
+        """Of names found only at the root, those in archive/ (its files are the runs') or that unread lists."""
+        return sorted(n for n in names if n.split("/")[0] == "archive" or unread({os.path.join(ROOT, n)}))
+
+    def test_control_root_names_unread(self):
+        self.assertEqual(self.root_names_unread(["archive/state.json", ".gitignore", "nope.txt", "THIRD_PARTY_NOTICES.md",
+                                                 "third_party"]), ["archive/state.json", "nope.txt"])
 
 
 class NoticesVersions(unittest.TestCase):
@@ -777,6 +822,100 @@ class NoticesVersions(unittest.TestCase):
         self.assertEqual(self.commits_after_testgrid(notices), ["f15bfa4808a4"] * 3 + ["abc1234"] + ["f15bfa4808a4"] * 16)
         self.assertEqual(self.commits_after_testgrid("TestGrid at `f15bfa4808a4` <!-- was `abc1234` -->"),
                          ["f15bfa4808a4"])  # (a commit in a comment is not on the page)
+
+
+def tool_files():
+    """The files under tool/, by their paths from the root (but the virtualenv and caches): the tests read
+    their code and data."""
+    out = []
+    for d, dirs, names in os.walk(HERE):
+        dirs[:] = [x for x in dirs if x not in (".venv", "__pycache__", ".ruff_cache", ".pytest_cache")]
+        out += [os.path.relpath(os.path.join(d, n), ROOT).replace(os.sep, "/") for n in names if not n.endswith(".pyc")]
+    return sorted(out)
+
+
+def events(on):
+    """A workflow's on: as {event: its filters, or None}, whether it is a name, a list or a map."""
+    return {e: None for e in ([on] if isinstance(on, str) else on)} if isinstance(on, (str, list)) else on
+
+
+def github_paths(patterns, path):
+    """Whether a workflow's paths filter takes a change to `path`, as GitHub's filter patterns match: * does
+    not match /, ** does (**/ also nothing), ? and + are of the character before them, [] is a class, and the
+    last pattern that matches decides (a ! one excludes)."""
+    def regex(pattern):
+        out, i = "", 0
+        while i < len(pattern):
+            if pattern.startswith("**/", i):
+                out, i = out + "(?:.*/)?", i + 3
+            elif pattern.startswith("**", i):
+                out, i = out + ".*", i + 2
+            elif pattern[i] == "[" and (j := pattern.find("]", i + 1)) > i:
+                out, i = out + pattern[i:j + 1], j + 1
+            else:
+                out, i = out + ({"*": "[^/]*", "?": "?", "+": "+"}.get(pattern[i]) or re.escape(pattern[i])), i + 1
+        return re.compile(out + r"\Z")
+    taken = False
+    for p in patterns:
+        if regex(p.lstrip("!")).match(path):
+            taken = not p.startswith("!")
+    return taken
+
+
+class TestWorkflowPaths(unittest.TestCase):
+    """The test workflow runs on a change to each file of tool/, and to each file outside it that these tests
+    read (READ). Each file outside tool/ and archive/ that the docs link to is one of READ, and each such
+    folder holds one (Links checks the same of the pages a run writes)."""
+
+    READ = READ
+
+    def test_each_file_read_here_triggers_it(self):
+        workflow = yaml.safe_load(read(".github/workflows/test.yml"))
+        on = events(workflow.get(True, workflow.get("on")))  # (YAML 1.1 reads a bare on as true)
+        for event in ("push", "pull_request"):
+            self.assertIn(event, on, "the test workflow does not run on it")
+            patterns, ignored = (on[event] or {}).get("paths"), (on[event] or {}).get("paths-ignore") or []
+            files = self.READ + tool_files()
+            self.assertLessEqual({"tool/fetch_red_logs.py", "tool/go_unicode.json.gz"}, set(files))
+            for rel in files:
+                with self.subTest(event=event, file=rel):
+                    self.assertTrue((patterns is None or github_paths(patterns, rel)) and not github_paths(ignored, rel),
+                                    f"{rel}: test.yml does not run on a change to it: add it to its paths, or take it "
+                                    "out of paths-ignore")  # fails: AGENTS.md, the notices and the licenses
+
+    def test_each_file_the_docs_link_to_is_read_here(self):
+        # (so READ above holds each, and a change to one runs the tests)
+        linked = {f for doc in DOCS for link in links(read(doc))
+                  for f, _ in [target(link, os.path.join(ROOT, doc), ROOT)] if f not in (None, OUTSIDE)}
+        self.assertEqual(unread(linked), [], "the docs link to these files (or folders) outside tool/ and archive/, which "
+                         "READ does not hold: add each to READ (a folder: a file in it) and to test.yml's paths")
+
+    def test_control_unread(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for folder in ("docs", "third_party", "tool"):
+                os.makedirs(os.path.join(tmp, folder))
+            linked = {tmp, os.path.join(tmp, "docs"), os.path.join(tmp, "third_party"), os.path.join(tmp, "tool"),
+                      os.path.join(tmp, "README.md"), os.path.join(tmp, "tools.md"), os.path.join(tmp, "tool", "x.py"),
+                      os.path.join(tmp, "archive", "runs")}
+            self.assertEqual(unread(linked, tmp), ["docs", "tools.md"])
+
+    def test_control_on_in_each_form(self):
+        self.assertEqual((events("push"), events(["push", "pull_request"]), events({"push": {"paths": ["x"]}})),
+                         ({"push": None}, {"push": None, "pull_request": None}, {"push": {"paths": ["x"]}}))
+
+    def test_control_the_patterns_are_githubs(self):
+        self.assertTrue(github_paths(["third_party/**"], "third_party/go/LICENSE"))
+        self.assertFalse(github_paths(["third_party/*"], "third_party/go/LICENSE"))
+        self.assertFalse(github_paths(["**", "!*.md"], "README.md"))
+        self.assertTrue(github_paths(["**", "!*.md"], "tool/a.md"))  # (* stops at /)
+        self.assertTrue(github_paths(["LICENSE?"], "LICENSE"))
+        # (examples of GitHub's filter pattern cheat sheet)
+        for pattern, path in (("docs/**/*.md", "docs/README.md"), ("**/docs/**", "docs/hello.md"),
+                              ("**/README.md", "README.md"), ("**/*src/**", "my-src/code/js/app.js"),
+                              ("**/*-post.md", "my-post.md"), ("**/migrate-*.sql", "migrate-10909.sql"),
+                              ("*.jsx?", "page.js"), ("[CB]at", "Cat"), ("[1-2]00", "200")):
+            self.assertTrue(github_paths([pattern], path), (pattern, path))
+        self.assertFalse(github_paths(["[1-2]00"], "-00"))
 
 
 KINDS = ("text", "code", "pre", "alt", "mark")  # (all a page shows, see Page)
