@@ -1,5 +1,838 @@
 [
   {
+    "time": 1793233926,
+    "job": "ci-kubernetes-e2e-kubeadm-kinder-latest",
+    "build": "2115602404811476992",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kubeadm-kinder-latest"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "task-07-e2e",
+      "ci-kubernetes-e2e-kubeadm-kinder-latest.Overall"
+    ],
+    "red_test_count": 5,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115602404811476992",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115602404811476992/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115602404811476992/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 573221,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest/2115602404811476992"
+  },
+  {
+    "time": 1793232543,
+    "job": "ci-node-crio-conformance",
+    "build": "2115596615807930368",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115596615807930368",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115596615807930368/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115596615807930368/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2084843,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115596615807930368"
+  },
+  {
+    "time": 1793230687,
+    "job": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
+    "build": "2115588814880641024",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kubeadm-kinder-upgrade-1-37-latest"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "task-09-e2e-after",
+      "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest.Overall"
+    ],
+    "red_test_count": 5,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115588814880641024",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115588814880641024/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115588814880641024/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 967053,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115588814880641024"
+  },
+  {
+    "time": 1793229242,
+    "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+    "build": "2115582775586197504",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-slow-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] cpu & mem restart resizing cpu [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+      "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] no restart resizing mem [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+      "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] no restart resizing pod-level cpu & mem in the same direction [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+      "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] burstable pods - pod-level resources pod-level resize with limits add [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
+    ],
+    "red_test_count": 6,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gce-cos-slow-master/2115582775586197504",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gce-cos-slow-master/2115582775586197504/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gce-cos-slow-master/2115582775586197504/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 523889,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2115582775586197504"
+  },
+  {
+    "time": 1793228981,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2115581767858524160",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] PreStop should call prestop when killing a pod [Conformance]",
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-capz-master-windows/2115581767858524160",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-capz-master-windows/2115581767858524160/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-capz-master-windows/2115581767858524160/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 394137,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2115581767858524160"
+  },
+  {
+    "time": 1793228945,
+    "job": "ci-node-crio-conformance",
+    "build": "2115581515801825280",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115581515801825280",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115581515801825280/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115581515801825280/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2115708,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115581515801825280"
+  },
+  {
+    "time": 1793227714,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2115576482666385408",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a service. [Conformance]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2115576482666385408",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2115576482666385408/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2115576482666385408/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 228624,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115576482666385408"
+  },
+  {
+    "time": 1793226727,
+    "job": "ci-kubernetes-e2e-kubeadm-kinder-latest",
+    "build": "2115572205529075712",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kubeadm-kinder-latest"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "task-07-e2e",
+      "ci-kubernetes-e2e-kubeadm-kinder-latest.Overall"
+    ],
+    "red_test_count": 5,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115572205529075712",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115572205529075712/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115572205529075712/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 568268,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest/2115572205529075712"
+  },
+  {
+    "time": 1793225794,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2115567424236425216",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-apps] k8s.io/kubernetes/test/integration.job",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-integration-arm64-master/2115567424236425216",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-integration-arm64-master/2115567424236425216/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-integration-arm64-master/2115567424236425216/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2910861,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2115567424236425216"
+  },
+  {
+    "time": 1793225350,
+    "job": "ci-node-crio-conformance",
+    "build": "2115566416139653120",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115566416139653120",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115566416139653120/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115566416139653120/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2107681,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115566416139653120"
+  },
+  {
+    "time": 1793225044,
+    "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+    "build": "2115565159308070912",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-alphafeatures-master"
+    ],
+    "red_tests": [
+      "kubetest.Timeout",
+      "kubetest.listResources After",
+      "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2115565159308070912",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2115565159308070912/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2115565159308070912/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 125276,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2115565159308070912"
+  },
+  {
+    "time": 1793223436,
+    "job": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
+    "build": "2115558397871919104",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kubeadm-kinder-upgrade-1-37-latest"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "task-09-e2e-after",
+      "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest.Overall"
+    ],
+    "red_test_count": 5,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115558397871919104",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115558397871919104/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115558397871919104/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 986038,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115558397871919104"
+  },
+  {
+    "time": 1793222376,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+    "build": "2115553616277278720",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS when invoking the Recycle reclaim policy should test that a PV becomes Available and is clean after the PVC is deleted.",
+      "ci-kubernetes-e2e-kind-alpha-beta-features.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kind-alpha-beta-features/2115553616277278720",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kind-alpha-beta-features/2115553616277278720/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kind-alpha-beta-features/2115553616277278720/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 238496,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2115553616277278720"
+  },
+  {
+    "time": 1793221713,
+    "job": "ci-node-crio-conformance",
+    "build": "2115551098935709696",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115551098935709696",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115551098935709696/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115551098935709696/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2117608,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115551098935709696"
+  },
+  {
+    "time": 1793219515,
+    "job": "ci-kubernetes-e2e-kubeadm-kinder-latest",
+    "build": "2115541787396280320",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kubeadm-kinder-latest"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "task-07-e2e",
+      "ci-kubernetes-e2e-kubeadm-kinder-latest.Overall"
+    ],
+    "red_test_count": 5,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115541787396280320",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115541787396280320/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115541787396280320/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 579034,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest/2115541787396280320"
+  },
+  {
+    "time": 1793218146,
+    "job": "ci-node-crio-conformance",
+    "build": "2115535999873323008",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115535999873323008",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115535999873323008/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115535999873323008/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2118035,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115535999873323008"
+  },
+  {
+    "time": 1793216236,
+    "job": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
+    "build": "2115528197742268416",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kubeadm-kinder-upgrade-1-37-latest"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "task-09-e2e-after",
+      "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest.Overall"
+    ],
+    "red_test_count": 5,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115528197742268416",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115528197742268416/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115528197742268416/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 932607,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115528197742268416"
+  },
+  {
+    "time": 1793214534,
+    "job": "ci-node-crio-conformance",
+    "build": "2115520899137409024",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115520899137409024",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115520899137409024/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115520899137409024/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2114061,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115520899137409024"
+  },
+  {
+    "time": 1793214474,
+    "job": "ci-kubernetes-verify-master",
+    "build": "2115520657969123328",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#verify-master"
+    ],
+    "red_tests": [
+      "verify.govulncheck",
+      "verify.internal-modules",
+      "ci-kubernetes-verify-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-verify-master/2115520657969123328",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-verify-master/2115520657969123328/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-verify-master/2115520657969123328/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 491497,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-verify-master/2115520657969123328"
+  },
+  {
+    "time": 1793212282,
+    "job": "ci-kubernetes-e2e-kubeadm-kinder-latest",
+    "build": "2115511588755607552",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kubeadm-kinder-latest"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "task-07-e2e",
+      "ci-kubernetes-e2e-kubeadm-kinder-latest.Overall"
+    ],
+    "red_test_count": 5,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115511588755607552",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115511588755607552/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-latest/2115511588755607552/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 596039,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest/2115511588755607552"
+  },
+  {
+    "time": 1793211069,
+    "job": "ci-node-crio-conformance",
+    "build": "2115505799550734336",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115505799550734336",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115505799550734336/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115505799550734336/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2193189,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115505799550734336"
+  },
+  {
+    "time": 1793209091,
+    "job": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
+    "build": "2115497998422118400",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kubeadm-kinder-upgrade-1-37-latest"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "task-09-e2e-after",
+      "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest.Overall"
+    ],
+    "red_test_count": 5,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115497998422118400",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115497998422118400/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115497998422118400/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 936874,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2115497998422118400"
+  },
+  {
+    "time": 1793208762,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2115496991717855232",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for CRD without validation schema [Conformance]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gci-gce/2115496991717855232",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gci-gce/2115496991717855232/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gci-gce/2115496991717855232/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 224330,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115496991717855232"
+  },
+  {
+    "time": 1793207341,
+    "job": "ci-node-crio-conformance",
+    "build": "2115490700094083072",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "E2eNode Suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115490700094083072",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115490700094083072/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-node-crio-conformance/2115490700094083072/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2117644,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2115490700094083072"
+  },
+  {
+    "time": 1793197362,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2115449177923129344",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should return command exit codes should handle in-cluster config",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2115449177923129344",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2115449177923129344/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2115449177923129344/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 217348,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115449177923129344"
+  },
+  {
+    "time": 1793196612,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2115445402839814144",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration.apiserver",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-integration-master/2115445402839814144",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-integration-master/2115445402839814144/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-integration-master/2115445402839814144/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 283583,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2115445402839814144"
+  },
+  {
+    "time": 1793193191,
+    "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+    "build": "2115431561443676160",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-slow-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gce-cos-slow-master/2115431561443676160",
+    "run": "2026-10-29T005728Z",
+    "files": [
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gce-cos-slow-master/2115431561443676160/build-log.txt.gz",
+      "runs/2026-10/2026-10-29T005728Z/ci-kubernetes-e2e-gce-cos-slow-master/2115431561443676160/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 240846,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2115431561443676160"
+  },
+  {
     "time": 1793185929,
     "job": "ci-kubernetes-e2e-gce-cos-slow-master",
     "build": "2115401108884033536",
@@ -21,7 +854,7 @@
     ],
     "remote": [],
     "bytes": 231428,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -1186,7 +2019,7 @@
     "remote": [],
     "bytes": 376644,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1224,7 +2057,7 @@
     "remote": [],
     "bytes": 1017583,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1254,7 +2087,7 @@
     "remote": [],
     "bytes": 252725,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1282,7 +2115,7 @@
     "remote": [],
     "bytes": 201204,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1312,7 +2145,7 @@
     "remote": [],
     "bytes": 233332,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1341,7 +2174,7 @@
     "remote": [],
     "bytes": 1201943,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1370,7 +2203,7 @@
     "remote": [],
     "bytes": 379387,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1408,7 +2241,7 @@
     "remote": [],
     "bytes": 1088042,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1437,7 +2270,7 @@
     "remote": [],
     "bytes": 379606,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1467,7 +2300,7 @@
     "remote": [],
     "bytes": 228217,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

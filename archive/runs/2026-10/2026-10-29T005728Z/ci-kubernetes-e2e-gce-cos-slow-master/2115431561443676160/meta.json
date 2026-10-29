@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+  "build": "2115431561443676160",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master",
+  "started": 1793193191,
+  "created": 1793193161,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-slow-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-slow-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach UDP service through 136.64.208.24:80 after 2m...io/kubernetes/test/e2e/network/service.go:569 @ 10/28/26 13:27:13.259\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793196249,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2115431561443676160",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2115431561443676160/build-log.txt",
+  "log": {
+    "bytes": 144148,
+    "md5": "c6b924dea855cb2251a62a805512f6aa",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23520,
+    "gcs": {
+      "generation": "1793196259302152",
+      "md5": "c6b924dea855cb2251a62a805512f6aa",
+      "crc32c": "62ba404e",
+      "bytes": 144148,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96698,
+    "md5": "cac8142be09d0ace0754fc91e207c106",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12380,
+    "gcs": {
+      "generation": "1793196264158360",
+      "md5": "cac8142be09d0ace0754fc91e207c106",
+      "crc32c": "34d4d65c",
+      "bytes": 96698,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T005728Z",
+  "archived_at": 1793235448.0,
+  "settled": true,
+  "final": false
+}

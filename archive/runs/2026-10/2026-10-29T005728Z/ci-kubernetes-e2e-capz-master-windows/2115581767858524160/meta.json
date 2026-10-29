@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2115581767858524160",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793228981,
+  "created": 1793228973,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PreStop should call prestop when killing a pod [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] validating pre-stop.: timed out waiting for the condition\nIn ...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793234396,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2115581767858524160",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2115581767858524160/build-log.txt",
+  "log": {
+    "bytes": 324304,
+    "md5": "ccbe77095015d4153f16f0f9d8393f8d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 39959,
+    "gcs": {
+      "generation": "1793234404613112",
+      "md5": "ccbe77095015d4153f16f0f9d8393f8d",
+      "crc32c": "a1cd985d",
+      "bytes": 324304,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 69833,
+    "md5": "532bc18cb8592228c636745a2b6dc65d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12064,
+    "gcs": {
+      "generation": "1793234406467280",
+      "md5": "532bc18cb8592228c636745a2b6dc65d",
+      "crc32c": "5d6cf881",
+      "bytes": 69833,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T005728Z",
+  "archived_at": 1793235448.0,
+  "settled": false,
+  "final": false
+}

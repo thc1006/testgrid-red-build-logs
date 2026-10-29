@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2115565159308070912",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1793225044,
+  "created": 1793225013,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        },
+        {
+          "test": "kubetest.listResources After",
+          "status": "FAIL",
+          "message": "Failed to list resources (error during ./cluster/gce/list-resources.sh (interrupted): signal: interrupt):\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793232263,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2115565159308070912",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2115565159308070912/build-log.txt",
+  "log": {
+    "bytes": 53906,
+    "md5": "2c90b510dd6fbec80c935a59b45a96a7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 11110,
+    "gcs": {
+      "generation": "1793232266230935",
+      "md5": "2c90b510dd6fbec80c935a59b45a96a7",
+      "crc32c": "da86bf47",
+      "bytes": 53906,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 71370,
+    "md5": "8e5116d568938ad496900688a6f7c375",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10808,
+    "gcs": {
+      "generation": "1793232268022885",
+      "md5": "8e5116d568938ad496900688a6f7c375",
+      "crc32c": "cc6c05b6",
+      "bytes": 71370,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T005728Z",
+  "archived_at": 1793235448.0,
+  "settled": false,
+  "final": false
+}

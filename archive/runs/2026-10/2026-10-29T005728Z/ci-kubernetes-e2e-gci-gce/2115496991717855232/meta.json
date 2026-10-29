@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2115496991717855232",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793208762,
+  "created": 1793208761,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourcePublishOpenAPI [Privileged:ClusterAdmin] works for CRD without validation schema [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] failed to explain e2e-test-crd-publish-openapi-5829-3317-crds...t/e2e/apimachinery/crd_publish_openapi.go:185 @ 10/28/26 17:48:27.958\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793210940,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115496991717855232",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2115496991717855232/build-log.txt",
+  "log": {
+    "bytes": 139094,
+    "md5": "23cfcd18073947525a271f8e958f9f71",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22654,
+    "gcs": {
+      "generation": "1793210958566038",
+      "md5": "23cfcd18073947525a271f8e958f9f71",
+      "crc32c": "bf2e7a5e",
+      "bytes": 139094,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85236,
+    "md5": "c36c66c3f5c93dfb4098fb695c09b322",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11726,
+    "gcs": {
+      "generation": "1793210960486453",
+      "md5": "c36c66c3f5c93dfb4098fb695c09b322",
+      "crc32c": "f6307950",
+      "bytes": 85236,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T005728Z",
+  "archived_at": 1793235448.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2115576482666385408",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793227714,
+  "created": 1793227713,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a service. [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.000s.\nExpected:\n    <*v1.ResourceQuota | ...tes/test/e2e/apimachinery/resource_quota.go:150 @ 10/28/26 23:03:13.2\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793229894,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115576482666385408",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2115576482666385408/build-log.txt",
+  "log": {
+    "bytes": 142495,
+    "md5": "5b1537550731d2efd2780acdb2cfbfa3",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23282,
+    "gcs": {
+      "generation": "1793229908716959",
+      "md5": "5b1537550731d2efd2780acdb2cfbfa3",
+      "crc32c": "2dc3a5e2",
+      "bytes": 142495,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86129,
+    "md5": "8f55f337a6cae9f997a507b7820cbab6",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11959,
+    "gcs": {
+      "generation": "1793229910919806",
+      "md5": "8f55f337a6cae9f997a507b7820cbab6",
+      "crc32c": "76435f47",
+      "bytes": 86129,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T005728Z",
+  "archived_at": 1793235448.0,
+  "settled": false,
+  "final": false
+}

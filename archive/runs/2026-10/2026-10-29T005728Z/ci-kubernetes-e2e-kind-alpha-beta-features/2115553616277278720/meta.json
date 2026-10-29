@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2115553616277278720",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1793222376,
+  "created": 1793222261,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS when invoking the Recycle reclaim policy should test that a PV becomes Available and is clean after the PVC is deleted.",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be Succeeded or Fai...es/test/e2e/storage/persistent_volumes.go:390 @ 10/28/26 21:47:15.303\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793224108,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2115553616277278720",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2115553616277278720/build-log.txt",
+  "log": {
+    "bytes": 132818,
+    "md5": "6307520318277339445977c0233107e6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20977,
+    "gcs": {
+      "generation": "1793224124151966",
+      "md5": "6307520318277339445977c0233107e6",
+      "crc32c": "319b18a1",
+      "bytes": 132818,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 105678,
+    "md5": "95280f6c456110f1827687c40c859d32",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13596,
+    "gcs": {
+      "generation": "1793224126089496",
+      "md5": "95280f6c456110f1827687c40c859d32",
+      "crc32c": "6d0dd1ca",
+      "bytes": 105678,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T005728Z",
+  "archived_at": 1793235448.0,
+  "settled": true,
+  "final": false
+}

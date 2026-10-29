@@ -1,0 +1,77 @@
+{
+  "job": "ci-kubernetes-e2e-kubeadm-kinder-latest",
+  "build": "2115602404811476992",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest",
+  "started": 1793233926,
+  "created": 1793233893,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kubeadm-kinder-latest",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secret-1b46b182-5f25-4b76-89c4-30d2057328c7...s/test/e2e/framework/pod/output/output.go:263 @ 10/29/26 00:46:55.171\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secrets-6e216ba6-4d16-4302-9822-8044eaa89da...s/test/e2e/framework/pod/output/output.go:263 @ 10/29/26 00:46:59.096\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-configmaps-538c4e0a-d062-4097-b9ff-55cecac9...s/test/e2e/framework/pod/output/output.go:263 @ 10/29/26 00:46:52.083\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kubeadm-kinder-latest.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "task-07-e2e",
+          "status": "FAIL",
+          "message": "exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793235031,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest/2115602404811476992",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest/2115602404811476992/build-log.txt",
+  "log": {
+    "bytes": 492508,
+    "md5": "c7caa3b834c4723bfdde969c7ecd0ed7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 71140,
+    "gcs": {
+      "generation": "1793235035200891",
+      "md5": "c7caa3b834c4723bfdde969c7ecd0ed7",
+      "crc32c": "7dea632e",
+      "bytes": 492508,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 80713,
+    "md5": "1179c58e24d68f85a3a62124a0332317",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11354,
+    "gcs": {
+      "generation": "1793235037687369",
+      "md5": "1179c58e24d68f85a3a62124a0332317",
+      "crc32c": "560f4f35",
+      "bytes": 80713,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-29T005728Z",
+  "archived_at": 1793235448.0,
+  "settled": false,
+  "final": false
+}
