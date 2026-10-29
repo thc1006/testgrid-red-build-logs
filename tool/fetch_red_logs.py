@@ -85,6 +85,7 @@ import http.client
 import io
 import itertools
 import json
+import lzma
 import math
 import operator
 import os
@@ -95,6 +96,7 @@ import signal
 import stat
 import subprocess
 import sys
+import tarfile
 import tempfile
 import threading
 import time
@@ -201,6 +203,9 @@ BACKFILL_SLACK_HOURS = 6  # a build may start this long after its ID was made
 PROWJOB_WAIT = 30  # seconds to wait for prowjob.json; without it a tab keeps the margin it had
 GIVEN_UP_KEEP_DAYS = 30  # a build given up on stays listed this long, then only the run reports name it
 FUTURE_SLACK = 86400  # timestamps more than a day ahead are rejected as bogus
+MAX_ASSET_BYTES = 1 << 30  # a larger asset is refused: its upload could outlast a step
+ASSET_PRESET = 9  # xz's preset for an asset of a build's artifacts/ (see pack_artifacts)
+ASSET_FILES_BYTES = 2 << 30  # a build whose artifacts/ hold this many bytes of files is never packed
 
 
 def _umask():
@@ -222,6 +227,10 @@ class IntegrityError(Exception):
 
 class Abandoned(Exception):
     pass
+
+
+class OverLimit(Exception):
+    """Content over the limit a download was given (see download): not tried again."""
 
 
 class LocalIOError(Exception):
@@ -1539,14 +1548,16 @@ class Staged:
         remove_temps(self.temps)
 
 
-def download(url, path, compress=False, max_bytes=None):
+def download(url, path, compress=False, max_bytes=None, limit=None):
     """Fetch url to temp files next to path, checking length and md5 against GCS: a Staged copy, which
     put_in_place puts in place as path (gzipped, as path.gz, if compress), or as numbered parts if it is
     larger than max_bytes (see split_parts).
 
-    Its info's md5 and byte count describe the raw content either way.
+    Its info's md5 and byte count describe the raw content either way. With a limit, content of more than it is
+    OverLimit, before it is written, as is one past MAX_DOWNLOAD_BYTES.
     """
     final = path + ".gz" if compress else path
+    too_large = IntegrityError if limit is None else OverLimit  # (OverLimit is not tried again)
     try:
         part = temp_path(final)
     except OSError as e:  # (a disk error, as one writing it is)
@@ -1563,7 +1574,7 @@ def download(url, path, compress=False, max_bytes=None):
             raise IntegrityError(f"{url}: unsupported Content-Encoding {sent_enc!r}")
         sent_len = header_int(r.headers, "Content-Length")
         if sent_len is not None and sent_len > MAX_DOWNLOAD_BYTES:
-            raise IntegrityError(f"{url}: {sent_len} bytes is more than the {MAX_DOWNLOAD_BYTES} byte limit")
+            raise too_large(f"{url}: {sent_len} bytes is more than the {MAX_DOWNLOAD_BYTES} byte limit")
         raw, raw_len, out, out_len = hashlib.md5(), 0, hashlib.md5(), 0
         gunzip = Gunzip() if sent_enc == "gzip" else None
         # Without an md5 (a composite object), check GCS's crc32c of the stored bytes instead.
@@ -1579,6 +1590,8 @@ def download(url, path, compress=False, max_bytes=None):
 
         def write(data):
             nonlocal out_len
+            if limit is not None and out_len + len(data) > limit:
+                raise OverLimit(f"{url}: more than {limit} bytes")
             try:
                 sink.write(data)
             except OSError as e:
@@ -1592,13 +1605,13 @@ def download(url, path, compress=False, max_bytes=None):
                 raw.update(chunk)
                 raw_len += len(chunk)
                 if raw_len > MAX_DOWNLOAD_BYTES:
-                    raise IntegrityError(f"{url}: more than the {MAX_DOWNLOAD_BYTES} byte limit")
+                    raise too_large(f"{url}: more than the {MAX_DOWNLOAD_BYTES} byte limit")
                 if crc_of == "raw":
                     crc["raw"] = crc32c(chunk, crc["raw"])
                 if gunzip:
                     for piece in gunzip.feed(chunk):
                         if out_len + len(piece) > MAX_DOWNLOAD_BYTES:  # (a few bytes can gunzip to many)
-                            raise IntegrityError(f"{url}: more than the {MAX_DOWNLOAD_BYTES} byte limit once gunzipped")
+                            raise too_large(f"{url}: more than the {MAX_DOWNLOAD_BYTES} byte limit once gunzipped")
                         write(piece)
                 else:
                     write(chunk)
@@ -1984,6 +1997,116 @@ def take_node_logs(gcs, where, base, target, compress, max_bytes, apiserver, who
     for name, info in whole.items():
         records.setdefault(name, info)  # (GCS no longer has it where it was, or at all: the copy stays)
     return sorted(records.values(), key=lambda info: info["path"]), error, refused
+
+
+class AssetTooLarge(Exception):
+    """An asset of a build's artifacts/ of ASSET_FILES_BYTES of files or more, or of more than MAX_ASSET_BYTES,
+    which a run does not upload; files, the bytes of files it counted."""
+
+    def __init__(self, message, files):
+        super().__init__(message)
+        self.files = files
+
+
+class AssetRefused(IntegrityError):
+    """A file of a build's artifacts/ whose name would not be a plain one in an asset (see member_name)."""
+
+
+def member_name(path):
+    """The name in an asset of the file GCS has at path in a build's folder: its path below artifacts/. A path
+    whose name would not be a plain relative one (an empty, "." or ".." part, a control character) is
+    AssetRefused."""
+    name = path.removeprefix("artifacts/") if isinstance(path, str) else ""
+    parts = name.split("/")
+    if name == path or re.search(r"[\x00-\x1f\x7f-\x9f]", name) or any(p in ("", ".", "..") for p in parts):
+        raise AssetRefused(f"cannot pack {str(path)[:200]!r}: not a plain name below artifacts/")
+    return name
+
+
+def still_packing(what):
+    """Abandoned once the run is stopped, TimeoutError once it is past its deadline: xz takes minutes for a large
+    build, which neither download() nor the wait for it would stop."""
+    ctx = context()
+    if ctx.abandoned.is_set():
+        raise Abandoned(what)
+    if time.monotonic() > ctx.deadline:
+        raise TimeoutError(f"{what}: run timeout reached while packing")
+
+
+class Packing:
+    """A member's file as tarfile reads it into the asset: still_packing at each read."""
+
+    def __init__(self, f, what):
+        self.f, self.what = f, what
+
+    def read(self, n=-1):
+        still_packing(self.what)
+        return self.f.read(n)
+
+
+def pack_artifacts(base, members, work, out, mtime):
+    """Pack the files GCS has at members (paths in a build's folder, at base, below artifacts/) into out, an xz
+    (preset ASSET_PRESET) of a PAX tar of them named by member_name, sorted by its bytes; each taken into the
+    folder work and checked as download() takes and checks a file. Every entry has mtime, mode 0644 and owner 0,
+    so the same files give the same bytes (with the same liblzma). Returns {"bytes", "sha256", "members":
+    [{"path", "bytes", "md5", "gcs"}]}. Each name is checked before any file is taken (AssetRefused). Files that
+    would reach ASSET_FILES_BYTES (a gzipped one counted unpacked: its download stops there), or an asset of more
+    than MAX_ASSET_BYTES, raise AssetTooLarge, a member GCS no longer has NotFound, a disk error LocalIOError, a run
+    stopped Abandoned and one past its deadline TimeoutError (see still_packing); out is written only whole."""
+    records, files = [], 0
+    named = [(path, member_name(path)) for path in sorted(members, key=lambda p: str(p).encode("utf-8", "surrogateescape"))]
+    try:
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(out), prefix=f".{os.path.basename(out)}.", suffix=".part")
+    except OSError as e:  # (a disk error, as one writing it is)
+        raise LocalIOError(f"{out}: {e}") from None
+    f = xz = tar = None
+    try:
+        f = os.fdopen(fd, "wb")
+        xz = lzma.LZMAFile(f, "wb", format=lzma.FORMAT_XZ, check=lzma.CHECK_CRC64, preset=ASSET_PRESET)
+        tar = tarfile.open(fileobj=xz, mode="w", format=tarfile.PAX_FORMAT)
+        for path, name in named:
+            entry = tarfile.TarInfo(name)
+            still_packing(out)
+            try:
+                staged = download(node_log_url(base, path), os.path.join(work, "member"), limit=ASSET_FILES_BYTES - files - 1)
+            except OverLimit:  # (GCS lists a gzipped file's stored bytes, fewer than it holds)
+                raise AssetTooLarge(f"its artifacts/ hold {ASSET_FILES_BYTES} bytes of files or more, a run packs less "
+                                    f"than {ASSET_FILES_BYTES}", ASSET_FILES_BYTES) from None
+            try:
+                files += staged.info["bytes"]
+                (src, _), = staged.temps
+                entry.size, entry.mtime, entry.mode, entry.type = staged.info["bytes"], int(mtime), 0o644, tarfile.REGTYPE
+                entry.uid = entry.gid = 0
+                entry.uname = entry.gname = ""
+                with open(src, "rb") as data:
+                    tar.addfile(entry, Packing(data, out))
+            except TimeoutError:  # (see still_packing)
+                raise
+            except OSError as e:
+                raise LocalIOError(f"{tmp}: {e}") from None
+            finally:
+                staged.discard()
+            records.append({"path": path, **{k: staged.info[k] for k in ("bytes", "md5", "gcs")}})
+        try:  # (closing writes the rest of the asset: a disk error, as one writing it is)
+            for handle in (tar, xz, f):
+                handle.close()
+            size, sha = os.path.getsize(tmp), hashlib.sha256()
+            if size > MAX_ASSET_BYTES:
+                raise AssetTooLarge(f"{out}: {size} bytes packed from {files} bytes of files, a run uploads an asset "
+                                    f"of at most {MAX_ASSET_BYTES}", files)
+            with open(tmp, "rb") as packed:
+                for chunk in iter(lambda: packed.read(1 << 20), b""):
+                    sha.update(chunk)
+            os.replace(tmp, out)
+        except OSError as e:
+            raise LocalIOError(f"{tmp}: {e}") from None
+    finally:
+        for handle in filter(None, (tar, xz, f)):
+            with contextlib.suppress(OSError, ValueError):
+                handle.close()
+        with contextlib.suppress(FileNotFoundError):
+            os.remove(tmp)
+    return {"bytes": size, "sha256": sha.hexdigest(), "members": records}
 
 
 def copy_of(n):
