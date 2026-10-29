@@ -3,6 +3,7 @@
 Run: cd tool && python -m unittest test_node_e2e -v
 """
 import hashlib
+import inspect
 import io
 import math
 import os
@@ -10,6 +11,7 @@ import shutil
 import sys
 import tarfile
 import tempfile
+import threading
 import time
 import unittest
 from unittest import mock
@@ -18,8 +20,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import fetch_red_logs as frl  # noqa: E402
-from test_fetch_red_logs import FakeServer, gcs_object, gzip_stored, md5_b64  # noqa: E402
-from test_integrity import DAY, HOUR, ArchiveWorld, obj  # noqa: E402
+from test_fetch_red_logs import FakeServer, gcs_object, gzip_stored, md5_b64, table  # noqa: E402
+from test_integrity import DAY, HOUR, ArchiveWorld, obj, snowflake  # noqa: E402
 
 # (the args of real jobs' prowjob.json, cut short)
 KUBETEST_NODE = ["--deployment=node", "--gcp-zone=us-central1-b", "--node-tests=true", "--provider=gce", "--timeout=80m"]
@@ -297,6 +299,440 @@ class PackArtifacts(unittest.TestCase):
             with self.assertRaises(frl.AssetTooLarge):
                 self.pack("c.tar.xz")
         self.assertEqual(sorted(os.listdir(self.dir)), ["a.tar.xz", "b.tar.xz", "work"])
+
+
+class Assets(ArchiveWorld):
+    """A red build of a node e2e job, finished three days ago, whose artifacts/ GCS has; the runs pack them into
+    --assets."""
+
+    FILES = {f"artifacts/{HOST}/kubelet.log": b"kubelet\n" * 100, f"artifacts/{HOST}/serial-1.log": b"booting\n",
+             f"artifacts/{HOST}-system.log": b"system\n", "artifacts/junit_runner.xml": b"<testsuites/>\n"}
+
+    def setUp(self):
+        super().setUp()
+        self.assets = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.assets)
+        self.node_e2e(self.base, self.FILES)
+
+    def node_e2e(self, base, files, ago=3 * DAY, args=KUBETEST2_NODE):
+        self.srv.route(base + "/finished.json", (200, {}, {"result": "FAILURE", "timestamp": int(time.time() - ago)}))
+        self.srv.route(base + "/build-log.txt", obj(b"log\n"))
+        self.srv.route(base + "/prowjob.json", (200, {}, prowjob(args)))
+        for path, data in files.items():
+            self.srv.route(f"{base}/{path}", gcs_object(data))
+
+    def manifest(self):
+        return frl.read_json(os.path.join(self.assets, "manifest.json"))
+
+    def asset(self, name):
+        with open(os.path.join(self.assets, name), "rb") as f:
+            return f.read()
+
+    def test_a_pending_asset_of_its_artifacts(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        run, meta = self.runs()[-1], self.meta()
+        record = meta.get("artifacts_asset")
+        self.assertIsNotNone(record)
+        name = f"job_{self.build}.tar.xz"
+        data = self.asset(name)
+        self.assertEqual(record, {"name": name, "month": run["run"][:7], "bytes": len(data),
+                                  "sha256": hashlib.sha256(data).hexdigest(), "members": record["members"],
+                                  "built_by_run": run["run"], "pending_since": run["started"]})
+        self.assertEqual([(m["path"], m["bytes"], m["md5"]) for m in record["members"]],
+                         [(p, len(d), hashlib.md5(d).hexdigest()) for p, d in sorted(self.FILES.items())])
+        with tarfile.open(fileobj=io.BytesIO(data), mode="r:xz") as tar:
+            self.assertEqual(sorted(tar.getnames()), sorted(p.removeprefix("artifacts/") for p in self.FILES))
+        self.assertEqual(self.manifest(), {"run": run["run"], "assets": [
+            {"name": name, "month": record["month"], "bytes": len(data), "sha256": record["sha256"]}]})
+        self.assertEqual(run["assets_built"], [name])
+        self.assertEqual(run["bytes_downloaded"], len(b"log\n") + sum(map(len, self.FILES.values())))  # (packing too)
+        self.assertIn("assets", run["timings"])
+        # (not a file of the build folder: what intact() and the cleanup read stays as it was)
+        self.assertEqual(sorted(os.listdir(self.bdir())), ["build-log.txt", "meta.json"])
+        self.assertEqual(frl.file_records(meta), frl.file_records({k: v for k, v in meta.items() if k != "artifacts_asset"}))
+        self.assertTrue(frl.intact(self.bdir(), meta, deep=True))
+        self.assertEqual(frl.stray_files(self.bdir(), meta), [])
+        self.assertEqual(sorted(os.listdir(self.assets)), sorted([name, "manifest.json"]))  # (the work folder goes)
+        code, out = self.check()
+        self.assertEqual(code, 0, out)
+
+    def test_a_run_packs_a_pending_one_again_the_same(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        first, data = self.meta()["artifacts_asset"], self.asset(f"job_{self.build}.tar.xz")
+        self.assets = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.assets)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        again = self.meta()["artifacts_asset"]
+        self.assertEqual(again, dict(first, built_by_run=self.runs()[-1]["run"]))
+        self.assertEqual(self.asset(again["name"]), data)
+        self.assertEqual([a["sha256"] for a in self.manifest()["assets"]], [first["sha256"]])
+
+    def test_its_month_is_that_of_the_run_that_archived_it(self):
+        # (a run of another month packs it into the release of the month it was archived in, again too)
+        self.assertEqual(self.fetch(), 0)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_by_run="2026-09-30T230000Z"))
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        self.assertEqual(self.meta()["artifacts_asset"]["month"], "2026-09")
+        meta = self.meta()
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, archived_by_run="2026-08-01T000000Z"))
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.meta()["artifacts_asset"]["month"], "2026-09")
+
+    def test_but_not_one_uploaded(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        meta = self.meta()
+        meta["artifacts_asset"]["uploaded"] = {"release": "node-logs-2026-10"}
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.meta(), meta)
+        self.assertEqual(self.manifest()["assets"], [])
+
+    def test_a_repair_keeps_its_record(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        meta = self.meta()
+        meta["artifacts_asset"]["uploaded"] = {"release": "node-logs-2026-10", "url": "https://x/y"}
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        os.remove(os.path.join(self.bdir(), "build-log.txt"))
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"repaired": [self.key]})
+        self.assertEqual(self.meta()["artifacts_asset"], meta["artifacts_asset"])
+        self.assertEqual(self.manifest()["assets"], [])
+
+    def test_one_whose_node_never_existed(self):
+        for path in list(self.FILES):
+            self.srv.httpd.routes.pop(f"{self.base}/{path}")
+        self.srv.route(f"{self.base}/artifacts/junit_runner.xml", gcs_object(b"<testsuites/>\n"))
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        self.assertEqual(self.meta()["artifacts_asset"], {"members": []})
+        self.assertEqual(self.manifest()["assets"], [])
+        self.srv.route(f"{self.base}/artifacts/{HOST}/serial-1.log", gcs_object(b"late\n"))
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.meta()["artifacts_asset"], {"members": []})  # (looked at once)
+
+    def test_a_folders_placeholder_is_no_member(self):
+        # (an empty object named <folder>/, as the GCS console makes one)
+        self.srv.route(f"{self.base}/artifacts/{HOST}/", gcs_object(b""))
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        self.assertEqual(len(self.meta()["artifacts_asset"]["members"]), len(self.FILES))
+
+    def test_one_not_settled_yet_waits(self):
+        self.finished(ago=30 * 60)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        self.assertNotIn("artifacts_asset", self.meta())
+        self.assertEqual(self.manifest()["assets"], [])
+        self.finished(ago=3 * HOUR)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.meta()["artifacts_asset"]["name"], f"job_{self.build}.tar.xz")
+
+    def test_one_that_never_settles_once_final(self):
+        # (no finished.json: final GIVE_UP_DAYS after it was archived, never settled)
+        self.srv.httpd.routes.pop(self.base + "/finished.json")
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        self.assertNotIn("artifacts_asset", self.meta())
+        meta = dict(self.meta(), archived_at=time.time() - 15 * DAY)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual((self.meta()["settled"], self.meta()["final"]), (False, True))
+        self.assertIn("name", self.meta()["artifacts_asset"])
+
+    def test_a_member_gcs_no_longer_has_loses_a_pending_one(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        path = f"artifacts/{HOST}/serial-1.log"
+        self.srv.httpd.routes.pop(f"{self.base}/{path}")
+        self.assets = tempfile.mkdtemp()  # (each run's: on GitHub's runner, in $RUNNER_TEMP)
+        self.addCleanup(shutil.rmtree, self.assets)
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        self.assertIn(f"GCS no longer has {self.srv.url}{self.base}/{path}", self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual(self.meta()["artifacts_asset"]["lost"], path)
+        self.assertEqual(self.manifest()["assets"], [])
+        self.assertEqual(sorted(os.listdir(self.assets)), ["manifest.json"])
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # (not tried again)
+
+    def test_a_listing_gcs_changed_since_is_an_error_of_this_run_only(self):
+        listed = frl.list_objects
+
+        def stale(gcs, bucket, folder):
+            return dict(listed(gcs, bucket, folder), **{f"{folder}{HOST}/gone.log": (1, False, None)})
+        with mock.patch.object(frl, "list_objects", side_effect=stale):
+            self.assertEqual(self.fetch("--assets", self.assets), 1)  # fails: 2 (no --assets)
+        self.assertIn("packing its artifacts/ failed: NotFound", self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual(self.meta()["artifacts_asset"], {"failing_since": self.runs()[-1]["started"]})
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(len(self.meta()["artifacts_asset"]["members"]), len(self.FILES))
+        self.assertNotIn("failing_since", self.meta()["artifacts_asset"])
+
+    def test_what_is_not_gcss_doing_starts_no_failures(self):
+        self.assertEqual(self.fetch(), 0)
+        ctx = frl.RunContext(frl.AdaptiveLimit(8, 8), time.monotonic() + 60)
+        self.addCleanup(frl.bind_context, frl.context())
+        frl.bind_context(ctx)
+        for error in (frl.LocalIOError("disk full"), TypeError("a bug"), frl.Abandoned("stopped"), "deadline"):
+            if error == "deadline":  # (a pack stopped at the run's deadline: see still_packing)
+                ctx.deadline, error = time.monotonic() - 1, TimeoutError("run timeout reached while packing")
+            with self.subTest(error), mock.patch.object(frl, "pack_artifacts", side_effect=error), \
+                    self.assertRaises(type(error)):
+                frl.take_asset(self.srv.url, self.bdir(), self.meta(), self.assets, "run", time.time())  # fails: no take_asset
+            self.assertNotIn("artifacts_asset", self.meta())
+
+    def test_one_gcs_keeps_serving_wrong_is_given_up_on(self):
+        self.srv.route(f"{self.base}/artifacts/{HOST}/kubelet.log", gcs_object(b"other", md5=md5_b64(b"kubelet")))
+        self.assertEqual(self.fetch("--assets", self.assets), 1)  # fails: 2 (no --assets)
+        self.assertIn("packing its artifacts/ failed: IntegrityError", self.runs()[-1]["errors"][0]["error"])
+        since = self.runs()[-1]["started"]
+        self.assertEqual(self.fetch("--assets", self.assets), 1)  # (an error of each run, for GIVE_UP_DAYS)
+        self.assertEqual(self.meta()["artifacts_asset"], {"failing_since": since})
+        frl.write_json(os.path.join(self.bdir(), "meta.json"),
+                       dict(self.meta(), artifacts_asset={"failing_since": since - frl.GIVE_UP_DAYS * DAY - 1}))
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        self.assertIn(f"failed for {frl.GIVE_UP_DAYS} days, given up: IntegrityError", self.runs()[-1]["errors"][0]["error"])
+        self.assertIn("IntegrityError", self.meta()["artifacts_asset"]["given_up"])
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # (said once)
+        self.assertEqual(self.manifest()["assets"], [])
+
+    def test_a_pending_one_keeps_its_record_as_it_fails(self):
+        # (a given-up rebuild's bytes and sha256 still say which asset GitHub holds: see record_uploads)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        pending = self.meta()["artifacts_asset"]
+        self.srv.route(f"{self.base}/artifacts/{HOST}/kubelet.log", gcs_object(b"other", md5=md5_b64(b"kubelet")))
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        self.assertEqual(self.meta()["artifacts_asset"], dict(pending, failing_since=self.runs()[-1]["started"]))
+        since = self.runs()[-1]["started"] - frl.GIVE_UP_DAYS * DAY - 1
+        frl.write_json(os.path.join(self.bdir(), "meta.json"),
+                       dict(self.meta(), artifacts_asset=dict(pending, failing_since=since)))
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        record = self.meta()["artifacts_asset"]
+        self.assertIn("IntegrityError", record.pop("given_up"))
+        self.assertEqual(record, dict(pending, failing_since=since))
+
+    def test_a_listing_that_keeps_failing_is_given_up_on(self):
+        self.assertEqual(self.fetch(), 0)
+        with mock.patch.object(frl, "list_objects", side_effect=frl.IntegrityError("an unexpected listing")):
+            self.assertEqual(self.fetch("--assets", self.assets), 1)  # fails: 2 (no --assets)
+            self.assertIn("packing its artifacts/ failed: IntegrityError", self.runs()[-1]["errors"][0]["error"])
+            self.assertEqual(self.meta()["artifacts_asset"], {"failing_since": self.runs()[-1]["started"]})
+            frl.write_json(os.path.join(self.bdir(), "meta.json"),
+                           dict(self.meta(), artifacts_asset={"failing_since": time.time() + 2 * DAY}))
+            self.assertEqual(self.fetch("--assets", self.assets), 1)  # (one not plausible starts again)
+            since = self.runs()[-1]["started"]
+            self.assertEqual(self.meta()["artifacts_asset"], {"failing_since": since})
+            frl.write_json(os.path.join(self.bdir(), "meta.json"),
+                           dict(self.meta(), artifacts_asset={"failing_since": since - frl.GIVE_UP_DAYS * DAY - 1}))
+            self.assertEqual(self.fetch("--assets", self.assets), 1)
+            self.assertIn(f"failed for {frl.GIVE_UP_DAYS} days, given up", self.runs()[-1]["errors"][0]["error"])
+            self.assertEqual(self.fetch("--assets", self.assets), 0)
+
+    def test_a_name_it_refuses_is_reported_once(self):
+        self.srv.route(f"{self.base}/artifacts/{HOST}//kubelet.log", gcs_object(b"x\n"))
+        self.assertEqual(self.fetch("--assets", self.assets), 1)  # fails: 2 (no --assets)
+        self.assertIn("not a plain name below artifacts/: never packed", self.runs()[-1]["errors"][0]["error"])
+        self.assertIn(f"{HOST}//kubelet.log", self.meta()["artifacts_asset"]["refused"])
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.manifest()["assets"], [])
+
+    def test_one_whose_files_reach_the_cap_once_unpacked(self):
+        path = f"artifacts/{HOST}/kubelet.log"
+        self.srv.route(f"{self.base}/{path}", gzip_stored(self.FILES[path]))
+        name = f"{self.base.removeprefix('/bucket/')}/{path}"
+        self.srv.gcs_listing("bucket", [name], sizes={name: 30})  # (GCS lists the bytes it stores, fewer than it holds)
+        files = sum(map(len, self.FILES.values()))
+        with mock.patch.object(frl, "ASSET_FILES_BYTES", files):
+            self.assertEqual(self.fetch("--assets", self.assets), 1)  # fails: 2 (no --assets)
+            self.assertIn(f"its artifacts/ hold {files} bytes of files or more", self.runs()[-1]["errors"][0]["error"])
+            self.assertEqual(self.meta()["artifacts_asset"], {"too_large": files})
+            self.assertEqual(self.fetch("--assets", self.assets), 0)
+
+    def test_one_too_large_is_reported_once(self):
+        files = sum(map(len, self.FILES.values()))
+        with mock.patch.object(frl, "ASSET_FILES_BYTES", files):
+            self.assertEqual(self.fetch("--assets", self.assets), 1)  # fails: 2 (no --assets)
+            self.assertIn(f"its artifacts/ hold {files} bytes", self.runs()[-1]["errors"][0]["error"])
+            self.assertEqual(self.meta()["artifacts_asset"], {"too_large": files})
+            self.assertEqual(self.fetch("--assets", self.assets), 0)
+        with mock.patch.object(frl, "ASSET_FILES_BYTES", files + 1), mock.patch.object(frl, "MAX_ASSET_BYTES", 1):
+            self.assertEqual(self.fetch("--assets", self.assets), 0)  # (recorded: never packed)
+            self.assertEqual(self.manifest()["assets"], [])
+        meta = self.meta()
+        del meta["artifacts_asset"]
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # (pending)
+        pending = self.meta()["artifacts_asset"]
+        self.assets = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.assets)
+        with mock.patch.object(frl, "MAX_ASSET_BYTES", 1):  # (packed again: an asset too large to upload)
+            self.assertEqual(self.fetch("--assets", self.assets), 1)
+            self.assertEqual(self.meta()["artifacts_asset"], dict(pending, too_large=files))
+            self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(sorted(os.listdir(self.assets)), ["manifest.json"])
+
+    def test_one_of_too_many_files_is_reported_once(self):
+        files, n = sum(map(len, self.FILES.values())), len(self.FILES)
+        with mock.patch.object(frl, "MAX_ASSET_MEMBERS", n - 1):  # fails: no MAX_ASSET_MEMBERS
+            self.assertEqual(self.fetch("--assets", self.assets), 1)
+            self.assertIn(f"its artifacts/ hold {n} files, a run packs at most {n - 1}",
+                          self.runs()[-1]["errors"][0]["error"])
+            self.assertEqual(self.meta()["artifacts_asset"], {"too_large": files})
+            self.assertEqual(self.fetch("--assets", self.assets), 0)
+        meta = self.meta()
+        del meta["artifacts_asset"]
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        with mock.patch.object(frl, "MAX_ASSET_MEMBERS", n):
+            self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(len(self.meta()["artifacts_asset"]["members"]), n)
+
+    def test_a_member_that_is_not_one(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        meta = self.meta()
+        meta["artifacts_asset"]["members"][1] = "artifacts/x"
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        self.assertIn("IntegrityError", self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual(self.meta(), meta)
+        meta["artifacts_asset"]["members"][1] = {"path": "artifacts/../x"}  # (one a pack refuses: said once)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        record = self.meta()["artifacts_asset"]
+        self.assertIn("artifacts/../x", record.pop("refused"))
+        self.assertEqual(record, meta["artifacts_asset"])
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+
+    def test_the_runs_deadline_stops_the_packs(self):
+        self.assertEqual(self.fetch(), 0)
+        ctx, started, done = frl.RunContext(frl.AdaptiveLimit(8, 8)), [], frl.threading.Event()
+        self.addCleanup(frl.bind_context, frl.context())
+        frl.bind_context(ctx)
+
+        def packing(*args):  # (as pack_artifacts stops at its next read, see still_packing, and its read may wait)
+            started.append(args)
+            ctx.abandoned.wait(60)
+            done.wait(10)
+            raise frl.Abandoned("packing")
+        with mock.patch.object(frl, "take_asset", side_effect=packing):  # fails: no take_asset
+            begun = time.monotonic()
+            got = frl.take_assets(self.root, self.srv.url, self.assets, "run", time.time(), begun + 0.5)
+            waited = time.monotonic() - begun
+            done.set()
+        self.assertEqual((got, len(started)), (([], {}, 1, 0, False), 1))
+        self.assertTrue(ctx.abandoned.is_set())
+        self.assertLess(waited, 5)  # (not waiting for the pack it stopped)
+
+    def test_none_starts_past_the_runs_deadline(self):
+        self.assertEqual(self.fetch(), 0)
+        ctx = frl.RunContext(frl.AdaptiveLimit(8, 8))
+        self.addCleanup(frl.bind_context, frl.context())
+        frl.bind_context(ctx)
+        with mock.patch.object(frl, "take_asset", return_value=({"members": []}, 0)) as take:  # fails: no take_asset
+            got = frl.take_assets(self.root, self.srv.url, self.assets, "run", time.time(), time.monotonic() - 1)
+        self.assertEqual((got, take.call_count, ctx.abandoned.is_set()), (([], {}, 1, 0, False), 0, False))
+
+    def test_four_at_a_time_and_the_next_once_one_is_done(self):
+        builds = [snowflake(self.start - 600 * i) for i in range(6)]  # (newest first: self.build is the first)
+        self.show(builds, {"job.Overall": ([12] * 6, ["boom"] * 6)})
+        for build in builds[1:]:
+            self.node_e2e(f"/bucket/logs/job/{build}", {f"artifacts/{HOST}/kubelet.log": b"k\n"})
+        self.assertEqual(self.fetch(), 0)
+        lock, now, peak, newest, waited = threading.Lock(), [0], [0], threading.Event(), []
+
+        def packing(gcs, target, meta, *rest):
+            with lock:
+                now[0] += 1
+                peak[0] = max(peak[0], now[0])
+            if meta["build"] == builds[0]:  # (packed last)
+                newest.set()
+            elif meta["build"] == builds[-1]:  # (packed first: done once the last has started)
+                waited.append(newest.wait(5))
+            else:
+                time.sleep(0.2)
+            with lock:
+                now[0] -= 1
+            return {"members": []}, 0
+        with mock.patch.object(frl, "cpu_count", lambda: 8):
+            with mock.patch.object(frl, "take_asset", side_effect=packing):  # fails: no take_asset
+                got = frl.take_assets(self.root, self.srv.url, self.assets, "run", time.time(), time.monotonic() + 60)
+        self.assertEqual((got, peak[0], waited), (([], {}, 0, 0, False), 4, [True]))
+
+    def test_the_oldest_first_whatever_its_job(self):
+        older = snowflake(self.start - 600)
+        self.srv.summary("dash", {"t": "FAILING", "u": "FAILING"})
+        self.srv.table("dash", "u", table("bucket/logs/zjob", [older], {"zjob.Overall": ([12], ["boom"])},
+                                          start=(self.start - 600) * 1000))
+        self.node_e2e(f"/bucket/logs/zjob/{older}", {f"artifacts/{HOST}/kubelet.log": b"older\n"})
+        with mock.patch.object(frl, "ASSET_BYTES", 1), mock.patch.object(frl, "cpu_count", lambda: 1):  # fails: no ASSET_BYTES
+            self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.runs()[-1]["assets_built"], [f"zjob_{older}.tar.xz"])
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # (and listed so: one left pending is uploaded first)
+        self.assertEqual([a["name"] for a in self.manifest()["assets"]], [f"zjob_{older}.tar.xz", f"job_{self.build}.tar.xz"])
+
+    def test_a_cap_leaves_the_rest_for_later(self):
+        older = snowflake(self.start - 600)
+        base = f"/bucket/logs/job/{older}"
+        self.show([self.build, older], {"job.Overall": ([12, 12], ["boom", "boom"])})
+        self.node_e2e(base, {f"artifacts/{HOST}/kubelet.log": b"older\n"})
+        with mock.patch.object(frl, "ASSET_BYTES", 1), mock.patch.object(frl, "cpu_count", lambda: 1):  # fails: no ASSET_BYTES
+            self.assertEqual(self.fetch("--assets", self.assets), 0)  # (one at a time: the first goes past it)
+        run = self.runs()[-1]
+        self.assertEqual(run["assets_built"], [f"job_{older}.tar.xz"])
+        self.assertEqual(run["left_for_later"], {"artifacts_assets": 1})
+        self.assertNotIn("artifacts_asset", self.meta())
+        with mock.patch.object(frl, "ASSET_SECONDS", 0):
+            self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.runs()[-1]["left_for_later"], {"artifacts_assets": 2})
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(sorted(self.runs()[-1]["assets_built"]), [f"job_{older}.tar.xz", f"job_{self.build}.tar.xz"])
+
+    def test_an_interrupt_while_packing_still_reports_the_run(self):
+        wait = frl.cf.wait
+
+        def interrupted(fs, timeout=None, return_when=frl.cf.ALL_COMPLETED):
+            if next(f.function for f in inspect.stack() if f.filename == frl.__file__) == "take_assets":
+                raise KeyboardInterrupt
+            return wait(fs, timeout, return_when)
+        with mock.patch.object(frl.cf, "wait", side_effect=interrupted):
+            self.assertEqual(self.fetch("--assets", self.assets), 130)  # fails: 2 (no --assets)
+        run = self.runs()[-1]
+        self.assertTrue(run["interrupted"])
+        self.assertEqual((run["left_for_later"], run["assets_built"]), ({"artifacts_assets": 1}, []))
+        self.assertEqual(self.manifest()["assets"], [])
+
+    def test_none_after_the_downloads_were_interrupted(self):
+        self.assertEqual(self.fetch(), 0)
+        wait = frl.cf.wait
+
+        def interrupted(fs, timeout=None, return_when=frl.cf.ALL_COMPLETED):
+            done = wait(fs, timeout, return_when)
+            if next(f.function for f in inspect.stack() if f.filename == frl.__file__) == "run":  # (the downloads')
+                raise KeyboardInterrupt  # (once they are all done: none is left to stop)
+            return done
+        with mock.patch.object(frl.cf, "wait", side_effect=interrupted):
+            self.assertEqual(self.fetch("--assets", self.assets), 130)  # fails: 2 (no --assets)
+        self.assertEqual(self.runs()[-1]["errors"], [])
+        self.assertEqual(self.manifest()["assets"], [])
+        self.assertEqual(self.runs()[-1]["left_for_later"], {"artifacts_assets": 1})  # (due all the same)
+
+    def test_an_interrupt_while_it_reads_the_records_still_reports_the_run(self):
+        with mock.patch.object(frl, "asset_due", side_effect=KeyboardInterrupt):  # fails: no asset_due
+            self.assertEqual(self.fetch("--assets", self.assets), 130)
+        self.assertTrue(self.runs()[-1]["interrupted"])
+        self.assertTrue(os.path.exists(os.path.join(self.root, "state.json")))
+        self.assertEqual(self.manifest()["assets"], [])
+
+    def test_without_assets_nothing_is_packed(self):
+        self.assertEqual(self.fetch(), 0)
+        self.assertIs(self.meta()["node_e2e"], True)
+        self.assertNotIn("artifacts_asset", self.meta())
+        self.assertNotIn("assets_built", self.runs()[-1])
+        self.assertEqual(os.listdir(self.assets), [])
+
+    def test_nor_for_a_build_that_is_not_node_e2e(self):
+        self.srv.route(self.base + "/prowjob.json", (200, {}, prowjob(KUBETEST_GCE)))
+        self.assertEqual(self.fetch(), 0)
+        before = self.read("meta.json")
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
+        self.assertEqual(self.read("meta.json"), before)
+        self.assertEqual(self.manifest()["assets"], [])
+
+    def test_assets_in_the_archive_are_refused(self):
+        self.assertEqual(self.fetch("--assets", os.path.join(self.root, "assets")), 1)  # fails: 2 (no --assets)
+        self.assertFalse(os.path.exists(os.path.join(self.root, "assets")))
 
 
 if __name__ == "__main__":
