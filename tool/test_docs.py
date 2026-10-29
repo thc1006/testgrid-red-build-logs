@@ -2,11 +2,13 @@
 
 The tests check README.md, AGENTS.md, THIRD_PARTY_NOTICES.md and tool/oracle/README.md, as GitHub shows them (see
 Page): their links and anchors, and those of the pages a run writes; HTML comments and code fences that could hide
-text; the oracle's files; and the days INDEX.md says red builds are given up on after.
+text; the oracle's files; the versions the ported files come from; and the days INDEX.md says red builds are given
+up on after.
 
 Run: cd tool && uv run python -m unittest test_docs -v
 """
 import email.message
+import gzip
 import io
 import json
 import os
@@ -584,6 +586,197 @@ class OracleReadme(unittest.TestCase):
     def test_control_missing(self):
         self.assertEqual(self.missing({".jsonl", "nope.py", "README.md", ".github/nope.yml"}, [ROOT]),
                          [".github/nope.yml", "nope.py"])
+
+
+class NoticesVersions(unittest.TestCase):
+    """The versions of the ported code agree. Each ported Python file THIRD_PARTY_NOTICES.md lists names in its header
+    (its first comment lines) the version of each of Go, TestGrid and apimachinery whose section of the notices lists
+    it, and no other, the same in every file; the notices name the same ones; go_unicode.json.gz was dumped by that Go,
+    of the Unicode version the notices name and the headers of the Unicode section's files name too. HEADERS, NOTICES
+    and UNICODE are how a version is written: a TestGrid commit in the notices is one in backticks whose block names
+    TestGrid last of OWNERS' projects before it. Other versions in the notices, such as GCS's client's, are not checked.
+    The ported files are listed below too, so a new one fails until it is added."""
+
+    V = r"(\d+(?:\.\d+)+)"
+    HEADERS = {"Go": rf"\b[Gg]o\s*{V}|(?<![\w.]){V};\s+Copyright\s+The\s+Go\s+Authors",
+               "TestGrid": r"(?i)\btestgrid\b(?:(?!\b(?:test-infra|prow)\b)[^;()])*?[\s(]([0-9a-f]{7,40});\s+Copyright",
+               "apimachinery": rf"k8s\.io/apimachinery\s+\((v{V[1:]};"}
+    UNICODE = rf"\bUnicode\s+{V}|(?<![\w.]){V};\s+Copyright\s+Unicode"
+    SECTIONS = {"Go": "Go", "TestGrid": "TestGrid", "Kubernetes": "apimachinery"}  # (the notices' sections)
+    NOTICES = {"Go": HEADERS["Go"], "apimachinery": rf"k8s\.io/apimachinery\s+(?:and\s+k8s\.io/api\s+)?(v{V[1:]}"}
+    # (a commit in the notices is that of the project of OWNERS named last before it in its block)
+    OWNERS = re.compile(r"(?i)\b(testgrid|test-infra|prow)\b")
+
+    def header(self, name):
+        with open(os.path.join(HERE, name), encoding="utf-8") as f:
+            lines = f.read().split("\n")
+        return " ".join(x.lstrip("#").strip() for x in lines[:next(i for i, x in enumerate(lines) if not x.startswith("#"))])
+
+    def test_control_a_headers_go_in_any_words(self):
+        for header in ("(Go 1.26.5)", "Go 1.26.5's fmt", "go1.26.5", "(go 1.26.5)", "(1.26.5; Copyright The Go Authors)",
+                       "(and 1.26.5; Copyright The Go Authors)"):
+            self.assertEqual({next(filter(None, m.groups())) for m in re.finditer(self.HEADERS["Go"], header)},
+                             {"1.26.5"}, header)
+        # (a Go module's own version is not Go's)
+        self.assertFalse(re.search(self.HEADERS["Go"], "golang.org/x/text (v0.14.0; Copyright The Go Authors)"))
+
+    def test_each_version(self):
+        page, ports = Page(read("THIRD_PARTY_NOTICES.md")), {}
+        notices, sections = page.text("text", "code"), self.sections(page)
+        for title, blocks in sections.items():
+            for tag, runs in blocks:
+                first = next(((k, t) for k, t in runs if t.strip()), ("", ""))
+                name = re.fullmatch(r"tool/(\w+\.py)", first[1]) if tag == "li" and first[0] == "code" else None
+                if name:  # (a list item that opens with the file's path)
+                    ports.setdefault(name[1], []).extend([self.SECTIONS[title]] if title in self.SECTIONS else [])
+        self.assertEqual(sorted(ports), ["fetch_red_logs.py", "gofmt.py", "goregexp.py", "testgrid_config.py",
+                                         "testgrid_rule.py"])
+        said = {}
+        for name, families in ports.items():
+            header = self.header(name)
+            for family in self.HEADERS:
+                with self.subTest(name=name, family=family):
+                    found = {next(filter(None, m.groups())) for m in re.finditer(self.HEADERS[family], header)}
+                    self.assertEqual(len(found), int(family in families), found)
+                    said.setdefault(family, set()).update(found)
+        for family, versions in said.items():
+            with self.subTest(family):
+                self.assertEqual(len(versions), 1, versions)
+                found = (set(self.commits_after_testgrid(read("THIRD_PARTY_NOTICES.md"))) if family == "TestGrid" else
+                         {next(filter(None, m.groups())) for m in re.finditer(self.NOTICES[family], notices)})
+                self.assertEqual(found, versions)
+        with gzip.open(os.path.join(HERE, "go_unicode.json.gz"), "rt", encoding="utf-8") as f:
+            tables = json.load(f)
+        self.assertEqual({"go" + v for v in said["Go"]}, {tables["go"]})
+        self.assertEqual(set(re.findall(rf"\bUnicode\s+{self.V}", notices)), {tables["unicode"]})
+        # (the files the notices' Unicode section names list its characters: their headers name its version)
+        listing = {m[1] for _, runs in sections["Unicode"] for k, t in runs if k == "code"
+                   for m in [re.fullmatch(r"tool/(\w+\.py)", t)] if m}
+        self.assertEqual(listing, {"fetch_red_logs.py", "testgrid_rule.py"})
+        self.assertEqual(self.unicode_problems(listing, ports, self.header, tables["unicode"]), [])
+
+    def sections(self, page):
+        """{title: its blocks} of each ## section of a Page."""
+        out, title = {}, None
+        for tag, runs in page.blocks:
+            if tag == "h2":
+                title = "".join(t for _, t in runs).strip()
+                out[title] = []
+            elif title is not None:
+                out[title].append((tag, runs))
+        return out
+
+    def commits_after_testgrid(self, text):
+        """The commits in code spans of Markdown text whose paragraph, list item or heading names TestGrid before them,
+        with no other project of OWNERS named in between (in text or in code), in order."""
+        out = []
+        for _, runs in Page(text).blocks:
+            owner = None
+            for kind, t in runs:
+                for m in self.OWNERS.finditer(t):
+                    owner = m[1].lower()
+                if kind == "code" and re.fullmatch(r"[0-9a-f]{7,40}", t) and owner == "testgrid":
+                    out.append(t)
+        return out
+
+    def test_control_a_version_in_code(self):
+        real = read
+        self.assertIn("k8s.io/apimachinery and k8s.io/api v", real("THIRD_PARTY_NOTICES.md"))
+        with mock.patch(f"{__name__}.read", lambda rel: real(rel).replace(
+                "k8s.io/apimachinery and k8s.io/api v", "`k8s.io/apimachinery` and `k8s.io/api` v")
+                if rel == "THIRD_PARTY_NOTICES.md" else real(rel)):
+            self.test_each_version()
+
+    def test_control_a_comment_names_no_version(self):
+        real = read
+        with mock.patch(f"{__name__}.read", lambda rel: real(rel) + (
+                "\n<!-- TestGrid at `abc1234`, Go 1.2.3 -->\n" if rel == "THIRD_PARTY_NOTICES.md" else "")):
+            self.test_each_version()
+
+    def test_control_a_loose_list(self):
+        # (a blank line between two items makes the list loose: each item's text is in a paragraph of its own)
+        real, item = read, "\n- `tool/gofmt.py`"
+        self.assertIn(item, real("THIRD_PARTY_NOTICES.md"))
+        with mock.patch(f"{__name__}.read", lambda rel: real(rel).replace(item, "\n" + item)
+                        if rel == "THIRD_PARTY_NOTICES.md" else real(rel)):
+            self.test_each_version()
+
+    def test_control_items(self):
+        # (a list item's block holds its text, in a loose list as in a tight one, and the end tag of another block
+        # does not end it; a paragraph in another block is a block of its own)
+        def blocks(text):
+            return [(tag, [(k, t) for k, t in runs if t.strip()]) for tag, runs in Page(text).blocks]
+        for text in ("- `a` b</p>c\n- d\n", "- `a` b</p>c\n\n- d\n"):
+            self.assertEqual(blocks(text), [("li", [("code", "a"), ("text", " b"), ("text", "c")]), ("li", [("text", "d")])],
+                             text)
+        self.assertEqual(blocks("<dl><dd>\n<p>a</p>\n</dd></dl>\n"), [("dd", []), ("p", [("text", "a")])])
+        # (a folded paragraph's end tag ends it, so the item's ends the item: what follows is in no block)
+        self.assertEqual(blocks("- a\n\n- b\n\n<div>c 7</div>\n"), [("li", [("text", "a")]), ("li", [("text", "b")]),
+                                                                    (None, [("text", "c 7")])])
+        # (a paragraph after another block of its item, such as a nested list, a heading or a table, is one of its own:
+        # the text stays in order)
+        for text, after in (("- - a\n\n  b\n", [("li", [("text", "a")])]), ("- ## a\n\n  b\n", [("h2", [("text", "a")])]),
+                            ("- | a |\n  |---|\n  | c |\n\n  b\n", [("th", [("text", "a")]), ("td", [("text", "c")])])):
+            self.assertEqual(blocks(text), [("li", [])] + after + [("p", [("text", "b")])], text)
+
+    def unicode_problems(self, listing, ports, header, version):
+        """[(file, the Unicode versions its header names)] for each file of ports or listing whose header names a
+        Unicode version though the notices' Unicode section does not list it, or, listed, does not name `version`
+        alone."""
+        out = []
+        for name in sorted(set(ports) | set(listing)):
+            found = {next(filter(None, m.groups())) for m in re.finditer(self.UNICODE, header(name))}
+            if found != ({version} if name in listing else set()):
+                out.append((name, found))
+        return out
+
+    def test_control_unicode_problems(self):
+        headers = {"a.py": "x (15.0.0; Copyright Unicode, Inc.)", "b.py": "y", "c.py": "z Unicode 14.0.0", "d.py": "w",
+                   "e.py": "tables of 16.0.0; Copyright Unicode, Inc.", "f.py": "an emoji set (v44.1; Copyright Unicode, Inc.)",
+                   "g.py": "Unicode 15.0.0", "h.py": "(15.0.0; Copyright Unicode) and Unicode 16.0.0",
+                   "i.py": "a module's data (v1.44.1; Copyright Unicode, Inc.)"}
+        self.assertEqual(self.unicode_problems({"a.py", "d.py", "h.py"}, set(headers) - {"d.py", "h.py"}, headers.get, "15.0.0"),
+                         [("c.py", {"14.0.0"}), ("d.py", set()), ("e.py", {"16.0.0"}), ("g.py", {"15.0.0"}),
+                          ("h.py", {"15.0.0", "16.0.0"})])
+
+    def test_control_a_headers_testgrid_commit(self):
+        for header in ("TestGrid (f15bfa4808a4; Copyright The TestGrid Authors)", "TestGrid at f15bfa4808a4; Copyright The",
+                       "TestGrid's pkg/updater (f15bfa4808a4; Copyright The TestGrid Authors) and Prow (a1b2c3d4e5f6; Copyright",
+                       "github.com/GoogleCloudPlatform/testgrid (f15bfa4808a4; Copyright The TestGrid Authors)",
+                       "TestGrid (f15bfa4808a4; Copyright The TestGrid Authors) and k8s.io/utils (a1b2c3d4e5f6; Copyright X)"):
+            self.assertEqual(re.findall(self.HEADERS["TestGrid"], header), ["f15bfa4808a4"], header)
+        # (another project's commit, or a pseudo-version's, is not TestGrid's)
+        for header in ("Prow (a1b2c3d4e5f6; Copyright The Kubernetes Authors)",
+                       "k8s.io/utils (v0.0.0-20230726121419-3b25d923346b; Copyright The Kubernetes Authors)",
+                       "TestGrid's code; its port at a1b2c3d4e5f6; Copyright X",
+                       "TestGrid and Prow (a1b2c3d4e5f6; Copyright The Kubernetes Authors)",
+                       "tool/testgrid_rule.py at a1b2c3d4e5f6; Copyright X", "notestgrid (f15bfa4808a4; Copyright X)",
+                       "TestGrid's tests (with k8s.io/utils at a1b2c3d4e5f6; Copyright X)",
+                       "TestGrid's configurator, in test-infra (a1b2c3d4e5f6; Copyright The Kubernetes Authors)",
+                       "TestGrid (v0.0.177-0.20260902201319-f15bfa4808a4; Copyright The TestGrid Authors)",
+                       "TestGrid at v0.0.177-0.20260902201319-f15bfa4808a4; Copyright The TestGrid Authors",
+                       "TestGrid (f15bfa4808a4; see below)", "TestGrid (f15bfa; Copyright X)",
+                       f"TestGrid ({'a' * 41}; Copyright X)"):
+            self.assertEqual(re.findall(self.HEADERS["TestGrid"], header), [], header)
+        notices = "\n\n".join([
+            "TestGrid `f15bfa4808a4`, and github.com/GoogleCloudPlatform/testgrid at `f15bfa4808a4`; test-infra at "
+            "`a1b2c3d4e5f6`",
+            "TestGrid at `f15bfa4808a4` (once `abc1234`); its `pkg/updater` at\n`f15bfa4808a4`",  # (a paragraph of two lines)
+            "`1234567`, of no project named in its paragraph; `tool/testgrid_rule.py` at `7654321`",
+            "`GoogleCloudPlatform/testgrid` at `f15bfa4808a4`; TestGrid's configurator, in test-infra at `a1b2c3d4e5f6`",
+            "TestGrid at `f15bfa4808a4`; Prow at `a1b2c3d4e5f6`",
+            "- TestGrid's item at `f15bfa4808a4`\n- another item, at `2345678`\n## TestGrid\n`3456789`",
+            "1. TestGrid at `f15bfa4808a4`\n2. another, at `2345678`", "the notices name\nTestGrid at `f15bfa4808a4`",
+            "TestGrid in an issue\n#123 at `f15bfa4808a4`", "TestGrid at `f15bfa4808a4`\n   \n`2345678`",
+            "TestGrid at `f15bfa4808a4`\n  - a nested item at `2345678`\n* another item at `3456789`",
+            " ## TestGrid\n`4567890`", "TestGrid\n    # not a heading, at `f15bfa4808a4`",
+            "####### TestGrid at\n`f15bfa4808a4`", "#123 moved TestGrid to\n`f15bfa4808a4`",
+            "TestGrid at `f15bfa4808a4`\n#\n`2345678`", "TestGrid at `f15bfa4808a4`\n1) another at `2345678`",
+            "TestGrid at `f15bfa4808a4`\n+ a third at `3456789`",
+            "- TestGrid at `f15bfa4808a4`\n\n  its second paragraph, at `2345678`"])  # (a loose item's second paragraph)
+        self.assertEqual(self.commits_after_testgrid(notices), ["f15bfa4808a4"] * 3 + ["abc1234"] + ["f15bfa4808a4"] * 16)
+        self.assertEqual(self.commits_after_testgrid("TestGrid at `f15bfa4808a4` <!-- was `abc1234` -->"),
+                         ["f15bfa4808a4"])  # (a commit in a comment is not on the page)
 
 
 KINDS = ("text", "code", "pre", "alt", "mark")  # (all a page shows, see Page)
