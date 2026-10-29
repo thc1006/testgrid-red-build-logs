@@ -2,7 +2,7 @@
 
 The tests check README.md, AGENTS.md, THIRD_PARTY_NOTICES.md and tool/oracle/README.md, as GitHub shows them (see
 Page): their links and anchors, and those of the pages a run writes; HTML comments and code fences that could hide
-text; and the days INDEX.md says red builds are given up on after.
+text; the oracle's files; and the days INDEX.md says red builds are given up on after.
 
 Run: cd tool && uv run python -m unittest test_docs -v
 """
@@ -519,6 +519,71 @@ class Hiding(unittest.TestCase):
                             ("````\na\n```\n", [1]), ("1. ```\n   a\n   ```\n", []), ("~~~\na\n````\n", [1]),
                             ("   ```\na\n   ```\n", []), ("```\na\n``` x\n", [1]), ("> ```\n> a\n> ```\n", [])):
             self.assertEqual(Page(text).unclosed, lines, text)
+
+
+class OracleReadme(unittest.TestCase):
+    """tool/oracle/README.md names each file of the oracle (by its path there, its folder, or a name no other
+    of its files has), and each local file it names is there."""
+
+    UPSTREAM = {"cluster/prod/updater.yaml", "tabulator.yaml", "config/testgrids", "pkg/tabulator", "pkg/updater",
+                "util/gcs", "prowjob.json"}  # (TestGrid's, test-infra's and Prow's)
+
+    def files(self):
+        oracle = os.path.join(HERE, "oracle")
+        return sorted(os.path.relpath(os.path.join(d, n), oracle) for d, dirs, names in os.walk(oracle)
+                      if not dirs.__setitem__(slice(None), [x for x in dirs if x != "__pycache__"])
+                      for n in names if not n.endswith(".pyc"))
+
+    def unnamed(self, files, text):
+        """Of files (paths in tool/oracle/), those a code span of text (as GitHub shows it) names in none of those
+        ways."""
+        code, names = set(Page(text).code), [os.path.basename(f) for f in files]
+        return [f for f in files if f != "README.md" and not any(
+            n in code for n in (f, os.path.dirname(f), os.path.basename(f) if names.count(os.path.basename(f)) == 1
+                                else "") if n not in ("", "fuzz"))]
+
+    def test_it_names_each_file(self):
+        unnamed = self.unnamed(self.files(), read("tool/oracle/README.md"))
+        self.assertEqual(unnamed, [],  # fails: ['build.sh', 'fuzz/filtergolden.py', 'fuzz/fmtdiff.py']
+                         "these files of the oracle are in no code span of tool/oracle/README.md: name each there")
+
+    def test_control_unnamed(self):
+        self.assertEqual(self.unnamed(["a.py", "fuzz/b.py", "c.sh", "README.md"], "x <!--> `a.py` <!-- `c.sh` --> `b.py`"),
+                         ["c.sh"])
+
+    def local_names(self, text):
+        """The names in code spans of text (as GitHub shows it) that look like files or folders (with an extension, a
+        slash, or a leading dot), but TestGrid's, test-infra's and Prow's."""
+        return {t for t in Page(text).code
+                if re.search(r"\.(py|sh|go|json|gz|ya?ml|md|proto|txt|mod|sum|bzl|toml|lock)$|/|^\.[A-Za-z]", t) and " " not in t
+                and t not in self.UPSTREAM}
+
+    def test_control_local_names(self):
+        self.assertEqual(self.local_names("`.gitignore` `a.py` `b c.py` `x/y` `pkg/updater` `gocheck` `.000`"),
+                         {".gitignore", "a.py", "x/y"})
+        self.assertEqual(self.local_names("`a.py`\n\n```\nb.py\n```\n\n    c.py\n"), {"a.py"})  # (code blocks name none)
+
+    def test_each_local_file_it_names_is_there(self):
+        named = self.local_names(read("tool/oracle/README.md"))
+        places = [os.path.join(HERE, "oracle"), os.path.join(HERE, "oracle", "fuzz"), HERE, ROOT]
+        self.assertEqual(self.missing(named, places), [], "tool/oracle/README.md names these, but they are not there: "
+                         "fix the name or add the file")
+
+    def test_control_a_comment_names_no_local_file(self):
+        real = read
+        with mock.patch(f"{__name__}.read",
+                        lambda rel: real(rel) + ("\n<!-- `nope.py` -->\n" if rel == "tool/oracle/README.md" else "")):
+            self.test_each_local_file_it_names_is_there()
+
+    def missing(self, named, places):
+        """Of named, those at none of places, but a leading-dot name without a slash that is nowhere: that is a
+        file's extension (`.jsonl`), not a file."""
+        return sorted(n for n in named if not any(os.path.exists(os.path.join(p, n)) for p in places)
+                      and not (n.startswith(".") and "/" not in n))
+
+    def test_control_missing(self):
+        self.assertEqual(self.missing({".jsonl", "nope.py", "README.md", ".github/nope.yml"}, [ROOT]),
+                         [".github/nope.yml", "nope.py"])
 
 
 KINDS = ("text", "code", "pre", "alt", "mark")  # (all a page shows, see Page)
