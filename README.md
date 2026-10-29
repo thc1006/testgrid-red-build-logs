@@ -111,6 +111,10 @@ from GCS.
   warning that red builds in the rest of its gap may be missing.
 - On a tab new to the archive, or one it forgot after the tab was unlisted, GCS
   is searched only 14 days back for builds the tab no longer shows.
+- A red build that cannot be archived, such as one whose log is over 4 GiB in
+  GCS or once gunzipped, is tried again on every run, and each failure fails
+  the run. It is given up on 14 days after the first run that could not
+  archive it, and INDEX.md lists it for at least 30 days more.
 
 ### Builds taken from GCS that may never have shown red
 
