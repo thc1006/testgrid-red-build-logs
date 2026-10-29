@@ -1000,6 +1000,36 @@ def prow_job_hours(gcs, query, build):
     return round((timeout + grace) / 3600 + 0.25, 2)
 
 
+def node_e2e_job(prowjob):
+    """Whether a build's prowjob.json (parsed) runs node e2e tests: kubetest with --deployment=node, or kubetest2 with
+    --test=node (before the "--" that starts its tester's flags). None for one that is not a ProwJob's."""
+    containers = prowjob
+    for key in ("spec", "pod_spec", "containers"):
+        containers = containers.get(key) if isinstance(containers, dict) else None
+    if not isinstance(containers, list) or not all(isinstance(c, dict) for c in containers):
+        return None
+    for c in containers:
+        words = [w for key in ("command", "args") if isinstance(c.get(key), list) for w in c[key] if isinstance(w, str)]
+        if "--deployment=node" in words:
+            return True
+        for i, w in enumerate(words):
+            if w.rsplit("/", 1)[-1] == "kubetest2":
+                flags = words[i + 1:]
+                if "--test=node" in flags[:flags.index("--") if "--" in flags else None]:
+                    return True
+    return False
+
+
+def read_node_e2e(base):
+    """node_e2e_job of the build's prowjob.json, at base; None if GCS has none, or cannot serve it now."""
+    try:
+        return node_e2e_job(get_json(base + "/prowjob.json"))
+    except (Abandoned, *BUGS):
+        raise
+    except Exception:  # (GCS's doing: read again by the next comparison)
+        return None
+
+
 INDEX_RE = re.compile(r"(?:.*/)?pr-logs/directory/[^/]+")  # (the prefix of a query: see indexed)
 LINK_PART_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]*")  # a part of a folder a link of Prow's index names
 # what Go's strings.TrimSpace trims: Unicode's White_Space (str.strip() trims U+001C to U+001F too)
@@ -3643,6 +3673,10 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                     del meta["note"]  # (said of the folder under the index, not of its own)
                 put_in_place(target, meta)  # (kept, as the sightings are; a disk error is a LocalIOError)
             finished = read_finished(base)
+            if "node_e2e" not in meta and not old.get("final"):  # (store() could not read it)
+                node_e2e = read_node_e2e(base)
+                if node_e2e is not None:
+                    meta["node_e2e"] = node_e2e
             changed = []
             # (a file taken again goes in place with the meta.json that says so, see put_in_place; meta stays
             # what is in place, for a failure below to keep)
@@ -4006,6 +4040,7 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
         remove_build_dir(target)
         raise
     home = os.path.basename(os.path.dirname(os.path.dirname(target)))  # the run folder that holds it
+    node_e2e = old["node_e2e"] if isinstance((old or {}).get("node_e2e"), bool) else read_node_e2e(base)
     meta = dict(rec,
                 tabs=tabs,
                 result=(finished or {}).get("result"),
@@ -4015,6 +4050,7 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
                 log=log,
                 podinfo=podinfo,
                 **({"artifacts": logs} if keeps_logs else {}),
+                **({"node_e2e": node_e2e} if node_e2e is not None else {}),
                 archived_by_run=home,
                 archived_at=folder_time(home) or now)
     if where != f"{rec['query']}/{rec['build']}":
