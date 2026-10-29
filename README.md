@@ -58,8 +58,8 @@ archive/runs/<YYYY-MM>/<run>/<job>/<build>/
   `cluster-info.log.gz`: kubetest2's dump of the cluster
   (`kubectl cluster-info dump`, with the logs of its `kube-system` pods), when
   GCS has one in `artifacts/cluster-logs/`. Read one with
-  `gzip -dc`. A build archived before the runs kept these logs has none, unless
-  a later run repaired a damaged copy of its files.
+  `gzip -dc`. A build archived before the runs kept these logs gets them when
+  a run next compares it with GCS, if GCS still has them.
 - `meta.json`: the tabs, the red tests (it says when some are left out),
   TestGrid's messages and the log's md5. A build GCS had no file for has only
   this.

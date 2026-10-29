@@ -387,6 +387,17 @@ class UpFailed(UpFailedWorld):
         self.assertNotIn("artifacts", self.meta())
         self.assertFalse([p for p in self.srv.httpd.hits if "artifacts" in p])
 
+    def test_but_for_one_whose_up_failure_testgrid_shows_only_once_it_was_archived(self):
+        # (judged red from GCS in a history gap, without its Up failure: its tabs take the cells TestGrid shows later)
+        self.show([self.build], {"job.Overall": ([12], ["boom"])})
+        self.assertEqual(self.fetch("--gzip"), 0)
+        m = self.meta()
+        self.assertNotIn("artifacts", m)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(m, tabs=[dict(t, judged_from_gcs=True) for t in m["tabs"]]))
+        self.show([self.build], {"job.Overall": ([12], ["boom"]), "kubetest.Up": ([12], ["e2e-up.sh: exit status 2"])})
+        self.assertEqual(self.fetch("--gzip"), 0)
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]], self.paths(self.LOGS))  # fails: KeyError: 'artifacts'
+
     def test_kubetest2s_folders(self):
         for path in [*self.LOGS, *self.OTHERS]:
             del self.srv.httpd.routes[f"{self.base}/artifacts/{path}"]
@@ -1042,6 +1053,84 @@ class UpFailedNotRead(UpFailedWorld):
         self.assertEqual((self.runs()[-1]["outcomes"], m["refreshed"], m["final"]),
                          ({"refreshed": [self.key]}, self.names(self.LOGS), True))
         self.assertEqual(self.check()[0], 0)
+
+
+class UpFailedArchivedBefore(UpFailedWorld):
+    """As UpFailed, finished 3 days ago and archived by code before the runs kept the logs of its nodes: final, its
+    meta.json lists none. The run whose sevenths it is in compares it with GCS, and takes them."""
+
+    def setUp(self):
+        super().setUp()
+        self.finished(ago=3 * DAY)
+        self.assertEqual(self.fetch("--gzip"), 0)
+        for name in os.listdir(self.bdir()):
+            if name.startswith("e2e-"):
+                os.remove(os.path.join(self.bdir(), name))
+        m = self.meta()
+        del m["artifacts"]
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), m)
+        self.assertTrue(m["final"])
+
+    def fetch_in_its_seventh(self, sevenths=frozenset(range(7))):
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set(sevenths)):
+            return self.fetch("--gzip")
+
+    def test_its_comparison_takes_them(self):
+        self.assertEqual(self.fetch_in_its_seventh(), 0)
+        m = self.meta()
+        self.assertEqual([r["path"] for r in m["artifacts"]], self.paths(self.LOGS))  # fails: KeyError: 'artifacts'
+        for path, data in self.LOGS.items():
+            self.assertEqual(self.stored(name_of(path)), data)
+        self.assertEqual((self.runs()[-1]["outcomes"], m["refreshed"], m["final"]),
+                         ({"refreshed": [self.key]}, self.names(self.LOGS), True))
+        self.assertEqual(self.check()[0], 0)
+
+    def test_one_testgrid_now_shows_without_its_up_failure(self):
+        # (the first sighting, with it, stays in meta.json)
+        self.show([self.build], {"job.Overall": ([12], ["boom"])})
+        self.assertEqual(self.fetch_in_its_seventh(), 0)
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]], self.paths(self.LOGS))  # fails: KeyError: 'artifacts'
+
+    def test_control_not_out_of_its_seventh(self):
+        self.assertEqual(self.fetch_in_its_seventh(()), 0)
+        self.assertNotIn("artifacts", self.meta())
+        self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
+
+    def test_control_nor_of_a_build_whose_up_did_not_fail(self):
+        m = self.meta()
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(m, tabs=[
+            dict(t, red_cells=[c for c in t["red_cells"] if c["test"] != "kubetest.Up"]) for t in m["tabs"]]))
+        self.show([self.build], {"job.Overall": ([12], ["boom"]), "kubetest.Up": ([1], [""])})
+        self.assertEqual(self.fetch_in_its_seventh(), 0)
+        self.assertNotIn("artifacts", self.meta())
+        self.assertEqual(sorted(os.listdir(self.bdir())), ["build-log.txt.gz", "meta.json"])
+
+    def test_control_nor_one_whose_artifacts_is_not_a_list(self):
+        # (left as it is, for cross_check.py to report)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), artifacts=None))
+        self.assertEqual(self.fetch_in_its_seventh(), 0)
+        self.assertIsNone(self.meta()["artifacts"])
+
+    def test_one_whose_nodes_gcs_has_no_logs_of_lists_none(self):
+        # (as a build whose cluster GCE had no room for: what GCS has of its control plane is empty)
+        for path in self.LOGS:
+            del self.srv.httpd.routes[f"{self.base}/artifacts/{path}"]
+        self.assertEqual(self.fetch_in_its_seventh(), 0)
+        m = self.meta()
+        self.assertEqual((m["artifacts"], m["final"]), ([], True))  # fails: KeyError: 'artifacts'
+        self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
+        self.assertEqual(self.check()[0], 0)
+
+    def test_a_listing_that_fails_fails_its_comparison_until_one_takes_them(self):
+        listing = self.srv.httpd.prefix_routes[LISTING]
+        self.refuse_listing()
+        self.assertEqual(self.fetch_in_its_seventh(), 1)  # fails: 0
+        self.assertIn("HTTP Error 503", self.runs()[-1]["errors"][0]["error"])
+        self.assertEqual(self.meta()["artifacts"], [])
+        self.srv.httpd.prefix_routes[LISTING] = listing
+        self.assertEqual(self.fetch_in_its_seventh(), 0)
+        self.assertEqual([r["path"] for r in self.meta()["artifacts"]], self.paths(self.LOGS))
+        self.assertNotIn("comparison_failing_since", self.meta())
 
 
 # (as `kubectl cluster-info dump` writes it: its objects as JSON, then the logs of each pod's containers)

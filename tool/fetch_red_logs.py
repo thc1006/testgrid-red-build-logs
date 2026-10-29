@@ -3681,12 +3681,13 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                     meta = new
                 except NotFound:
                     pass
-            # The logs of its cluster's nodes, of a build store() keeps them for (see NODE_LOGS): each compared
-            # with GCS and taken again if GCS holds another copy now, as the log is; then those GCS has that it has
-            # no copy of are taken (one store() could not read, or GCS did not have yet), as a podinfo.json it lacks.
+            # The logs of its cluster's nodes, of a build store() keeps them for (see NODE_LOGS), or whose Up failed
+            # but whose meta.json has no "artifacts" (archived before the runs kept them, say): each compared with GCS
+            # and taken again if GCS holds another copy now, as the log is; then those GCS has that it has no copy of
+            # are taken (one store() could not read, or GCS did not have yet), as a podinfo.json it lacks.
             # GCS failing on one of them, or on their listing, keeps none of the others from being compared or
             # taken: what it took goes in place, and then the failure fails the comparison, as the log's does.
-            if isinstance(meta.get("artifacts"), list):
+            if isinstance(meta.get("artifacts"), list) or ("artifacts" not in meta and up_failed(meta["tabs"])):
                 records, taken, failure = {}, [], None
                 try:
                     for name, info in node_log_records(meta):  # (all of such logs: the copy is intact)
