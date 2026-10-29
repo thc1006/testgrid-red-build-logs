@@ -1,8 +1,8 @@
 """The docs, and the pages a run writes, say what the code does.
 
 The tests check README.md, AGENTS.md, THIRD_PARTY_NOTICES.md and tool/oracle/README.md, as GitHub shows them (see
-Page): their links and anchors, and those of the pages a run writes; and the days INDEX.md says red builds are
-given up on after.
+Page): their links and anchors, and those of the pages a run writes; HTML comments and code fences that could hide
+text; and the days INDEX.md says red builds are given up on after.
 
 Run: cd tool && uv run python -m unittest test_docs -v
 """
@@ -33,14 +33,15 @@ sys.path.insert(0, HERE)
 import fetch_red_logs as frl  # noqa: E402
 
 DOCS = ["README.md", "AGENTS.md", "THIRD_PARTY_NOTICES.md", "tool/oracle/README.md"]
-# (cmark-gfm's options: raw HTML and footnotes; cmark-gfm is GitHub's fork of CommonMark's parser)
-OPTIONS = Options.CMARK_OPT_UNSAFE | Options.CMARK_OPT_FOOTNOTES
+# (cmark-gfm's options: raw HTML, footnotes and each block's lines; cmark-gfm is GitHub's fork of CommonMark's parser)
+OPTIONS = Options.CMARK_OPT_UNSAFE | Options.CMARK_OPT_FOOTNOTES | Options.CMARK_OPT_SOURCEPOS
 GITHUB = os.path.join(HERE, "testdata", "github_markdown.json")
 BLOCKS = {"p", "li", "h1", "h2", "h3", "h4", "h5", "h6", "td", "th", "dt", "dd"}  # (the elements that hold text)
 HEADINGS = {"h1", "h2", "h3", "h4", "h5", "h6"}
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 URL = re.compile(r"(?i)[a-z][a-z0-9+.-]*:|//")  # (a link to another site)
 COMMENT_END = re.compile(r"--!?>")  # (what ends an HTML comment)
+RAW_UNSAFE = re.compile(r"--!?>|<[?!]|</(?![A-Za-z>])")  # (an arrow, or what a browser reads as a comment)
 
 
 def read(rel):
@@ -87,13 +88,30 @@ class Page(HTMLParser):
       open. Text goes to the innermost block open, so an item's text after a nested list is the item's; a list item's
       first paragraph, with nothing before it in the item, is in the item's block, as a tight item's text is; text in
       no block is in one of its own (tag None). kind is "text", "code" (a code span), "pre" (a code block), "alt" (an
-      image's alt text) or "mark" (a footnote's)."""
+      image's alt text) or "mark" (a footnote's);
+    - unsafe: the line of the first HTML comment (see comments) that is not whole on one line (one with no end takes
+      the rest of the HTML, lines and all) or holds another "<!--", or of the first "-->", "--!>", "<?", "<!" or
+      "</" not before a letter of raw HTML outside comments, even in an attribute value (cmark-gfm writes those of
+      code and text with "&gt;" and "&lt;"); else None. GitHub may hide text after such a comment, such an arrow
+      ends any comment open above it, and a browser reads the others as a comment up to the next ">". It misses a
+      mistyped end before an arrow on its comment's one line: "<!-- a -> b --> c" hides " b";
+    - unclosed: the first line of each fenced code block that never closes, which GitHub shows as code to the end of
+      its container."""
 
     def __init__(self, markdown):
         super().__init__(convert_charrefs=True)
-        self.links, self.ids, self.blocks, self.headings = [], [], [], []
-        self.stack, self.open, self.heading, self.loose = [], [], None, None
+        self.lines = markdown.split("\n")
+        self.links, self.ids, self.blocks, self.unclosed, self.headings = [], [], [], [], []
+        self.stack, self.open, self.heading, self.loose, self.pre = [], [], None, None, None
         html = cmarkgfm.github_flavored_markdown_to_html(markdown, options=OPTIONS)
+        unsafe, at = [], 0  # ((offset, HTML its Markdown line holds) of each)
+        for start, end in comments(html) + [(len(html), len(html))]:  # (and the HTML after the last)
+            unsafe += [(m.start(), html[html.rfind("\n", 0, m.start()) + 1:m.end()])
+                       for m in RAW_UNSAFE.finditer(html, at, start)]
+            if "\n" in html[start:end] or "<!--" in html[start + 4:end]:
+                unsafe.append((start, html[start:end].split("\n")[0]))
+            at = len(html) if end is None else end
+        self.unsafe = self.line_of(html, *unsafe[0]) if unsafe else None
         self.feed(uncommented(html))
         self.close()
         self.anchors, taken, last = set(self.ids), set(), {}
@@ -106,6 +124,25 @@ class Page(HTMLParser):
             last[slug] = n
             taken.add(candidate)
             self.anchors.add(candidate)
+
+    def line_of(self, html, at, piece):
+        """The line of the Markdown that the HTML at `at` comes from: the one that holds the `piece` at `at`, counting
+        each from the first line of the last block cmark-gfm made before `at` if `at` is in it, else from the line
+        after it (raw HTML has no source position); else, in that block, the line of `at` in its HTML, else that line.
+        A code span before it in its block can make it a line early."""
+        first, base, blocks = 1, 0, list(re.finditer(r'<(\w+) data-sourcepos="(\d+):\d+-(\d+):', html[:at]))
+        if blocks:
+            tag, start, end = blocks[-1].groups()
+            base = html.rfind(f"</{tag}>", blocks[-1].end(), at)
+            first, base = (int(start), blocks[-1].start()) if base < 0 else (int(end) + 1, base)
+        skip = html.count(piece, base, at)  # (the same words on earlier lines)
+        for i in range(first - 1, len(self.lines)):
+            skip -= self.lines[i].count(piece)
+            if skip < 0:
+                return i + 1
+        if blocks and base == blocks[-1].start():  # (its HTML differs from its Markdown line: count the HTML's lines)
+            return first + html.count("\n", base, at)
+        return first
 
     def kind(self):
         kinds = {k for _, k in self.stack}
@@ -139,6 +176,8 @@ class Page(HTMLParser):
             self.loose = None
         if tag in HEADINGS:
             self.heading = []
+        if tag == "pre":
+            self.pre = (a.get("data-sourcepos"), [])
         if tag == "img" and a.get("alt"):
             self.run("alt", a["alt"])
         if tag not in VOID:
@@ -154,6 +193,9 @@ class Page(HTMLParser):
         if tag in HEADINGS and self.heading is not None:
             self.headings.append("".join(self.heading))
             self.heading = None
+        if tag == "pre" and self.pre:
+            self.fence(*self.pre)
+            self.pre = None
         if tag in BLOCKS and self.open and self.open[-1][0] == tag:
             self.open.pop()
         if any(t == tag for t, _ in self.stack):
@@ -163,7 +205,23 @@ class Page(HTMLParser):
     def handle_data(self, data):
         if self.heading is not None:
             self.heading.append(data)
+        if self.pre:
+            self.pre[1].append(data)
         self.run(self.kind(), data)
+
+    def fence(self, sourcepos, code):
+        """Adds to unclosed the first line of a fenced code block whose last line (by its source position) is no fence
+        of its first's character and length. (An indented code block's text holds its first line; a fenced one's does
+        not.)"""
+        if not sourcepos:
+            return
+        (l1, c1), (l2, _) = (map(int, p.split(":")) for p in sourcepos.split("-"))
+        first = self.lines[l1 - 1].encode()[c1 - 1:].decode("utf-8", "replace")
+        m = re.match(r"`{3,}|~{3,}", first)
+        if not m or "".join(code).startswith(first):
+            return
+        if not (l2 > l1 and re.fullmatch(rf"[ \t>]*{re.escape(m[0][0])}{{{len(m[0])},}}[ \t]*", self.lines[l2 - 1])):
+            self.unclosed.append(l1)
 
     def text(self, *kinds):
         """The page's text of these kinds (see blocks), each block's joined to the next by a space."""
@@ -340,6 +398,129 @@ class Links(unittest.TestCase):
         self.assertLess(time.monotonic() - start, 5)
 
 
+class Hiding(unittest.TestCase):
+    """No doc holds what could hide its text on GitHub's page: an HTML comment, an arrow, a "<?", "<!" or "</" (see Page's
+    unsafe), or a code fence left open (see Page's unclosed)."""
+
+    def test_no_comment_or_arrow_of_the_docs_can_hide_text(self):
+        self.assertEqual([(doc, Page(read(doc)).unsafe) for doc in DOCS if Page(read(doc)).unsafe is not None], [],
+                         '(doc, line): GitHub may hide text from here. Write each HTML comment whole on one line, with no "<!--" '
+                         'in it; in raw HTML, write "-->" as "--&gt;", and "<?", "<!" or "</" not before a letter with "&lt;"')
+
+    # (shapes the rule flags: comments that hide text, and comments of several lines and arrows in raw HTML that
+    # GitHub shows whole, which the docs do without; and "<?", "<!" and "</" not before a letter, read as comments)
+    UNSAFE = (
+        "# Notes\n\n<!-- keep these notes\nshort ->\n\n## Section A\n\nMID-MARK: fetch --> verify.",
+        "# Notes\n\n<!--\nkeep these notes short ->\n\nMID-MARK\n\nfetch --> verify.",
+        "# Notes\n\n<!-- keep these notes short\n\n## Section A\n\nMID-MARK: fetch --> verify.",
+        "# Notes\n\n<!-- keep these notes short\n\nMID-MARK\n\n```mermaid\ngraph LR\n  A --> B\n```",
+        "# Notes\n\n<!-- keep these notes short\n\nMID-MARK: the flow is fetch -->\nverify.",
+        "> - a\n>   <!-- one\n>   two ->\n>   MID-MARK more\n>   then fetch --> verify\n> - b",
+        "# Notes\n\nA note <!-- keep it short\nMID-MARK: fetch --> verify.",
+        "# Notes\n\n<!-- keep it short\nMID-MARK: fetch --> verify.",
+        "- a <!-- keep it short\n  MID-MARK: fetch --> verify\n- b",
+        "# Notes\n\n<!-- keep it short\n\n<img alt=\"fetch --> verify\" src=\"x.svg\">\n\nMID-MARK",
+        "# Notes\n\n<!-- keep these\nnotes short ->\nMID-MARK: the flow is fetch -->\nverify.",
+        "# Notes\n\n<!-- The old flow: fetch --> verify. -->\n\nMID-MARK",
+        "# Notes\n\n<!--\nThe old flow: fetch --> verify.\n-->\n\nMID-MARK",
+        "# Notes\n\nA note <!-- keep it short\nMID-MARK: fetch --> [verify](x.md)",
+        "# Notes\n\n<!-- keep it short\nMID-MARK: fetch --><img src=\"x.svg\">",
+        "# Notes\n\n<!-- keep it short\nMID-MARK: fetch --> <!-- c --> verify <!-- e -->",
+        "<!-- a\nMID-MARK: b --> <!--> verify <!-- c -->", "<!-- a\nMID-MARK: b --> <!---> verify <!-- c -->",
+        "<!-- a\nMID-MARK: b --> <!-- c --!> verify <!-- e -->",
+        "A note <!-- x -->\nand <!-- keep it short\nMID-MARK: fetch --> verify.",
+        "# Notes\n\n<!-- An old section.\n\nIts old text. -->\n\nMID-MARK",
+        "# Notes\n\nA note <!-- a TODO that\nwraps --> and MID-MARK.", "<!-- a\nb --> MID-MARK",
+        "<img alt=\"fetch --> verify\" src=\"x.svg\">\n\nMID-MARK", "<pre>\nfetch --> verify\n</pre>\n\nMID-MARK",
+        "<script>\nif (a-->0) {}\n</script>\n\nMID-MARK", "<table><tr><td>fetch --> verify</td></tr></table>\n\nMID-MARK",
+        "<div>\n<!--\na ->\n--></div>\n", "> - a\n>   <!-- b\n\n<div>--></div>\n", "<!-- a\n\nb -->\n", "<!-- a\n \t\nb -->\n",
+        "<!--\na\n--> b\n", "<!--\na\n--> -->\n", "<!-- a --> b --> c\n", "<div>\na --> b\n</div>\n", "<!-- a\n\nb --!> c\n",
+        "a <!-- b\nc --> d\n", "`a --> b`\n\n<!-- c\na --> b\n", "> - a\n>   <!-- b\n\n<div>--> c</div>\n",
+        "# A\n\n- item\n  <!-- two\nlines -->\n\n## B\n", "> a\n>\n> <!-- b\n\n# C\n", "# A\n<!-- b\n",
+        "> a\n> <!-- b\nc -->\n\n<!-- d -->\n", "- a\n  <!-- b\nc -->\n\n## D\n\n<!-- e -->\n",
+        "`<!-- b` in code\n\n# A\n<!-- b\n", "- a\n  <!-- b\nc -->\n\n<!-- d -->\n\n- e\n  <!-- f\n",
+        "# A\n\n<!-- b ->\n\nc\n\n<!-- d -->\n", "- a\n  - b\n    <!-- c\n  d <!-- e -->\n",
+        "- a\n  <!-- b\n<div>\nc\n-->\n</div>\n\nd\n", "> a\n> <!-- b\n<div>\nc\n-->\n</div>\n\nd\n",
+        "> a\n> <!-- b\n<blockquote>\nc -->\n</blockquote>\n", "<div>\n<!-- a\n\nb\n\n<div>--></div>\n",
+        "# A\n\n- a <!-- x -->\n  <!-- b\nc -->\n\n<!-- d -->\n", "<!-- Flow: a ->\n b -->\n\ntext\n",
+        "<DIV>\n<!-- a\n\n</div>\n<img alt=\"b\" src=\"c.svg\">\n-->\n",
+        "<div>\n<!-- a\n\n</DIV>\n<img alt=\"b\" src=\"c.svg\">\n-->\n",
+        "</blockquote>\n\n> a\n> <!-- b\n<div>\nc\n-->\n</div>\n",
+        "<div>\n<!-- a -->\n<!-- b\n\n</div>\n<img alt=\"c\" src=\"d.svg\">\n-->\n",
+        "<!-- Never write <!-- inside a comment. -->\n\nMID-MARK\n",
+        "<? a\n\nMID-MARK\n\n## B\n", "<!X a\n\nMID-MARK\n", "<![CDATA[ a\n\nMID-MARK\n\n> q\n", "a <?php b ?> MID-MARK\n",
+        "<!DOCTYPE html>\n\nMID-MARK\n", "<div>\n<? a\n</div>\n\nMID-MARK\n", "<picture>\n</ 1 MID-MARK\n</picture>\n",
+    ) + tuple(f"# A\n\n<!-- b {end}\n\nc --> d\n"
+              for end in ("\u2013>", "\u2014>", "--", "- >", "-- >", "-- !>", "-> c", "->", "-> \t")) + tuple(
+        t for end in ("->", "- ->", "-!>", "- >", "-- >", "- !>", "-- !>", "\u2013>", "\u2014>", "--", "-> \t")
+        for t in (f"<!-- a {end}\nb -->\n", f"<!-- a {end}\nb\nc -->\n", f"<!-- a\nb {end}\nc -->\n"))
+
+    def test_control_unsafe(self):
+        for text in self.UNSAFE:
+            self.assertIsNotNone(Page(text).unsafe, text)
+
+    def test_control_safe(self):
+        # (whole comments on one line, comment syntax in code, and "-->", "<?" and "<!" in text)
+        for text in ("<!-- a --> b <!-- c -->\n<!--> d <!---> e <!-- f --!>\n", "a `<!-- b` c\n\n```\n<!-- d\ne -->\n```\n",
+                     "    <!-- f\n", "a --> b, `c --> d`\n\n```mermaid\nA --> B\n```\n", "a <? b <! c `<?d` `<!e`\n"):
+            self.assertIsNone(Page(text).unsafe, text)
+
+    def test_control_the_line(self):
+        # (of the first one, in a block cmark-gfm made or in raw HTML)
+        for text, line in (("# A\n\n- item\n  <!-- two\nlines -->\n\n## B\n", 4), ("> a\n>\n> <!-- b\n\n# C\n", 3),
+                           ("`<!-- b` in code\n\n# A\n<!-- b\n", 4), ("x\n\n<!-- a -->\n<!-- b\nc -->\n", 4),
+                           ("`a --> b`\n\n<div>\na --> b\n</div>\n", 4), ('<img alt="a --> b" src="c.svg">\n', 1),
+                           ("a <!-- b --> c\n\n<div>--></div>\n\n<!-- d\n", 3), ("<!-- a <!-- b -->\n", 1),
+                           ("# T\n\n<!-- note -->\n\n<!-- note\nmore -->\n", 5), ("x\n\n<div>\n<? a\n</div>\n", 4),
+                           ("<div>\n<!-- a -->\n<!-- a\nb -->\n</div>\n", 3), ("<!-- a -->\n\nx\n\n<!-- a\nb -->\n", 5),
+                           ('x\nsay "hi" <!X y>\n', 2)):
+            self.assertEqual(Page(text).unsafe, line, text)
+
+    def failure(self, test, texts):
+        """What `test`, a test of the docs, fails with ("" if it passes) when each doc of `texts` ({doc: text}) reads as
+        its text and each other doc as empty, so that the real docs, failing a test or not, change nothing there."""
+        with mock.patch(f"{__name__}.read", lambda rel: texts.get(rel, "")):
+            self.assertEqual([read(doc) for doc in DOCS if doc not in texts], [""] * len(set(DOCS) - set(texts)))
+            try:
+                test()
+            except AssertionError as e:
+                return str(e)
+        return ""
+
+    def test_control_the_doc_tests_read_each_doc(self):
+        # (each doc in turn reads as a text of this test's own (see failure), then all of them do: the test lists each,
+        # with the line, and says what to change)
+        unsafe, fence = self.test_no_comment_or_arrow_of_the_docs_can_hide_text, self.test_no_fence_of_the_docs_is_unclosed
+        for test, text, entry, advice in ((unsafe, "# Notes\n\n<!-- a\nb -->\n", 3, "whole on one line"),
+                                          (unsafe, "# Notes\n\n<div>a --> b</div>\n", 3, 'as "--&gt;"'),
+                                          (fence, "# Notes\n\n```sh\nmake\n", [3], "Close it")):
+            for doc in DOCS:
+                with self.subTest(doc=doc, text=text):
+                    failure = self.failure(test, {doc: text})
+                    self.assertIn(f"[({doc!r}, {entry})]", failure)
+                    self.assertIn(advice, failure)
+            failure = self.failure(test, dict.fromkeys(DOCS, text))
+            for doc in DOCS:
+                self.assertIn(f"({doc!r}, {entry})", failure)
+
+    def test_control_comments(self):
+        # (as HTML's tokenizer reads them: "<!-->" and "<!--->" are whole, "<!--!>" and "<!---!>" go on to the next end)
+        html = "<!--> a <!---> b <!--!> c --> d <!---!> e --!> f <!-- g"
+        self.assertEqual((comments(html), uncommented(html)), ([(0, 5), (8, 14), (17, 29), (32, 46), (49, None)], " a  b  d  f "))
+
+    def test_no_fence_of_the_docs_is_unclosed(self):
+        self.assertEqual([(doc, Page(read(doc)).unclosed) for doc in DOCS if Page(read(doc)).unclosed], [],
+                         "(doc, lines): a fenced code block opens here and never closes, so GitHub shows the rest as code. "
+                         "Close it with a line of at least as many of its fence's characters")
+
+    def test_control_unclosed(self):
+        for text, lines in (("```sh\na\n```\n", []), ("```sh\na\n", [1]), ("- ```sh\n  a\n  ```\n- b\n", []),
+                            ("- ```\n  a\n- b\n", [1]), ("    ```\n    a\n", []), ("x\n\n> ~~~\n> a\n", [3]),
+                            ("````\na\n```\n", [1]), ("1. ```\n   a\n   ```\n", []), ("~~~\na\n````\n", [1]),
+                            ("   ```\na\n   ```\n", []), ("```\na\n``` x\n", [1]), ("> ```\n> a\n> ```\n", [])):
+            self.assertEqual(Page(text).unclosed, lines, text)
+
+
 KINDS = ("text", "code", "pre", "alt", "mark")  # (all a page shows, see Page)
 
 
@@ -387,12 +568,12 @@ class GitHubPage(HTMLParser):
 
 class GitHubsReading(unittest.TestCase):
     """Page reads each case of GITHUB as GitHub's renderer showed it when the case was recorded (its REST API's POST
-    /markdown, mode markdown): the same marks hidden (END-MARK, its last line, and MID-MARK), links, anchors and text (a
-    case where GitHub shows an emoji, or leaves a task list's boxes as written, compares no text). The cases are the
-    forms of Markdown the checks rely on, and the ones reviews found read otherwise than GitHub. They are the renders of
-    the day GITHUB's "recorded" gives, which no test renews; that API leaves alerts, math and task lists as written
-    where github.com renders them. To record them again (it needs GITHUB_TOKEN):
-    cd tool && uv run python test_docs.py --record"""
+    /markdown, mode markdown): the same marks hidden (END-MARK, its last line, and MID-MARK), links, anchors and text
+    (a case where GitHub shows an emoji, or leaves a task list's boxes as written, compares no text); and Page's unsafe
+    flags each case where GitHub hid a mark. The cases are the forms of Markdown the checks rely on, and the ones
+    reviews found read otherwise than GitHub. They are the renders of the day GITHUB's "recorded" gives, which no test
+    renews; that API leaves alerts, math and task lists as written where github.com renders them. To record them
+    again (it needs GITHUB_TOKEN): cd tool && uv run python test_docs.py --record"""
 
     def test_each_case_is_read_as_github_did(self):
         with open(GITHUB, encoding="utf-8") as f:
@@ -409,6 +590,14 @@ class GitHubsReading(unittest.TestCase):
             with self.subTest(case=case["name"]):
                 self.assertTrue(case["markdown"].endswith("\nEND-MARK\n"))
                 self.assertEqual({k: mine[k] for k in keys}, {k: theirs[k] for k in keys})
+
+    def test_each_hide_is_unsafe(self):
+        with open(GITHUB, encoding="utf-8") as f:
+            cases = json.load(f)["cases"]
+        hides = [c for c in cases if any(m in c["markdown"] and m not in GitHubPage(c["html"]).text
+                                         for m in ("MID-MARK", "END-MARK"))]
+        self.assertGreaterEqual(len(hides), 22)
+        self.assertEqual([c["name"] for c in hides if Page(c["markdown"]).unsafe is None], [])
 
     def test_control_github_pages(self):
         page = GitHubPage('<div class="markdown-heading"><h2 class="heading-element">A b</h2><a id="user-content-a-b" '
