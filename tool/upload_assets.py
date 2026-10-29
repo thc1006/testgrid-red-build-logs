@@ -197,7 +197,7 @@ def an_asset(got):
 
 
 def asset_info(a):
-    return {k: a.get(k) for k in ("id", "name", "size", "digest", "state")}
+    return dict({k: a.get(k) for k in ("id", "name", "size", "digest", "state")}, url=a.get("browser_download_url"))
 
 
 class Releases:

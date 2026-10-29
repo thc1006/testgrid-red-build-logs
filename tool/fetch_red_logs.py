@@ -2267,6 +2267,63 @@ def take_assets(root, gcs, assets, run_id, now, deadline):
     return entries, errors, len(due) + len(running), packed, interrupted
 
 
+ASSET_NAME_RE = re.compile(rf"({JOB_RE.pattern})_({BUILD_RE.pattern})\.tar\.xz")
+RELEASE_RE = re.compile(r"node-logs-(?:[a-z0-9-]+-)?[0-9]{4}-[0-9]{2}(?:-[0-9]+)?")  # (see upload_assets.py)
+
+
+def record_uploads(root, path):
+    """Record in meta.json each asset the upload step uploaded, as its uploaded.json at path lists them (see
+    upload_assets.py), and each other one its releases.json says a release holds: "uploaded" in the build's
+    "artifacts_asset", if the asset's size and digest are the record's. Returns (how many it recorded, warnings of
+    those of uploaded.json it did not)."""
+    try:
+        got = read_json(path)
+    except (ValueError, OSError) as e:
+        return 0, [f"{path} cannot be read ({e}): no upload is recorded; the next run finds them uploaded"]
+    if got is None:
+        return 0, [f"no {path}: the upload step uploaded nothing"]
+    listed = got.get("uploaded") if isinstance(got, dict) else None
+    if not isinstance(listed, dict):
+        return 0, [f"{path} lists no uploads: none is recorded"]
+    try:  # (what the branch's releases held at the end: one a step cut off uploaded, or a lost record's)
+        held = read_json(os.path.join(os.path.dirname(path), "releases.json"))
+        held = held.get("releases") if isinstance(held, dict) else None
+    except (ValueError, OSError):
+        held = None
+    found = {}
+    for tag, release in held.items() if isinstance(held, dict) else ():
+        assets = release.get("assets") if isinstance(release, dict) else None
+        for a in assets if isinstance(assets, list) else ():
+            if isinstance(a, dict) and a.get("state") == "uploaded" and isinstance(a.get("name"), str):
+                found.setdefault(a["name"], {"release": tag, **{k: a.get(k) for k in ("size", "digest", "url")}})
+    known, done, notes = archived_builds(root)[0], 0, []  # (notes: (name, warning))
+    for name, up in sorted(listed.items()) + sorted((n, a) for n, a in found.items() if n not in listed):
+        m = ASSET_NAME_RE.fullmatch(name)
+        rel = known.get(f"{m.group(1)}/{m.group(2)}") if m else None
+        try:
+            meta = read_json(os.path.join(root, rel, "meta.json")) if rel else None
+        except (ValueError, OSError):
+            meta = None
+        record = meta.get("artifacts_asset") if isinstance(meta, dict) else None
+        if not isinstance(record, dict):  # (a build's record names its asset so: see take_asset)
+            notes.append((name, f"{name}: uploaded, but no archived build's meta.json records it"))
+            continue
+        if name not in listed and record.get("uploaded"):
+            continue
+        if not isinstance(up, dict) or up.get("size") != record.get("bytes") \
+                or up.get("digest") != f"sha256:{record.get('sha256')}":
+            notes.append((name, f"{name}: the uploaded asset is not the one its meta.json records; not recorded"))
+            continue
+        if not (isinstance(up.get("release"), str) and RELEASE_RE.fullmatch(up["release"]) and is_text(up.get("url"))):
+            notes.append((name, f"{name}: uploaded.json does not say where it is; not recorded"))
+            continue
+        uploaded = {"release": up["release"], "url": up["url"], **({"note": up["note"]} if is_text(up.get("note")) else {})}
+        if record.get("uploaded") != uploaded:
+            put_in_place(os.path.join(root, rel), dict(meta, artifacts_asset=dict(record, uploaded=uploaded)))
+            done += 1
+    return done, [w for n, w in notes if n in listed]  # (of releases.json's, only those it records are said)
+
+
 def copy_of(n):
     """The file a build folder's file named n is a stored copy of (see STORED, NODE_LOGS and CLUSTER_INFO: as it came
     or gzipped, whole or in parts, as build-log.txt.gz.000 is of build-log.txt), else None."""
@@ -5692,6 +5749,9 @@ def main(argv=None):
     only.add_argument("--show-verifications", action="store_true",
                       help="only put each run's verification, as its verification.json records it, in INDEX.md's "
                            "table of runs (the workflow does this once the run is verified)")
+    only.add_argument("--record-uploads", metavar="FILE",
+                      help="only record in meta.json the assets of node e2e builds the upload step uploaded, as its "
+                           "uploaded.json (FILE) lists them (the workflow does this after the upload)")
     only.add_argument("--clean-partial", action="store_true",
                       help="only remove what cut-off downloads and killed runs left (temp files, build folders without "
                            "meta.json, stored files their meta.json does not list), as a run does at its start (the "
@@ -5707,10 +5767,11 @@ def main(argv=None):
     run_start = time.time()
     tool_version()  # (asked once, now: the run's report gives it)
     root = args.archive
-    # (a run makes the archive where nothing is; --show-verifications and --clean-partial have nothing to change)
+    # (a run makes the archive where nothing is; --show-verifications, --clean-partial and --record-uploads have
+    # nothing to change)
     # ("x/" would make lexists follow a link, and deny a file)
     if not os.path.isdir(root) and (os.path.lexists(root.rstrip(os.sep) or os.sep) or args.show_verifications
-                                    or args.clean_partial):
+                                    or args.clean_partial or args.record_uploads):
         print(f"ERROR {root} is not a folder: no archive is there", file=sys.stderr)
         return 1
     if args.assets is not None:
@@ -5720,7 +5781,7 @@ def main(argv=None):
                   file=sys.stderr)
             return 1
         os.makedirs(here, exist_ok=True)
-    if args.show_verifications or args.clean_partial:
+    if args.show_verifications or args.clean_partial or args.record_uploads:
         lock = lock_archive(root)
         if lock is None:
             print(f"ERROR another run holds {os.path.join(root, '.lock')}", file=sys.stderr)
@@ -5734,6 +5795,11 @@ def main(argv=None):
                 sweep_parts(root)
                 warnings = []
                 clean_partial_builds(root, warnings)
+                for w in warnings:
+                    print("WARNING", w, file=sys.stderr)
+            if args.record_uploads:
+                n, warnings = record_uploads(root, args.record_uploads)
+                print(f"meta.json records {n} more uploaded asset{'' if n == 1 else 's'}")
                 for w in warnings:
                     print("WARNING", w, file=sys.stderr)
         return 0
