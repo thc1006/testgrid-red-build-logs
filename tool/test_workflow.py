@@ -97,7 +97,9 @@ class FailedSteps(unittest.TestCase):
     def test_those_that_fail_without_failing_the_run(self):
         # (each says why: an error it need not stop on, a config earlier runs read, a cleanup the commit does again)
         checked = set(re.findall(r"steps\.([\w-]+)\.outcome == 'failure'", self.steps[-1]["if"]))
-        self.assertEqual(checked, {"fetch", "upload", "verify"})  # fails: no upload
+        self.assertEqual(checked, {"fetch", "upload", "record", "verify"})  # fails: no record
+        self.assertEqual(self.steps[-1]["env"], {k.upper(): f"${{{{ steps.{k}.outcome }}}}" for k in checked})
+        self.assertTrue(all(f"{k}: ${k.upper()}" in self.steps[-1]["run"] for k in checked))  # (it says which failed)
         quiet = [s["name"] for s in self.steps if s.get("continue-on-error") and s.get("id") not in checked]
         self.assertEqual(quiet, ["TestGrid's production manifests still deploy the commit the port follows",
                                  "Read TestGrid's config from its upload job's runs",
@@ -112,7 +114,7 @@ class FailedSteps(unittest.TestCase):
         after = self.steps[names.index("Show the verification in INDEX.md") + 1:]
         self.assertEqual([s["name"] for s in after],
                          ["Commit the archive", "Keep the unpushed commit",
-                          "Fail the run if fetching, uploading or verifying failed"])  # fails: fetching or verifying
+                          "Fail the run if fetching, uploading, recording or verifying failed"])  # fails: uploading or verifying
         self.assertEqual(after[0]["if"], "${{ !cancelled() }}")
         self.assertTrue(after[1]["if"].startswith("${{ failure() && "))
 
@@ -160,6 +162,11 @@ class Token(unittest.TestCase):
         self.assertLessEqual(60 + frl.MAX_ASSET_BYTES / ua.RATE, ua.SECONDS)  # (and the largest asset's upload)
         before = [s.get("id") or s.get("name") for s in self.steps[:names.index(upload["name"])]]
         self.assertEqual(before[-2:], ["fetch", "Remove what a cut-off fetch left"])
+        record = self.steps[names.index(upload["name"]) + 1]
+        self.assertEqual(record["name"], "Record the uploaded node logs in meta.json")  # fails: Verify the archive ...
+        self.assertIn('--record-uploads "$RUNNER_TEMP/node-logs/uploaded.json"', record["run"])
+        self.assertNotIn("if", record)  # (what a failed upload uploaded is recorded too)
+        self.assertEqual((record["id"], record["continue-on-error"]), ("record", True))
         fetch = next(s for s in self.steps if s.get("id") == "fetch")
         self.assertIn('--assets "$RUNNER_TEMP/node-logs"', fetch["run"])
 

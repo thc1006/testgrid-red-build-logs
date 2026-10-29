@@ -87,9 +87,9 @@ jobs:
       group: red-build-logs-archive-${{ github.ref }}
       cancel-in-progress: false
     runs-on: ubuntu-24.04
-    # More than the step timeouts below (5 + 2 + 34 + 50 + 2 + 20 + 20 + 2 + 10) plus
+    # More than the step timeouts below (5 + 2 + 34 + 50 + 2 + 20 + 2 + 20 + 2 + 10) plus
     # checkout and setup-uv, so the commit step always gets to run.
-    timeout-minutes: 152
+    timeout-minutes: 154
     permissions:
       contents: write # push the archive back to the branch, upload the node logs to releases
     steps:
@@ -176,6 +176,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: exec python3 -I -S tool/upload_assets.py "$RUNNER_TEMP/node-logs"
+
+      # meta.json records each asset the upload step uploaded (its uploaded.json). If
+      # this fails, they stay pending, and the run fails after the commit: the next
+      # run packs them again, finds them uploaded with the same digest, and records them.
+      - name: Record the uploaded node logs in meta.json
+        id: record
+        continue-on-error: true
+        timeout-minutes: 2
+        run: >-
+          exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive
+          --record-uploads "$RUNNER_TEMP/node-logs/uploaded.json"
 
       - name: Verify the archive against TestGrid and GCS
         id: verify
@@ -290,14 +301,17 @@ jobs:
           path: ${{ steps.commit.outputs.bundle }}
           retention-days: 14
 
-      - name: Fail the run if fetching, uploading or verifying failed
-        if: steps.fetch.outcome == 'failure' || steps.upload.outcome == 'failure' || steps.verify.outcome == 'failure'
+      - name: Fail the run if fetching, uploading, recording or verifying failed
+        if: >-
+          steps.fetch.outcome == 'failure' || steps.upload.outcome == 'failure' ||
+          steps.record.outcome == 'failure' || steps.verify.outcome == 'failure'
         env:
           FETCH: ${{ steps.fetch.outcome }}
           UPLOAD: ${{ steps.upload.outcome }}
+          RECORD: ${{ steps.record.outcome }}
           VERIFY: ${{ steps.verify.outcome }}
         run: |
-          echo "fetch: $FETCH, upload: $UPLOAD, verify: $VERIFY"
+          echo "fetch: $FETCH, upload: $UPLOAD, record: $RECORD, verify: $VERIFY"
           exit 1
 
   # A gap is searched in GCS, so nothing is lost, but a day without an archive

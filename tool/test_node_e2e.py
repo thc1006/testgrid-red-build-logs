@@ -1,4 +1,5 @@
-"""The red builds of node e2e jobs, told by their prowjob.json (see fetch_red_logs.node_e2e_job).
+"""The red builds of node e2e jobs, told by their prowjob.json (see fetch_red_logs.node_e2e_job), and the asset of
+each one's artifacts/: packed by the fetch, uploaded by upload_assets.py, recorded in its meta.json.
 
 Run: cd tool && python -m unittest test_node_e2e -v
 """
@@ -20,8 +21,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import fetch_red_logs as frl  # noqa: E402
+import upload_assets as ua  # noqa: E402
 from test_fetch_red_logs import FakeServer, gcs_object, gzip_stored, md5_b64, table  # noqa: E402
 from test_integrity import DAY, HOUR, ArchiveWorld, obj, snowflake  # noqa: E402
+from test_upload_assets import ENV, REPO, FakeGitHub  # noqa: E402
 
 # (the args of real jobs' prowjob.json, cut short)
 KUBETEST_NODE = ["--deployment=node", "--gcp-zone=us-central1-b", "--node-tests=true", "--provider=gce", "--timeout=80m"]
@@ -301,7 +304,7 @@ class PackArtifacts(unittest.TestCase):
         self.assertEqual(sorted(os.listdir(self.dir)), ["a.tar.xz", "b.tar.xz", "work"])
 
 
-class Assets(ArchiveWorld):
+class AssetWorld(ArchiveWorld):
     """A red build of a node e2e job, finished three days ago, whose artifacts/ GCS has; the runs pack them into
     --assets."""
 
@@ -328,6 +331,8 @@ class Assets(ArchiveWorld):
         with open(os.path.join(self.assets, name), "rb") as f:
             return f.read()
 
+
+class Assets(AssetWorld):
     def test_a_pending_asset_of_its_artifacts(self):
         self.assertEqual(self.fetch("--assets", self.assets), 0)  # fails: 2 (no --assets)
         run, meta = self.runs()[-1], self.meta()
@@ -733,6 +738,136 @@ class Assets(ArchiveWorld):
     def test_assets_in_the_archive_are_refused(self):
         self.assertEqual(self.fetch("--assets", os.path.join(self.root, "assets")), 1)  # fails: 2 (no --assets)
         self.assertFalse(os.path.exists(os.path.join(self.root, "assets")))
+
+
+class Uploads(AssetWorld):
+    """The workflow's steps on a red node e2e build: the fetch packs its artifacts/, the upload step uploads them to a
+    fake GitHub, and --record-uploads records that in meta.json."""
+
+    def setUp(self):
+        super().setUp()
+        self.gh = FakeGitHub()
+        self.addCleanup(self.gh.close)
+        for name in ("BACKOFF", "GAP"):
+            patcher = mock.patch.object(ua, name, 0)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def upload(self):
+        with mock.patch("sys.stdout"), mock.patch("sys.stderr"):
+            return ua.main([self.assets, "--api", self.gh.url, "--uploads", self.gh.url], ENV)
+
+    def record(self, path=None):
+        with mock.patch("sys.stdout") as out, mock.patch("sys.stderr") as err:
+            code = frl.main(["--archive", self.root, "--record-uploads",
+                             path or os.path.join(self.assets, "uploaded.json")])  # fails: SystemExit 2
+        self.warnings = "".join(c.args[0] for c in err.write.call_args_list)
+        self.said = "".join(c.args[0] for c in out.write.call_args_list)
+        return code
+
+    def uploaded_json(self, uploaded):
+        frl.write_json(os.path.join(self.assets, "uploaded.json"), {"run": "x", "uploaded": uploaded})
+
+    def new_assets(self):
+        self.assets = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.assets)
+
+    def test_fetch_upload_record(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        record = self.meta()["artifacts_asset"]
+        self.assertEqual(self.upload(), 0)
+        tag = "node-logs-" + record["month"]
+        self.assertEqual(self.gh.held(tag), {record["name"]: "sha256:" + record["sha256"]})
+        self.assertEqual(self.record(), 0, self.warnings)
+        url = f"https://github.com/{REPO}/releases/download/{tag}/{record['name']}"
+        self.assertEqual(self.meta()["artifacts_asset"], dict(record, uploaded={"release": tag, "url": url}))
+        self.assertEqual(self.warnings, "")
+        before = self.read("meta.json")
+        self.assertEqual(self.record(), 0)  # (again: nothing changes)
+        self.assertEqual(self.read("meta.json"), before)
+        self.assertEqual(self.said, "meta.json records 0 more uploaded assets\n")
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.manifest()["assets"], [])  # (not packed again)
+        self.assertEqual(self.check()[0], 0)
+
+    def test_a_run_whose_record_was_lost_finds_it_uploaded(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.upload(), 0)
+        self.new_assets()  # (the record step failed, or the push: the next run's folder is a new one)
+        self.assertEqual(self.record(), 0)
+        self.assertIn("no ", self.warnings)
+        self.assertNotIn("uploaded", self.meta()["artifacts_asset"])
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # (packs it again: the same bytes)
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(sum(1 for m, p, _ in self.gh.requests if m == "POST" and "/assets?" in p), 1)
+        self.assertEqual(self.record(), 0)
+        self.assertEqual(self.meta()["artifacts_asset"]["uploaded"]["release"], "node-logs-" + self.runs()[0]["run"][:7])
+
+    def test_an_upload_that_is_not_the_records(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        meta = self.meta()
+        record = meta["artifacts_asset"]
+        tag = "node-logs-" + record["month"]
+        good = {"release": tag, "size": record["bytes"], "digest": "sha256:" + record["sha256"], "url": "https://x/y"}
+        for up in (dict(good, digest="sha256:" + "0" * 64), dict(good, size=1), dict(good, release="v1"),
+                   dict(good, url=None), "x"):
+            with self.subTest(up):
+                frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+                self.uploaded_json({record["name"]: up})
+                self.assertEqual(self.record(), 0)
+                self.assertNotIn("uploaded", self.meta()["artifacts_asset"])
+                self.assertIn(record["name"], self.warnings)
+        self.uploaded_json({"job_1.tar.xz": good, "other_2.tar.xz": good, "x.tar.xz": good})
+        self.assertEqual(self.record(), 0)
+        self.assertEqual(self.warnings.count("no archived build's meta.json records it"), 3)
+        self.uploaded_json({record["name"]: good})
+        self.assertEqual(self.record(), 0, self.warnings)
+        self.assertEqual(self.meta()["artifacts_asset"]["uploaded"], {"release": tag, "url": "https://x/y"})
+
+    def test_one_a_cut_off_step_uploaded_is_recorded_from_releases_json(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        record = self.meta()["artifacts_asset"]
+        tag = "node-logs-" + record["month"]
+        self.gh.release(tag, [("other_1.tar.xz", b"x")])  # (one no archived build records: no warning)
+        self.assertEqual(self.upload(), 0)
+        self.uploaded_json({})  # (cut off before it wrote that it uploaded it)
+        self.assertEqual(self.record(), 0, self.warnings)
+        url = f"https://github.com/{REPO}/releases/download/{tag}/{record['name']}"
+        self.assertEqual(self.meta()["artifacts_asset"], dict(record, uploaded={"release": tag, "url": url}))
+        self.assertEqual((self.said, self.warnings), ("meta.json records 1 more uploaded asset\n", ""))
+
+    def test_a_lost_one_github_holds_whole_is_recorded(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.upload(), 0)
+        self.new_assets()  # (its record was lost)
+        self.srv.httpd.routes.pop(f"{self.base}/artifacts/{HOST}/serial-1.log")  # (GCS keeps a build's files 90 days)
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        self.assertIn("lost", self.meta()["artifacts_asset"])
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.record(), 0, self.warnings)
+        self.assertEqual(self.meta()["artifacts_asset"]["uploaded"]["release"], "node-logs-" + self.runs()[0]["run"][:7])
+
+    def test_one_github_says_no_digest_of_keeps_the_note(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.gh.hide_digest = 99
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.record(), 0, self.warnings)
+        self.assertIn("this is the sha256 of the file sent", self.meta()["artifacts_asset"]["uploaded"]["note"])
+        before = self.read("meta.json")
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.manifest()["assets"], [])  # (not packed, and replaced, again)
+        self.assertEqual((self.upload(), self.record()), (0, 0))  # (releases.json lists it with its digest now)
+        self.assertEqual(self.read("meta.json"), before)
+
+    def test_a_record_step_without_uploads(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        before = self.read("meta.json")
+        for text in ("{", "[]", '{"uploaded": []}'):
+            with self.subTest(text):
+                with open(os.path.join(self.assets, "uploaded.json"), "w") as f:
+                    f.write(text)
+                self.assertEqual(self.record(), 0)
+                self.assertEqual(self.read("meta.json"), before)
 
 
 if __name__ == "__main__":
