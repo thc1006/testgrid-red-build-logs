@@ -36,14 +36,15 @@ class FakeGitHub:
     answers instead (a 502 leaves a "starter" asset, as GitHub's may); wrong_digest: the next upload's answer says
     another digest; wrong_name, another name. faults: (status, headers, message) each next request answers instead
     (a rate limit, say); hide_digest: how many next answers of an asset (an upload's or a read's) say no digest;
-    reread_digest: the digest a read of an asset says."""
+    reread_digest: the digest a read of an asset says. An asset's browser_download_url is on `download` (GitHub's
+    host, or this server's, which serves its bytes, from data, through a redirect as GitHub's does)."""
 
-    wrong_name, hide_digest, reread_digest = False, 0, None
+    wrong_name, hide_digest, reread_digest, download = False, 0, None, "https://github.com"
 
     def __init__(self, default_branch="main"):
         self.default_branch, self.releases, self.assets, self.next_id = default_branch, {}, {}, 100
         self.upload_faults, self.wrong_digest, self.requests, self.lock = [], False, [], threading.Lock()
-        self.faults, self.delete_faults = [], []
+        self.faults, self.delete_faults, self.data = [], [], {}
         fake = self
 
         class Handler(http.server.BaseHTTPRequestHandler):
@@ -60,6 +61,10 @@ class FakeGitHub:
                 self.wfile.write(data)
 
             def handle_any(self):
+                if self.command == "GET" and (self.path.startswith(f"/{REPO}/releases/download/")
+                                              or self.path.startswith("/blob/")):
+                    self.downloaded()
+                    return
                 length = int(self.headers.get("Content-Length") or 0)
                 body = self.rfile.read(length) if length else b""
                 with fake.lock:
@@ -70,6 +75,24 @@ class FakeGitHub:
                         return
                     status, out = fake.serve(self.command, self.path, body, self.headers)
                 self.answer(status, out)
+
+            def downloaded(self):
+                with fake.lock:
+                    fake.requests.append((self.command, self.path, self.headers.get("Authorization")))
+                    tag, _, name = self.path.removeprefix(f"/{REPO}/releases/download/").partition("/")
+                    found = [a for rid, assets in fake.assets.items() for a in assets.values()
+                             if fake.releases[rid]["tag_name"] == tag and a["name"] == name]
+                    data = fake.data.get(self.path.removeprefix("/blob/"))
+                if found:
+                    self.answer(302, headers={"Location": f"/blob/{found[0]['id']}"})
+                    return
+                if data is None:
+                    self.answer(404, {"message": "Not Found"})
+                    return
+                self.send_response(200)
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
 
             do_GET = do_POST = do_DELETE = handle_any
 
@@ -100,8 +123,8 @@ class FakeGitHub:
         asset = {"id": self.new_id(), "name": name, "size": len(data), "state": state,
                  "digest": "sha256:" + hashlib.sha256(data).hexdigest() if digest else None,
                  "updated_at": "2026-10-30T00:00:00Z",
-                 "browser_download_url": f"https://github.com/{REPO}/releases/download/{tag}/{name}"}
-        self.assets[rid][name] = asset
+                 "browser_download_url": f"{self.download}/{REPO}/releases/download/{tag}/{name}"}
+        self.assets[rid][name], self.data[str(asset["id"])] = asset, data
         return asset
 
     def find(self, aid):
