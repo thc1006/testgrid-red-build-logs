@@ -391,7 +391,10 @@ class ReadmeNumbers(unittest.TestCase):
                 f"the part of the gap in the last {days} days and {days} days more in the run that finds it, then "
                 f"{days} days more in each later run",
                 f"until {frl.RECHECK_HOURS} hours after it finished", f"compared until {days} days after it was archived",
-                f"failed for {days} days", f"scheduled every {every} hours", f"(00:00 to {half:02d}:00, {half:02d}:00 to 24:00)",
+                f"failed for {days} days", f"an asset is still pending {days} days after its build was archived",
+                f"hold {frl.ASSET_FILES_BYTES / (1 << 30):g} GiB or more, or more than {frl.MAX_ASSET_MEMBERS:,} files",
+                f"would be over {frl.MAX_ASSET_BYTES / (1 << 30):g} GiB", f"once packing has failed for {days} days",
+                f"scheduled every {every} hours", f"(00:00 to {half:02d}:00, {half:02d}:00 to 24:00)",
                 f"less than {due} hours before", f"more than {late} hours old", f"Apache License {license_version}"]
 
     def test_each_number_bound_to_the_code_is_its(self):
