@@ -188,11 +188,16 @@ jobs:
           exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive
           --record-uploads "$RUNNER_TEMP/node-logs/uploaded.json"
 
+      # It checks the node logs' assets against what the upload step found in the
+      # releases (its releases.json), and downloads those of the builds of the last
+      # 48 hours and those packed in them.
       - name: Verify the archive against TestGrid and GCS
         id: verify
         continue-on-error: true
         timeout-minutes: 20
-        run: exec tool/.venv/bin/python tool/cross_check.py --archive archive --hours 48 --record
+        run: >-
+          exec tool/.venv/bin/python tool/cross_check.py --archive archive --hours 48 --record
+          --releases "$RUNNER_TEMP/node-logs/releases.json"
 
       # The fetch wrote INDEX.md before the run was verified: put the verification's
       # outcome (verification.json) in its table of runs, so the commit shows it. If

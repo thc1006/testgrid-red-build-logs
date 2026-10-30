@@ -20,6 +20,19 @@ For one run (default: the latest):
              from GCS as its updater reads it: testgrid_rule, on the rows each tab
              shows as the run had TestGrid's config), is archived; and
              every failed one is archived, or the reason it is not is shown
+  assets     the asset of each node e2e build's artifacts/ (see
+             fetch_red_logs.take_asset): with --releases (the upload step's
+             releases.json), each one uploaded to the branch's releases is
+             there, with the size, digest and URL meta.json records, and those
+             of the builds of the last --hours, or packed in them, are
+             downloaded and checked whole; one still pending GIVE_UP_DAYS
+             after its build was archived and it was first packed or tried,
+             one of a build taken out that a release still holds, or a
+             release that is a draft, is a problem.
+             What GCS changed of the artifacts/ of a build compared with GCS
+             (or that GCS could not be read for them), an asset no record
+             names, a record no run packs again, and a build not packed yet,
+             are only noted.
 A difference in GCS for a build whose copy is not settled yet (taken before
 Prow finished uploading) is only noted: the next fetch compares it again. So is
 what GCS holds of a build the fetch gave up on after failed comparisons with
@@ -37,14 +50,20 @@ that already has one keeps it.
 import argparse
 import concurrent.futures as cf
 import hashlib
+import http.client
+import lzma
 import math
 import operator
 import os
+import re
 import signal
 import sys
+import tarfile
 import threading
 import time
+import urllib.error
 import urllib.parse
+import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_red_logs as frl  # noqa: E402
@@ -229,6 +248,9 @@ def main(argv=None):
                    help="give up (and fail) if verification takes longer than this")
     p.add_argument("--testgrid", default=TESTGRID)
     p.add_argument("--gcs", default=GCS)
+    p.add_argument("--releases", metavar="FILE",
+                   help="the upload step's releases.json: check the node-log assets against it, and download those of "
+                        "the window's builds (see above)")
     p.add_argument("--record", action="store_true",
                    help="write what was checked and the outcome to verification.json in the run's folder (see above; "
                         "it is made with a hard link, so that folder's file system must support hard links)")
@@ -447,6 +469,194 @@ def gcs_log_appeared(m):
     return f"{m['job']}/{m['build']}: GCS now has a build-log.txt that is not archived"
 
 
+NOT_KEPT = ("lost", "too_large", "refused", "given_up")  # (an asset record no run packs again: see frl.take_asset)
+ASSET_URLS = ("https://",)  # (those it downloads)
+
+
+def check_assets(args, archived, excluded, compared, since, pool):
+    """(problems, notes, counts) of the node-log assets the archive records (see the module's docstring). compared:
+    whether a build is compared with GCS; since: the start of the window."""
+    problems, notes, counts, now = [], [], {}, time.time()
+    try:
+        held = frl.read_json(args.releases) if args.releases else None
+    except (OSError, ValueError) as e:
+        held = e
+    if args.releases and held is None:
+        notes.append(f"no {args.releases}: the upload step failed, and the assets are not compared with the releases")
+    elif held is not None and not (isinstance(held, dict) and isinstance(held.get("prefix"), str)
+                                   and isinstance(held.get("releases"), dict)):
+        problems.append(f"{args.releases} is not the upload step's list of the releases")
+        held = None
+    own = re.compile(re.escape(held["prefix"]) + r"[0-9]{4}-[0-9]{2}(?:-[0-9]+)?") if held else None
+    assets = {(tag, a["name"]): a for tag, r in (held["releases"].items() if held else ()) if isinstance(r, dict)
+              for a in (r.get("assets") if isinstance(r.get("assets"), list) else [])
+              if isinstance(a, dict) and isinstance(a.get("name"), str)}
+    problems += [f"{tag} is a draft (was its tag deleted?): its assets are not public" for tag, r in
+                 sorted(held["releases"].items() if held else ()) if isinstance(r, dict) and r.get("draft")]
+    named, gcs, downloads = set(), [], []
+    for (job, build), (_, m) in sorted(archived.items()):
+        r, key = m.get("artifacts_asset"), f"{job}/{build}"
+        if r is None:
+            if frl.asset_due(m):  # (a run packs it later: never a problem)
+                counts["pending"] = counts.get("pending", 0) + 1
+                notes.append(f"{key}: its artifacts/ are not packed yet (a later run packs them)")
+            continue
+        members = r.get("members", []) if isinstance(r, dict) else None
+        if not isinstance(members, list) or not all(isinstance(i, dict) and isinstance(i.get("path"), str) for i in members):
+            problems.append(LocalDamage(f"{key} meta.json: its artifacts_asset is not an asset's record"))
+            continue
+        named.add(r.get("name"))
+        up, gone = r.get("uploaded"), [k for k in NOT_KEPT if k in r]
+        what = "uploaded" if up else "not_kept" if gone else "pending" if "name" in r or "failing_since" in r else None
+        counts[what] = counts.get(what, 0) + 1
+        if what is None:  # (no node's folder: nothing to keep)
+            continue
+        if what == "not_kept":
+            notes.append(f"{key}: its artifacts/ are not kept ({gone[0]}: {str(r[gone[0]])[:200]})")
+            continue
+        if members and compared(m):
+            gcs.append((key, m, r))
+        if what == "pending":
+            # (from its first pack, or first try: a backfilled build is packed long after it was archived)
+            first = max([t for t in (m.get("archived_at"), r.get("pending_since") or r.get("failing_since"))
+                         if frl.plausible_time(t, now)] or [m["created"]])
+            if now - first > frl.GIVE_UP_DAYS * 86400:
+                problems.append(f"{key}: its node-log asset is still pending {(now - first) / 86400:.0f} days after its "
+                                "build was archived and it was first packed or tried: GCS deletes its artifacts/ "
+                                "about 90 days after the build")
+            else:
+                notes.append(f"{key}: its node-log asset is pending upload (the next run uploads it)")
+            continue
+        if not (isinstance(up, dict) and frl.is_text(up.get("release")) and frl.is_text(up.get("url"))
+                and up["url"].startswith(ASSET_URLS)):
+            problems.append(LocalDamage(f"{key} meta.json: its asset's \"uploaded\" does not say where it is"))
+            continue
+        a = assets.get((up["release"], r.get("name"))) if own and own.fullmatch(up["release"]) else False
+        if a is None:
+            problems.append(f"{key}: {up['release']} does not hold its asset {r.get('name')} (releases.json)")
+        elif a and ((a.get("state"), a.get("size")) != ("uploaded", r.get("bytes"))
+                    or a.get("digest") not in (f"sha256:{r.get('sha256')}", None)):
+            problems.append(f"{key}: {up['release']} holds {r.get('name')} of {a.get('size')} bytes, {a.get('digest')}, "
+                            f"{a.get('state')}, not the {r.get('bytes')} bytes of sha256:{r.get('sha256')} meta.json records")
+        elif a and a.get("url") != up["url"]:
+            problems.append(f"{key}: {up['release']} serves {r.get('name')} at {str(a.get('url'))[:200]}, not at the "
+                            "URL meta.json records")
+        # (and one packed in the window: a backfilled build's, or one uploaded late)
+        if args.releases and max(m["started"] or m["created"], frl.folder_time(str(r.get("built_by_run"))) or 0) >= since:
+            downloads.append((key, up["url"], r))
+    taken = {"{}_{}.tar.xz".format(*k.split("/", 1)) for k in excluded}
+    for tag, name in sorted(assets):
+        if name in taken:
+            problems.append(f"{name}: of a build taken out ({frl.EXCLUDED}), but {tag} still holds it")
+        elif name not in named:
+            notes.append(f"{name}: {tag} holds it, but no archived build's meta.json records it")
+
+    def members_changed(item):
+        key, m, r = item
+        try:
+            return [], [f"{p} (only noted: its asset is as it was packed)" for p in members_changed_in_gcs(args.gcs, m, r)]
+        except Exception as e:
+            cannot = f"{key}: cannot compare the members of its asset with GCS: {type(e).__name__}: {e}"
+            if isinstance(e, frl.TRANSIENT):  # (GCS's doing: noted, as what the comparison finds is)
+                return [], [f"{cannot} (only noted)"]
+            return [LocalDamage(cannot)], []
+    for found, noted in pool.map(members_changed, gcs):
+        problems += found
+        notes += noted
+    with cf.ThreadPoolExecutor(4) as fetching:  # (each xz stream takes some 65 MiB to read)
+        for found in fetching.map(lambda d: asset_problems(*d), downloads):
+            problems += found
+    counts.pop(None, None)
+    return problems, notes, dict(counts, compared_with_gcs=len(gcs), downloaded=len(downloads))
+
+
+def members_changed_in_gcs(gcs, m, record):
+    """What GCS changed of a build's artifacts/ since its asset was packed: each member GCS holds another copy of,
+    compared as a stored file is (see gcs_change), and each file GCS lists that is no member."""
+    bucket, folder = (frl.stored_folder(m) or f"{m['query']}/{m['build']}").split("/", 1)
+    listed = {name[len(folder) + 1:] for name in frl.list_objects(gcs, bucket, f"{folder}/artifacts/")
+              if not name.endswith("/")}  # (a folder's placeholder object holds no file)
+    changed = [gcs_change(m, i, i["path"]) for i in record["members"]]
+    changed += [f"{m['job']}/{m['build']} {p}: GCS has it, its asset does not"
+                for p in sorted(listed - {i["path"] for i in record["members"]})]
+    return [c for c in changed if c]
+
+
+class Capped:
+    """A stream as tarfile reads it, refused past limit bytes."""
+
+    def __init__(self, r, limit, what):
+        self.r, self.left, self.what = r, limit, what
+
+    def read(self, n=-1):
+        data = self.r.read(self.left + 1 if n < 0 else min(n, self.left + 1))
+        self.left -= len(data)
+        if self.left < 0:
+            raise ValueError(f"more bytes than {self.what}")
+        return data
+
+
+class Hashed(Capped):
+    """A download as tarfile reads it: hashed, refused past limit bytes, and IncompleteRead (tried again) if its body
+    ends before its Content-Length."""
+
+    def __init__(self, r, limit):
+        super().__init__(r, limit, "meta.json records")
+        self.sha = hashlib.sha256()
+
+    def read(self, n=-1):
+        data = super().read(n)
+        if not data and n and getattr(self.r, "length", None):  # (http.client reads a cut body as its end)
+            raise http.client.IncompleteRead(b"", self.r.length)
+        self.sha.update(data)
+        return data
+
+
+def asset_problems(key, url, record):
+    """What is wrong with an uploaded asset as its URL serves it: its size and sha256, and each member's name, size and
+    md5, against its record. Read as a stream, at most the bytes recorded; a failed request is tried again."""
+    label = f"{key} {record.get('name')}"
+    for attempt in range(frl.RETRIES):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "testgrid-red-build-logs"}),
+                                        timeout=60) as r:
+                got = Hashed(r, record["bytes"])
+                return [f"{label}: {p}" for p in asset_members(got, record)] or (
+                    [] if (got.left, got.sha.hexdigest()) == (0, record["sha256"]) else
+                    [f"{label}: {url} serves {record['bytes'] - got.left} bytes of sha256:{got.sha.hexdigest()}, not "
+                     f"the {record['bytes']} of sha256:{record['sha256']} meta.json records"])
+        except (urllib.error.URLError, http.client.HTTPException, OSError) as e:  # (an HTTPError too)
+            if isinstance(e, urllib.error.HTTPError) and e.code < 500 or attempt == frl.RETRIES - 1:
+                return [f"{label}: cannot download {url}: {type(e).__name__}: {e}"]
+            time.sleep(frl.BACKOFF * 2 ** attempt)
+        except (tarfile.TarError, lzma.LZMAError, EOFError, ValueError, KeyError, TypeError, frl.IntegrityError) as e:
+            return [f"{label}: {url} serves no asset of its members: {type(e).__name__}: {e}"]
+    raise AssertionError("not reached")
+
+
+def asset_members(got, record):
+    """What is wrong with the members of an asset as tarfile reads them from got (see Hashed), which it then reads to
+    its end. The tar is read up to its members' bytes, with room for their headers (a PAX header can be any size)."""
+    want = iter(record["members"])
+    room = sum(m["bytes"] + 4096 for m in record["members"] if frl.is_int(m.get("bytes"))) + 20480
+    with lzma.LZMAFile(got) as xz, tarfile.open(fileobj=Capped(xz, room, "its members take"), mode="r|") as tar:
+        for entry in tar:
+            m = next(want, None)
+            if m is None or not entry.isreg() or (entry.name, entry.size) != (frl.member_name(m["path"]), m["bytes"]):
+                return [f"its {entry.name[:200]!r} of {entry.size} bytes is not the member meta.json records next"]
+            md5, f = hashlib.md5(), tar.extractfile(entry)
+            while chunk := f.read(1 << 20):
+                md5.update(chunk)
+            if md5.hexdigest() != m["md5"]:
+                return [f"its {entry.name[:200]!r} has md5 {md5.hexdigest()}, not the {m['md5']} meta.json records"]
+    lacked = next(want, None)
+    if lacked is not None:
+        return [f"it lacks {lacked['path'][:200]}"]
+    while got.read(1 << 20):
+        pass
+    return []
+
+
 def inventory(archived, root):
     """What the archive holds, by kind of record (and what state.json still tracks)."""
     counts = {}
@@ -655,6 +865,15 @@ def check(args, problems, notes, record):
     print("  inventory: " + inventory(archived, root))
     record.scope(compared_with_gcs=compared, sevenths=sorted(sevenths), differ=bad, not_settled=len(unsettled),
                  **({"given_up": given_up} if given_up else {}))
+
+    # 1b. the assets of node e2e builds' artifacts/, and what the releases hold
+    found, noted, counts = check_assets(args, archived, excluded, compare_with_gcs, since, pool)
+    problems += found
+    notes += noted
+    print(f"  assets: {counts.get('uploaded', 0)} uploaded ({counts['downloaded']} of the window's downloaded and checked "
+          f"whole), {counts.get('pending', 0)} pending upload, {counts.get('not_kept', 0)} not kept; the artifacts/ of "
+          f"{counts['compared_with_gcs']} compared with GCS")
+    record.scope(assets=counts)
 
     # 2. every column TestGrid paints red now
     def load(t):

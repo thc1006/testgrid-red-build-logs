@@ -169,6 +169,9 @@ class Token(unittest.TestCase):
         self.assertEqual((record["id"], record["continue-on-error"]), ("record", True))
         fetch = next(s for s in self.steps if s.get("id") == "fetch")
         self.assertIn('--assets "$RUNNER_TEMP/node-logs"', fetch["run"])
+        verify = next(s for s in self.steps if s.get("id") == "verify")  # (after the record step: it checks the assets)
+        self.assertIn('--releases "$RUNNER_TEMP/node-logs/releases.json"', verify["run"])  # fails: not in it
+        self.assertGreater(self.steps.index(verify), self.steps.index(record))
 
     def test_the_job_outlasts_its_steps(self):
         # (so the commit step always gets to run: their timeouts, and 7 minutes for checkout and setup-uv)

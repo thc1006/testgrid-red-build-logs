@@ -3,9 +3,11 @@ each one's artifacts/: packed by the fetch, uploaded by upload_assets.py, record
 
 Run: cd tool && python -m unittest test_node_e2e -v
 """
+import contextlib
 import hashlib
 import inspect
 import io
+import json
 import math
 import os
 import shutil
@@ -15,11 +17,14 @@ import tempfile
 import threading
 import time
 import unittest
+import urllib.error
+import urllib.parse
 from unittest import mock
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
+import cross_check as cc  # noqa: E402
 import fetch_red_logs as frl  # noqa: E402
 import upload_assets as ua  # noqa: E402
 from test_fetch_red_logs import FakeServer, gcs_object, gzip_stored, md5_b64, table  # noqa: E402
@@ -759,7 +764,7 @@ class Assets(AssetWorld):
         self.assertFalse(os.path.exists(os.path.join(self.root, "assets")))
 
 
-class Uploads(AssetWorld):
+class UploadWorld(AssetWorld):
     """The workflow's steps on a red node e2e build: the fetch packs its artifacts/, the upload step uploads them to a
     fake GitHub, and --record-uploads records that in meta.json."""
 
@@ -790,6 +795,15 @@ class Uploads(AssetWorld):
     def new_assets(self):
         self.assets = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.assets)
+
+    def take_out(self):
+        frl.write_json(os.path.join(self.root, "excluded.json"), {self.key: {"reason": "a log that must not stay public"}})
+
+    def state(self):
+        return frl.read_json(os.path.join(self.root, "state.json"))
+
+
+class Uploads(UploadWorld):
 
     def test_fetch_upload_record(self):
         self.assertEqual(self.fetch("--assets", self.assets), 0)
@@ -877,12 +891,6 @@ class Uploads(AssetWorld):
         self.assertEqual(self.manifest()["assets"], [])  # (not packed, and replaced, again)
         self.assertEqual((self.upload(), self.record()), (0, 0))  # (releases.json lists it with its digest now)
         self.assertEqual(self.read("meta.json"), before)
-
-    def take_out(self):
-        frl.write_json(os.path.join(self.root, "excluded.json"), {self.key: {"reason": "a log that must not stay public"}})
-
-    def state(self):
-        return frl.read_json(os.path.join(self.root, "state.json"))
 
     def test_the_asset_of_a_build_taken_out_is_deleted(self):
         self.assertEqual(self.fetch("--assets", self.assets), 0)
@@ -1032,6 +1040,360 @@ class Uploads(AssetWorld):
                     f.write(text)
                 self.assertEqual(self.record(), 0)
                 self.assertEqual(self.read("meta.json"), before)
+
+
+class Verified(UploadWorld):
+    """cross_check.py on the assets, as the workflow runs it after the record step: against what releases.json says
+    the branch's releases hold, and each asset of the window's builds downloaded from its URL (on the fake GitHub)."""
+
+    def setUp(self):
+        super().setUp()
+        self.gh.download = self.gh.url
+        for patcher in (mock.patch.object(frl, "BACKOFF", 0),
+                        mock.patch.object(cc, "ASSET_URLS", ("https://", self.gh.url), create=True)):  # (the fake's http://)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def verify(self, hours="200"):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = cc.main(["--archive", self.root, "--testgrid", self.srv.url, "--gcs", self.srv.url, "--hours", hours,
+                            "--releases", os.path.join(self.assets, "releases.json")])  # fails: SystemExit 2
+        self.out = out.getvalue()
+        return code
+
+    def uploaded_one(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual((self.upload(), self.record()), (0, 0))
+        return self.meta()["artifacts_asset"]
+
+    def held(self):
+        record = self.meta()["artifacts_asset"]
+        return next(a for assets in self.gh.assets.values() for a in assets.values() if a["name"] == record["name"])
+
+    def edit_releases(self, tag, **changes):
+        path = os.path.join(self.assets, "releases.json")
+        held = frl.read_json(path)
+        held["releases"][tag]["assets"][0].update(changes)
+        frl.write_json(path, held)
+
+    def test_an_uploaded_asset_is_checked_whole(self):
+        self.uploaded_one()
+        self.assertEqual(self.verify(), 0, self.out)
+        self.assertIn("assets: 1 uploaded (1 of the window's downloaded and checked whole), 0 pending", self.out)
+        self.assertEqual([p for _, p, _ in self.gh.requests if p.startswith("/blob/")], [f"/blob/{self.held()['id']}"])
+        self.assertNotIn("no archived build's meta.json records it", self.out)
+        before = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime(time.time() - DAY))
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), artifacts_asset=dict(
+            self.meta()["artifacts_asset"], built_by_run=before)))  # (nor packed in the window)
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set()):  # (nor compared with GCS out of its seventh)
+            self.assertEqual(self.verify(hours="1"), 0, self.out)  # (one older than the window is not downloaded)
+        self.assertIn("(0 of the window's downloaded", self.out)
+        self.assertIn("the artifacts/ of 0 compared with GCS", self.out)
+
+    def test_a_draft_is_a_problem(self):
+        self.uploaded_one()
+        path = os.path.join(self.assets, "releases.json")
+        held = frl.read_json(path)
+        tag = self.meta()["artifacts_asset"]["uploaded"]["release"]
+        held["releases"][tag]["draft"] = True  # (as when its tag is deleted)
+        frl.write_json(path, held)
+        self.assertEqual(self.verify(), 1)
+        self.assertIn(f"{tag} is a draft", self.out)
+
+    def test_bytes_that_are_not_its_asset(self):
+        record = self.uploaded_one()
+        data = self.gh.data[str(self.held()["id"])]
+        for served, says in ((b"x" * len(data), "no asset of its members: LZMAError"),
+                             (data + b"\0", "more bytes than meta.json records"),
+                             (data[:-1], f"serves {record['bytes'] - 1} bytes")):
+            with self.subTest(says):
+                self.gh.data[str(self.held()["id"])] = served
+                self.assertEqual(self.verify(), 1)
+                self.assertIn(says, self.out)
+        self.gh.data[str(self.held()["id"])] = data
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), artifacts_asset=dict(
+            record, sha256="0" * 64)))  # (the bytes as packed, of another sha256 than its record's)
+        self.assertEqual(self.verify(), 1)
+        self.assertIn(f"serves {record['bytes']} bytes of sha256:{record['sha256']}, not", self.out)
+
+    def test_a_member_not_as_recorded(self):
+        record = self.uploaded_one()
+        meta = self.meta()
+        for i, member in enumerate(record["members"]):
+            with self.subTest(member["path"]):
+                members = [dict(m, md5="0" * 32) if j == i else m for j, m in enumerate(record["members"])]
+                frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, artifacts_asset=dict(record, members=members)))
+                self.assertEqual(self.verify(), 1)
+                self.assertIn(f"has md5 {member['md5']}, not the {'0' * 32} meta.json records", self.out)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, artifacts_asset=dict(
+            record, members=record["members"][:-1])))
+        self.assertEqual(self.verify(), 1)
+        self.assertIn("is not the member meta.json records next", self.out)
+        renamed = [dict(record["members"][0], path=record["members"][0]["path"] + ".old")] + record["members"][1:]
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, artifacts_asset=dict(record, members=renamed)))
+        self.assertEqual(self.verify(), 1)
+        self.assertIn(f"its {record['members'][0]['path'].removeprefix('artifacts/')!r} of", self.out)
+        extra = dict(record["members"][0], path="artifacts/zz.log")
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, artifacts_asset=dict(
+            record, members=record["members"] + [extra])))
+        self.assertEqual(self.verify(), 1)
+        self.assertIn("it lacks artifacts/zz.log", self.out)
+
+    def test_one_its_release_no_longer_holds(self):
+        record = self.uploaded_one()
+        for assets in self.gh.assets.values():
+            assets.pop(record["name"], None)
+        self.assertEqual((self.fetch("--assets", self.assets), self.upload()), (0, 0))  # (nothing to upload)
+        self.assertEqual(self.verify(), 1)
+        self.assertIn(f"node-logs-{record['month']} does not hold its asset {record['name']}", self.out)
+        self.assertIn("HTTP Error 404", self.out)
+        self.assertEqual(sum(1 for _, p, _ in self.gh.requests if "/releases/download/" in p), 1)  # (a 404 is not tried again)
+
+    def test_one_github_holds_otherwise(self):
+        record = self.uploaded_one()
+        for key, value in (("digest", "sha256:" + "0" * 64), ("size", 1), ("state", "starter")):
+            with self.subTest(key):
+                self.edit_releases(f"node-logs-{record['month']}", **{key: value})
+                self.assertEqual(self.verify(), 1)
+                self.assertIn(f"holds {record['name']} of ", self.out)
+                self.assertEqual((self.upload(), self.record()), (0, 0))  # (as it was)
+        self.edit_releases(f"node-logs-{record['month']}", digest=None)  # (GitHub's digest is "string or null")
+        self.assertEqual(self.verify(), 0, self.out)
+
+    def test_what_gcs_changed_since_is_only_noted(self):
+        self.uploaded_one()
+        self.srv.route(f"{self.base}/artifacts/{HOST}/kubelet.log", gcs_object(b"uploaded again\n"))
+        self.srv.route(f"{self.base}/artifacts/{HOST}/late.log", gcs_object(b"late\n"))
+        self.assertEqual(self.verify(), 0, self.out)
+        self.assertIn(f"artifacts/{HOST}/kubelet.log: GCS changed since it was archived", self.out)
+        self.assertIn(f"artifacts/{HOST}/late.log: GCS has it, its asset does not (only noted", self.out)
+
+    def test_a_pending_one_is_noted_then_a_problem(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # (the upload step never ran)
+        self.assertEqual(self.verify(), 0, self.out)
+        self.assertIn(f"{self.key}: its node-log asset is pending upload", self.out)
+        self.assertIn("releases.json: the upload step failed", self.out)
+        meta = self.meta()
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, archived_at=time.time() - 15 * DAY))
+        self.assertEqual(self.verify(), 0, self.out)  # (packed now)
+        meta["artifacts_asset"]["pending_since"] = time.time() - 15 * DAY
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, archived_at=time.time() - 15 * DAY))
+        self.assertEqual(self.verify(), 1)
+        self.assertIn(f"{self.key}: its node-log asset is still pending 15 days after its build was archived", self.out)
+
+    def test_a_pending_one_that_fails_counts_from_its_first_pack(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        meta = self.meta()
+        meta["artifacts_asset"].update(pending_since=time.time() - 15 * DAY, failing_since=time.time() - DAY)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, archived_at=time.time() - 15 * DAY))
+        self.assertEqual(self.verify(), 1)
+        self.assertIn(f"{self.key}: its node-log asset is still pending 15 days after its build was archived", self.out)
+
+    def test_one_whose_first_pack_fails_counts_from_that_try(self):
+        self.assertEqual(self.fetch(), 0)  # (backfilled: packed long after it was archived)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_at=time.time() - 20 * DAY))
+        self.srv.route(f"{self.base}/artifacts/{HOST}/serial-1.log", gcs_object(b"booting\n", md5=md5_b64(b"other")))
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        self.assertEqual(list(self.meta()["artifacts_asset"]), ["failing_since"])
+        self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.verify(), 1)  # (the run's error)
+        self.assertIn(f"{self.key}: its node-log asset is pending upload", self.out)
+
+    def test_one_no_run_packs_is_noted(self):
+        meta = self.meta() if self.fetch("--assets", self.assets) == 0 else None
+        for key, value in (("lost", f"artifacts/{HOST}/serial-1.log"), ("too_large", 1 << 31), ("refused", "x"),
+                           ("given_up", "y")):
+            with self.subTest(key):
+                frl.write_json(os.path.join(self.bdir(), "meta.json"),
+                               dict(meta, archived_at=time.time() - 30 * DAY, artifacts_asset={key: value}))
+                self.assertEqual(self.verify(), 0, self.out)
+                self.assertIn(f"{self.key}: its artifacts/ are not kept ({key}: {value})", self.out)
+
+    def test_a_lost_one_github_holds_whole_is_checked_as_uploaded(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.upload(), 0)
+        self.new_assets()  # (its record was lost)
+        self.srv.httpd.routes.pop(f"{self.base}/artifacts/{HOST}/serial-1.log")
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        self.assertEqual((self.upload(), self.record()), (0, 0))
+        self.assertEqual(sorted(self.meta()["artifacts_asset"]), ["built_by_run", "bytes", "lost", "members", "month",
+                                                                  "name", "pending_since", "sha256", "uploaded"])
+        self.assertEqual(self.fetch("--assets", self.assets), 0)  # (a run without the error of the lost one)
+        self.assertEqual(self.verify(), 0, self.out)
+        self.assertIn("assets: 1 uploaded (1 of the window's downloaded and checked whole), 0 pending upload, 0 not kept",
+                      self.out)
+
+    def test_a_build_taken_out_whose_asset_a_release_still_holds(self):
+        record = self.uploaded_one()
+        self.take_out()
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.gh.delete_faults = [500] * ua.RETRIES * 2
+        self.assertEqual(self.upload(), 1)
+        self.assertEqual(self.verify(), 1)
+        self.assertIn(f"{record['name']}: of a build taken out (excluded.json), but node-logs-{record['month']} still "
+                      "holds it", self.out)
+
+    def test_an_asset_no_record_names_is_noted(self):
+        self.gh.release("node-logs-" + time.strftime("%Y-%m", time.gmtime()), [("other_1.tar.xz", b"x")])
+        self.uploaded_one()
+        self.assertEqual(self.verify(), 0, self.out)
+        self.assertIn("other_1.tar.xz: node-logs-", self.out)
+        self.assertIn("holds it, but no archived build's meta.json records it", self.out)
+
+    def test_another_branchs_records_are_not_compared_with_its_releases(self):
+        record = self.uploaded_one()
+        for assets in self.gh.assets.values():
+            assets.pop(record["name"], None)  # (gone from the default branch's release: not what this branch checks)
+        self.gh.release(ua.branch_prefix("test", "main") + record["month"], prerelease=True)
+        with mock.patch("sys.stdout"), mock.patch("sys.stderr"):
+            self.assertEqual(ua.main([self.assets, "--api", self.gh.url, "--uploads", self.gh.url],
+                                     dict(ENV, GITHUB_REF_NAME="test")), 0)
+        self.assertEqual(self.verify(), 1)
+        self.assertNotIn("does not hold its asset", self.out)
+        self.assertIn("HTTP Error 404", self.out)  # (downloaded all the same)
+
+    def test_a_releases_json_not_the_upload_steps(self):
+        self.uploaded_one()
+        for value in ([], {"releases": {}}, {"prefix": "node-logs-", "releases": []}, "{"):
+            with self.subTest(value):
+                with open(os.path.join(self.assets, "releases.json"), "w") as f:
+                    f.write(value if isinstance(value, str) else json.dumps(value))
+                self.assertEqual(self.verify(), 1)
+                self.assertIn("releases.json is not the upload step's list of the releases", self.out)
+
+    def test_one_packed_in_the_window_is_downloaded(self):
+        # (a backfilled build's, or one uploaded late: its build started before the window)
+        record = self.uploaded_one()
+        self.gh.data[str(self.held()["id"])] = b"x" * record["bytes"]
+        self.assertEqual(self.verify(hours="48"), 1)
+        self.assertIn("(1 of the window's downloaded", self.out)
+        self.assertIn("serves no asset of its members", self.out)
+
+    def test_a_failed_download_is_tried_again(self):
+        self.uploaded_one()
+        urlopen, data = cc.urllib.request.urlopen, self.gh.data[str(self.held()["id"])]
+
+        class Cut(io.BytesIO):
+            length = 1  # (http.client: the bytes of its Content-Length not read yet)
+        failed = [Cut(data[:len(data) // 2]), cc.urllib.error.HTTPError("x", 503, "Service Unavailable", {}, None)]
+
+        def opening(req, *args, **kwargs):
+            if "/releases/download/" in req.full_url and failed:
+                if isinstance(failed[-1], Exception):
+                    raise failed.pop()
+                return failed.pop()
+            return urlopen(req, *args, **kwargs)
+        with mock.patch.object(cc.urllib.request, "urlopen", side_effect=opening):
+            self.assertEqual(self.verify(), 0, self.out)
+        self.assertEqual(failed, [])
+
+    def test_a_tar_of_more_bytes_than_its_members_take(self):
+        # (a PAX header of any size, which tarfile reads whole)
+        buf = io.BytesIO()
+        with tarfile.open(fileobj=buf, mode="w:xz", format=tarfile.PAX_FORMAT) as tar:
+            entry = tarfile.TarInfo("a")
+            entry.size, entry.pax_headers = 1, {"comment": "x" * 100_000}
+            tar.addfile(entry, io.BytesIO(b"x"))
+        data = buf.getvalue()
+        record = {"members": [{"path": "artifacts/a", "bytes": 1, "md5": hashlib.md5(b"x").hexdigest()}]}
+        with self.assertRaisesRegex(ValueError, "more bytes than its members take"):
+            cc.asset_members(cc.Hashed(io.BytesIO(data), len(data)), record)  # fails: no asset_members
+
+    def test_but_one_of_what_its_members_take_is_read_whole(self):
+        # (one small member: the end of the tar; many of long names: each one's PAX header)
+        for members in ([("a", b"x")], [(f"{i:03}" + "n" * 150, b"x") for i in range(30)]):
+            with self.subTest(len(members)):
+                buf = io.BytesIO()
+                with tarfile.open(fileobj=buf, mode="w:xz", format=tarfile.PAX_FORMAT) as tar:
+                    for name, data in members:
+                        entry = tarfile.TarInfo(name)
+                        entry.size = len(data)
+                        tar.addfile(entry, io.BytesIO(data))
+                record = {"members": [{"path": "artifacts/" + name, "bytes": len(data), "md5": hashlib.md5(data).hexdigest()}
+                                      for name, data in members]}
+                got = cc.Hashed(io.BytesIO(buf.getvalue()), len(buf.getvalue()))  # fails: no Hashed
+                self.assertEqual(cc.asset_members(got, record), [])
+                self.assertEqual(got.left, 0)
+
+    def test_a_failed_comparison_of_its_members_with_gcs_is_noted(self):
+        # (the fetch never compares them, so never gives up on one GCS keeps refusing)
+        self.uploaded_one()
+        listing = frl.list_objects
+        for error in (frl.IntegrityError("GCS answers 503 (fake)"),
+                      urllib.error.HTTPError("https://gcs", 403, "Forbidden (fake)", {}, None)):
+            with self.subTest(error):
+                def failing(gcs, bucket, prefix, *args, error=error, **kwargs):
+                    if prefix.endswith("/artifacts/"):
+                        raise error
+                    return listing(gcs, bucket, prefix, *args, **kwargs)
+                with mock.patch.object(frl, "list_objects", side_effect=failing):
+                    self.assertEqual(self.verify(), 0, self.out)
+                self.assertIn(f"{self.key}: cannot compare the members of its asset with GCS: {type(error).__name__}",
+                              self.out)
+        m, member = self.meta(), self.meta()["artifacts_asset"]["members"][0]
+        path = urllib.parse.urlsplit(frl.node_log_url(m["log_url"].rsplit("/", 1)[0], member["path"])).path
+        served = self.srv.httpd.routes.get(path)
+        for status in (403, 503):  # (as GCS answers a member's HEAD)
+            with self.subTest(status):
+                self.srv.route(path, (status, {}, b""))
+                self.assertEqual(self.verify(), 0, self.out)
+                self.assertIn(f"{self.key}: cannot compare the members of its asset with GCS: HTTPError", self.out)
+                self.assertGreater(self.srv.hits(path), 0)
+        record = m["artifacts_asset"]
+        self.edit_releases(record["uploaded"]["release"], digest="sha256:" + "0" * 64)
+        self.assertEqual(self.verify(), 1)  # (what the release holds is still checked)
+        self.assertIn(f"holds {record['name']} of {record['bytes']} bytes, sha256:{'0' * 64}", self.out)
+        self.edit_releases(record["uploaded"]["release"], digest="sha256:" + record["sha256"])
+        self.srv.route(path, served)
+        self.assertEqual(self.verify(), 0, self.out)
+        with mock.patch.object(frl, "list_objects", side_effect=KeyError("path")):  # (not GCS's doing)
+            self.assertEqual(self.verify(), 1)
+        self.assertIn(f"{self.key}: cannot compare the members of its asset with GCS: KeyError", self.out)
+
+    def test_one_archived_long_before_it_was_first_packed(self):
+        # (a backfilled build: GIVE_UP_DAYS count from its first pack)
+        self.assertEqual(self.fetch(), 0)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_at=time.time() - 20 * DAY))
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        with mock.patch.object(ua, "put", side_effect=ua.Later("left for the next run")):
+            self.assertEqual(self.upload(), 0)
+        self.assertEqual(self.verify(), 0, self.out)
+        self.assertIn(f"{self.key}: its node-log asset is pending upload", self.out)
+        meta = self.meta()
+        del meta["archived_at"], meta["artifacts_asset"]["pending_since"]
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, created=int(time.time() - 20 * DAY)))
+        self.assertEqual(self.verify(), 1)  # (without those, from when the build was made)
+        self.assertIn(f"{self.key}: its node-log asset is still pending 20 days after", self.out)
+
+    def test_one_not_packed_yet_is_noted(self):
+        self.assertEqual(self.fetch(), 0)  # (a run that packed none: the next packs it)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(self.meta(), archived_at=time.time() - 30 * DAY))
+        self.assertEqual(self.verify(), 0, self.out)
+        self.assertIn(f"{self.key}: its artifacts/ are not packed yet", self.out)
+        self.assertIn("0 uploaded (0 of the window's downloaded and checked whole), 1 pending upload", self.out)
+
+    def test_one_that_is_not_where_github_has_it(self):
+        record = self.uploaded_one()
+        meta = self.meta()
+        meta["artifacts_asset"]["uploaded"]["url"] = "file:///etc/hostname"
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        self.assertEqual(self.verify(), 1)
+        self.assertIn(f"{self.key} meta.json: its asset's \"uploaded\" does not say where it is", self.out)
+        self.assertIn("(0 of the window's downloaded", self.out)
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, artifacts_asset=record))
+        self.edit_releases(f"node-logs-{record['month']}", url="https://example.com/x")
+        self.assertEqual(self.verify(), 1)
+        self.assertIn(f"serves {record['name']} at https://example.com/x, not at the URL meta.json records", self.out)
+
+    def test_a_record_that_is_not_one(self):
+        self.uploaded_one()
+        meta = self.meta()
+        for value in ([], {"members": "x"}, {"name": "x", "members": [{"path": 1}]}):
+            with self.subTest(value):
+                frl.write_json(os.path.join(self.bdir(), "meta.json"), dict(meta, artifacts_asset=value))
+                self.assertEqual(self.verify(), 1)
+                self.assertIn(f"{self.key} meta.json: its artifacts_asset is not an asset's record", self.out)
 
 
 if __name__ == "__main__":

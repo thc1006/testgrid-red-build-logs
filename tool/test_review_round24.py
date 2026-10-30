@@ -970,7 +970,8 @@ class VerificationRecord(ArchiveWorld):
         self.assertEqual(v["scope"], {"window": {"from": t0 - 200 * 3600, "to": t0}, "tabs": 1, "builds": 1,
                                       "compared_with_gcs": 1, "sevenths": [int(t0 // 86400) % 7], "differ": 0,
                                       "not_settled": 0, "red_on_testgrid": 1, "red_not_settled": 0, "gcs_builds": 0,
-                                      "judged_by_rule": 0})
+                                      "judged_by_rule": 0,
+                                      "assets": {"compared_with_gcs": 0, "downloaded": 0}})  # fails: no assets
 
     def test_it_says_incomplete_until_the_checks_end(self):
         # (so a verification killed part-way, which writes nothing more, never reads as passed; it
