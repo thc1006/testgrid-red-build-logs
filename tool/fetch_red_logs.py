@@ -4042,7 +4042,7 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                     del meta["note"]  # (said of the folder under the index, not of its own)
                 put_in_place(target, meta)  # (kept, as the sightings are; a disk error is a LocalIOError)
             finished = read_finished(base)
-            if "node_e2e" not in meta and not old.get("final"):  # (store() could not read it)
+            if "node_e2e" not in meta:  # (not read when stored)
                 node_e2e = read_node_e2e(base)
                 if node_e2e is not None:
                     meta["node_e2e"] = node_e2e
