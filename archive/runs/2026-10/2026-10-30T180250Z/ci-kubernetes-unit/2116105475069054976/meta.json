@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2116105475069054976",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1793354026,
+  "created": 1793353835,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-network] k8s.io/kubernetes/pkg/controller/nodeipam/ipam.sync",
+          "status": "FAIL",
+          "message": "Failed\npanic: test timed out after 3m0s\n\trunning tests:\n\t\tTestNodeSync...SyncUpdate\n=== PAUSE TestNodeSyncUpdate\n\n=== RUN   TestNodeSyncResync\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793355413,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2116105475069054976",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2116105475069054976/build-log.txt",
+  "log": {
+    "bytes": 248419,
+    "md5": "5b6675a6133db7b17b728214a44fb27b",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 33587,
+    "gcs": {
+      "generation": "1793355413870133",
+      "md5": "5b6675a6133db7b17b728214a44fb27b",
+      "crc32c": "d97eb7fe",
+      "bytes": 248419,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 145327,
+    "md5": "082779e633e373d34fae31a1e7033585",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 15143,
+    "gcs": {
+      "generation": "1793355416719919",
+      "md5": "082779e633e373d34fae31a1e7033585",
+      "crc32c": "e5b3340a",
+      "bytes": 145327,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-30T180250Z",
+  "archived_at": 1793383370.0,
+  "settled": true,
+  "final": false
+}

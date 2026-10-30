@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2116174681806475264",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793370336,
+  "created": 1793370335,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] [DRA] control plane supports count/resourceclaims.resource.k8s.io ResourceQuota",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\ncreating second claim not allowed\nE...t: k8s.io/kubernetes/test/e2e/dra/dra.go:3839 @ 10/30/26 15:01:13.673\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793372995,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2116174681806475264",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2116174681806475264/build-log.txt",
+  "log": {
+    "bytes": 126645,
+    "md5": "7bb205990554dc8cf651b9f00b846e04",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21491,
+    "gcs": {
+      "generation": "1793373013561557",
+      "md5": "7bb205990554dc8cf651b9f00b846e04",
+      "crc32c": "90fd864a",
+      "bytes": 126645,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86676,
+    "md5": "b4d3b9b85ca696d90db6d49e8a2323a9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11988,
+    "gcs": {
+      "generation": "1793373016666154",
+      "md5": "b4d3b9b85ca696d90db6d49e8a2323a9",
+      "crc32c": "7f956dd3",
+      "bytes": 86676,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-30T180250Z",
+  "archived_at": 1793383370.0,
+  "settled": true,
+  "final": false
+}

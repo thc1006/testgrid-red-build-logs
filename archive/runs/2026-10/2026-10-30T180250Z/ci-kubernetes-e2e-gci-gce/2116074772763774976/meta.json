@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2116074772763774976",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793346515,
+  "created": 1793346515,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and non-pre-bound PV: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-v8w4d\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 10/30/26 08:07:37.958\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793348813,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2116074772763774976",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2116074772763774976/build-log.txt",
+  "log": {
+    "bytes": 150550,
+    "md5": "a746ae17a510ad52c90adf547cfde47e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25203,
+    "gcs": {
+      "generation": "1793348829421530",
+      "md5": "a746ae17a510ad52c90adf547cfde47e",
+      "crc32c": "e27f13cc",
+      "bytes": 150550,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85086,
+    "md5": "0cf0d825780456f514a30c1b41bde59a",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11807,
+    "gcs": {
+      "generation": "1793348834182055",
+      "md5": "0cf0d825780456f514a30c1b41bde59a",
+      "crc32c": "a073eaba",
+      "bytes": 85086,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-30T180250Z",
+  "archived_at": 1793383370.0,
+  "settled": true,
+  "final": false
+}
