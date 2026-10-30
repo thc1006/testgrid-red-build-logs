@@ -5167,6 +5167,13 @@ def left_for_later(left):
     return ["## Left for later runs", ""] + lines + [""] if lines else []
 
 
+def not_archived(unresolved, given_up):
+    """The red builds INDEX.md lists as not archived (write_index's missing), of state.json's records."""
+    return ([{"rec": u["rec"], "status": u.get("last_error") or "waiting for GCS upload"} for u in unresolved.values()]
+            + [{"rec": u["rec"], "status": f"given up: {u.get('last_error') or 'unknown error'}"}
+               for u in given_up.values()])
+
+
 def write_index(root, now, current_run=None, missing=(), known=None):
     """Rewrite INDEX.md, the weekly pages, the charts and recent runs' READMEs.
 
@@ -6697,12 +6704,10 @@ def run(args, root, run_start, pool, deadline):
         warnings += [w for w in tidy if w not in warnings]  # (the start of the run may have said so already)
     except OSError as e:
         errors.append({"build": None, "error": f"removing what cut-off downloads left failed: {type(e).__name__}: {e}"})
-    missing = ([{"rec": u["rec"], "status": u.get("last_error") or "waiting for GCS upload"} for u in unresolved.values()]
-               + [{"rec": u["rec"], "status": f"given up: {u.get('last_error') or 'unknown error'}"}
-                  for u in given_up.values()])
     entries = None
     try:
-        entries, _ = write_index(root, time.time(), report_, missing)  # adds unreadable files to errors
+        # (adds unreadable files to errors)
+        entries, _ = write_index(root, time.time(), report_, not_archived(unresolved, given_up))
     except Exception as e:
         errors.append({"build": None, "error": f"writing the index or charts failed: {type(e).__name__}: {e}"})
     elapsed = time.time() - run_start
