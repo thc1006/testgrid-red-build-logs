@@ -1,5 +1,93 @@
 [
   {
+    "time": 1793309203,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2115918239270703104",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-30T010003Z/ci-kubernetes-e2e-capz-master-windows/2115918239270703104",
+    "run": "2026-10-30T010003Z",
+    "files": [
+      "runs/2026-10/2026-10-30T010003Z/ci-kubernetes-e2e-capz-master-windows/2115918239270703104/build-log.txt.gz",
+      "runs/2026-10/2026-10-30T010003Z/ci-kubernetes-e2e-capz-master-windows/2115918239270703104/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 360601,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2115918239270703104"
+  },
+  {
+    "time": 1793300096,
+    "job": "ci-kubernetes-e2e-kind-ipv6",
+    "build": "2115879735199272960",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-ipv6-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and non-pre-bound PV: test write access",
+      "ci-kubernetes-e2e-kind-ipv6.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-10/2026-10-30T010003Z/ci-kubernetes-e2e-kind-ipv6/2115879735199272960",
+    "run": "2026-10-30T010003Z",
+    "files": [
+      "runs/2026-10/2026-10-30T010003Z/ci-kubernetes-e2e-kind-ipv6/2115879735199272960/build-log.txt.gz",
+      "runs/2026-10/2026-10-30T010003Z/ci-kubernetes-e2e-kind-ipv6/2115879735199272960/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 243472,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2115879735199272960"
+  },
+  {
+    "time": 1793298403,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2115872940137385984",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-10/2026-10-30T010003Z/ci-kubernetes-e2e-capz-master-windows/2115872940137385984",
+    "run": "2026-10-30T010003Z",
+    "files": [
+      "runs/2026-10/2026-10-30T010003Z/ci-kubernetes-e2e-capz-master-windows/2115872940137385984/build-log.txt.gz",
+      "runs/2026-10/2026-10-30T010003Z/ci-kubernetes-e2e-capz-master-windows/2115872940137385984/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 512658,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2115872940137385984"
+  },
+  {
     "time": 1793287211,
     "job": "ci-kubernetes-integration-arm64-master",
     "build": "2115825879350251520",
@@ -2080,15 +2168,25 @@
     "run": "2026-10-28T125300Z",
     "files": [
       "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/build-log.txt.gz",
-      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/podinfo.json.gz"
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/podinfo.json.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/bootstrap-e2e-master.serial-1.log.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/bootstrap-e2e-minion-group-7sgk.kube-node-configuration.log.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/bootstrap-e2e-minion-group-7sgk.kube-node-installation.log.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/bootstrap-e2e-minion-group-x3cp.kube-node-configuration.log.gz",
+      "runs/2026-10/2026-10-28T125300Z/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584/bootstrap-e2e-minion-group-x3cp.kube-node-installation.log.gz"
     ],
     "remote": [],
-    "bytes": 144586,
+    "bytes": 533563,
     "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "node_logs": true,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2115332154471747584"
   },
@@ -2288,7 +2386,7 @@
     "remote": [],
     "bytes": 247225,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -2317,7 +2415,7 @@
     "remote": [],
     "bytes": 316479,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -2345,7 +2443,7 @@
     "remote": [],
     "bytes": 196269,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -2374,7 +2472,7 @@
     "remote": [],
     "bytes": 269885,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -2406,7 +2504,7 @@
     "remote": [],
     "bytes": 964469,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -2435,7 +2533,7 @@
     "remote": [],
     "bytes": 312683,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -2464,7 +2562,7 @@
     "remote": [],
     "bytes": 223068,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

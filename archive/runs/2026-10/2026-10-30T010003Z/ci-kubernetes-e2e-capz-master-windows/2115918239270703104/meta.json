@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2115918239270703104",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793309203,
+  "created": 1793309194,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secrets-c6eb8336-e2ce-43d0-8c6a-72535256088...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793314742,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2115918239270703104",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2115918239270703104/build-log.txt",
+  "log": {
+    "bytes": 297364,
+    "md5": "e3a6f9db5e5fcfe6c32bbe1afe3981ee",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 44831,
+    "gcs": {
+      "generation": "1793314749873913",
+      "md5": "e3a6f9db5e5fcfe6c32bbe1afe3981ee",
+      "crc32c": "d579c993",
+      "bytes": 297364,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 63237,
+    "md5": "6250fe75954a11576d9814d3f4d7b848",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10379,
+    "gcs": {
+      "generation": "1793314751565085",
+      "md5": "6250fe75954a11576d9814d3f4d7b848",
+      "crc32c": "5875dcdb",
+      "bytes": 63237,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-30T010003Z",
+  "archived_at": 1793322003.0,
+  "settled": true,
+  "final": false
+}

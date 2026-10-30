@@ -1,0 +1,60 @@
+{
+  "run": "2026-10-30T010003Z",
+  "outcome": "ok",
+  "started": 1793322023.8703644,
+  "finished": 1793322053.1684556,
+  "tool": {
+    "commit": "4c44581b46f1760e0fe9e8abd2d882afd909aea4",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "40982973703",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1793149203.953951,
+      "to": 1793322003.953951
+    },
+    "tabs": 46,
+    "builds": 1202,
+    "compared_with_gcs": 236,
+    "sevenths": [
+      1
+    ],
+    "differ": 0,
+    "not_settled": 0,
+    "red_on_testgrid": 76,
+    "red_not_settled": 0,
+    "gcs_builds": 1930,
+    "judged_by_rule": 35
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 22,
+  "notes": [
+    "ci-kubernetes-build-fast/2115253386126299136: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115270750033154048: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115301202764763136: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115313279092920320: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115446659189051392: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115450686672998400: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115452195909406720: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115489693515649024: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115501270075707392: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115533734714281984: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115546820909207552: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115614737193504768: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115720181295616000: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2115877973788725248: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind/2115630591469686784: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-enabled/2115266722389823488: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-enabled-conformance/2115266722540818432: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-features/2115256152701800448: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-features/2115439613492334592: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-features/2115545563654000640: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-ipv6/2115439613421031424: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-master/2115490700345741312: ERROR, not listed on TestGrid (not archived)"
+  ]
+}
