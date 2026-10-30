@@ -60,6 +60,17 @@ archive/runs/<YYYY-MM>/<run>/<job>/<build>/
   GCS has one in `artifacts/cluster-logs/`. Read one with
   `gzip -dc`. A build archived before the runs kept these logs gets them when
   a run next compares it with GCS, if GCS still has them.
+- For a node e2e build (one whose `prowjob.json` runs kubetest's or
+  kubetest2's node tests), the files GCS has in its `artifacts/` are not in
+  its folder: if a node's folder is among them, they are one `.tar.xz` asset
+  of the release `node-logs-<YYYY-MM>` of the month it was archived, which the
+  build's rows in INDEX.md and on its week's page link. Read it with
+  `curl -L <url> | tar -xJ`. `meta.json` has its sha256, and each file's md5.
+  They are not kept if they hold 2 GiB or more, or more than 10,000 files, if
+  the asset would be over 1 GiB, if a file's name is not a plain path, if GCS
+  deletes one before a run packs them, or once packing has failed for 14 days.
+  A build archived before the runs kept these gets them when a run next
+  compares it with GCS, if GCS still has them.
 - `meta.json`: the tabs, the red tests (it says when some are left out),
   TestGrid's messages and the log's md5. A build GCS had no file for has only
   this.
@@ -137,7 +148,9 @@ from GCS.
    TestGrid's rule.
 4. Download each new log, including those found in step 3, and check its size
    and checksum against GCS. In the same pass, compare archived builds with GCS
-   again, since Prow can upload a log twice.
+   again, since Prow can upload a log twice. Then pack the `artifacts/` of red
+   node e2e builds whose asset is not uploaded yet and whose copy is no longer
+   provisional, oldest first, as many as a run's time and size limits allow.
 
    A build is compared on every run until 48 hours after it finished. One
    without a log or without `finished.json` is compared until 14 days after it
@@ -151,9 +164,15 @@ from GCS.
    its comparisons have failed for 14 days. Then the run gives up on it: it is
    still compared at least once a week, but a failure on GCS's side is no
    longer an error.
-5. Rewrite the index and the charts, then run
+5. Upload the packed `artifacts/` to the month's release. Of the steps that
+   run the tool, only this one and the commit get the workflow's token.
+6. Rewrite the index and the charts, then run
    [`cross_check.py`](tool/cross_check.py). It checks the archive again on its
-   own, and fails the run if a red build is missing or a stored file changed.
+   own, and fails the run if a red build is missing, a stored file changed, a
+   release is a draft, lacks a node e2e build's asset, holds it with another
+   size, digest or URL, or holds that of a build taken out, or an asset is
+   still pending 14 days after its build was archived and it was first packed
+   or tried.
    For a build given up on in step 4, what GCS holds is only noted.
    What it checked, and the outcome, are kept in the run's folder as
    `verification.json`.
@@ -193,9 +212,10 @@ to `archive/excluded.json`:
 {"ci-kubernetes-unit/2110090875689242624": {"reason": "the log holds a token"}}
 ```
 
-The next run removes its folder and never fetches it again, and
-`cross_check.py` does not count it as missing. Its files stay in the git
-history until that is rewritten. A run stops if it cannot use the file.
+The next run removes its folder and its node-log asset, if it has one, and
+never fetches it again, and `cross_check.py` does not count it as missing.
+Its files stay in the git history until that is rewritten. A run stops if it
+cannot use the file.
 
 ## Running it locally
 
