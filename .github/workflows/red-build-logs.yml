@@ -87,17 +87,19 @@ jobs:
       group: red-build-logs-archive-${{ github.ref }}
       cancel-in-progress: false
     runs-on: ubuntu-24.04
-    # More than the step timeouts below (5 + 2 + 34 + 50 + 2 + 20 + 2 + 10) plus checkout
-    # and setup-uv, so the commit step always gets to run.
-    timeout-minutes: 132
+    # More than the step timeouts below (5 + 2 + 34 + 50 + 2 + 20 + 20 + 2 + 10) plus
+    # checkout and setup-uv, so the commit step always gets to run.
+    timeout-minutes: 152
     permissions:
-      contents: write # push the archive back to the branch
+      contents: write # push the archive back to the branch, upload the node logs to releases
     steps:
       # Check out the branch tip, not the commit that triggered the run: a re-run
       # or a run queued behind another must build on what the last run pushed.
       # github.ref_name is the default branch for scheduled runs (their event
       # payload has no repository field) and the chosen branch for manual ones.
-      # No credentials are kept in .git/config; only the commit step gets the token.
+      # No credentials are kept in .git/config. Of the steps that run the tool, only
+      # "Upload the node logs of red node e2e builds" and "Commit the archive" get the
+      # token.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref_name }}
@@ -147,7 +149,9 @@ jobs:
         id: fetch
         continue-on-error: true
         timeout-minutes: 50
-        run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --gzip --testgrid-config "$RUNNER_TEMP/testgrid-config.json"
+        run: >-
+          exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --gzip
+          --testgrid-config "$RUNNER_TEMP/testgrid-config.json" --assets "$RUNNER_TEMP/node-logs"
 
       # A fetch killed outright (at its step's timeout, say) does not remove what its
       # cut-off downloads left, as it does at its start and end: its rule does it here,
@@ -156,6 +160,22 @@ jobs:
         continue-on-error: true
         timeout-minutes: 2
         run: exec tool/.venv/bin/python tool/fetch_red_logs.py --archive archive --clean-partial
+
+      # The artifacts/ of red node e2e builds the fetch packed go to the month's
+      # release (tool/upload_assets.py). Of the steps that run the tool, only this one
+      # and "Commit the archive" get the token.
+      # The script reads nothing of TestGrid or GCS but the manifest the fetch wrote,
+      # which it checks, imports none of the fetch's code, and runs on the runner's
+      # Python as python3 -I -S, so no package of the environment loads with the
+      # token present. An asset it does not upload stays pending, and the next run
+      # packs it again.
+      - name: Upload the node logs of red node e2e builds
+        id: upload
+        continue-on-error: true
+        timeout-minutes: 20
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: exec python3 -I -S tool/upload_assets.py "$RUNNER_TEMP/node-logs"
 
       - name: Verify the archive against TestGrid and GCS
         id: verify
@@ -270,13 +290,14 @@ jobs:
           path: ${{ steps.commit.outputs.bundle }}
           retention-days: 14
 
-      - name: Fail the run if fetching or verifying failed
-        if: steps.fetch.outcome == 'failure' || steps.verify.outcome == 'failure'
+      - name: Fail the run if fetching, uploading or verifying failed
+        if: steps.fetch.outcome == 'failure' || steps.upload.outcome == 'failure' || steps.verify.outcome == 'failure'
         env:
           FETCH: ${{ steps.fetch.outcome }}
+          UPLOAD: ${{ steps.upload.outcome }}
           VERIFY: ${{ steps.verify.outcome }}
         run: |
-          echo "fetch: $FETCH, verify: $VERIFY"
+          echo "fetch: $FETCH, upload: $UPLOAD, verify: $VERIFY"
           exit 1
 
   # A gap is searched in GCS, so nothing is lost, but a day without an archive

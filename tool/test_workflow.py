@@ -6,12 +6,18 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 
 import yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+import fetch_red_logs as frl  # noqa: E402
+import upload_assets as ua  # noqa: E402
+
 WORKFLOW = os.path.join(HERE, "..", ".github", "workflows", "red-build-logs.yml")
 # (gh api ... --jq: the committer date of the last commit under archive/runs/, "" for none)
 FAKE_GH = '#!/bin/sh\n[ -n "$FAKE_GH_FAILS" ] && exit 1\nprintf "%s\\n" "$FAKE_LAST"\n'
@@ -91,7 +97,7 @@ class FailedSteps(unittest.TestCase):
     def test_those_that_fail_without_failing_the_run(self):
         # (each says why: an error it need not stop on, a config earlier runs read, a cleanup the commit does again)
         checked = set(re.findall(r"steps\.([\w-]+)\.outcome == 'failure'", self.steps[-1]["if"]))
-        self.assertEqual(checked, {"fetch", "verify"})
+        self.assertEqual(checked, {"fetch", "upload", "verify"})  # fails: no upload
         quiet = [s["name"] for s in self.steps if s.get("continue-on-error") and s.get("id") not in checked]
         self.assertEqual(quiet, ["TestGrid's production manifests still deploy the commit the port follows",
                                  "Read TestGrid's config from its upload job's runs",
@@ -105,13 +111,16 @@ class FailedSteps(unittest.TestCase):
         names = [s.get("name") for s in self.steps]
         after = self.steps[names.index("Show the verification in INDEX.md") + 1:]
         self.assertEqual([s["name"] for s in after],
-                         ["Commit the archive", "Keep the unpushed commit", "Fail the run if fetching or verifying failed"])
+                         ["Commit the archive", "Keep the unpushed commit",
+                          "Fail the run if fetching, uploading or verifying failed"])  # fails: fetching or verifying
         self.assertEqual(after[0]["if"], "${{ !cancelled() }}")
         self.assertTrue(after[1]["if"].startswith("${{ failure() && "))
 
 
 class Token(unittest.TestCase):
-    """The archive job's token: the checkout keeps none in .git/config, where any later step could read it."""
+    """The archive job's token: the checkout keeps none in .git/config, where any later step could read it, only
+    the upload of the node logs and the commit get it, and the upload runs only upload_assets.py, on the runner's
+    Python with no site module, after the fetch and its cleanup."""
 
     def setUp(self):
         with open(WORKFLOW) as f:
@@ -121,6 +130,43 @@ class Token(unittest.TestCase):
     def test_the_checkout_keeps_none(self):
         checkouts = [s for s in self.steps if str(s.get("uses")).startswith("actions/checkout@")]
         self.assertEqual([s["with"].get("persist-credentials") for s in checkouts], [False])
+
+    def test_only_the_upload_and_the_commit_get_it(self):
+        with open(WORKFLOW) as f:
+            text = f.read()
+        archive = text[text.index("\n  archive:\n"):text.index("\n  behind:\n")]
+        self.assertEqual((yaml.safe_load(text)["permissions"], self.job["permissions"]), ({}, {"contents": "write"}))
+        self.assertEqual(archive.count("github.token"), 2)  # fails: 1
+        self.assertNotIn("secrets.", archive)
+        self.assertNotIn("env", self.job)
+        got = [s["name"] for s in self.steps if "github.token" in str(s)]
+        self.assertEqual(got, ["Upload the node logs of red node e2e builds", "Commit the archive"])
+        for s in self.steps:
+            if "github.token" in str(s):
+                self.assertEqual(s["env"]["GITHUB_TOKEN"], "${{ github.token }}")
+                self.assertEqual([k for k, v in s.items() if "github.token" in str(v)], ["env"])
+
+    def test_the_upload_runs_only_the_script(self):
+        names = [s.get("name") for s in self.steps]
+        upload = self.steps[names.index("Upload the node logs of red node e2e builds")]  # fails: not in list
+        self.assertEqual(upload["run"], 'exec python3 -I -S tool/upload_assets.py "$RUNNER_TEMP/node-logs"')
+        self.assertEqual(set(upload), {"name", "id", "continue-on-error", "timeout-minutes", "env", "run"})  # (no shell)
+        self.assertEqual(upload["env"], {"GITHUB_TOKEN": "${{ github.token }}"})  # (no PATH or BASH_ENV)
+        with open(WORKFLOW) as f:
+            self.assertEqual(yaml.safe_load(f)["defaults"], {"run": {"shell": "bash"}})
+        self.assertNotIn("defaults", self.job)
+        self.assertEqual((upload["id"], upload["continue-on-error"]), ("upload", True))
+        self.assertGreater(upload["timeout-minutes"] * 60, ua.SECONDS)  # (its waits end in time to write its files)
+        self.assertLessEqual(60 + frl.MAX_ASSET_BYTES / ua.RATE, ua.SECONDS)  # (and the largest asset's upload)
+        before = [s.get("id") or s.get("name") for s in self.steps[:names.index(upload["name"])]]
+        self.assertEqual(before[-2:], ["fetch", "Remove what a cut-off fetch left"])
+        fetch = next(s for s in self.steps if s.get("id") == "fetch")
+        self.assertIn('--assets "$RUNNER_TEMP/node-logs"', fetch["run"])
+
+    def test_the_job_outlasts_its_steps(self):
+        # (so the commit step always gets to run: their timeouts, and 7 minutes for checkout and setup-uv)
+        total = sum(s.get("timeout-minutes", 0) for s in self.steps)
+        self.assertEqual(self.job["timeout-minutes"], total + 7)
 
 
 if __name__ == "__main__":
