@@ -106,16 +106,20 @@ class NodeE2eBuild(ArchiveWorld):
         self.assertEqual(self.fetch(), 0)
         self.assertIs(self.meta()["node_e2e"], True)
 
-    def test_but_not_for_a_final_build(self):
-        # (one archived before the runs read it: taken in a later change, not one of every final build at once)
+    def test_a_final_build_in_its_seventh(self):
+        # (one archived before the runs read it: compared, and so read, within a week)
         self.finished(ago=3 * DAY)
         self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
         self.assertEqual(self.fetch(), 0)
         self.assertTrue(self.meta()["final"])
         self.route(prowjob(KUBETEST_NODE))
         before = self.read("meta.json")
-        self.assertEqual(self.fetch(), 0)
-        self.assertEqual(self.read("meta.json"), before)
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set()):
+            self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.read("meta.json"), before)  # (not in its seventh)
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set(range(7))):
+            self.assertEqual(self.fetch(), 0)
+        self.assertIs(self.meta().get("node_e2e"), True)  # fails: None
 
     def test_a_repair_keeps_what_it_recorded(self):
         self.finished(ago=3 * DAY)
@@ -372,6 +376,18 @@ class Assets(AssetWorld):
         self.assertEqual(again, dict(first, built_by_run=self.runs()[-1]["run"]))
         self.assertEqual(self.asset(again["name"]), data)
         self.assertEqual([a["sha256"] for a in self.manifest()["assets"]], [first["sha256"]])
+
+    def test_one_archived_before_the_runs_read_its_prowjob_json(self):
+        # (final, and packed in the run whose sevenths it is in: so each is packed within a week)
+        self.assertEqual(self.fetch(), 0)
+        meta = self.meta()
+        del meta["node_e2e"]
+        frl.write_json(os.path.join(self.bdir(), "meta.json"), meta)
+        with mock.patch.object(frl, "gcs_sevenths", return_value=set(range(7))):
+            self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.meta()["artifacts_asset"]["name"], f"job_{self.build}.tar.xz")  # fails: KeyError: 'artifacts_asset'
+        self.assertEqual([a["name"] for a in self.manifest()["assets"]], [f"job_{self.build}.tar.xz"])
+        self.assertTrue(self.meta()["node_e2e"])
 
     def test_its_month_is_that_of_the_run_that_archived_it(self):
         # (a run of another month packs it into the release of the month it was archived in, again too)
