@@ -2352,7 +2352,19 @@ def record_uploads(root, path):
         left = [n for n in names if n not in gone]
         write_json(state_path, {k: v for k, v in state.items() if k != "assets_to_delete"}
                    | ({"assets_to_delete": left} if left else {}))
+    if done:
+        write_pages(root, got.get("run"))
     return done, [w for n, w in notes if n in listed]  # (of releases.json's, only those it records are said)
+
+
+def write_pages(root, run_id):
+    """Write INDEX.md, the weekly pages and the run folders' READMEs again, from the meta.json files as they are now,
+    as the run run_id wrote them, if its folder is the last (the fetch writes them before the upload step)."""
+    rels = run_dirs(root)
+    run = read_report(root, rels[-1]) if rels and is_text(run_id) and rels[-1].endswith("/" + run_id) else None
+    if isinstance(run, dict):
+        state = load_state(root, [])
+        write_index(root, time.time(), dict(run, dir=rels[-1]), not_archived(state["unresolved"], state["given_up"]))
 
 
 def copy_of(n):
@@ -4853,11 +4865,26 @@ def index_entry(job, build, meta, now, rel=None):
         "in_parts": any((info or {}).get("parts") for _, info in stored),
         # (it keeps logs of its cluster's nodes too, or kubetest2's cluster-info.log: see NODE_LOGS, CLUSTER_INFO)
         **({"node_logs": True} if any(isinstance(info, dict) for _, info in node_log_records(meta)) else {}),
+        **({"asset": asset} if (asset := asset_entry(meta)) else {}),
         # red only by TestGrid's rule applied to GCS: meta.json keeps no sighting of it on TestGrid (see merge_tabs)
         "from_gcs": bool(meta.get("backfilled")) and all(
             t.get("judged_from_gcs") or not (t.get("red_cells") or cells_left_out(t)) for t in meta["tabs"]),
         "prow_url": meta.get("prow_url") or f"https://prow.k8s.io/view/gs/{meta['query']}/{build}",
     }
+
+
+ASSET_URL_RE = re.compile(r"https://[A-Za-z0-9._~%/-]+")  # (one a Markdown link can hold as it is)
+PENDING_UPLOAD = "artifacts/: pending upload"
+
+
+def asset_entry(meta):
+    """What the pages say of the asset of a node e2e build's artifacts/ (see take_asset): {"url"} once it is
+    uploaded, {"pending": True} while a run is to pack or upload it, else None."""
+    record = meta.get("artifacts_asset")
+    up = record.get("uploaded") if isinstance(record, dict) else None
+    if isinstance(up, dict) and isinstance(up.get("url"), str) and ASSET_URL_RE.fullmatch(up["url"]):
+        return {"url": up["url"]}
+    return {"pending": True} if asset_due(meta) else None
 
 
 def load_index(root, now, known=None):
@@ -4911,6 +4938,8 @@ def build_rows(entries, files=True, prefix=""):
         if files:
             links = [f"[{p.rsplit('/', 1)[1]}]({prefix}{p})" for p in e["files"]]
             links += [f"[{name} in GCS (too large to store)]({url})" for name, url in e.get("remote") or []]
+            if e.get("asset"):  # (a node e2e build's artifacts/, in a release: see asset_entry)
+                links.append(f"[artifacts/ as .tar.xz]({e['asset']['url']})" if "url" in e["asset"] else PENDING_UPLOAD)
             last = " ".join(links) or "none"
             if e.get("comparison_given_up"):  # (final for that, settled or not)
                 since = e.get("comparison_failing_since")
@@ -5131,6 +5160,8 @@ def holdings(entries, waiting, current_run):
             ("… without a file (GCS had none)", count(lambda e: not e["has_log"] and not e["files"] and not e["remote"])),
             ("… with a file stored in parts (too large for one file in git)", count(lambda e: e["in_parts"])),
             ("… with control-plane or node logs (its cluster did not come up)", count(lambda e: e.get("node_logs"))),
+            ("… with its artifacts/ in a release (a node e2e build)", count(lambda e: "url" in e.get("asset", {}))),
+            ("… whose artifacts/ are pending upload", count(lambda e: "pending" in e.get("asset", {}))),
             ("… provisional (perhaps taken before Prow finished uploading)",
              count(lambda e: e["settled"] is False and e["final"] is not True)),
             ("… still compared with GCS on every run", count(lambda e: e["final"] is not True)),
@@ -5182,7 +5213,8 @@ def write_index(root, now, current_run=None, missing=(), known=None):
     """
     entries, bad = load_index(root, now, known)
     if current_run is not None and isinstance(current_run.get("errors"), list):
-        current_run["errors"] += [{"build": None, "error": f"unreadable {b}"} for b in bad]
+        current_run["errors"] += [e for e in ({"build": None, "error": f"unreadable {b}"} for b in bad)
+                                  if e not in current_run["errors"]]  # (a report written again has them)
     weeks = {}
     for e in entries:
         weeks.setdefault(week_of(e["time"]), []).append(e)

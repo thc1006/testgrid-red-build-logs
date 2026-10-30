@@ -4,6 +4,7 @@ each one's artifacts/: packed by the fetch, uploaded by upload_assets.py, record
 Run: cd tool && python -m unittest test_node_e2e -v
 """
 import contextlib
+import glob
 import hashlib
 import inspect
 import io
@@ -1040,6 +1041,95 @@ class Uploads(UploadWorld):
                     f.write(text)
                 self.assertEqual(self.record(), 0)
                 self.assertEqual(self.read("meta.json"), before)
+
+
+class Pages(UploadWorld):
+    """INDEX.md, the week's page and the run folder's README on a red node e2e build: where its artifacts/ are."""
+
+    def pages(self):
+        found = [os.path.join(self.root, "INDEX.md"), *glob.glob(os.path.join(self.root, "weeks", "*.md")),
+                 os.path.join(self.bdir(), "..", "..", "README.md")]
+        out = {}
+        for path in found:
+            with open(path, encoding="utf-8") as f:
+                out[os.path.relpath(path, self.root)] = f.read()
+        return out
+
+    def row(self, text):
+        return next(line for line in text.splitlines() if f"[job {self.build}](" in line)
+
+    def test_its_row_says_where_they_are(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        before = self.pages()
+        self.assertEqual(len(before), 3)
+        for name, text in before.items():
+            self.assertTrue(self.row(text).endswith(f" {frl.PENDING_UPLOAD} |"), name)  # fails: AttributeError
+        self.assertIn("| … whose artifacts/ are pending upload | 1 |", before["INDEX.md"])
+        self.assertEqual((self.upload(), self.record()), (0, 0))
+        url = self.meta()["artifacts_asset"]["uploaded"]["url"]
+        after = self.pages()
+        for name, text in after.items():
+            self.assertTrue(self.row(text).endswith(f") [artifacts/ as .tar.xz]({url}) |"), name)
+        # (written again as the fetch wrote it, from meta.json as it is now)
+        changed = [a for a, b in zip(before["INDEX.md"].splitlines(), after["INDEX.md"].splitlines(), strict=True)
+                   if a != b and not a.startswith("Updated ")]
+        self.assertEqual(changed, [self.row(before["INDEX.md"]), "| … with its artifacts/ in a release (a node e2e build) | 0 |",
+                                   "| … whose artifacts/ are pending upload | 1 |"])
+        self.assertIn("| … with its artifacts/ in a release (a node e2e build) | 1 |", after["INDEX.md"])
+
+    def test_none_for_a_build_that_is_not_node_e2e(self):
+        self.srv.route(self.base + "/prowjob.json", (200, {}, prowjob(KUBETEST_GCE)))
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        for name, text in self.pages().items():
+            self.assertNotIn("artifacts/", self.row(text), name)
+        self.assertIn("| … whose artifacts/ are pending upload | 0 |", self.pages()["INDEX.md"])  # fails: not there
+
+    def test_nor_a_link_of_a_url_a_link_cannot_hold(self):
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        meta = self.meta()
+        meta["artifacts_asset"]["uploaded"] = {"release": "node-logs-2026-10", "url": "https://x.example/a)b"}
+        self.assertIsNone(frl.asset_entry(meta))  # fails: no asset_entry
+        meta["artifacts_asset"]["uploaded"]["url"] = "https://x.example/a"
+        self.assertEqual(frl.asset_entry(meta), {"url": "https://x.example/a"})
+
+    def test_the_pages_of_another_run_are_left_as_they_are(self):
+        # (the record step of a run whose fetch was cut off before it made its folder)
+        self.assertEqual(self.fetch("--assets", self.assets), 0)
+        self.assertEqual(self.upload(), 0)
+        before = self.pages()
+        frl.write_json(os.path.join(self.assets, "uploaded.json"), dict(frl.read_json(
+            os.path.join(self.assets, "uploaded.json")), run="2026-10-01T000000Z"))
+        self.assertEqual(self.record(), 0)
+        self.assertIn("uploaded", self.meta()["artifacts_asset"])
+        self.assertEqual(self.pages(), before)
+
+    def test_its_errors_are_said_once(self):
+        # (an unreadable meta.json: the run's report has it already)
+        self.assertEqual(self.fetch(), 0)
+        os.makedirs(os.path.join(self.root, frl.run_dirs(self.root)[-1], "job", "1"))
+        with open(os.path.join(self.root, frl.run_dirs(self.root)[-1], "job", "1", "meta.json"), "w") as f:
+            f.write("{")
+        self.assertEqual(self.fetch("--assets", self.assets), 1)
+        readme = os.path.join(self.root, frl.run_dirs(self.root)[-1], "README.md")
+
+        def said():
+            with open(readme, encoding="utf-8") as f:
+                return [self.pages()["INDEX.md"].count("unreadable"), f.read().count("unreadable")]
+        before = said()
+        self.assertEqual((self.upload(), self.record()), (0, 0))
+        self.assertIn("uploaded", self.meta()["artifacts_asset"])
+        self.assertEqual(said(), before)
+
+    def test_and_the_builds_not_archived_yet(self):
+        other = snowflake(self.start - 3600)  # (red, and GCS fails to serve it)
+        self.show([self.build, other], {"job.Overall": ([12, 12], ["boom", "boom"])})
+        for name in ("finished.json", "build-log.txt", "prowjob.json"):
+            self.srv.route(f"/bucket/logs/job/{other}/{name}", (500, {}, b""))
+        with mock.patch.object(frl, "BACKOFF", 0):
+            self.assertEqual(self.fetch("--assets", self.assets), 1)
+        self.assertIn(f"[job {other}](", self.pages()["INDEX.md"].split("## Not archived yet")[1])
+        self.assertEqual((self.upload(), self.record()), (0, 0))
+        self.assertIn(f"[job {other}](", self.pages()["INDEX.md"].split("## Not archived yet")[1])
 
 
 class Verified(UploadWorld):
