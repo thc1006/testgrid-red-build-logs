@@ -110,5 +110,18 @@ class FailedSteps(unittest.TestCase):
         self.assertTrue(after[1]["if"].startswith("${{ failure() && "))
 
 
+class Token(unittest.TestCase):
+    """The archive job's token: the checkout keeps none in .git/config, where any later step could read it."""
+
+    def setUp(self):
+        with open(WORKFLOW) as f:
+            self.job = yaml.safe_load(f)["jobs"]["archive"]
+        self.steps = self.job["steps"]
+
+    def test_the_checkout_keeps_none(self):
+        checkouts = [s for s in self.steps if str(s.get("uses")).startswith("actions/checkout@")]
+        self.assertEqual([s["with"].get("persist-credentials") for s in checkouts], [False])
+
+
 if __name__ == "__main__":
     unittest.main()
