@@ -1207,7 +1207,7 @@ class ReportTest(unittest.TestCase):
             with open(os.path.join(root, "charts", "tabs-light.svg")) as f:
                 svg = f.read()
             self.assertGreaterEqual(svg.count(">2</text>"), 13)
-            self.assertEqual(svg.count('fill="none" stroke="#e1e0d9"'), 1)  # only the legend's "no history yet"
+            self.assertEqual(svg.count('fill="none" stroke="#e1e0d9"'), 1)  # only the legend's "not seen on TestGrid"
         finally:
             shutil.rmtree(root)
 
