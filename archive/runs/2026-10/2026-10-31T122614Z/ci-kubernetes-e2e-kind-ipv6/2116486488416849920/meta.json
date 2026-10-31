@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2116486488416849920",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1793444703,
+  "created": 1793444675,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics PVC should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 10/31/26 11:51:24.704\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793447567,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2116486488416849920",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2116486488416849920/build-log.txt",
+  "log": {
+    "bytes": 161063,
+    "md5": "425ec7635291ead48fa8753df0a27d3c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22511,
+    "gcs": {
+      "generation": "1793447582843238",
+      "md5": "425ec7635291ead48fa8753df0a27d3c",
+      "crc32c": "0e714ae8",
+      "bytes": 161063,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95423,
+    "md5": "d0ee8b6b741e3e3d24ca291f93d4130b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12681,
+    "gcs": {
+      "generation": "1793447585436700",
+      "md5": "d0ee8b6b741e3e3d24ca291f93d4130b",
+      "crc32c": "b030136a",
+      "bytes": 95423,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-31T122614Z",
+  "archived_at": 1793449574.0,
+  "settled": false,
+  "final": false
+}
