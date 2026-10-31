@@ -1402,19 +1402,24 @@ JUNIT_NAME = re.compile(r".+/(?:junit((_[^_]+)?(_[0-9]+-[0-9]+)?(_[0-9]+)?|.+)?\
 
 
 def resolve(name):
-    """The object TestGrid opens for a listed one: url.ResolveReference drops "."
-    and ".." path segments."""
-    out = []
-    elems = name.split("/")
+    """The object TestGrid opens for a listed one: url.ResolveReference's resolvePath
+    on "/" + name, which drops "." and ".." path segments, then the path without its
+    leading "/" or "//"."""
+    dst, first = "/", True
+    elems = ("/" + name).split("/")
     for elem in elems:
-        if elem == "..":
-            if out:
-                out.pop()
-        elif elem != ".":
-            out.append(elem)
+        if elem == ".":
+            first = False
+        elif elem == "..":
+            i = dst.rfind("/", 1)
+            dst = dst[:i] if i > 0 else "/"
+            first = dst == "/"  # (back at the root, the next segment adds no "/")
+        else:
+            dst += elem if first else "/" + elem
+            first = False
     if elems[-1] in (".", ".."):
-        out.append("")  # resolvePath ends such a path with "/"
-    return "/".join(out)
+        dst += "/"
+    return dst[2:] if dst.startswith("//") else dst[1:]
 
 
 def junit_reads(names):

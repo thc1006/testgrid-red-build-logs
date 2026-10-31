@@ -239,11 +239,14 @@ def cases():
              "artifacts/testXxml", "artifacts/junit/a.xml", "artifacts/./junit_2.xml", "artifacts/x/../junit_3.xml",
              "artifacts/../../junit.xml", "artifacts/junit.XML", "artifacts/notjunit.xml", "junitx.xml",
              "artifacts/junit_a b.xml", "artifacts/junit_%41.xml", "artifacts/junit?.xml", "artifacts/junit#.xml",
-             "artifacts//junit.xml", "artifacts/../.", "artifacts/test.xml/.."]
+             "artifacts//junit.xml", "artifacts/../.", "artifacts/test.xml/..", "../../..//logs/job/1/junit_4.xml"]
     for n in names:
         add("name-" + n, artifacts=[{"name": n, "data": b'<testsuite><testcase name="x"><failure/></testcase></testsuite>'}])
     add("name-dot-target-exists", artifacts=[{"name": "artifacts/./junit_2.xml", "data": b"<x/>"},
                                              {"name": "artifacts/junit_2.xml", "data": b"<testsuite><testcase name='y'><failure/></testcase></testsuite>"}])
+    # (back at the bucket's root, "//" names the folder again: Go 1.26.9 opens the object there)
+    add("name-root-target-exists", artifacts=[{"name": "../../..//logs/job/1/junit_4.xml", "data": b"<x/>"},
+                                              {"name": "junit_4.xml", "data": b"<testsuite><testcase name='y'><failure/></testcase></testsuite>"}])
     # --- a test group's cell options (as the configurator prints them)
     def junits(*files):
         return [{"name": n, "data": d.encode()} for n, d in files]
