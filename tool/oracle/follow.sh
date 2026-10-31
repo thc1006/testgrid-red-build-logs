@@ -21,10 +21,21 @@ module=github.com/GoogleCloudPlatform/testgrid
 
 pinned=$(python3 -c 'import json; print(json.load(open("oracle/pinned.json"))["testgrid_module_version"])')
 (cd "$work" && go mod init follow-testgrid > /dev/null 2>&1)
-version=$(cd "$work" && go list -m -json "$module@$commit" | python3 -c 'import json, sys; print(json.load(sys.stdin)["Version"])')
-dir_of() {
-  (cd "$work" && go mod download -json "$module@$1") | python3 -c 'import json, sys; print(json.load(sys.stdin)["Dir"])'
+# (GOTOOLCHAIN=auto: a module that needs a newer Go than setup-go's is looked up with that Go)
+lookup() {
+  local key=$1
+  shift
+  (cd "$work" && GOTOOLCHAIN=auto go "$@") | python3 -I -c 'import json, sys
+try:
+    found = json.load(sys.stdin)
+except ValueError:
+    found = {}
+if found.get("Error") or not found.get(sys.argv[1]):
+    sys.exit(found.get("Error") or "go gave no " + sys.argv[1])
+print(found[sys.argv[1]])' "$key"
 }
+version=$(lookup Version list -m -json "$module@$commit")
+dir_of() { lookup Dir mod download -json "$module@$1"; }
 old_dir=$(dir_of "$pinned")
 new_dir=$(dir_of "$version")
 changed=$(python3 -I oracle/relevant_diff.py "$old_dir" "$new_dir")
