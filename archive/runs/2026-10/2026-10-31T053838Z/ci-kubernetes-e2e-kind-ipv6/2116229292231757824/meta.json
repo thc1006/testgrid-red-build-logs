@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2116229292231757824",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1793383384,
+  "created": 1793383355,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.001s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 10/30/26 18:31:01.715\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793385133,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2116229292231757824",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2116229292231757824/build-log.txt",
+  "log": {
+    "bytes": 126894,
+    "md5": "253438eba2202ce9dc7690d3f10abda8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20780,
+    "gcs": {
+      "generation": "1793385155404317",
+      "md5": "253438eba2202ce9dc7690d3f10abda8",
+      "crc32c": "d4b4e97f",
+      "bytes": 126894,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95426,
+    "md5": "6576a8254c9d33e39e2da8a1f4ad3c40",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12617,
+    "gcs": {
+      "generation": "1793385158538982",
+      "md5": "6576a8254c9d33e39e2da8a1f4ad3c40",
+      "crc32c": "538680e2",
+      "bytes": 95426,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-31T053838Z",
+  "archived_at": 1793425118.0,
+  "settled": true,
+  "final": false
+}

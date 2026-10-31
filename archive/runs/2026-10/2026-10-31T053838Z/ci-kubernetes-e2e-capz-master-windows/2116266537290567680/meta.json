@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2116266537290567680",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793392243,
+  "created": 1793392235,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FAILING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secret-e1ab8d93-4f5b-4bbd-945b-24053840862c...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793397867,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2116266537290567680",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2116266537290567680/build-log.txt",
+  "log": {
+    "bytes": 308015,
+    "md5": "afce2dba644069594a11208b1ea877a1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 48718,
+    "gcs": {
+      "generation": "1793397875094136",
+      "md5": "afce2dba644069594a11208b1ea877a1",
+      "crc32c": "20dd6eab",
+      "bytes": 308015,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 63775,
+    "md5": "bed80a307e5796ff988d40da87103106",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10507,
+    "gcs": {
+      "generation": "1793397879717157",
+      "md5": "bed80a307e5796ff988d40da87103106",
+      "crc32c": "d9800a28",
+      "bytes": 63775,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-31T053838Z",
+  "archived_at": 1793425118.0,
+  "settled": true,
+  "final": false
+}

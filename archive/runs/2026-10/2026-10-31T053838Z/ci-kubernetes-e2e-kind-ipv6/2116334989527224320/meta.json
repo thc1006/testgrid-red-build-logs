@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2116334989527224320",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1793408622,
+  "created": 1793408555,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics Ephemeral should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 10/31/26 01:43:56.334\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793411115,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2116334989527224320",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2116334989527224320/build-log.txt",
+  "log": {
+    "bytes": 161534,
+    "md5": "e9d163874ecdb7a5c5f54016ed592d08",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22399,
+    "gcs": {
+      "generation": "1793411130908360",
+      "md5": "e9d163874ecdb7a5c5f54016ed592d08",
+      "crc32c": "de0f6958",
+      "bytes": 161534,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 102175,
+    "md5": "6dd96457549a3a7be4d95f14b22d7cf6",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13440,
+    "gcs": {
+      "generation": "1793411132552425",
+      "md5": "6dd96457549a3a7be4d95f14b22d7cf6",
+      "crc32c": "e841757a",
+      "bytes": 102175,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-31T053838Z",
+  "archived_at": 1793425118.0,
+  "settled": true,
+  "final": false
+}

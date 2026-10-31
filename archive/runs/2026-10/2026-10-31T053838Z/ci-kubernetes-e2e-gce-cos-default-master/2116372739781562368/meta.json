@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2116372739781562368",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1793417584,
+  "created": 1793417556,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Pre-provisioned PV (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-preprovisionedpv-hn8h\" success...es/test/e2e/framework/pod/output/output.go:263 @ 10/31/26 04:02:21.78\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793420063,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2116372739781562368",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2116372739781562368/build-log.txt",
+  "log": {
+    "bytes": 192463,
+    "md5": "4b4881cdefb007b6c75be2969089de54",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 30010,
+    "gcs": {
+      "generation": "1793420091494346",
+      "md5": "4b4881cdefb007b6c75be2969089de54",
+      "crc32c": "e2309b31",
+      "bytes": 192463,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94205,
+    "md5": "c28b309225b3fe498d6efa57f40a5654",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12372,
+    "gcs": {
+      "generation": "1793420093441749",
+      "md5": "c28b309225b3fe498d6efa57f40a5654",
+      "crc32c": "ac11394b",
+      "bytes": 94205,
+      "encoding": "identity"
+    }
+  },
+  "archived_by_run": "2026-10-31T053838Z",
+  "archived_at": 1793425118.0,
+  "settled": false,
+  "final": false
+}
