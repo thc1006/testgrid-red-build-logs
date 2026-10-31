@@ -696,18 +696,25 @@ class EndToEndTest(unittest.TestCase):
         return frl.report.summarize(entries, frl.report.load_runs(self.root), OLD / 1000 + 3 * DAY)["rows"]
 
     def test_timeout_does_not_blame_builds_already_on_disk(self):
+        # (one request at a time: 1004 is served only once the run stopped, so the builds
+        # before it have 6 seconds and 1001 and 1002 wait behind it)
         self.run_tool()
+        served, done = threading.Event(), threading.Event()
+        self.addCleanup(served.set)
 
         def slow(h):
-            time.sleep(2)
+            served.wait(60)
             send(h, *gcs_object(b"x"))
+            done.set()
 
         self.srv.route("/bucket/logs/job-a/1004/finished.json", slow)
-        os.remove(self.bpath("job-a", "1004", "meta.json"))  # forces 1004 to be fetched again, slowly
-        self.run_tool("--run-timeout-minutes", "0.01", "--max-concurrency", "1", "--start-concurrency", "1")
+        os.remove(self.bpath("job-a", "1004", "meta.json"))  # forces 1004 to be fetched again
+        self.run_tool("--run-timeout-minutes", "0.1", "--max-concurrency", "1", "--start-concurrency", "1")
         run = self.last_run()
         self.assertEqual([e["build"] for e in run["errors"] if "run timeout" in e["error"]], ["job-a/1004"])
-        time.sleep(2.5)
+        self.assertEqual(sorted(run["outcomes"]["not-checked"]), ["job-a/1001", "job-a/1002"])
+        served.set()
+        self.assertTrue(done.wait(30))
 
     def test_restored_given_up_build_leaves_given_up(self):
         self.run_tool()
