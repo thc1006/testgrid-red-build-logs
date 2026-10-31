@@ -408,6 +408,8 @@ class FollowModuleLookup(unittest.TestCase):
                 os.makedirs(os.path.join(tmp, side, "util", "gcs"))
                 with open(os.path.join(tmp, side, "util", "gcs", "gcs.go"), "w") as f:
                     f.write(text)
+                with open(os.path.join(tmp, side, "go.mod"), "w") as f:
+                    f.write("module m\n\ngo 1.26.9\n")
             with open(os.path.join(oracle, "pinned.json")) as f:
                 pinned = json.load(f)["testgrid_module_version"]
             local = json.dumps({"Error": "m@v0.0.178 requires go >= 1.26.9 (running go 1.26.5; GOTOOLCHAIN=local)"})
@@ -437,6 +439,8 @@ class FollowModuleLookup(unittest.TestCase):
         status, _, written = self.follow()
         self.assertEqual(status, 1)  # (the build failed)
         self.assertIn("Changed in the code the port follows:\n\n- `util/gcs/gcs.go`\n", written)  # fails: ""
+        self.assertIn("deploy v0.0.178 (2bbb98db)\n", written)
+        self.assertIn("an oracle built with Go 1.26.9.\n", written)
 
     def test_a_lookup_that_fails_stops_with_gos_error(self):
         for answer, error in (({"Error": "m@v0.0.178: invalid version"}, "m@v0.0.178: invalid version\n"),

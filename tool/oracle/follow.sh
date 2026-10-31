@@ -44,7 +44,7 @@ new_dir=$(dir_of "$version")
 changed=$(python3 -I oracle/relevant_diff.py "$old_dir" "$new_dir")
 # (written now, before the build and the checks: a build that fails, or a run cut off, still leaves it)
 {
-  echo "## TestGrid's production manifests deploy $version"
+  echo "## TestGrid's production manifests deploy $version ($commit)"
   echo
   echo "Pinned: $pinned."
   if [ -n "$changed" ]; then
@@ -64,6 +64,9 @@ import relevant_diff
 print(relevant_diff.bazel(sys.argv[1])["go"] or relevant_diff.go_mod(sys.argv[1]).get("go") or "")' "$new_dir")
 export GOTOOLCHAIN=${go_version:+go$go_version}
 export GOTOOLCHAIN=${GOTOOLCHAIN:-auto}
+if [ -n "$go_version" ]; then
+  echo "The checks below use an oracle built with Go $go_version." >> "$summary"
+fi
 
 oracle/build.sh "$work/oracle" "$version"
 export TGORACLE="$work/oracle/tgoracle" GOCHECK="$work/oracle/gocheck" SCHEMADUMP="$work/oracle/schemadump" \
