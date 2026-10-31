@@ -1,9 +1,9 @@
-# Ported in part from Go's regexp/syntax and unicode (Go 1.26.5). Copyright The Go Authors; BSD 3-Clause
+# Ported in part from Go's regexp/syntax and unicode (Go 1.26.9). Copyright The Go Authors; BSD 3-Clause
 # license in third_party/go/LICENSE. THIRD_PARTY_NOTICES.md lists what was ported and what changed.
 """Go's regexp, as TestGrid's tabulator compiles a tab's filters (regexp.Compile:
 regexp/syntax.Parse with its Perl flags) and matches them (MatchString).
 
-The parser is Go's regexp/syntax/parse.go (Go 1.26.5, tool/oracle/pinned.json), ported
+The parser is Go's regexp/syntax/parse.go (Go 1.26.9, tool/oracle/pinned.json), ported
 function by function: the same parse tree, built the same way (literals merged as it goes,
 alternations factored, nodes reused from a free list), so a pattern is accepted or
 rejected exactly as Go does, its size and height limits included (they count nodes

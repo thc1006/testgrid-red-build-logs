@@ -1,6 +1,6 @@
-# Ported in part from TestGrid (f15bfa4808a4; Copyright The TestGrid Authors and The Kubernetes Authors)
+# Ported in part from TestGrid (2bbb98db9f1a; Copyright The TestGrid Authors and The Kubernetes Authors)
 # and k8s.io/apimachinery (v0.27.4; Copyright The Kubernetes Authors), both Apache License 2.0 (LICENSE),
-# and from Go (1.26.5; Copyright The Go Authors), BSD 3-Clause license in third_party/go/LICENSE. It uses
+# and from Go (1.26.9; Copyright The Go Authors), BSD 3-Clause license in third_party/go/LICENSE. It uses
 # the GCS client's error text for a missing object (cloud.google.com/go/storage v1.31.0; Copyright Google LLC),
 # Apache License 2.0 (LICENSE), and Unicode's White_Space characters (15.0.0; Copyright Unicode, Inc.), Unicode
 # License in third_party/unicode/LICENSE. THIRD_PARTY_NOTICES.md lists what was ported and what changed.

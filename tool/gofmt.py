@@ -1,4 +1,4 @@
-# Ported in part from Go's fmt, strconv and unicode (Go 1.26.5). Copyright The Go Authors; BSD 3-Clause
+# Ported in part from Go's fmt, strconv and unicode (Go 1.26.9). Copyright The Go Authors; BSD 3-Clause
 # license in third_party/go/LICENSE. THIRD_PARTY_NOTICES.md lists what was ported and what changed.
 """Go's fmt.Sprintf with string operands, as TestGrid renders a test name by a test
 group's test_name_config (pkg/updater nameConfig.render: fmt.Sprintf(format,

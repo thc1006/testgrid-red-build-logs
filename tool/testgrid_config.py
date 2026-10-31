@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Ported in part from TestGrid (f15bfa4808a4; Copyright The TestGrid Authors and The Kubernetes Authors),
-# Apache License 2.0 (LICENSE), and Go's net/url (1.26.5; Copyright The Go Authors), BSD 3-Clause license in
+# Ported in part from TestGrid (2bbb98db9f1a; Copyright The TestGrid Authors and The Kubernetes Authors),
+# Apache License 2.0 (LICENSE), and Go's net/url (1.26.9; Copyright The Go Authors), BSD 3-Clause license in
 # third_party/go/LICENSE. THIRD_PARTY_NOTICES.md lists what was ported and what changed.
 """What TestGrid's config says about the archive's tabs, built as testgrid.k8s.io's is.
 

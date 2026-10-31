@@ -5,7 +5,7 @@ some of its data comes from them. The tool judges builds the way TestGrid does,
 so those parts follow the upstream code closely. This file names the upstream
 files each part comes from, their licenses, and what changed.
 
-The ports were written from Go 1.26.5, TestGrid `f15bfa4808a4`, and
+The ports were written from Go 1.26.9, TestGrid `2bbb98db9f1a`, and
 k8s.io/apimachinery and k8s.io/api v0.27.4, the versions TestGrid's `go.mod`
 requires. [`tool/oracle/pinned.json`](tool/oracle/pinned.json) names the
 versions the tool is checked against now;
@@ -14,7 +14,7 @@ says how it moves.
 
 ## Go
 
-Go 1.26.5, under the BSD 3-Clause license in
+Go 1.26.9, under the BSD 3-Clause license in
 [`third_party/go/LICENSE`](third_party/go/LICENSE). The license reads Copyright
 2009 The Go Authors; the source files below carry years from 2009 to 2025.
 Paths are under `src/`.
@@ -56,7 +56,7 @@ in [`third_party/unicode/LICENSE`](third_party/unicode/LICENSE).
 
 ## TestGrid
 
-github.com/GoogleCloudPlatform/testgrid at `f15bfa4808a4`, under the Apache
+github.com/GoogleCloudPlatform/testgrid at `2bbb98db9f1a`, under the Apache
 License 2.0, the license of this repository ([`LICENSE`](LICENSE)). Each file
 below carries `Copyright <year> The TestGrid Authors` (TG) or `Copyright <year>
 The Kubernetes Authors` (K8s), with the year shown, but the protos

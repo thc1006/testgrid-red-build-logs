@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Changed from readResult in TestGrid's pkg/updater/read.go (f15bfa4808a4): the
+// Changed from readResult in TestGrid's pkg/updater/read.go (2bbb98db9f1a): the
 // four reads run one after another and every error is kept. See THIRD_PARTY_NOTICES.md
 // at the root of this repository.
 

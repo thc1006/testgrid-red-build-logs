@@ -1629,7 +1629,8 @@ class Drift(unittest.TestCase):
 
     def test_the_pinned_commit_after_a_release(self):  # ST02, ST03, ST10
         # (a hash longer or shorter than the pinned one, of the same commit)
-        self.assertEqual(self.drift("v20260902-v0.0.176-37-gf15bfa4808a4ab", "v20260902-v0.0.176-37-gf15bfa48"),
+        self.assertEqual(self.drift("v20260902-v0.0.176-37-gf15bfa4808a4ab", "v20260902-v0.0.176-37-gf15bfa48",
+                                    {"testgrid_commit": "f15bfa4808a4"}),
                          (0, ["updater=f15bfa4808a4ab", "tabulator=f15bfa48", "moved=false"]))
 
     def test_another_commit_or_a_tag_not_read(self):  # ST01, ST04, ST08, ST10
