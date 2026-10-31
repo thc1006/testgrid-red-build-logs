@@ -176,3 +176,12 @@ jobs:
             exit 1
           fi
           oracle/follow.sh "$UPDATER" "$GITHUB_RUN_ID"
+
+      # (as the oracle job keeps its own: the cases to replay against the new commit)
+      - name: Keep the random builds that differ
+        if: ${{ failure() && hashFiles('tool/bad-*.jsonl') != '' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: follow-mismatches
+          path: tool/bad-*.jsonl
+          retention-days: 30
