@@ -15,13 +15,14 @@ def main(argv):
         return 0
     with gzip.open(path, "rt", encoding="utf-8") as f:
         held = json.load(f)
+    go, was = dumped.get("go") or "Go", held.get("go")  # (as "go1.26.9")
     if "--any-go" in argv:
         dumped.pop("go"), held.pop("go")
     if dumped != held:
-        print(f"{path} does not hold Go {dumped.get('go', '')}'s unicode tables (Unicode {dumped['unicode']}; "
-              f"it holds Unicode {held['unicode']}{', from ' + held['go'] if 'go' in held else ''})")
+        print(f"{path} does not hold {go}'s unicode tables (Unicode {dumped['unicode']}; "
+              f"it holds Unicode {held['unicode']}{', from ' + was if was else ''})")
         return 1
-    print(f"{path} holds Go {dumped.get('go', '')}'s unicode tables (Unicode {dumped['unicode']})")
+    print(f"{path} holds {go}'s unicode tables (Unicode {dumped['unicode']})")
     return 0
 
 

@@ -5,6 +5,7 @@ test_control_* passes there and shows the scenario works otherwise.
 Run: cd tool && uv run --frozen python -m unittest test_review_round24 -v
 """
 import contextlib
+import gzip
 import io
 import json
 import os
@@ -346,6 +347,26 @@ class FollowChecks(unittest.TestCase):
     def test_control_the_unicode_check_fails_when_unidump_fails(self):
         # (one pipeline: under pipefail, its status is the function's, condition or not)
         self.assertEqual(self.check("unicode", "#!/bin/sh\necho '{}'\nexit 2\n"), ["unicode"])
+
+
+class GoUnicodeCheck(unittest.TestCase):
+    """`gounicode.py check --any-go`, as follow.sh runs it, dropped the Go names before it printed one: "holds Go
+    's unicode tables"."""
+
+    def test_it_names_the_go_it_checked(self):
+        path = os.path.join(HERE, "go_unicode.json.gz")
+        with gzip.open(path, "rt", encoding="utf-8") as f:
+            held = json.load(f)
+        for argv, dumped, code, said in (
+                (["--any-go"], dict(held, go="go9.9.9"), 0, "holds go9.9.9's unicode tables"),
+                ([], dict(held, go="go9.9.9"), 1, f"does not hold go9.9.9's unicode tables (Unicode {held['unicode']}; "
+                                                  f"it holds Unicode {held['unicode']}, from {held['go']})"),
+                ([], held, 0, f"holds {held['go']}'s unicode tables")):
+            with self.subTest(argv=argv, go=dumped["go"]):
+                done = subprocess.run([sys.executable, "-I", os.path.join(HERE, "oracle", "gounicode.py"), "check", path,
+                                       *argv], input=json.dumps(dumped), capture_output=True, text=True, timeout=60)
+                self.assertEqual(done.returncode, code, done.stderr)
+                self.assertIn(said, done.stdout)  # fails: "holds Go 's unicode tables" (with --any-go)
 
 
 class FollowSummary(unittest.TestCase):
