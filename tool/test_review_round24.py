@@ -387,6 +387,65 @@ class FollowSummary(unittest.TestCase):
         self.assertIn("Changed in the code the port follows:\n\n- `pkg/updater/read.go`\n", written)  # fails: not written
 
 
+class FollowModuleLookup(unittest.TestCase):
+    """follow.sh looked TestGrid's module up with setup-go's GOTOOLCHAIN=local: for v0.0.178, which
+    needs go >= 1.26.9, Go 1.26.5's `go mod download -json` gave an "Error" and no "Dir", and the run
+    of 2026-10-31 stopped at a Python traceback (KeyError: 'Dir'). Here go is stood in: it answers as
+    Go 1.26.5 did unless GOTOOLCHAIN=auto, and the build fails, after the summary is written."""
+
+    def follow(self, answer=None):
+        """(follow.sh's exit status, stderr and summary; answer: go's to GOTOOLCHAIN=auto, else the new Dir)"""
+        with tempfile.TemporaryDirectory() as tmp:
+            oracle, stubs = os.path.join(tmp, "tool", "oracle"), os.path.join(tmp, "bin")
+            os.makedirs(oracle)
+            os.makedirs(stubs)
+            for name in ("follow.sh", "relevant_diff.py"):
+                shutil.copy(os.path.join(HERE, "oracle", name), oracle)
+            with open(os.path.join(oracle, "pinned.json"), "w") as f:  # (as on 2026-10-31)
+                json.dump({"testgrid_commit": "f15bfa4808a4", "go": "1.26.5",
+                           "testgrid_module_version": "v0.0.177-0.20260902201319-f15bfa4808a4"}, f)
+            for side, text in (("old", "a"), ("new", "a2")):
+                os.makedirs(os.path.join(tmp, side, "util", "gcs"))
+                with open(os.path.join(tmp, side, "util", "gcs", "gcs.go"), "w") as f:
+                    f.write(text)
+            with open(os.path.join(oracle, "pinned.json")) as f:
+                pinned = json.load(f)["testgrid_module_version"]
+            local = json.dumps({"Error": "m@v0.0.178 requires go >= 1.26.9 (running go 1.26.5; GOTOOLCHAIN=local)"})
+            auto = json.dumps({"Dir": f"{tmp}/new"} if answer is None else answer)
+            go = ('#!/bin/sh\ncase "$1 $2" in\n  "mod init") exit 0 ;;\n'
+                  '  "list -m") echo \'{"Version": "v0.0.178"}\' ;;\n'
+                  f'  "mod download") case "$4" in *@{pinned}) echo \'{{"Dir": "{tmp}/old"}}\' ;;\n'
+                  f'    *) if [ "$GOTOOLCHAIN" = auto ]; then a=\'{auto}\'; else a=\'{local}\'; fi\n'
+                  '       echo "$a"; case "$a" in *Error*) exit 1 ;; esac ;; esac ;;\n'
+                  'esac\n')
+            for path, script in ((os.path.join(oracle, "build.sh"), "#!/bin/sh\nexit 1\n"),
+                                 (os.path.join(stubs, "go"), go)):
+                with open(path, "w") as f:
+                    f.write(script)
+                os.chmod(path, 0o755)
+            summary = os.path.join(tmp, "summary.md")
+            done = subprocess.run(["bash", os.path.join(oracle, "follow.sh"), "2bbb98db", "1"], cwd=tmp,
+                                  env=dict(os.environ, PATH=f"{stubs}:{os.environ['PATH']}", GITHUB_STEP_SUMMARY=summary,
+                                           GOTOOLCHAIN="local"), capture_output=True, text=True, timeout=120)
+            written = ""
+            if os.path.exists(summary):
+                with open(summary) as f:
+                    written = f.read()
+        return done.returncode, done.stderr, written
+
+    def test_a_module_that_needs_a_newer_go_is_looked_up_with_it(self):
+        status, _, written = self.follow()
+        self.assertEqual(status, 1)  # (the build failed)
+        self.assertIn("Changed in the code the port follows:\n\n- `util/gcs/gcs.go`\n", written)  # fails: ""
+
+    def test_a_lookup_that_fails_stops_with_gos_error(self):
+        for answer, error in (({"Error": "m@v0.0.178: invalid version"}, "m@v0.0.178: invalid version\n"),
+                              ({}, "go gave no Dir\n")):
+            with self.subTest(answer=answer):
+                # fails: (1, "Traceback (most recent call last):\n ... KeyError: 'Dir'\n", "")
+                self.assertEqual(self.follow(answer), (1, error, ""))
+
+
 # ------------------------------------------------------------------ the commit step: files GitHub would refuse
 
 LIMIT = 95 << 20  # (the commit step's limit; GitHub blocks files over 100 MiB)
