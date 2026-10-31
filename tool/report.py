@@ -507,8 +507,8 @@ def render_heatmap(s, mode):
     y += 18
     x = left
     b.append(f'<rect x="{x + 0.5}" y="{y + 0.5}" width="13" height="13" rx="3" fill="none" stroke="{c["grid"]}"/>')
-    b.append(text(x + 20, y + 11.5, "no history yet", 11, c["ink2"]))
-    x += 112
+    b.append(text(x + 20, y + 11.5, "not seen on TestGrid", 11, c["ink2"]))
+    x += 144
     b.append(f'<rect x="{x}" y="{y}" width="14" height="14" rx="3" fill="{c["empty"]}"/>')
     b.append(text(x + 20, y + 11.5, "0", 11, c["ink2"]))
     x += 44
