@@ -136,8 +136,9 @@ def coverage(runs):
 
     A successful scan at time T shows the tab's columns back to its oldest
     start O, and every build that started before T - max_job_hours has
-    finished by then, so the scan covers [O, T - max_job_hours] (clipped to
-    --since-hours); it has seen [O, T]. Tabs that failed to load cover nothing.
+    finished by then, so the scan covers [O, T - max_job_hours] and has seen
+    [O, T], both clipped to --since-hours. Tabs that failed to load cover
+    nothing and are not seen.
     """
     spans, listed, seen_spans = {}, {}, {}
     for run in sorted(runs, key=lambda r: r["started"]):
