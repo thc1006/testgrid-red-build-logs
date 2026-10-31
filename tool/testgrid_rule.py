@@ -1250,8 +1250,8 @@ class _XMLDecoder:
                 depth -= 1
 
 
-def _check_depth(depth):
-    if depth >= MAX_XML_DEPTH:
+def _check_depth(level):
+    if level > MAX_XML_DEPTH:
         raise XMLError("exceeded max depth")
 
 
@@ -1270,11 +1270,11 @@ _SUITE_NUMBERS = {b"time": go_parse_float_ok, b"failures": _INT_ATTR, b"tests": 
 _RESULT_NUMBERS = {b"time": go_parse_float_ok}
 
 
-def _junit_element(kind, start, depth):
+def _junit_element(kind, start, level):
     """A frame for one element encoding/xml's unmarshal decodes into a junit type:
-    [kind, value, depth]. Each unmarshal call checks its depth, as Go counts it:
-    a slice field is one call and its new element the next, a pointer field one."""
-    _check_depth(depth)
+    [kind, value, level]. Each unmarshal call checks how many elements are open,
+    its own included: the element's level, the root's 1."""
+    _check_depth(level)
     if kind == "suite":
         value = {"name": "", "suites": [], "results": []}
         numbers = _SUITE_NUMBERS
@@ -1286,7 +1286,7 @@ def _junit_element(kind, start, depth):
         for (_, local), attr in start[2]:
             if local in (b"name", b"value"):
                 value[local.decode()] = attr
-        return [kind, value, depth]
+        return [kind, value, level]
     else:
         value, numbers = [], {}
     for (_, local), attr in start[2] if kind in ("suite", "result") else ():
@@ -1294,16 +1294,16 @@ def _junit_element(kind, start, depth):
             value["name"] = attr
         elif local in numbers:
             _attr_number(attr, numbers[local])
-    return [kind, value, depth]
+    return [kind, value, level]
 
 
-# Per kind, the child elements it decodes: (field kind, extra unmarshal calls first)
+# Per kind, the child elements it decodes, and their kinds
 _JUNIT_CHILDREN = {
-    "suites": {b"testsuite": ("suite", 1)},
-    "suite": {b"testsuite": ("suite", 1), b"properties": ("properties", 0), b"testcase": ("result", 1)},
-    "properties": {b"property": ("property", 1)},
-    "result": {b"system-out": ("text", 0), b"system-err": ("text", 0), b"error": ("errored", 0),
-               b"failure": ("failure", 0), b"skipped": ("skipped", 0), b"properties": ("properties", 0)},
+    "suites": {b"testsuite": "suite"},
+    "suite": {b"testsuite": "suite", b"properties": "properties", b"testcase": "result"},
+    "properties": {b"property": "property"},
+    "result": {b"system-out": "text", b"system-err": "text", b"error": "errored", b"failure": "failure",
+               b"skipped": "skipped", b"properties": "properties"},
 }
 
 
@@ -1315,7 +1315,7 @@ def _decode_junit_root(x, top):
     while frames:
         t = x.token()
         frame = frames[-1]
-        kind, value, depth = frame
+        kind, value, level = frame
         if t[0] == "text":
             if kind in ("text", "errored", "failure", "skipped"):
                 value.append(t[1])
@@ -1339,19 +1339,16 @@ def _decode_junit_root(x, top):
             continue
         if t[0] != "start":
             continue
-        child = _JUNIT_CHILDREN.get(kind, {}).get(t[1][1])
-        if child is None:
+        ckind = _JUNIT_CHILDREN.get(kind, {}).get(t[1][1])
+        if ckind is None:
             x.skip()  # an element no field takes (its text is not data either)
             continue
-        ckind, extra = child
-        for k in range(extra):
-            _check_depth(depth + 1 + k)
         if ckind == "skipped":  # a second <skipped> decodes into the same Skipped
             skipped = value["skipped"] = value["skipped"] or {"message": ""}
             for (_, local), attr in t[2]:
                 if local == b"message":
                     skipped["message"] = attr
-        frames.append(_junit_element(ckind, t, depth + 1 + extra))
+        frames.append(_junit_element(ckind, t, level + 1))
 
 
 class Malformed(Exception):
@@ -1384,7 +1381,7 @@ def parse_junit(data):
     if t[1][1] not in (b"testsuites", b"testsuite"):
         raise Malformed("bad element name")
     try:
-        top = _junit_element("suites" if t[1][1] == b"testsuites" else "suite", t, 0)
+        top = _junit_element("suites" if t[1][1] == b"testsuites" else "suite", t, 1)
     except XMLError as e:
         raise Malformed(f"did not consume the entire root element ({e})") from None
     try:
