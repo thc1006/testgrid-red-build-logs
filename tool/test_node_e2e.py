@@ -1026,8 +1026,8 @@ class Uploads(UploadWorld):
         self.assertEqual(self.fetch("--assets", self.assets), 0)
         record = self.meta()["artifacts_asset"]
         self.assertEqual(self.upload(), 0)
-        self.addCleanup(shutil.rmtree, self.root)
         self.root = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.root)
         self.take_out()
         self.assertEqual(self.fetch("--assets", self.assets), 0)
         self.assertEqual(self.manifest()["delete"], [record["name"]])  # fails: KeyError: 'delete'

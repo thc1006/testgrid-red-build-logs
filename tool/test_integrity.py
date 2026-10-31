@@ -333,8 +333,11 @@ class ArchiveWorld(unittest.TestCase):
     """One red build, started three hours ago, on one tab."""
 
     def setUp(self):
+        # (each world is cleaned up, also one a test sets up again)
         self.srv = FakeServer()
+        self.addCleanup(self.srv.close)
         self.root = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.root)
         self.start = int(time.time()) - 4 * DAY
         self.build = snowflake(self.start)
         self.key = f"job/{self.build}"
@@ -342,10 +345,6 @@ class ArchiveWorld(unittest.TestCase):
         self.srv.summary("dash", {"t": "FAILING"})
         self.show([self.build], {"job.Overall": ([12], ["boom"])})
         self.srv.gcs_listing("bucket", [])
-
-    def tearDown(self):
-        self.srv.close()
-        shutil.rmtree(self.root)
 
     def show(self, builds, rows, start=None):
         self.srv.table("dash", "t", table("bucket/logs/job", builds, rows, start=(start or self.start) * 1000))
