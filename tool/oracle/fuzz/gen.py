@@ -300,8 +300,8 @@ def junit_doc(rng):
     else:
         body = rng.choice(["<other/>", "", "   ", "<!-- only a comment -->", "<testsuites/>", "<testsuite/>",
                            "<x:testsuite xmlns:x='u'></x:testsuite>", "<x:testsuite></y:testsuite>",
-                           "<testsuite></testsuites>", "<testsuite>" * 5001 + "</testsuite>" * 5001,
-                           "<testsuite>" * 4999 + "</testsuite>" * 4999, "<a:b:c/>", "<1a/>", "<testsuite a=b/>",
+                           "<testsuite></testsuites>", "<testsuite>" * 10001 + "</testsuite>" * 10001,
+                           "<testsuite>" * 10000 + "</testsuite>" * 10000, "<a:b:c/>", "<1a/>", "<testsuite a=b/>",
                            "<testsuite a='1'b='2'/>", "<testsuite a='<'/>", "</testsuite>"])
     prolog = rng.choice(["", "", '<?xml version="1.0" encoding="UTF-8"?>\n', "<?xml version='1.0' encoding='utf8'?>",
                          '<?xml version="1.1"?>', '<?xml encoding="latin1"?>', "<?xml encoding = 'latin1'?>",

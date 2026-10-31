@@ -168,6 +168,18 @@ class JunitNamesTest(unittest.TestCase):
                 self.assertEqual(tr.resolve(name), want)  # fails: "/b", "/logs/job/1/junit_4.xml"
 
 
+class JunitDepthTest(unittest.TestCase):
+    """encoding/xml decodes an element with at most 10000 elements open, its own included."""
+
+    def test_nested_suites(self):
+        suites = lambda n, inner=b"": b"<testsuite>" * n + inner + b"</testsuite>" * n  # noqa: E731
+        self.assertEqual(len(tr.parse_junit(suites(5001))), 1)  # fails: Malformed("did not consume the entire root element")
+        self.assertEqual(len(tr.parse_junit(suites(10000))), 1)
+        for data in (suites(10001), suites(9999, b"<testcase name='d'><failure/></testcase>")):
+            with self.assertRaises(tr.Malformed):  # (did not consume the entire root element)
+                tr.parse_junit(data)
+
+
 class VerdictTest(unittest.TestCase):
     """What a tab shows of a column: the rows it hides, and which columns are not decided."""
 
