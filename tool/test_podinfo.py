@@ -194,7 +194,7 @@ class PodInfo(ArchiveWorld):
         real = os.replace
 
         def full(src, dst):
-            if "podinfo" in dst:
+            if os.path.basename(dst).startswith("podinfo"):
                 raise OSError(28, "No space left on device")
             return real(src, dst)
         with mock.patch.object(frl.os, "replace", side_effect=full):
