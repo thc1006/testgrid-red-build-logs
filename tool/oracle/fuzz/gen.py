@@ -319,7 +319,7 @@ JUNIT_NAMES = ["artifacts/junit_01.xml", "artifacts/junit.xml", "junit.xml", "ar
                "artifacts/foo/junit_e2e_20260101-1200_01.xml", "artifacts/test.xml", "artifacts/testAxml",
                "artifacts/junit/a.xml", "artifacts/./junit_02.xml", "artifacts/x/../junit_03.xml", "artifacts/junit.XML",
                "artifacts/notjunit.xml", "artifacts/build-log.txt", "junitx.xml", "artifacts/junit_0é.xml",
-               "artifacts/../../other/junit.xml", "artifacts/.."]
+               "artifacts/../../other/junit.xml", "artifacts/..", "../../..//logs/job/1/junit_05.xml"]
 
 
 STATUSES = list(range(16)) + [None]

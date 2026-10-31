@@ -162,6 +162,10 @@ class JunitNamesTest(unittest.TestCase):
                            ("a/b/..", "a/"), ("a/.", "a/"), ("a//..", "a/")):
             with self.subTest(name=name):
                 self.assertEqual(tr.resolve(name), want)
+        # (back at the root, Go 1.26.9 starts the path again: the next segment adds no "/")
+        for name, want in (("a/..//b", "b"), ("logs/job/1/../../..//logs/job/1/junit_4.xml", "logs/job/1/junit_4.xml")):
+            with self.subTest(name=name):
+                self.assertEqual(tr.resolve(name), want)  # fails: "/b", "/logs/job/1/junit_4.xml"
 
 
 class VerdictTest(unittest.TestCase):
