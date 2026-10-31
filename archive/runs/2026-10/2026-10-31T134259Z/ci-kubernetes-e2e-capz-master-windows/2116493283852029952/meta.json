@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2116493283852029952",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793446303,
+  "created": 1793446296,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FAILING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secrets-15b1ea80-d2a7-4287-a43a-bae540b3cb0...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793452162,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2116493283852029952",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2116493283852029952/build-log.txt",
+  "log": {
+    "bytes": 296352,
+    "md5": "29398007192a88b1d788c6a7ab0361fc",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 46484,
+    "gcs": {
+      "generation": "1793452169979039",
+      "md5": "29398007192a88b1d788c6a7ab0361fc",
+      "crc32c": "50d6714b",
+      "bytes": 296352,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 64503,
+    "md5": "deaaedfb3e5770c722eee0f1de89dd40",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10747,
+    "gcs": {
+      "generation": "1793452172405815",
+      "md5": "deaaedfb3e5770c722eee0f1de89dd40",
+      "crc32c": "a9b18a84",
+      "bytes": 64503,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-10-31T134259Z",
+  "archived_at": 1793454179.0,
+  "settled": false,
+  "final": false
+}

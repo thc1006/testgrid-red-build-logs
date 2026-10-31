@@ -62,5 +62,56 @@
   "refreshed_by_run": "2026-10-17T233055Z",
   "refreshed": [
     "podinfo.json"
-  ]
+  ],
+  "node_e2e": true,
+  "artifacts_asset": {
+    "name": "ci-node-e2e-containerd-2-1-cos-dra_2107896510585769984.tar.xz",
+    "month": "2026-10",
+    "bytes": 16340,
+    "sha256": "e93b6b4e536f314a00c868eab6374a915720120c97f6509ef1fdbb57ef4d7479",
+    "members": [
+      {
+        "path": "artifacts/junit_runner.xml",
+        "bytes": 252,
+        "md5": "f185a22500f2f2256f825f7836b9c8d0",
+        "gcs": {
+          "generation": "1791396937116830",
+          "md5": "f185a22500f2f2256f825f7836b9c8d0",
+          "crc32c": "bd4740ad",
+          "bytes": 252,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/metadata.json",
+        "bytes": 166,
+        "md5": "c0cb6cd2387bcab2372f2d0aba79bbe9",
+        "gcs": {
+          "generation": "1791396937174174",
+          "md5": "c0cb6cd2387bcab2372f2d0aba79bbe9",
+          "crc32c": "08fc149c",
+          "bytes": 166,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-41869887-cos-125-19216-700-23/serial-1.log",
+        "bytes": 65032,
+        "md5": "cef84062c12c257a45298ab4e48e5f58",
+        "gcs": {
+          "generation": "1791396937126520",
+          "md5": "cef84062c12c257a45298ab4e48e5f58",
+          "crc32c": "7efa4ace",
+          "bytes": 65032,
+          "encoding": "identity"
+        }
+      }
+    ],
+    "built_by_run": "2026-10-31T134259Z",
+    "pending_since": 1793454179.0729728,
+    "uploaded": {
+      "release": "node-logs-2026-10",
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-node-e2e-containerd-2-1-cos-dra_2107896510585769984.tar.xz"
+    }
+  }
 }
