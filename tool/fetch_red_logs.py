@@ -2269,7 +2269,69 @@ def take_assets(root, gcs, assets, run_id, now, deadline, excluded=()):
 
 
 ASSET_NAME_RE = re.compile(rf"({JOB_RE.pattern})_({BUILD_RE.pattern})\.tar\.xz")
-RELEASE_RE = re.compile(r"node-logs-(?:[a-z0-9-]+-)?[0-9]{4}-[0-9]{2}(?:-[0-9]+)?")  # (see upload_assets.py)
+RELEASE_RE = re.compile(r"node-logs-(?:[a-z0-9-]+-)?([0-9]{4}-[0-9]{2})(?:-[0-9]+)?")  # (see upload_assets.py)
+ASSET_URLS = ("https://",)  # (those an asset is read from)
+READ_SECONDS = 45  # the record step's time to read assets (it has 2 minutes): the next run reads the rest
+
+
+class Read:
+    """A stream as tarfile reads it: hashed if sha (a hashlib object), IntegrityError past limit bytes (more than
+    what) or past a body cut short, TimeoutError past deadline (time.monotonic())."""
+
+    def __init__(self, r, limit, deadline, what, sha=None):
+        self.r, self.left, self.deadline, self.what, self.sha = r, limit, deadline, what, sha
+
+    def read(self, n=-1):
+        if time.monotonic() > self.deadline:
+            raise TimeoutError("the record step's time to read assets is up")
+        data = self.r.read(self.left + 1 if n < 0 else min(n, self.left + 1))
+        self.left -= len(data)
+        if self.left < 0:
+            raise IntegrityError(f"more bytes than {self.what}")
+        if not data and n and getattr(self.r, "length", None):  # (http.client reads a cut body as its end)
+            raise IntegrityError("its body was cut short")
+        if self.sha:
+            self.sha.update(data)
+        return data
+
+
+def asset_held(url, size, digest, deadline):
+    """(sha256, members) of the asset a release holds at url, of size bytes and digest ("sha256:..."; None if GitHub
+    gave none), read as take_asset records them: [{"path", "bytes", "md5"}] (what GCS held then is not known).
+    IntegrityError if it is not such an asset: a whole xz of a tar of regular files whose names member_name gives,
+    fewer than ASSET_FILES_BYTES and at most MAX_ASSET_MEMBERS, none twice; TimeoutError past deadline."""
+    members, files, seen = [], 0, set()
+    if time.monotonic() > deadline:
+        raise TimeoutError("the record step's time to read assets is up")
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "testgrid-red-build-logs"}),
+                                timeout=20) as r:
+        got = Read(r, size, deadline, "the release lists", hashlib.sha256())
+        room = ASSET_FILES_BYTES + 4096 * MAX_ASSET_MEMBERS + 20480  # (with their headers: a PAX header can be any size)
+        try:
+            with lzma.LZMAFile(got) as xz, \
+                    tarfile.open(fileobj=(unpacked := Read(xz, room, deadline, "a run packs")), mode="r|") as tar:
+                for entry in tar:
+                    path = "artifacts/" + entry.name
+                    files += entry.size
+                    if not entry.isreg() or member_name(path) != entry.name or files >= ASSET_FILES_BYTES \
+                            or len(members) >= MAX_ASSET_MEMBERS or path in seen:
+                        raise IntegrityError(f"its {entry.name[:200]!r} is no member take_asset packs")
+                    seen.add(path)
+                    md5, f = hashlib.md5(), tar.extractfile(entry)
+                    while chunk := f.read(1 << 20):
+                        md5.update(chunk)
+                    members.append({"path": path, "bytes": entry.size, "md5": md5.hexdigest()})
+                while unpacked.read(1 << 20):  # (to the xz's end: one cut short raises EOFError)
+                    pass
+            while got.read(1 << 20):
+                pass
+        except (tarfile.TarError, lzma.LZMAError, EOFError, AssetRefused) as e:
+            raise IntegrityError(f"no asset of node logs: {type(e).__name__}: {e}") from None
+    sha = got.sha.hexdigest()
+    if got.left or not members or digest not in (None, "sha256:" + sha):
+        raise IntegrityError(f"{size - got.left} bytes of sha256:{sha} and {len(members)} members, not the {size} "
+                             f"bytes of {digest} the release lists")
+    return sha, members
 
 
 def keep_to_delete(root, names):
@@ -2292,8 +2354,10 @@ def asset_names(value):
 def record_uploads(root, path):
     """Record in meta.json each asset the upload step uploaded, as its uploaded.json at path lists them (see
     upload_assets.py), and each other one its releases.json says a release holds: "uploaded" in the build's
-    "artifacts_asset", if the asset's size and digest are the record's. Returns (how many it recorded, warnings of
-    those of uploaded.json it did not)."""
+    "artifacts_asset", if the asset's size and digest are the record's. One a release holds of a build whose record
+    was never packed (a run uploaded it, its commit was lost, and GCS no longer had the artifacts/ when the next one
+    listed them) is read from the release, and recorded as it is (see asset_held). Returns (how many it recorded,
+    warnings of those of uploaded.json it did not, and of those it could not read)."""
     try:
         got = read_json(path)
     except (ValueError, OSError) as e:
@@ -2314,7 +2378,8 @@ def record_uploads(root, path):
         for a in assets if isinstance(assets, list) else ():
             if isinstance(a, dict) and a.get("state") == "uploaded" and isinstance(a.get("name"), str):
                 found.setdefault(a["name"], {"release": tag, **{k: a.get(k) for k in ("size", "digest", "url")}})
-    known, done, notes = archived_builds(root)[0], 0, []  # (notes: (name, warning))
+    known, done, notes, unread = archived_builds(root)[0], 0, [], []  # (notes: (name, warning))
+    run, until = got.get("run") if is_text(got.get("run")) else None, time.monotonic() + READ_SECONDS
     for name, up in sorted(listed.items()) + sorted((n, a) for n, a in found.items() if n not in listed):
         m = ASSET_NAME_RE.fullmatch(name)
         rel = known.get(f"{m.group(1)}/{m.group(2)}") if m else None
@@ -2327,6 +2392,23 @@ def record_uploads(root, path):
             notes.append((name, f"{name}: uploaded, but no archived build's meta.json records it"))
             continue
         if name not in listed and record.get("uploaded"):
+            continue
+        if name not in listed and "sha256" not in record:
+            tag, url, size = up.get("release"), up.get("url"), up.get("size")
+            held = RELEASE_RE.fullmatch(tag) if isinstance(tag, str) else None
+            if not (held and is_text(url) and url.startswith(ASSET_URLS) and is_int(size) and 0 < size <= MAX_ASSET_BYTES):
+                unread.append(f"{name}: {str(tag)[:100]} holds it, but releases.json does not say where or how large")
+                continue
+            try:
+                sha, members = asset_held(url, size, up.get("digest"), until)
+            except (TimeoutError, *TRANSIENT) as e:
+                unread.append(f"{name}: {tag} holds it, but it is not recorded: {type(e).__name__}: {str(e)[:300]} "
+                              "(the next run reads it again)")
+                continue
+            put_in_place(os.path.join(root, rel), dict(meta, artifacts_asset={
+                "name": name, "month": held.group(1), "bytes": size, "sha256": sha, "members": members,
+                "read_by_run": run, "uploaded": {"release": tag, "url": url}}))
+            done += 1
             continue
         if not isinstance(up, dict) or up.get("size") != record.get("bytes") \
                 or up.get("digest") != f"sha256:{record.get('sha256')}":
@@ -2354,7 +2436,7 @@ def record_uploads(root, path):
                    | ({"assets_to_delete": left} if left else {}))
     if done:
         write_pages(root, got.get("run"))
-    return done, [w for n, w in notes if n in listed]  # (of releases.json's, only those it records are said)
+    return done, [w for n, w in notes if n in listed] + unread  # (of releases.json's others, those it cannot read)
 
 
 def write_pages(root, run_id):

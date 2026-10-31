@@ -541,8 +541,9 @@ def check_assets(args, archived, excluded, compared, since, pool):
         elif a and a.get("url") != up["url"]:
             problems.append(f"{key}: {up['release']} serves {r.get('name')} at {str(a.get('url'))[:200]}, not at the "
                             "URL meta.json records")
-        # (and one packed in the window: a backfilled build's, or one uploaded late)
-        if args.releases and max(m["started"] or m["created"], frl.folder_time(str(r.get("built_by_run"))) or 0) >= since:
+        # (and one packed in the window, or read from its release: a backfilled build's, or one uploaded late)
+        if args.releases and max(m["started"] or m["created"], *(frl.folder_time(str(r.get(k))) or 0
+                                                                for k in ("built_by_run", "read_by_run"))) >= since:
             downloads.append((key, up["url"], r))
     taken = {"{}_{}.tar.xz".format(*k.split("/", 1)) for k in excluded}
     for tag, name in sorted(assets):
