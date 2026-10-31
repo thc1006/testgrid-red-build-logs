@@ -446,6 +446,63 @@ class FollowModuleLookup(unittest.TestCase):
                 self.assertEqual(self.follow(answer), (1, error, ""))
 
 
+
+class FollowProposal(unittest.TestCase):
+    """follow.sh named the commit it proposes by the module's version: for a pseudo-version, the
+    commit it ends in; for a release, the release. The manifests of 2026-10-31 deploy
+    2bbb98db (image tag v20261029-v0.0.177-4-g2bbb98db), which go resolves to the release v0.0.178:
+    pinned.json would have said "v0.0.178", which drift.sh compares with the image tag's commit,
+    and found moved on every run. Here every check is stood in and passes."""
+
+    def propose(self, version):
+        """(pinned.json as follow.sh writes it, and the branch it switches to)"""
+        with tempfile.TemporaryDirectory() as tmp:
+            oracle, stubs = os.path.join(tmp, "tool", "oracle"), os.path.join(tmp, "bin")
+            os.makedirs(os.path.join(oracle, "fuzz"))
+            os.makedirs(stubs)
+            os.makedirs(os.path.join(tmp, "testgrid"))
+            for name in ("follow.sh", "relevant_diff.py", "pinned.json"):
+                shutil.copy(os.path.join(HERE, "oracle", name), oracle)
+            with open(os.path.join(tmp, "tool", "testgrid_types.json"), "w") as f:
+                f.write('{"about": "pinned", "types": 1}\n')
+            listed = json.dumps({"Version": version, "Origin": {"Hash": "2bbb98db9f1aabc654a5f4adddee6e6e3fbc3d4e"}})
+            go = ('#!/bin/sh\ncase "$1 $2" in\n  "mod init") exit 0 ;;\n'
+                  f'  "list -m") echo \'{listed}\' ;;\n'
+                  f'  "mod download") echo \'{{"Dir": "{tmp}/testgrid"}}\' ;;\nesac\n')
+            dump = "#!/bin/sh\necho '{}'\n"
+            build = (f'#!/bin/sh\nmkdir -p "$1"\n'
+                     f'for b in schemadump unidump; do printf "%s" "{dump}" > "$1/$b"; chmod +x "$1/$b"; done\n')
+            git = f'#!/bin/sh\necho "$@" >> {tmp}/git.log\ncase "$*" in *ls-remote*) exit 2 ;; esac\n'  # (no such branch)
+            for path, script in ((os.path.join(oracle, "build.sh"), build), (os.path.join(stubs, "go"), go),
+                                 (os.path.join(stubs, "git"), git), (os.path.join(stubs, "gh"), "#!/bin/sh\necho url\n"),
+                                 (os.path.join(stubs, "uv"), "#!/bin/sh\n"),
+                                 (os.path.join(oracle, "gotypes.py"), 'print(\'{"about": "new", "types": 1}\')\n'),
+                                 *((os.path.join(oracle, name), "") for name in (
+                                     "gounicode.py", "fuzz/edge.py", "fuzz/run.py", "fuzz/filterdiff.py", "fuzz/fmtdiff.py"))):
+                with open(path, "w") as f:
+                    f.write(script)
+                os.chmod(path, 0o755)
+            done = subprocess.run(["bash", os.path.join(oracle, "follow.sh"), "2bbb98db", "1"], cwd=tmp,
+                                  env=dict(os.environ, PATH=f"{stubs}:{os.environ['PATH']}", GH_TOKEN="token",
+                                           GITHUB_STEP_SUMMARY=os.devnull, GITHUB_SERVER_URL="https://github.com",
+                                           GITHUB_REPOSITORY="owner/repo", GITHUB_RUN_ID="1"),
+                                  capture_output=True, text=True, timeout=120)
+            self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+            with open(os.path.join(oracle, "pinned.json")) as f:
+                pinned = json.load(f)
+            with open(os.path.join(tmp, "git.log")) as f:
+                switched = [line.split()[-1] for line in f if line.startswith("switch ")]
+        return pinned["testgrid_commit"], pinned["testgrid_module_version"], switched
+
+    def test_a_release_is_pinned_by_its_commit(self):
+        # fails: ("v0.0.178", "v0.0.178", ["follow-testgrid-v0.0.178"])
+        self.assertEqual(self.propose("v0.0.178"), ("2bbb98db9f1a", "v0.0.178", ["follow-testgrid-2bbb98db9f1a"]))
+
+    def test_control_a_pseudo_version_is_pinned_by_the_commit_it_ends_in(self):
+        version = "v0.0.177-0.20260902201319-f15bfa4808a4"
+        self.assertEqual(self.propose(version), ("f15bfa4808a4", version, ["follow-testgrid-f15bfa4808a4"]))
+
+
 # ------------------------------------------------------------------ the commit step: files GitHub would refuse
 
 LIMIT = 95 << 20  # (the commit step's limit; GitHub blocks files over 100 MiB)

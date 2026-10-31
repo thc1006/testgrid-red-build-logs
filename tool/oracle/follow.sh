@@ -30,9 +30,12 @@ try:
     found = json.load(sys.stdin)
 except ValueError:
     found = {}
-if found.get("Error") or not found.get(sys.argv[1]):
+value = found
+for name in sys.argv[1].split("."):
+    value = value.get(name) if isinstance(value, dict) else None
+if found.get("Error") or not value:
     sys.exit(found.get("Error") or "go gave no " + sys.argv[1])
-print(found[sys.argv[1]])' "$key"
+print(value)' "$key"
 }
 version=$(lookup Version list -m -json "$module@$commit")
 dir_of() { lookup Dir mod download -json "$module@$1"; }
@@ -105,11 +108,12 @@ if [ -n "$changed" ] || [ ${#failed[@]} -gt 0 ]; then
 fi
 
 # Nothing the port follows changed, and the checks pass: propose the new pinned.json. (A
-# pseudo-version ends in its commit; a release's version is the release, which drift.sh
-# compares as it is.)
+# pseudo-version ends in its commit; a release's commit is go's Origin.Hash. drift.sh
+# compares an image tag's -g<commit> with it.)
 short=${version##*-}
 if ! [[ $short =~ ^[0-9a-f]{12}$ ]]; then
-  short=$version
+  short=$(lookup Origin.Hash list -m -json "$module@$version")
+  short=${short:0:12}
 fi
 branch="follow-testgrid-$short"
 python3 - "$short" "$version" "$go_version" <<'PY'
