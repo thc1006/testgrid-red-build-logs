@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2116805593225236480",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793520756,
+  "created": 1793520756,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should implement NodePort and HealthCheckNodePort correctly when ExternalTrafficPolicy changes",
+          "status": "FAIL",
+          "message": "[FAILED] updating ExternalTrafficPolicy and HealthCheckNodePort: faile...o/kubernetes/test/e2e/network/service.go:4036 @ 11/01/26 08:29:17.486\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793522806,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2116805593225236480",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2116805593225236480/build-log.txt",
+  "log": {
+    "bytes": 156203,
+    "md5": "9ac8818f494256e94d44d2daeb4c9e00",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24696,
+    "gcs": {
+      "generation": "1793522820290049",
+      "md5": "9ac8818f494256e94d44d2daeb4c9e00",
+      "crc32c": "dcffeae4",
+      "bytes": 156203,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85107,
+    "md5": "83016ed94d46342996ebf72f60e47102",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11734,
+    "gcs": {
+      "generation": "1793522822181768",
+      "md5": "83016ed94d46342996ebf72f60e47102",
+      "crc32c": "26afce75",
+      "bytes": 85107,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-01T132221Z",
+  "archived_at": 1793539341.0,
+  "settled": true,
+  "final": false
+}

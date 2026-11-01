@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2116750732714577920",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1793507709,
+  "created": 1793507676,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration.examples",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestAggregatedAPIServer/WithoutWardleFeatureGateAtV1....  TestAggregatedAPIServer\n--- FAIL: TestAggregatedAPIServer (265.07s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793510095,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2116750732714577920",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2116750732714577920/build-log.txt",
+  "log": {
+    "bytes": 553538,
+    "md5": "b3108c3df3c3b84d1717bce3d1fab292",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 64556,
+    "gcs": {
+      "generation": "1793510099833856",
+      "md5": "b3108c3df3c3b84d1717bce3d1fab292",
+      "crc32c": "33085ca0",
+      "bytes": 553538,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 93984,
+    "md5": "9e328bc0f8212a0a4d2a9c90505af185",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12287,
+    "gcs": {
+      "generation": "1793510101610820",
+      "md5": "9e328bc0f8212a0a4d2a9c90505af185",
+      "crc32c": "d0ea84e5",
+      "bytes": 93984,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-01T132221Z",
+  "archived_at": 1793539341.0,
+  "settled": true,
+  "final": false
+}

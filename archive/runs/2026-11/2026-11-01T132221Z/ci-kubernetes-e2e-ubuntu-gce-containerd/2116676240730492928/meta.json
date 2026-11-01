@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2116676240730492928",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793489916,
+  "created": 1793489916,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] EndpointSlice should create Endpoints and EndpointSlices for Pods matching a Service [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out waiting for EndpointSlices to match expectations: c...bernetes/test/e2e/network/endpointslice.go:699 @ 10/31/26 23:48:41.77\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793492055,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2116676240730492928",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2116676240730492928/build-log.txt",
+  "log": {
+    "bytes": 138846,
+    "md5": "ded2133f778b025c094d9530b0ab8d53",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22330,
+    "gcs": {
+      "generation": "1793492068769370",
+      "md5": "ded2133f778b025c094d9530b0ab8d53",
+      "crc32c": "4196450d",
+      "bytes": 138846,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86565,
+    "md5": "23561d8f45a1cd18f182b3796036cd04",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11982,
+    "gcs": {
+      "generation": "1793492070876219",
+      "md5": "23561d8f45a1cd18f182b3796036cd04",
+      "crc32c": "11b5e4bc",
+      "bytes": 86565,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-01T132221Z",
+  "archived_at": 1793539341.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2116767845395206144",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1793511757,
+  "created": 1793511756,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should only target nodes with endpoints [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 35.192.62.83:8081 after ...ernetes/test/e2e/framework/service/util.go:49 @ 11/01/26 05:55:20.756\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793514281,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2116767845395206144",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2116767845395206144/build-log.txt",
+  "log": {
+    "bytes": 142346,
+    "md5": "2c261fe4023294473307f3fafacf3d35",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23471,
+    "gcs": {
+      "generation": "1793514287496139",
+      "md5": "2c261fe4023294473307f3fafacf3d35",
+      "crc32c": "d8cb601d",
+      "bytes": 142346,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85322,
+    "md5": "7a847fbbce044ab99bf6b9e1178e0ec2",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11696,
+    "gcs": {
+      "generation": "1793514290110747",
+      "md5": "7a847fbbce044ab99bf6b9e1178e0ec2",
+      "crc32c": "e4e24d2e",
+      "bytes": 85322,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-01T132221Z",
+  "archived_at": 1793539341.0,
+  "settled": true,
+  "final": false
+}
