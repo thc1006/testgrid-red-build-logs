@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2116654347675766784",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1793484726,
+  "created": 1793484696,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs should create a non-pre-bound PV and PVC: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-zxkhz\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 10/31/26 22:23:53.462\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793486429,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2116654347675766784",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2116654347675766784/build-log.txt",
+  "log": {
+    "bytes": 137817,
+    "md5": "a47b327724d2ee5f15cdf40f7f83ef88",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22156,
+    "gcs": {
+      "generation": "1793486446700736",
+      "md5": "a47b327724d2ee5f15cdf40f7f83ef88",
+      "crc32c": "cc0a6ec2",
+      "bytes": 137817,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94323,
+    "md5": "85b0c438211155eb681b5ec4a923ba05",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12467,
+    "gcs": {
+      "generation": "1793486448988353",
+      "md5": "85b0c438211155eb681b5ec4a923ba05",
+      "crc32c": "0e805565",
+      "bytes": 94323,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-01T000656Z",
+  "archived_at": 1793491616.0,
+  "settled": false,
+  "final": false
+}

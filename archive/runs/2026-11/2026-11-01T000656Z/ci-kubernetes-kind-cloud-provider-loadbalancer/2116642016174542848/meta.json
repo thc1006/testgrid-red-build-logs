@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "build": "2116642016174542848",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "started": 1793481786,
+  "created": 1793481756,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "sig-network-kind, loadbalancer",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pods Extended (pod generation) Pod Generation pod generation should start at 1 and increment per update [MinimumKubeletVersion:1.34] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 20.000s.\nexpected pod generation to be 5, got...: k8s.io/kubernetes/test/e2e/node/pods.go:534 @ 10/31/26 21:31:29.724\n"
+        },
+        {
+          "test": "ci-kubernetes-kind-cloud-provider-loadbalancer.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793482924,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2116642016174542848",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2116642016174542848/build-log.txt",
+  "log": {
+    "bytes": 156603,
+    "md5": "a44cdc056c6aa4b1142e1f4b23ab9c13",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25569,
+    "gcs": {
+      "generation": "1793482927275758",
+      "md5": "a44cdc056c6aa4b1142e1f4b23ab9c13",
+      "crc32c": "e45a3bea",
+      "bytes": 156603,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98116,
+    "md5": "26776c06eadcc282e3fe125d9f8f1a79",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12657,
+    "gcs": {
+      "generation": "1793482929231595",
+      "md5": "26776c06eadcc282e3fe125d9f8f1a79",
+      "crc32c": "4015a220",
+      "bytes": 98116,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-01T000656Z",
+  "archived_at": 1793491616.0,
+  "settled": true,
+  "final": false
+}

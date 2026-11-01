@@ -62,5 +62,284 @@
   "refreshed_by_run": "2026-10-17T233055Z",
   "refreshed": [
     "podinfo.json"
-  ]
+  ],
+  "node_e2e": true,
+  "artifacts_asset": {
+    "name": "ci-kubernetes-node-e2e-containerd_2104631192446832640.tar.xz",
+    "month": "2026-10",
+    "bytes": 10155172,
+    "sha256": "37422a4043ed785cd399a2358a54938578fb06042b08b42078e0b6328c9f27ca",
+    "members": [
+      {
+        "path": "artifacts/junit_cos01.xml",
+        "bytes": 443428,
+        "md5": "07e1176b4bcb941388d225be3d4f4897",
+        "gcs": {
+          "generation": "1790620557587133",
+          "md5": "07e1176b4bcb941388d225be3d4f4897",
+          "crc32c": "ad8e0bea",
+          "bytes": 443428,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/junit_runner.xml",
+        "bytes": 1907,
+        "md5": "75a100a699366c648e98b81c68e55229",
+        "gcs": {
+          "generation": "1790620556843904",
+          "md5": "75a100a699366c648e98b81c68e55229",
+          "crc32c": "cdce09d2",
+          "bytes": 1907,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/junit_ubuntu01.xml",
+        "bytes": 488034,
+        "md5": "ac48cbe7c59cfa0717d2751325a62df5",
+        "gcs": {
+          "generation": "1790620557374897",
+          "md5": "ac48cbe7c59cfa0717d2751325a62df5",
+          "crc32c": "b4f7ea38",
+          "bytes": 488034,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/metadata.json",
+        "bytes": 145,
+        "md5": "4818bb97a9c44baab27af1afc3306508",
+        "gcs": {
+          "generation": "1790620557015665",
+          "md5": "4818bb97a9c44baab27af1afc3306508",
+          "crc32c": "c554a342",
+          "bytes": 145,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-cos-129-19506-448-53/cloud-init.log",
+        "bytes": 14675,
+        "md5": "8c62775e20eda953d0934138af2ee874",
+        "gcs": {
+          "generation": "1790620557009629",
+          "md5": "8c62775e20eda953d0934138af2ee874",
+          "crc32c": "24467e9f",
+          "bytes": 14675,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-cos-129-19506-448-53/containerd-installation.log",
+        "bytes": 17,
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "gcs": {
+          "generation": "1790620556867611",
+          "md5": "cdfc37141b925a27919a83355bf842dd",
+          "crc32c": "4cbc7ffc",
+          "bytes": 17,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-cos-129-19506-448-53/containerd.log",
+        "bytes": 25300282,
+        "md5": "e5f1e0e22b2b0207b3a08ac27aa6a80f",
+        "gcs": {
+          "generation": "1790620558284958",
+          "md5": "e5f1e0e22b2b0207b3a08ac27aa6a80f",
+          "crc32c": "b772e7a7",
+          "bytes": 25300282,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-cos-129-19506-448-53/kern.log",
+        "bytes": 48857,
+        "md5": "a1e8dc6338bd46d6fdfcc1948de8f51d",
+        "gcs": {
+          "generation": "1790620556921340",
+          "md5": "a1e8dc6338bd46d6fdfcc1948de8f51d",
+          "crc32c": "20e08bb5",
+          "bytes": 48857,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-cos-129-19506-448-53/kubelet.log",
+        "bytes": 39579771,
+        "md5": "fbe0b47a762f3016fc5f7f70e079a847",
+        "gcs": {
+          "generation": "1790620558479481",
+          "md5": "fbe0b47a762f3016fc5f7f70e079a847",
+          "crc32c": "a4c399bb",
+          "bytes": 39579771,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-cos-129-19506-448-53/serial-1.log",
+        "bytes": 195027,
+        "md5": "e9b08975cf372c61c86efc0c9a3e12e8",
+        "gcs": {
+          "generation": "1790620558321129",
+          "md5": "e9b08975cf372c61c86efc0c9a3e12e8",
+          "crc32c": "83d8a99d",
+          "bytes": 195027,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-cos-129-19506-448-53/services.log",
+        "bytes": 26773287,
+        "md5": "d2c18e8ec079c2bf232b2f5100a7bb94",
+        "gcs": {
+          "generation": "1790620557275977",
+          "md5": "d2c18e8ec079c2bf232b2f5100a7bb94",
+          "crc32c": "5e0081ab",
+          "bytes": 26773287,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-cos-129-19506-448-53/tmp-node-e2e-eb76938d-cos-129-19506-448-53-ginkgo.log",
+        "bytes": 921159,
+        "md5": "a6ad09e157db98d21798b8eabd308f65",
+        "gcs": {
+          "generation": "1790620557501950",
+          "md5": "a6ad09e157db98d21798b8eabd308f65",
+          "crc32c": "19bf91aa",
+          "bytes": 921159,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927-system.log",
+        "bytes": 28611772,
+        "md5": "b61bbd56b7e477b95579635459da9ad8",
+        "gcs": {
+          "generation": "1790620558213909",
+          "md5": "b61bbd56b7e477b95579635459da9ad8",
+          "crc32c": "f157a8ad",
+          "bytes": 28611772,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927/cloud-init.log",
+        "bytes": 20701,
+        "md5": "7f476f917981ed0ab2eaf6126e762a0c",
+        "gcs": {
+          "generation": "1790620557094306",
+          "md5": "7f476f917981ed0ab2eaf6126e762a0c",
+          "crc32c": "0975e643",
+          "bytes": 20701,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927/containerd-installation.log",
+        "bytes": 17,
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "gcs": {
+          "generation": "1790620556929035",
+          "md5": "cdfc37141b925a27919a83355bf842dd",
+          "crc32c": "4cbc7ffc",
+          "bytes": 17,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927/containerd.log",
+        "bytes": 26223508,
+        "md5": "dd337b92e6b99092cdd929ce9110d8e2",
+        "gcs": {
+          "generation": "1790620557642504",
+          "md5": "dd337b92e6b99092cdd929ce9110d8e2",
+          "crc32c": "c10887d9",
+          "bytes": 26223508,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927/kern.log",
+        "bytes": 49080,
+        "md5": "780cb537835bea9258e34cac75a307c7",
+        "gcs": {
+          "generation": "1790620557085796",
+          "md5": "780cb537835bea9258e34cac75a307c7",
+          "crc32c": "ee514950",
+          "bytes": 49080,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927/kubelet.log",
+        "bytes": 39455900,
+        "md5": "3207b4b717c9b1a7ad3847920300f9af",
+        "gcs": {
+          "generation": "1790620558374375",
+          "md5": "3207b4b717c9b1a7ad3847920300f9af",
+          "crc32c": "bb727a88",
+          "bytes": 39455900,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927/pods/container-probe-1815_startup-sidecar-ecb396a6-d589-4ce1-8ded-36652cfddf17_c7be8a8d-08ae-405a-b757-cce58b2957e6/sidecar/0.log",
+        "bytes": 0,
+        "md5": "d41d8cd98f00b204e9800998ecf8427e",
+        "gcs": {
+          "generation": "1790620556929091",
+          "md5": "d41d8cd98f00b204e9800998ecf8427e",
+          "crc32c": "00000000",
+          "bytes": 0,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927/serial-1.log",
+        "bytes": 73699,
+        "md5": "70cbf523fe00498e4c87456c15dc9a90",
+        "gcs": {
+          "generation": "1790620556857967",
+          "md5": "70cbf523fe00498e4c87456c15dc9a90",
+          "crc32c": "64619af9",
+          "bytes": 73699,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927/services.log",
+        "bytes": 26806472,
+        "md5": "8dca35d8512c12705423004f9fda28b2",
+        "gcs": {
+          "generation": "1790620557581931",
+          "md5": "8dca35d8512c12705423004f9fda28b2",
+          "crc32c": "01b0818b",
+          "bytes": 26806472,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927/tmp-node-e2e-eb76938d-ubuntu-gke-2404-1-34-amd64-v20260927-ginkgo.log",
+        "bytes": 945037,
+        "md5": "3ce6187a8ccc181acb5dd099f42a548b",
+        "gcs": {
+          "generation": "1790620557224043",
+          "md5": "3ce6187a8ccc181acb5dd099f42a548b",
+          "crc32c": "8571573e",
+          "bytes": 945037,
+          "encoding": "identity"
+        }
+      }
+    ],
+    "built_by_run": "2026-11-01T000656Z",
+    "pending_since": 1793491616.0445862,
+    "uploaded": {
+      "release": "node-logs-2026-10",
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-kubernetes-node-e2e-containerd_2104631192446832640.tar.xz"
+    }
+  }
 }

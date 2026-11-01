@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2116614835583062016",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1793475308,
+  "created": 1793475276,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler/preemption.podgroup",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestPodGroupAsyncPreemption/Lower_priority_Pod_can_se...odGroupAsyncPreemption\n--- FAIL: TestPodGroupAsyncPreemption (95.56s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793477715,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2116614835583062016",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2116614835583062016/build-log.txt",
+  "log": {
+    "bytes": 223631,
+    "md5": "7accd11dd2955b09d0c1427c5bbef907",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19728,
+    "gcs": {
+      "generation": "1793477721673004",
+      "md5": "7accd11dd2955b09d0c1427c5bbef907",
+      "crc32c": "1ea9261d",
+      "bytes": 223631,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 93739,
+    "md5": "03205c08bb25277fff514460a850d50b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12366,
+    "gcs": {
+      "generation": "1793477744386877",
+      "md5": "03205c08bb25277fff514460a850d50b",
+      "crc32c": "f870a1f7",
+      "bytes": 93739,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-01T000656Z",
+  "archived_at": 1793491616.0,
+  "settled": true,
+  "final": false
+}

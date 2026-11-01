@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2116655604679315456",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793484996,
+  "created": 1793484996,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics PVC should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 10/31/26 23:08:54.584\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793488592,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2116655604679315456",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2116655604679315456/build-log.txt",
+  "log": {
+    "bytes": 184312,
+    "md5": "7fdf5779af51d6d68e1baf2f67b54e9f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25631,
+    "gcs": {
+      "generation": "1793488608321874",
+      "md5": "7fdf5779af51d6d68e1baf2f67b54e9f",
+      "crc32c": "ca6603ba",
+      "bytes": 184312,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86638,
+    "md5": "c823ede603e60abe43253e4ce51baf4b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11787,
+    "gcs": {
+      "generation": "1793488611117382",
+      "md5": "c823ede603e60abe43253e4ce51baf4b",
+      "crc32c": "8b79451c",
+      "bytes": 86638,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-01T000656Z",
+  "archived_at": 1793491616.0,
+  "settled": false,
+  "final": false
+}
