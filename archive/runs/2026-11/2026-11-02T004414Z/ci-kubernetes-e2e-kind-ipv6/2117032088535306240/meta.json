@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2117032088535306240",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1793574786,
+  "created": 1793574757,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should return command exit codes should support port-forward",
+          "status": "FAIL",
+          "message": "[FAILED] Container port output missing expected value. Wanted:'itworks...io/kubernetes/test/e2e/kubectl/kubectl.go:595 @ 11/01/26 23:26:22.814\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793576390,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2117032088535306240",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2117032088535306240/build-log.txt",
+  "log": {
+    "bytes": 133495,
+    "md5": "fb679a5cff6dd4c7584217fe4a58871c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21181,
+    "gcs": {
+      "generation": "1793576407790364",
+      "md5": "fb679a5cff6dd4c7584217fe4a58871c",
+      "crc32c": "d0cae6eb",
+      "bytes": 133495,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94202,
+    "md5": "49154a4a35778f0e537381dd6289e5cf",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12443,
+    "gcs": {
+      "generation": "1793576410310205",
+      "md5": "49154a4a35778f0e537381dd6289e5cf",
+      "crc32c": "f8286128",
+      "bytes": 94202,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-02T004414Z",
+  "archived_at": 1793580254.0,
+  "settled": false,
+  "final": false
+}

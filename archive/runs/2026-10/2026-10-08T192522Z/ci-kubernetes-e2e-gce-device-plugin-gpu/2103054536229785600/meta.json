@@ -59,8 +59,106 @@
   "archived_at": 1791487522.3170176,
   "settled": true,
   "final": true,
-  "refreshed_by_run": "2026-10-17T233055Z",
+  "refreshed_by_run": "2026-11-02T004414Z",
   "refreshed": [
-    "podinfo.json"
+    "cluster-info.log",
+    "kt2-7869b7ae-0efb-master.containerd.log",
+    "kt2-7869b7ae-0efb-master.etcd.log",
+    "kt2-7869b7ae-0efb-master.kube-master-configuration.log",
+    "kt2-7869b7ae-0efb-master.kube-master-installation.log",
+    "kt2-7869b7ae-0efb-master.serial-1.log"
+  ],
+  "node_e2e": false,
+  "artifacts": [
+    {
+      "path": "artifacts/cluster-logs/cluster-info.log",
+      "bytes": 436819,
+      "md5": "875de52f2c5b0070d668311ddded4939",
+      "verified": true,
+      "file": "cluster-info.log.gz",
+      "file_bytes": 37754,
+      "gcs": {
+        "generation": "1790244803510166",
+        "md5": "875de52f2c5b0070d668311ddded4939",
+        "crc32c": "84f612ea",
+        "bytes": 436819,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/cluster-logs/kt2-7869b7ae-0efb-master/containerd.log",
+      "bytes": 117181,
+      "md5": "21d870085502ac8e76de01160d06c544",
+      "verified": true,
+      "file": "kt2-7869b7ae-0efb-master.containerd.log.gz",
+      "file_bytes": 14817,
+      "gcs": {
+        "generation": "1790244803357553",
+        "md5": "21d870085502ac8e76de01160d06c544",
+        "crc32c": "f19d0b27",
+        "bytes": 117181,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/cluster-logs/kt2-7869b7ae-0efb-master/etcd.log",
+      "bytes": 23861,
+      "md5": "0b6ee5b7e3928810c1315c322441c382",
+      "verified": true,
+      "file": "kt2-7869b7ae-0efb-master.etcd.log.gz",
+      "file_bytes": 4819,
+      "gcs": {
+        "generation": "1790244803133377",
+        "md5": "0b6ee5b7e3928810c1315c322441c382",
+        "crc32c": "861c0d92",
+        "bytes": 23861,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/cluster-logs/kt2-7869b7ae-0efb-master/kube-master-configuration.log",
+      "bytes": 48733,
+      "md5": "109fb8cc5dbddafb9a0fa1ab839676e9",
+      "verified": true,
+      "file": "kt2-7869b7ae-0efb-master.kube-master-configuration.log.gz",
+      "file_bytes": 5515,
+      "gcs": {
+        "generation": "1790244803331053",
+        "md5": "109fb8cc5dbddafb9a0fa1ab839676e9",
+        "crc32c": "370f105c",
+        "bytes": 48733,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/cluster-logs/kt2-7869b7ae-0efb-master/kube-master-installation.log",
+      "bytes": 24870,
+      "md5": "0757e21eea70f765365a15694778497d",
+      "verified": true,
+      "file": "kt2-7869b7ae-0efb-master.kube-master-installation.log.gz",
+      "file_bytes": 3697,
+      "gcs": {
+        "generation": "1790244803130254",
+        "md5": "0757e21eea70f765365a15694778497d",
+        "crc32c": "3d4c82d1",
+        "bytes": 24870,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/cluster-logs/kt2-7869b7ae-0efb-master/serial-1.log",
+      "bytes": 74161,
+      "md5": "d985884036f4c4527a0d445a41205159",
+      "verified": true,
+      "file": "kt2-7869b7ae-0efb-master.serial-1.log.gz",
+      "file_bytes": 20009,
+      "gcs": {
+        "generation": "1790244803493704",
+        "md5": "d985884036f4c4527a0d445a41205159",
+        "crc32c": "f440f21b",
+        "bytes": 74161,
+        "encoding": "identity"
+      }
+    }
   ]
 }

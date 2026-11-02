@@ -1,0 +1,55 @@
+{
+  "run": "2026-11-02T004414Z",
+  "outcome": "ok",
+  "started": 1793580490.8540368,
+  "finished": 1793580540.330357,
+  "tool": {
+    "commit": "0b3aa08fe59050709178379d7db8438adc5f0697",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "41368718300",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1793407454.2440846,
+      "to": 1793580254.2440846
+    },
+    "tabs": 46,
+    "builds": 1306,
+    "compared_with_gcs": 254,
+    "sevenths": [
+      4
+    ],
+    "differ": 0,
+    "not_settled": 2,
+    "assets": {
+      "uploaded": 39,
+      "compared_with_gcs": 14,
+      "downloaded": 39
+    },
+    "red_on_testgrid": 68,
+    "red_not_settled": 0,
+    "gcs_builds": 1964,
+    "judged_by_rule": 17
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 12,
+  "notes": [
+    "ci-kubernetes-build-fast/2116362923235348480: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2116364182180859904: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2116365440006492160: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2116367957884932096: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2116380287972675584: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2116414010634014720: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2116575074315145216: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2116816164674867200: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2116906761091813376: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-features/2116365440128126976: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-features/2116410739315970048: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-ipv6/2116380288224333824: ERROR, not listed on TestGrid (not archived)"
+  ]
+}

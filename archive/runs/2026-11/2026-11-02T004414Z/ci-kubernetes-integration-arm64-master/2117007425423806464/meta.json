@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2117007425423806464",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1793568909,
+  "created": 1793568876,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestPreemptionRespectsWaitingPod\n    preemption_test....im pod was deleted\n--- FAIL: TestPreemptionRespectsWaitingPod (2.32s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793571297,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2117007425423806464",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2117007425423806464/build-log.txt",
+  "log": {
+    "bytes": 214459,
+    "md5": "b814772e6d708f89002373a6e3600b62",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19072,
+    "gcs": {
+      "generation": "1793571301571407",
+      "md5": "b814772e6d708f89002373a6e3600b62",
+      "crc32c": "f1cde3f2",
+      "bytes": 214459,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94135,
+    "md5": "95660229b86784e35862951e7bc6547c",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12306,
+    "gcs": {
+      "generation": "1793571304074810",
+      "md5": "95660229b86784e35862951e7bc6547c",
+      "crc32c": "bb9aac52",
+      "bytes": 94135,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-02T004414Z",
+  "archived_at": 1793580254.0,
+  "settled": true,
+  "final": false
+}

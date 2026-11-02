@@ -103,5 +103,164 @@
   "archived_by_run": "2026-10-26T044539Z",
   "archived_at": 1792989939.0,
   "settled": true,
-  "final": true
+  "final": true,
+  "node_e2e": true,
+  "artifacts_asset": {
+    "name": "ci-node-e2e-containerd-2-1-cos-dra_2114423657932525568.tar.xz",
+    "month": "2026-10",
+    "bytes": 1127028,
+    "sha256": "6029591b3cc51352b908c016bd32b210b777a521d2a7703f40b1235902543b11",
+    "members": [
+      {
+        "path": "artifacts/junit_cos01.xml",
+        "bytes": 1087686,
+        "md5": "514034aeb1bff96bc29e6d884991e7d7",
+        "gcs": {
+          "generation": "1792956590473294",
+          "md5": "514034aeb1bff96bc29e6d884991e7d7",
+          "crc32c": "79126c2e",
+          "bytes": 1087686,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/junit_runner.xml",
+        "bytes": 254,
+        "md5": "5109cf009379920932853e99660f3936",
+        "gcs": {
+          "generation": "1792956590347371",
+          "md5": "5109cf009379920932853e99660f3936",
+          "crc32c": "ecc4c3dc",
+          "bytes": 254,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/metadata.json",
+        "bytes": 167,
+        "md5": "708fe16cfbdd9282d4fe69187b03082f",
+        "gcs": {
+          "generation": "1792956590536843",
+          "md5": "708fe16cfbdd9282d4fe69187b03082f",
+          "crc32c": "69239ddd",
+          "bytes": 167,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8-system.log",
+        "bytes": 7380563,
+        "md5": "3eedfd1658cccefffa6a744a7cb40ca5",
+        "gcs": {
+          "generation": "1792956590478975",
+          "md5": "3eedfd1658cccefffa6a744a7cb40ca5",
+          "crc32c": "3768bedc",
+          "bytes": 7380563,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8/cloud-init.log",
+        "bytes": 13432,
+        "md5": "a207a81e92fc799b6632b2f234ed624b",
+        "gcs": {
+          "generation": "1792956590613118",
+          "md5": "a207a81e92fc799b6632b2f234ed624b",
+          "crc32c": "1a1240a1",
+          "bytes": 13432,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8/containerd-installation.log",
+        "bytes": 2718072,
+        "md5": "102141a61b68ab3af52642f0f4ec2258",
+        "gcs": {
+          "generation": "1792956590399593",
+          "md5": "102141a61b68ab3af52642f0f4ec2258",
+          "crc32c": "7aae7e7e",
+          "bytes": 2718072,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8/containerd.log",
+        "bytes": 4236971,
+        "md5": "a86479064d2ff2e32a72258bc90fe1dc",
+        "gcs": {
+          "generation": "1792956590413157",
+          "md5": "a86479064d2ff2e32a72258bc90fe1dc",
+          "crc32c": "07716e33",
+          "bytes": 4236971,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8/kern.log",
+        "bytes": 48220,
+        "md5": "7004086b0401676ad167abfda8f1709f",
+        "gcs": {
+          "generation": "1792956590547542",
+          "md5": "7004086b0401676ad167abfda8f1709f",
+          "crc32c": "5c7c2006",
+          "bytes": 48220,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8/kubelet.log",
+        "bytes": 7516189,
+        "md5": "4f4356445d63ae5d1df70d1a1b564643",
+        "gcs": {
+          "generation": "1792956590412397",
+          "md5": "4f4356445d63ae5d1df70d1a1b564643",
+          "crc32c": "3918cd05",
+          "bytes": 7516189,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8/serial-1.log",
+        "bytes": 124985,
+        "md5": "2b06e7c78507f29a8151e68843e9f953",
+        "gcs": {
+          "generation": "1792956590471549",
+          "md5": "2b06e7c78507f29a8151e68843e9f953",
+          "crc32c": "d19fd625",
+          "bytes": 124985,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8/services.log",
+        "bytes": 5217422,
+        "md5": "fa36b6e3b5890d0cf414b281cc77a107",
+        "gcs": {
+          "generation": "1792956590622860",
+          "md5": "fa36b6e3b5890d0cf414b281cc77a107",
+          "crc32c": "9919d621",
+          "bytes": 5217422,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8/tmp-node-e2e-6cb0a5ce-cos-125-19216-760-8-ginkgo.log",
+        "bytes": 479120,
+        "md5": "c0ce65ff14a4d4af97f5999e8c7aa8a8",
+        "gcs": {
+          "generation": "1792956590521090",
+          "md5": "c0ce65ff14a4d4af97f5999e8c7aa8a8",
+          "crc32c": "85c60183",
+          "bytes": 479120,
+          "encoding": "identity"
+        }
+      }
+    ],
+    "built_by_run": "2026-11-02T004414Z",
+    "pending_since": 1793580254.2440846,
+    "uploaded": {
+      "release": "node-logs-2026-10",
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-node-e2e-containerd-2-1-cos-dra_2114423657932525568.tar.xz"
+    }
+  }
 }

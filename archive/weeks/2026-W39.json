@@ -1870,6 +1870,9 @@
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-kubernetes-node-e2e-containerd_2104026198320353280.tar.xz"
+    },
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2104026198320353280"
   },
@@ -6986,15 +6989,22 @@
     "run": "2026-10-08T192522Z",
     "files": [
       "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600/build-log.txt.gz",
-      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600/podinfo.json.gz"
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600/podinfo.json.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600/cluster-info.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600/kt2-7869b7ae-0efb-master.containerd.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600/kt2-7869b7ae-0efb-master.etcd.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600/kt2-7869b7ae-0efb-master.kube-master-configuration.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600/kt2-7869b7ae-0efb-master.kube-master-installation.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600/kt2-7869b7ae-0efb-master.serial-1.log.gz"
     ],
     "remote": [],
-    "bytes": 151442,
+    "bytes": 877067,
     "settled": true,
     "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "node_logs": true,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2103054536229785600"
   },
