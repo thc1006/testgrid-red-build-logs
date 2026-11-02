@@ -1,0 +1,73 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2117128223052533760",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793597685,
+  "created": 1793597677,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secret-25f47e70-1820-411c-a904-6ed66822abdb...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secrets-b4b83c90-ce89-4866-a182-c4c52a3d82c...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-configmaps-7db27087-27de-419f-ae96-db63f1a7...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793604410,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117128223052533760",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117128223052533760/build-log.txt",
+  "log": {
+    "bytes": 735757,
+    "md5": "e508644ca7c6c74ddfebd17d10bb1f74",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 105328,
+    "gcs": {
+      "generation": "1793604415718927",
+      "md5": "e508644ca7c6c74ddfebd17d10bb1f74",
+      "crc32c": "e282e900",
+      "bytes": 735757,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 63789,
+    "md5": "a802fe34265fbce230ef40b4071f00e7",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10516,
+    "gcs": {
+      "generation": "1793604418175793",
+      "md5": "a802fe34265fbce230ef40b4071f00e7",
+      "crc32c": "fb287b6c",
+      "bytes": 63789,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-02T214636Z",
+  "archived_at": 1793655996.0,
+  "settled": true,
+  "final": false
+}

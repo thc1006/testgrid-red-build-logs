@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2117222343402065920",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1793620118,
+  "created": 1793620117,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach UDP service through 35.194.22.252:80 after 2m...io/kubernetes/test/e2e/network/service.go:569 @ 11/02/26 12:01:53.978\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793622812,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2117222343402065920",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2117222343402065920/build-log.txt",
+  "log": {
+    "bytes": 138477,
+    "md5": "fd0d3e7f3bf5a372e47afe20f0b3fae5",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22866,
+    "gcs": {
+      "generation": "1793622820892796",
+      "md5": "fd0d3e7f3bf5a372e47afe20f0b3fae5",
+      "crc32c": "1a976789",
+      "bytes": 138477,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86086,
+    "md5": "7aed59c0bda27fb8622aff119c035926",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11721,
+    "gcs": {
+      "generation": "1793622823451526",
+      "md5": "7aed59c0bda27fb8622aff119c035926",
+      "crc32c": "44008976",
+      "bytes": 86086,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-02T214636Z",
+  "archived_at": 1793655996.0,
+  "settled": true,
+  "final": false
+}

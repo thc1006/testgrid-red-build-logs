@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2117174779659161600",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793608777,
+  "created": 1793608777,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] Garbage collector should support orphan deletion of custom resources",
+          "status": "FAIL",
+          "message": "[FAILED] Told to stop trying after 0.007s.\nUnexpected final error whil...st/e2e/apimachinery/garbage_collector.go:1116 @ 11/02/26 08:57:41.289\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793610993,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117174779659161600",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117174779659161600/build-log.txt",
+  "log": {
+    "bytes": 131713,
+    "md5": "596867dd36a83bf61e7de3f98605cc6f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22216,
+    "gcs": {
+      "generation": "1793611010927333",
+      "md5": "596867dd36a83bf61e7de3f98605cc6f",
+      "crc32c": "fee03a2b",
+      "bytes": 131713,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85875,
+    "md5": "2d188a503d4a3c39caaa3420338eab90",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11921,
+    "gcs": {
+      "generation": "1793611013604864",
+      "md5": "2d188a503d4a3c39caaa3420338eab90",
+      "crc32c": "9b92f255",
+      "bytes": 85875,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-02T214636Z",
+  "archived_at": 1793655996.0,
+  "settled": true,
+  "final": false
+}

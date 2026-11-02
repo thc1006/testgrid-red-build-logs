@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2117192899236990976",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1793613128,
+  "created": 1793613097,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Pre-provisioned PV (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-preprovisionedpv-b2b7\" success...es/test/e2e/framework/pod/output/output.go:263 @ 11/02/26 10:03:38.91\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793614598,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2117192899236990976",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2117192899236990976/build-log.txt",
+  "log": {
+    "bytes": 154342,
+    "md5": "8a5ad1b432407723617d0030c9df6443",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24410,
+    "gcs": {
+      "generation": "1793614617133645",
+      "md5": "8a5ad1b432407723617d0030c9df6443",
+      "crc32c": "04a0cd0c",
+      "bytes": 154342,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95370,
+    "md5": "dfe242aa704b0b2dde793464080d0b44",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12582,
+    "gcs": {
+      "generation": "1793614619706967",
+      "md5": "dfe242aa704b0b2dde793464080d0b44",
+      "crc32c": "3c077e53",
+      "bytes": 95370,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-02T214636Z",
+  "archived_at": 1793655996.0,
+  "settled": true,
+  "final": false
+}

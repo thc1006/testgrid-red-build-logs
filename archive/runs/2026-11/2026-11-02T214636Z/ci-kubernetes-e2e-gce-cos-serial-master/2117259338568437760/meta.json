@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2117259338568437760",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1793629014,
+  "created": 1793628937,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Daemon set should surge pods onto nodes when spec was updated and update strategy is RollingUpdate [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] complete surge rollout of DaemonSet \"daemon-set\" while preser...io/kubernetes/test/e2e/apps/daemon_set.go:833 @ 11/02/26 17:48:12.312\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793643672,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2117259338568437760",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2117259338568437760/build-log.txt",
+  "log": {
+    "bytes": 199878,
+    "md5": "3f114e70c881ba65aaf5966a1f77dca1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24502,
+    "gcs": {
+      "generation": "1793643707464490",
+      "md5": "3f114e70c881ba65aaf5966a1f77dca1",
+      "crc32c": "34671863",
+      "bytes": 199878,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 70225,
+    "md5": "a9b10e88465eb24ab29ab0d85e610a1f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10629,
+    "gcs": {
+      "generation": "1793643713193141",
+      "md5": "a9b10e88465eb24ab29ab0d85e610a1f",
+      "crc32c": "b6287d66",
+      "bytes": 70225,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-02T214636Z",
+  "archived_at": 1793655996.0,
+  "settled": true,
+  "final": false
+}
