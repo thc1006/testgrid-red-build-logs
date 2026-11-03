@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "build": "2117483316591464448",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "started": 1793682366,
+  "created": 1793682338,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test phase transition timestamp multiple updates",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-2tbfs\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 11/03/26 05:23:56.631\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793683883,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2117483316591464448",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2117483316591464448/build-log.txt",
+  "log": {
+    "bytes": 149703,
+    "md5": "021266255cd4a3a2b2ff3fab3c7365cd",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22995,
+    "gcs": {
+      "generation": "1793683898872771",
+      "md5": "021266255cd4a3a2b2ff3fab3c7365cd",
+      "crc32c": "70fc9345",
+      "bytes": 149703,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96422,
+    "md5": "e349816002c850972958aad0855184d4",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12810,
+    "gcs": {
+      "generation": "1793683903222091",
+      "md5": "e349816002c850972958aad0855184d4",
+      "crc32c": "3ad5d95c",
+      "bytes": 96422,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-03T064623Z",
+  "archived_at": 1793688383.0,
+  "settled": false,
+  "final": false
+}

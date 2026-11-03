@@ -2115,6 +2115,9 @@
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-kubernetes-node-e2e-containerd_2110873288556154880.tar.xz"
+    },
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2110873288556154880"
   },
@@ -2470,15 +2473,21 @@
     "run": "2026-10-15T170240Z",
     "files": [
       "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/build-log.txt.gz",
-      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/podinfo.json.gz"
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/podinfo.json.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-10/2026-10-15T170240Z/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744/bootstrap-e2e-master.serial-1.log.gz"
     ],
     "remote": [],
-    "bytes": 151734,
+    "bytes": 433571,
     "settled": true,
     "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "node_logs": true,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2110696119125151744"
   },
@@ -3811,15 +3820,23 @@
     "run": "2026-10-14T143159Z",
     "files": [
       "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/build-log.txt.gz",
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/podinfo.json.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/podinfo.json.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/bootstrap-e2e-master.serial-1.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/bootstrap-e2e-minion-group-6b7z.kube-node-configuration.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336/bootstrap-e2e-minion-group-6b7z.kube-node-installation.log.gz"
     ],
     "remote": [],
-    "bytes": 148925,
+    "bytes": 482494,
     "settled": true,
     "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "node_logs": true,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2110228030281486336"
   },

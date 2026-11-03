@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2117464441850171392",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793677845,
+  "created": 1793677838,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FAILING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secret-713c4bbf-ce71-4ed2-9e00-508634cc7dd9...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793684605,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117464441850171392",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117464441850171392/build-log.txt",
+  "log": {
+    "bytes": 349759,
+    "md5": "17fdca2dde95389dbe53bf4208bd4f4e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 53808,
+    "gcs": {
+      "generation": "1793684612309394",
+      "md5": "17fdca2dde95389dbe53bf4208bd4f4e",
+      "crc32c": "eaa9bb94",
+      "bytes": 349759,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 65469,
+    "md5": "0d20ba2dfff8fd123b4781d80583527f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10926,
+    "gcs": {
+      "generation": "1793684614158507",
+      "md5": "0d20ba2dfff8fd123b4781d80583527f",
+      "crc32c": "866a2309",
+      "bytes": 65469,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-03T064623Z",
+  "archived_at": 1793688383.0,
+  "settled": false,
+  "final": false
+}
