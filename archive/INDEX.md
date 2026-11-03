@@ -1,15 +1,15 @@
 # Red TestGrid builds
 
-Updated 2026-11-03T06:49:00Z. The builds with a red cell on sig-release-master-blocking and sig-release-master-informing that the runs found: seen red on TestGrid, or taken from GCS by TestGrid's rule ([what that can miss or add](../README.md#limits)); times are UTC. Each archived build is in the folder of the run that first archived it, under [runs/](runs/). A file marked provisional may have been taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
+Updated 2026-11-03T17:05:35Z. The builds with a red cell on sig-release-master-blocking and sig-release-master-informing that the runs found: seen red on TestGrid, or taken from GCS by TestGrid's rule ([what that can miss or add](../README.md#limits)); times are UTC. Each archived build is in the folder of the run that first archived it, under [runs/](runs/). A file marked provisional may have been taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/trend-dark.svg">
-  <img alt="Red builds per day, data to Nov 3 06:49 UTC. Blocking: week-over-week change appears after 14 fully covered days; Informing: week-over-week change appears after 14 fully covered days" src="charts/trend-light.svg">
+  <img alt="Red builds per day, data to Nov 3 17:05 UTC. Blocking: week-over-week change appears after 14 fully covered days; Informing: week-over-week change appears after 14 fully covered days" src="charts/trend-light.svg">
 </picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="charts/tabs-dark.svg">
-  <img alt="Red builds per tab, 14 days to Nov 3 06:49 UTC. Busiest over the last 7 of them: capz-windows-master 33, ci-node-crio-conformance 23, ci-kubernetes-unit 20, gce-ubuntu-master-containerd 15, integration-arm64-master 12." src="charts/tabs-light.svg">
+  <img alt="Red builds per tab, 14 days to Nov 3 17:05 UTC. Busiest over the last 7 of them: capz-windows-master 36, ci-node-crio-conformance 23, ci-kubernetes-unit 22, gce-ubuntu-master-containerd 16, gce-cos-master-default 12." src="charts/tabs-light.svg">
 </picture>
 
 <details><summary>Red builds per tab (table)</summary>
@@ -17,34 +17,34 @@ Updated 2026-11-03T06:49:00Z. The builds with a red cell on sig-release-master-b
 | Dashboard | Tab | 7 days to Nov 3 | 14 days |
 |---|---|---:|---:|
 | Blocking | ci-node-crio-conformance | 23 | 34 |
-| Blocking | ci-kubernetes-unit | 20 | 31 |
-| Blocking | gce-ubuntu-master-containerd | 15 | 34 |
+| Blocking | ci-kubernetes-unit | 22 | 33 |
+| Blocking | gce-ubuntu-master-containerd | 16 | 35 |
+| Blocking | gce-cos-master-default | 12 | 24 |
 | Blocking | integration-arm64-master | 12 | 22 |
 | Blocking | Conformance - GCE - master | 12 | 12 |
-| Blocking | gce-cos-master-default | 11 | 23 |
-| Blocking | kind-ipv6-master | 7 | 10 |
+| Blocking | kind-ipv6-master | 8 | 11 |
 | Blocking | build-master | 6 | 16 |
 | Blocking | integration-master | 4 | 15 |
+| Blocking | kind-master | 4 | 11 |
 | Blocking | gce-cos-default-master | 3 | 10 |
-| Blocking | kind-master | 3 | 10 |
+| Blocking | gce-device-plugin-gpu-master | 3 | 8 |
 | Blocking | gce-cos-alphafeatures-master | 3 | 3 |
 | Blocking | kind-master-beta-features | 2 | 9 |
-| Blocking | gce-device-plugin-gpu-master | 2 | 7 |
 | Blocking | ci-node-e2e | 2 | 5 |
 | Blocking | cmd-master | 1 | 6 |
 | Blocking | sig-network-kind, loadbalancer | 1 | 2 |
 | Blocking | verify-master | 1 | 1 |
 | Blocking | gce-master-scale-performance-100 | 0 | 1 |
 | Blocking | skew-cluster-latest-kubectl-stable2-gce | 0 | 1 |
-| Informing | capz-windows-master | 33 | 44 |
-| Informing | gce-cos-master-slow | 11 | 21 |
+| Informing | capz-windows-master | 36 | 47 |
+| Informing | gce-cos-master-slow | 12 | 22 |
 | Informing | kubeadm-kinder-upgrade-1-37-latest | 10 | 10 |
 | Informing | kubeadm-kinder-latest | 9 | 9 |
 | Informing | gce-cos-slow-master | 7 | 14 |
 | Informing | gce-cos-serial-master | 3 | 8 |
+| Informing | gce-cos-master-serial | 3 | 6 |
 | Informing | kind-master-alpha-beta-enabled | 2 | 6 |
 | Informing | kind-master-alpha-beta-features | 2 | 6 |
-| Informing | gce-cos-master-serial | 2 | 5 |
 | Informing | kind-master-beta-enabled | 1 | 7 |
 | Informing | ci-node-crio-dra | 1 | 4 |
 | Informing | gce-cos-master-alpha-features | 1 | 4 |
@@ -61,8 +61,8 @@ Updated 2026-11-03T06:49:00Z. The builds with a red cell on sig-release-master-b
 
 | Day (UTC) | Blocking | Informing |
 |---|---:|---:|
-| 2026-11-03 | 0 (so far, to 06:49 UTC) | 2 (so far, to 06:49 UTC) |
-| 2026-11-02 | 12 | 15 (partial) |
+| 2026-11-03 | 7 (so far, to 17:05 UTC) | 7 (so far, to 17:05 UTC) |
+| 2026-11-02 | 12 | 15 |
 | 2026-11-01 | 25 (partial) | 11 |
 | 2026-10-31 | 31 | 10 |
 | 2026-10-30 | 16 | 12 |
@@ -102,6 +102,7 @@ Verification is the outcome that verification recorded in the run's verification
 
 | Run (UTC) | New builds | Updated | Collection result | Verification |
 |---|---:|---:|---|---|
+| [2026-11-03 17:05:20](runs/2026-11/2026-11-03T170520Z/) | 12 | 0 | ok | [ok](runs/2026-11/2026-11-03T170520Z/verification.json) |
 | [2026-11-03 06:46:23](runs/2026-11/2026-11-03T064623Z/) | 6 | 3 | ok | [ok](runs/2026-11/2026-11-03T064623Z/verification.json) |
 | [2026-11-02 21:46:36](runs/2026-11/2026-11-02T214636Z/) | 24 | 0 | ok | [ok](runs/2026-11/2026-11-02T214636Z/verification.json) |
 | [2026-11-02 00:44:14](runs/2026-11/2026-11-02T004414Z/) | 16 | 6 | ok | [ok](runs/2026-11/2026-11-02T004414Z/verification.json) |
@@ -134,14 +135,26 @@ Verification is the outcome that verification recorded in the run's verification
 
 ## Builds from the last 14 days
 
-405 archived builds that started since 2026-10-21 (UTC), newest first.
+417 archived builds that started since 2026-10-21 (UTC), newest first.
 
 ### 2026-11-03
 
 | Time | Tab | Build | Red tests | Files |
 |---|---|---|---|---|
-| 05:06 | informing#kind-master-alpha-beta-enabled | [ci-kubernetes-e2e-kind-alpha-beta-enabled 2117483316591464448](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2117483316591464448) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS with Single PV - PVC pairs c (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T064623Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2117483316591464448/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T064623Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2117483316591464448/podinfo.json.gz) (provisional) |
-| 03:50 | informing#capz-windows-master | [ci-kubernetes-e2e-capz-master-windows 2117464441850171392](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117464441850171392) | Kubernetes e2e suite.\[It\] \[sig-node\] Secrets should be consumable as environment variable (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T064623Z/ci-kubernetes-e2e-capz-master-windows/2117464441850171392/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T064623Z/ci-kubernetes-e2e-capz-master-windows/2117464441850171392/podinfo.json.gz) (provisional) |
+| 15:21 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2117638088070008832](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2117638088070008832) | \[sig-api-machinery\] k8s.io/apiserver/pkg/storage.cacher (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-unit/2117638088070008832/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-unit/2117638088070008832/podinfo.json.gz) (provisional) |
+| 15:01 | blocking#kind-master | [ci-kubernetes-e2e-kind 2117632804832415744](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2117632804832415744) | Kubernetes e2e suite.\[It\] \[sig-api-machinery\] CustomResourceValidationRules \[Privileged:Cl (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-kind/2117632804832415744/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-kind/2117632804832415744/podinfo.json.gz) (provisional) |
+| 14:24 | blocking#kind-ipv6-master | [ci-kubernetes-e2e-kind-ipv6 2117623744254971904](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2117623744254971904) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS with Single PV - PVC pairs c (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-kind-ipv6/2117623744254971904/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-kind-ipv6/2117623744254971904/podinfo.json.gz) |
+| 13:31 | blocking#gce-device-plugin-gpu-master | [ci-kubernetes-e2e-gce-device-plugin-gpu 2117610404988325888](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2117610404988325888) | kubetest2.Up (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2117610404988325888/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2117610404988325888/podinfo.json.gz) |
+| 12:53 | informing#gce-cos-master-slow | [ci-kubernetes-e2e-gci-gce-slow 2117601093964795904](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2117601093964795904) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers \[Feature:LoadBalancer\] should be abl (+2) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce-slow/2117601093964795904/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce-slow/2117601093964795904/podinfo.json.gz) |
+| 12:51 | informing#capz-windows-master | [ci-kubernetes-e2e-capz-master-windows 2117600591063552000](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117600591063552000) | Kubernetes e2e suite.\[SynchronizedBeforeSuite\] (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-capz-master-windows/2117600591063552000/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-capz-master-windows/2117600591063552000/podinfo.json.gz) |
+| 10:08 | blocking#gce-cos-master-default | [ci-kubernetes-e2e-gci-gce 2117559569453420544](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2117559569453420544) | kubetest.Up (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/podinfo.json.gz) [bootstrap-e2e-master.containerd.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-master.containerd.log.gz) [bootstrap-e2e-master.etcd.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-master.etcd.log.gz) [bootstrap-e2e-master.kube-master-configuration.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-master.kube-master-configuration.log.gz) [bootstrap-e2e-master.kube-master-installation.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-master.kube-master-installation.log.gz) [bootstrap-e2e-master.serial-1.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-master.serial-1.log.gz) [bootstrap-e2e-minion-group-fc3v.kube-node-configuration.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-minion-group-fc3v.kube-node-configuration.log.gz) [bootstrap-e2e-minion-group-fc3v.kube-node-installation.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-minion-group-fc3v.kube-node-installation.log.gz) [bootstrap-e2e-minion-group-h48l.kube-node-configuration.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-minion-group-h48l.kube-node-configuration.log.gz) [bootstrap-e2e-minion-group-h48l.kube-node-installation.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-minion-group-h48l.kube-node-installation.log.gz) [bootstrap-e2e-minion-group-mmwz.kube-node-configuration.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-minion-group-mmwz.kube-node-configuration.log.gz) [bootstrap-e2e-minion-group-mmwz.kube-node-installation.log.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce/2117559569453420544/bootstrap-e2e-minion-group-mmwz.kube-node-installation.log.gz) |
+| 09:51 | informing#capz-windows-master | [ci-kubernetes-e2e-capz-master-windows 2117555291384975360](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117555291384975360) | Kubernetes e2e suite.\[It\] \[sig-node\] Secrets should be consumable as environment variable (+3) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-capz-master-windows/2117555291384975360/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-capz-master-windows/2117555291384975360/podinfo.json.gz) |
+| 06:51 | informing#capz-windows-master | [ci-kubernetes-e2e-capz-master-windows 2117509992411041792](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117509992411041792) | ci-kubernetes-e2e-capz-master-windows.Overall | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-capz-master-windows/2117509992411041792/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-capz-master-windows/2117509992411041792/podinfo.json.gz) |
+| 06:32 | blocking#gce-ubuntu-master-containerd | [ci-kubernetes-e2e-ubuntu-gce-containerd 2117505210808012800](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117505210808012800) | Kubernetes e2e suite.\[It\] \[sig-api-machinery\] Aggregator Should be able to support the 1.1 (+2) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117505210808012800/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117505210808012800/podinfo.json.gz) |
+| 06:22 | blocking#ci-kubernetes-unit | [ci-kubernetes-unit 2117501940052004864](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2117501940052004864) | \[sig-api-machinery\] k8s.io/client-go/metadata.metadatainformer (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-unit/2117501940052004864/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-unit/2117501940052004864/podinfo.json.gz) |
+| 05:06 | informing#kind-master-alpha-beta-enabled | [ci-kubernetes-e2e-kind-alpha-beta-enabled 2117483316591464448](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2117483316591464448) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS with Single PV - PVC pairs c (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T064623Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2117483316591464448/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T064623Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2117483316591464448/podinfo.json.gz) |
+| 05:02 | informing#gce-cos-master-serial | [ci-kubernetes-e2e-gci-gce-serial 2117482562031980544](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2117482562031980544) | Kubernetes e2e suite.\[It\] \[sig-node\] Pod InPlace Resize Container (deferred-resizes) \[Feat (+2) | [build-log.txt.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce-serial/2117482562031980544/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T170520Z/ci-kubernetes-e2e-gci-gce-serial/2117482562031980544/podinfo.json.gz) |
+| 03:50 | informing#capz-windows-master | [ci-kubernetes-e2e-capz-master-windows 2117464441850171392](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117464441850171392) | Kubernetes e2e suite.\[It\] \[sig-node\] Secrets should be consumable as environment variable (+1) | [build-log.txt.gz](runs/2026-11/2026-11-03T064623Z/ci-kubernetes-e2e-capz-master-windows/2117464441850171392/build-log.txt.gz) [podinfo.json.gz](runs/2026-11/2026-11-03T064623Z/ci-kubernetes-e2e-capz-master-windows/2117464441850171392/podinfo.json.gz) |
 
 ### 2026-11-02
 
@@ -615,16 +628,16 @@ Verification is the outcome that verification recorded in the run's verification
 
 | | Builds |
 |---|---:|
-| Archived builds | 1336 |
-| … with a log | 1331 |
+| Archived builds | 1348 |
+| … with a log | 1343 |
 | … with only podinfo.json (the pod never ran) | 5 |
 | … without a file (GCS had none) | 0 |
 | … with a file stored in parts (too large for one file in git) | 0 |
-| … with control-plane or node logs (its cluster did not come up) | 19 |
+| … with control-plane or node logs (its cluster did not come up) | 20 |
 | … with its artifacts/ in a release (a node e2e build) | 47 |
 | … whose artifacts/ are pending upload | 0 |
 | … provisional (perhaps taken before Prow finished uploading) | 2 |
-| … still compared with GCS on every run | 55 |
+| … still compared with GCS on every run | 52 |
 | … given up on after failed comparisons with GCS (still compared at least once a week) | 0 |
 | … taken from GCS, judged by TestGrid's rule | 0 |
 | Red builds waiting to be archived | 0 |
@@ -634,7 +647,7 @@ Verification is the outcome that verification recorded in the run's verification
 
 ## Every week
 
-- [2026-W45](weeks/2026-W45.md): Nov 2 – Nov 8, 29 builds
+- [2026-W45](weeks/2026-W45.md): Nov 2 – Nov 8, 41 builds
 - [2026-W44](weeks/2026-W44.md): Oct 26 – Nov 1, 239 builds
 - [2026-W43](weeks/2026-W43.md): Oct 19 – Oct 25, 179 builds
 - [2026-W42](weeks/2026-W42.md): Oct 12 – Oct 18, 188 builds

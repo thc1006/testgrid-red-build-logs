@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2117623744254971904",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1793715849,
+  "created": 1793715818,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and use it multiple times in a single pod",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-w2zw2\" failed to reach Success: Timed out aft...es/test/e2e/storage/persistent_volumes.go:232 @ 11/03/26 14:40:05.269\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793717472,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2117623744254971904",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2117623744254971904/build-log.txt",
+  "log": {
+    "bytes": 137081,
+    "md5": "d69854ebeb2fbda25c25c30661566f27",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22319,
+    "gcs": {
+      "generation": "1793717491919604",
+      "md5": "d69854ebeb2fbda25c25c30661566f27",
+      "crc32c": "2e2aace7",
+      "bytes": 137081,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 100646,
+    "md5": "9c3c876b6063f878a722215990c27fa6",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12916,
+    "gcs": {
+      "generation": "1793717494562443",
+      "md5": "9c3c876b6063f878a722215990c27fa6",
+      "crc32c": "8878eded",
+      "bytes": 100646,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-03T170520Z",
+  "archived_at": 1793725520.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,64 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2117610404988325888",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1793712683,
+  "created": 1793712638,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Up",
+          "status": "FAIL",
+          "message": "error encountered during /home/prow/go/src/k8s.io/kubernetes/cluster/get-kube.sh: exit status 92"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793712807,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2117610404988325888",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2117610404988325888/build-log.txt",
+  "log": {
+    "bytes": 12597,
+    "md5": "ff1876d75dad9ffb9f71a9ded99500c9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 3217,
+    "gcs": {
+      "generation": "1793712807849366",
+      "md5": "ff1876d75dad9ffb9f71a9ded99500c9",
+      "crc32c": "5dafd708",
+      "bytes": 12597,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98515,
+    "md5": "51c97c78c2c596d347f0f862f81427cc",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12742,
+    "gcs": {
+      "generation": "1793712828693543",
+      "md5": "51c97c78c2c596d347f0f862f81427cc",
+      "crc32c": "c0036fe2",
+      "bytes": 98515,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-03T170520Z",
+  "archived_at": 1793725520.0,
+  "settled": true,
+  "final": false
+}

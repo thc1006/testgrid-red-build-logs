@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2117505210808012800",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793687558,
+  "created": 1793687558,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] Aggregator Should be able to support the 1.17 Sample API Server using the current Aggregator [LinuxOnly] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] attempting to delete a newly created flunders([{{ } {rest-flu...netes/test/e2e/apimachinery/aggregator.go:794 @ 11/03/26 06:46:15.488\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793689719,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117505210808012800",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117505210808012800/build-log.txt",
+  "log": {
+    "bytes": 179711,
+    "md5": "5ea7add63344b40059f0cf98948e0601",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 27216,
+    "gcs": {
+      "generation": "1793689742411994",
+      "md5": "5ea7add63344b40059f0cf98948e0601",
+      "crc32c": "5717db7b",
+      "bytes": 179711,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85887,
+    "md5": "b1df539c3479aeadf7c2751f8c58c35d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11974,
+    "gcs": {
+      "generation": "1793689744536772",
+      "md5": "b1df539c3479aeadf7c2751f8c58c35d",
+      "crc32c": "924304b4",
+      "bytes": 85887,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-03T170520Z",
+  "archived_at": 1793725520.0,
+  "settled": true,
+  "final": false
+}

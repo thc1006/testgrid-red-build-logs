@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2117632804832415744",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1793718098,
+  "created": 1793717979,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourceValidationRules [Privileged:ClusterAdmin] MUST fail create of a custom resource that exceeds the runtime cost limit for x-kubernetes-validations rule execution",
+          "status": "FAIL",
+          "message": "[FAILED] creating CustomResourceDefinition including an expensive rule.../e2e/apimachinery/crd_validation_rules.go:245 @ 11/03/26 15:07:52.074\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793719676,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2117632804832415744",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2117632804832415744/build-log.txt",
+  "log": {
+    "bytes": 104583,
+    "md5": "7a84160dfba7fc15b068e840b06fc9fa",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 16913,
+    "gcs": {
+      "generation": "1793719695850157",
+      "md5": "7a84160dfba7fc15b068e840b06fc9fa",
+      "crc32c": "18b764c5",
+      "bytes": 104583,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 127987,
+    "md5": "d67034175f188390880710bdaf4edbf5",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 14810,
+    "gcs": {
+      "generation": "1793719698458995",
+      "md5": "d67034175f188390880710bdaf4edbf5",
+      "crc32c": "eab48b58",
+      "bytes": 127987,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-03T170520Z",
+  "archived_at": 1793725520.0,
+  "settled": false,
+  "final": false
+}
