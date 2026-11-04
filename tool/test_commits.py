@@ -144,5 +144,68 @@ class BuildCommits(ArchiveWorld):
                          {"kubernetes/test-infra": T, "kubernetes/kubernetes": K})  # fails: KeyError
 
 
+V = "v1.38.0-alpha.3.406+58d9a3d9bb7203"
+
+
+class ReadJobVersion(unittest.TestCase):
+    def read(self, finished):
+        with mock.patch.object(frl, "get_json", return_value=finished):
+            return frl.read_finished("base")["job_version"]
+
+    def test_the_job_version_its_job_wrote(self):
+        self.assertEqual(self.read({"result": "FAILURE", "metadata": {"job-version": V, "revision": V}}),
+                         V)  # fails: KeyError
+
+    def test_none_of_one_that_is_not_a_version(self):
+        for metadata in ({"job-version": ""}, {"job-version": "master"}, {"job-version": V + "\n"},
+                         {"job-version": "v1.38 0"}, {"job-version": "v" + "1" * 129}, {"job-version": 1.38},
+                         {"revision": V}, {}, None, [V], V):
+            with self.subTest(metadata):
+                self.assertIsNone(self.read({"result": "FAILURE", "metadata": metadata}))  # fails: KeyError
+        self.assertIsNone(self.read({"result": "FAILURE"}))  # fails: KeyError
+
+
+class BuildJobVersion(ArchiveWorld):
+    """A red build whose finished.json says which version of Kubernetes its job tested."""
+
+    def finished_with(self, ago, version):
+        self.srv.route(self.base + "/finished.json", (200, {}, {
+            "result": "FAILURE", "timestamp": int(frl.time.time() - ago),
+            **({"metadata": {"job-version": version}} if version else {})}))
+
+    def test_store_records_it(self):
+        self.finished_with(3 * DAY, V)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.meta().get("job_version"), V)  # fails: None
+        self.assertEqual(self.check()[0], 0)
+
+    def test_none_for_a_job_that_wrote_none(self):
+        self.finished_with(3 * DAY, None)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        self.assertNotIn("job_version", self.meta())
+
+    def test_a_comparison_records_one_written_later(self):
+        self.finished_with(3 * HOUR, None)  # (not final: compared again by the next run)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        self.assertNotIn("job_version", self.meta())
+        self.finished_with(3 * HOUR, V)
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"already-archived": [self.key]})
+        self.assertEqual(self.meta().get("job_version"), V)  # fails: None
+
+    def test_a_repair_keeps_what_it_recorded(self):
+        self.finished_with(3 * DAY, V)
+        self.srv.route(self.base + "/build-log.txt", obj(b"log\n"))
+        self.assertEqual(self.fetch(), 0)
+        os.remove(os.path.join(self.bdir(), "build-log.txt"))
+        self.finished_with(3 * DAY, None)
+        self.assertEqual(self.fetch(), 0)
+        self.assertEqual(self.runs()[-1]["outcomes"], {"repaired": [self.key]})
+        self.assertEqual(self.meta().get("job_version"), V)  # fails: None
+
+
 if __name__ == "__main__":
     unittest.main()

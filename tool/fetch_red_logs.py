@@ -2587,11 +2587,13 @@ class NotCompared(Exception):
         self.meta = meta
 
 
+VERSION_RE = re.compile(r"v?[0-9][0-9A-Za-z.+_-]{0,127}")  # (a job-version, as v1.38.0-alpha.3.406+58d9a3d9bb7203)
+
+
 def read_finished(base):
-    """The result and finish time to record for a build, from its finished.json;
-    None while GCS has none. A field that is not a usable result string or Unix
-    time is None (and a finished.json that is not JSON gives neither). One that
-    cannot be fetched raises."""
+    """The result, finish time and job-version (the version of Kubernetes the job says it tested) to record for a
+    build, from its finished.json; None while GCS has none. A field that is not a usable result string, Unix time or
+    version is None (and a finished.json that is not JSON gives none). One that cannot be fetched raises."""
     try:
         finished = get_json(base + "/finished.json")
     except NotFound:
@@ -2600,9 +2602,12 @@ def read_finished(base):
         finished = None
     finished = finished if isinstance(finished, dict) else {}
     result, stamp = finished.get("result"), finished.get("timestamp")
+    meta = finished.get("metadata")
+    version = meta.get("job-version") if isinstance(meta, dict) else None
     return {"result": result if is_text(result, 40) else None,
             "timestamp": stamp if isinstance(stamp, (int, float)) and not isinstance(stamp, bool)
-            and plausible_time(stamp, time.time()) else None}
+            and plausible_time(stamp, time.time()) else None,
+            "job_version": version if isinstance(version, str) and VERSION_RE.fullmatch(version) else None}
 
 
 MAX_JUNIT_BYTES = 256 << 20  # a junit file larger than this (only one stored gzipped can be) is not judged here
@@ -4302,6 +4307,8 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                 meta["result"] = finished["result"]
             if finished["timestamp"] is not None:
                 meta["finished"] = finished["timestamp"]
+            if finished["job_version"] is not None:
+                meta["job_version"] = finished["job_version"]
         meta["settled"], meta["final"] = settle_flags(meta, time.time(), now)
     if meta != old:
         try:
@@ -4545,11 +4552,15 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
     home = os.path.basename(os.path.dirname(os.path.dirname(target)))  # the run folder that holds it
     node_e2e = old["node_e2e"] if isinstance((old or {}).get("node_e2e"), bool) else read_node_e2e(base)
     commits = old["commits"] if isinstance((old or {}).get("commits"), dict) else read_commits(base, finished)
+    kept_version = (old or {}).get("job_version")  # (a repair keeps one recorded)
+    version = (finished or {}).get("job_version") or (
+        kept_version if isinstance(kept_version, str) and VERSION_RE.fullmatch(kept_version) else None)
     meta = dict(rec,
                 tabs=tabs,
                 result=(finished or {}).get("result"),
                 finished=(finished or {}).get("timestamp"),
                 **({"commits": commits} if commits is not None else {}),
+                **({"job_version": version} if version else {}),
                 prow_url=f"https://prow.k8s.io/view/gs/{where}",
                 log_url=base + "/build-log.txt",
                 log=log,
