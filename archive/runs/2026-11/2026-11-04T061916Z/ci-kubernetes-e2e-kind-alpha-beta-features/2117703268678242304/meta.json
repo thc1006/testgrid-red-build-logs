@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2117703268678242304",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1793734928,
+  "created": 1793734778,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a custom resource.",
+          "status": "FAIL",
+          "message": "[FAILED] context deadline exceeded\nIn [It] at: k8s.io/kubernetes/test/e2e/apimachinery/resource_quota.go:681 @ 11/03/26 20:03:24.614\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793736542,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2117703268678242304",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2117703268678242304/build-log.txt",
+  "log": {
+    "bytes": 139660,
+    "md5": "0c99614752f8b097c6133966e3540061",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20835,
+    "gcs": {
+      "generation": "1793736565399206",
+      "md5": "0c99614752f8b097c6133966e3540061",
+      "crc32c": "0cf9e031",
+      "bytes": 139660,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94338,
+    "md5": "58cd14ccc9c8963d631c5954e6f1a2e2",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12548,
+    "gcs": {
+      "generation": "1793736568277317",
+      "md5": "58cd14ccc9c8963d631c5954e6f1a2e2",
+      "crc32c": "fd2f6f7e",
+      "bytes": 94338,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-04T061916Z",
+  "archived_at": 1793773156.0,
+  "settled": true,
+  "final": false
+}

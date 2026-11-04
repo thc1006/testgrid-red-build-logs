@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2117827336794542080",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793764368,
+  "created": 1793764359,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-configmaps-833e8dc1-bd61-4c5f-90c7-2a864345...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793769951,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117827336794542080",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117827336794542080/build-log.txt",
+  "log": {
+    "bytes": 311193,
+    "md5": "650b8af419cced35e554114e8a4c14b1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 49774,
+    "gcs": {
+      "generation": "1793769962291519",
+      "md5": "650b8af419cced35e554114e8a4c14b1",
+      "crc32c": "dd6b305b",
+      "bytes": 311193,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 70398,
+    "md5": "2bb444a9d11db6fd341fcc0d65c69b5f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12085,
+    "gcs": {
+      "generation": "1793769964831891",
+      "md5": "2bb444a9d11db6fd341fcc0d65c69b5f",
+      "crc32c": "fcf97687",
+      "bytes": 70398,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-04T061916Z",
+  "archived_at": 1793773156.0,
+  "settled": false,
+  "final": false
+}

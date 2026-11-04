@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2117658738969022464",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1793724259,
+  "created": 1793724162,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.storage",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCorrectness/cacher_small_history\n    correctness_...(2.51s)\n\n=== RUN   TestCorrectness\n--- FAIL: TestCorrectness (53.79s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793726576,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2117658738969022464",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2117658738969022464/build-log.txt",
+  "log": {
+    "bytes": 174422,
+    "md5": "23e53cc4af35d76fa098bfce02bc348d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 13634,
+    "gcs": {
+      "generation": "1793726581129657",
+      "md5": "23e53cc4af35d76fa098bfce02bc348d",
+      "crc32c": "33575af3",
+      "bytes": 174422,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95030,
+    "md5": "77e86e9489f223a0be6d562400ecaecc",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12337,
+    "gcs": {
+      "generation": "1793726583557327",
+      "md5": "77e86e9489f223a0be6d562400ecaecc",
+      "crc32c": "dab5dc5b",
+      "bytes": 95030,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-04T061916Z",
+  "archived_at": 1793773156.0,
+  "settled": true,
+  "final": false
+}

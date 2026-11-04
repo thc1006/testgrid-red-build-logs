@@ -1,0 +1,173 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2117645889320259584",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793721106,
+  "created": 1793721098,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-configmaps-5a4729e9-eb96-4d97-b79e-28f22e73...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secret-33b89d93-fecb-4af1-abd5-1d029e53be9d...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secrets-c983ea5e-17b2-48bf-93fe-1970fefb954...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] Projected PodCertificate [FeatureGate:PodCertificateRequest] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should allow server and client pods to establish an mTLS connection [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 30.000s.\nclient logs did not contain expected...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] ServiceAccounts ServiceAccountIssuerDiscovery should support OIDC discovery of service account issuer [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Told to stop trying after 71.784s.\npod \"oidc-discovery-valida...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] DNS should provide DNS for ExternalName services [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] unexpected error getting pod client logs for webserver: clien...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] DNS should provide DNS for pods for Subdomain [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] context deadline exceeded\nIn [It] at: k8s.io/kubernetes/test/...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] DNS should provide DNS for services [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to read musl_udp@dns-test-service.dns-4301.svc.cluster...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] DNS should provide DNS for the cluster [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to read musl_udp@kubernetes.default.svc.cluster.local ...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] EndpointSlice should support a Service with multiple endpoint IPs specified in multiple EndpointSlices [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] error running /usr/local/bin/kubectl --kubeconfig=/home/prow/...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] EndpointSlice should support a Service with multiple ports specified in multiple EndpointSlices [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] error running /usr/local/bin/kubectl --kubeconfig=/home/prow/...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should be able to change the type from ClusterIP to ExternalName [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] context deadline exceeded\nIn [It] at: k8s.io/kubernetes/test/...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should be able to change the type from ExternalName to ClusterIP [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] service is not reachable within 2m0s timeout on endpoint exte...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should be able to change the type from ExternalName to NodePort [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] service is not reachable within 2m0s timeout on endpoint exte...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should be able to change the type from NodePort to ExternalName [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] context deadline exceeded\nIn [It] at: k8s.io/kubernetes/test/...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should be able to create a functioning NodePort service [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] service is not reachable within 2m0s timeout on endpoint node...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should serve a basic endpoint from pods [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] service is not reachable within 2m0s timeout on endpoint endp...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should serve endpoints on same port and different protocols [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to connect to Service TCP port: service is not reachab...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should serve multiport endpoints from pods [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] service is not reachable within 2m0s timeout on endpoint mult...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-windows] Hybrid cluster network for all supported CNIs should provide Internet connection and DNS for Windows containers [Feature:Networking-IPv4] [Feature:Networking-DNS]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 63.071s.\nUnexpected error:\n    <exec.CodeExit...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-windows] Services should be able to create a functioning NodePort service for Windows",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 31.472s.\nUnexpected error:\n    <exec.CodeExit...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-windows] [Feature:WindowsHostProcessContainers] HostProcess containers should support querying api-server using in-cluster config",
+          "status": "FAIL",
+          "message": "[FAILED] app logs should not contain 'status=failed'\nExpected\n    <str...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-windows] [Feature:Windows] DNS should support configurable pod DNS servers",
+          "status": "FAIL",
+          "message": "[FAILED] command terminated with exit code 6\nIn [It] at: k8s.io/kubern...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793728584,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117645889320259584",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117645889320259584/build-log.txt",
+  "log": {
+    "bytes": 6098261,
+    "md5": "f049c5ee1f71921eee0714cd8d44dd32",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 585812,
+    "gcs": {
+      "generation": "1793728593652109",
+      "md5": "f049c5ee1f71921eee0714cd8d44dd32",
+      "crc32c": "69ca737d",
+      "bytes": 6098261,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 62962,
+    "md5": "00a18da989e87aaa306b5324059f5960",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10290,
+    "gcs": {
+      "generation": "1793728596037769",
+      "md5": "00a18da989e87aaa306b5324059f5960",
+      "crc32c": "c830dbaf",
+      "bytes": 62962,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-04T061916Z",
+  "archived_at": 1793773156.0,
+  "settled": true,
+  "final": false
+}

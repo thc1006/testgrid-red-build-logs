@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2117698486320238592",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1793733816,
+  "created": 1793733638,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/apiserver/pkg/storage.cacher",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestGet/object_created_resource_version\n=== PAUSE Tes...1:41713: use of closed network connection\"}\n--- FAIL: TestGet (1.61s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793735235,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2117698486320238592",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2117698486320238592/build-log.txt",
+  "log": {
+    "bytes": 250073,
+    "md5": "b6d4d3608dcf70a4192ad674f705ee89",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 33742,
+    "gcs": {
+      "generation": "1793735235852380",
+      "md5": "b6d4d3608dcf70a4192ad674f705ee89",
+      "crc32c": "457f2d44",
+      "bytes": 250073,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 102129,
+    "md5": "80ed8d94b6451b6873df22e19a4110dd",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12746,
+    "gcs": {
+      "generation": "1793735238439023",
+      "md5": "80ed8d94b6451b6873df22e19a4110dd",
+      "crc32c": "59af1bf5",
+      "bytes": 102129,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-04T061916Z",
+  "archived_at": 1793773156.0,
+  "settled": true,
+  "final": false
+}
