@@ -1042,6 +1042,42 @@ def read_node_e2e(base):
         return None
 
 
+SHA_RE = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")  # (a commit's full hash: SHA-1, or SHA-256)
+REPO_PART_RE = re.compile(r"[A-Za-z0-9_.-]{1,100}")  # (an owner's or a repository's name on GitHub)
+
+
+def commits_of(records):
+    """{"org/repo": commit} of a build's clone-records.json (parsed): the commit Prow checked out of each
+    repository it cloned for the build, after merging a pull request's. A record of a clone that failed, or with no
+    such commit or name, gives none; None for one that is not a list."""
+    if not isinstance(records, list):
+        return None
+    commits = {}
+    for r in records:
+        if not isinstance(r, dict) or r.get("failed"):
+            continue
+        refs, sha = r.get("refs"), r.get("final_sha")
+        org, repo = (refs.get("org"), refs.get("repo")) if isinstance(refs, dict) else (None, None)
+        if (isinstance(sha, str) and SHA_RE.fullmatch(sha) and isinstance(org, str) and isinstance(repo, str)
+                and REPO_PART_RE.fullmatch(org) and REPO_PART_RE.fullmatch(repo)):
+            commits[f"{org}/{repo}"] = sha
+    return commits
+
+
+def read_commits(base, finished):
+    """commits_of the build's clone-records.json, at base: {} if GCS has none but has its finished.json (finished,
+    see read_finished: no clone was recorded, as for a job that tests a build of Kubernetes it downloads, or a pod
+    that ended first), None if GCS has neither (it may have deleted the build's files) or cannot serve it now."""
+    try:
+        return commits_of(get_json(base + "/clone-records.json"))
+    except NotFound:
+        return {} if finished is not None else None
+    except (Abandoned, *BUGS):
+        raise
+    except Exception:  # (GCS's doing, or not JSON: read again by the next comparison)
+        return None
+
+
 INDEX_RE = re.compile(r"(?:.*/)?pr-logs/directory/[^/]+")  # (the prefix of a query: see indexed)
 LINK_PART_RE = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]*")  # a part of a folder a link of Prow's index names
 # what Go's strings.TrimSpace trims: Unicode's White_Space (str.strip() trims U+001C to U+001F too)
@@ -4140,6 +4176,10 @@ def recheck(old, rec, target, gcs, run_id, now, compress, max_bytes, compare_fin
                 node_e2e = read_node_e2e(base)
                 if node_e2e is not None:
                     meta["node_e2e"] = node_e2e
+            if not isinstance(meta.get("commits"), dict):  # (as node_e2e)
+                commits = read_commits(base, finished)
+                if commits is not None:
+                    meta["commits"] = commits
             changed = []
             # (a file taken again goes in place with the meta.json that says so, see put_in_place; meta stays
             # what is in place, for a failure below to keep)
@@ -4504,10 +4544,12 @@ def store(rec, target, existed, old, finished, base, run_id, now, max_job_hours,
         raise
     home = os.path.basename(os.path.dirname(os.path.dirname(target)))  # the run folder that holds it
     node_e2e = old["node_e2e"] if isinstance((old or {}).get("node_e2e"), bool) else read_node_e2e(base)
+    commits = old["commits"] if isinstance((old or {}).get("commits"), dict) else read_commits(base, finished)
     meta = dict(rec,
                 tabs=tabs,
                 result=(finished or {}).get("result"),
                 finished=(finished or {}).get("timestamp"),
+                **({"commits": commits} if commits is not None else {}),
                 prow_url=f"https://prow.k8s.io/view/gs/{where}",
                 log_url=base + "/build-log.txt",
                 log=log,
