@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2117849743949303808",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793769701,
+  "created": 1793769701,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] Projected PodCertificate [FeatureGate:PodCertificateRequest] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] MaxExpirationSeconds validations should issue certificate with specified duration (1h) when MaxExpirationSeconds is set [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] failed to parse certificate: data does not contain any valid ...test/e2e/auth/projected_podcertificate.go:259 @ 11/04/26 05:29:11.584\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793772017,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117849743949303808",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117849743949303808/build-log.txt",
+  "log": {
+    "bytes": 121421,
+    "md5": "b08e5f8f93da9b4624b516c2463b664f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20620,
+    "gcs": {
+      "generation": "1793772034141595",
+      "md5": "b08e5f8f93da9b4624b516c2463b664f",
+      "crc32c": "94686ffa",
+      "bytes": 121421,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87563,
+    "md5": "f00acfe2ed563c4d6803089f59bdeb47",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12005,
+    "gcs": {
+      "generation": "1793772036447286",
+      "md5": "f00acfe2ed563c4d6803089f59bdeb47",
+      "crc32c": "fa8f1927",
+      "bytes": 87563,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-04T171542Z",
+  "archived_at": 1793812542.0,
+  "settled": true,
+  "final": false
+}

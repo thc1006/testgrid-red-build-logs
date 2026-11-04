@@ -1,5 +1,967 @@
 [
   {
+    "time": 1793806600,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2118004507135709184",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2118004507135709184",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2118004507135709184/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2118004507135709184/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 828375,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2118004507135709184"
+  },
+  {
+    "time": 1793806274,
+    "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+    "build": "2118003007567171584",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-device-plugin-gpu-master"
+    ],
+    "red_tests": [
+      "kubetest2.Up",
+      "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2118003007567171584",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2118003007567171584/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-device-plugin-gpu/2118003007567171584/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 110100,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2118003007567171584"
+  },
+  {
+    "time": 1793806252,
+    "job": "ci-node-e2e-containerd-2-4-cos-dra",
+    "build": "2118003004220116992",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#ci-node-e2e-containerd-2-4-cos-dra"
+    ],
+    "red_tests": [
+      "kubetest2.Test",
+      "ci-node-e2e-containerd-2-4-cos-dra.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-node-e2e-containerd-2-4-cos-dra/2118003004220116992",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-node-e2e-containerd-2-4-cos-dra/2118003004220116992/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-node-e2e-containerd-2-4-cos-dra/2118003004220116992/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 100728,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra/2118003004220116992"
+  },
+  {
+    "time": 1793804440,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117995447413903360",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117995447413903360",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117995447413903360/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117995447413903360/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 642036,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117995447413903360"
+  },
+  {
+    "time": 1793802160,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117985883259932672",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117985883259932672",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117985883259932672/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117985883259932672/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 674068,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117985883259932672"
+  },
+  {
+    "time": 1793801740,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2117984122302369792",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117984122302369792",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117984122302369792/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117984122302369792/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 453760,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2117984122302369792"
+  },
+  {
+    "time": 1793801716,
+    "job": "ci-kubernetes-build",
+    "build": "2117983870010789888",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#build-master"
+    ],
+    "red_tests": [
+      "ci-kubernetes-build.Overall"
+    ],
+    "red_test_count": 1,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-build/2117983870010789888",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-build/2117983870010789888/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-build/2117983870010789888/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 196266,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-build/2117983870010789888"
+  },
+  {
+    "time": 1793799912,
+    "job": "ci-kubernetes-e2e-gce-cos-default-master",
+    "build": "2117976319978377216",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-default-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-default-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117976319978377216",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117976319978377216/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117976319978377216/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 908949,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2117976319978377216"
+  },
+  {
+    "time": 1793799220,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2117973551888732160",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117973551888732160",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117973551888732160/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117973551888732160/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 444969,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2117973551888732160"
+  },
+  {
+    "time": 1793797360,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117965750286159872",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117965750286159872",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117965750286159872/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117965750286159872/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 652403,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117965750286159872"
+  },
+  {
+    "time": 1793797060,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2117964491911073792",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117964491911073792",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117964491911073792/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117964491911073792/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 483394,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2117964491911073792"
+  },
+  {
+    "time": 1793796886,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2117963736684695552",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-capz-master-windows/2117963736684695552",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-capz-master-windows/2117963736684695552/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-capz-master-windows/2117963736684695552/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 388008,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117963736684695552"
+  },
+  {
+    "time": 1793795140,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117956438599929856",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117956438599929856",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117956438599929856/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117956438599929856/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 732101,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117956438599929856"
+  },
+  {
+    "time": 1793792710,
+    "job": "ci-kubernetes-e2e-gce-cos-default-master",
+    "build": "2117946121610334208",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-default-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-default-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117946121610334208",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117946121610334208/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117946121610334208/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 860766,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2117946121610334208"
+  },
+  {
+    "time": 1793790639,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2117937564055769088",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should only target nodes with endpoints [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce-slow/2117937564055769088",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce-slow/2117937564055769088/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce-slow/2117937564055769088/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 220076,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2117937564055769088"
+  },
+  {
+    "time": 1793790460,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117936808892305408",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117936808892305408",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117936808892305408/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117936808892305408/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 699614,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117936808892305408"
+  },
+  {
+    "time": 1793790219,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2117935802485837824",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117935802485837824",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117935802485837824/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117935802485837824/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 471763,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2117935802485837824"
+  },
+  {
+    "time": 1793788179,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117927245723996160",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117927245723996160",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117927245723996160/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117927245723996160/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 477609,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117927245723996160"
+  },
+  {
+    "time": 1793786086,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2117918438331518976",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 1,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-capz-master-windows/2117918438331518976",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-capz-master-windows/2117918438331518976/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-capz-master-windows/2117918438331518976/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 162769,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117918438331518976"
+  },
+  {
+    "time": 1793785452,
+    "job": "ci-kubernetes-e2e-gce-cos-default-master",
+    "build": "2117915670841659392",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-default-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-default-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117915670841659392",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117915670841659392/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117915670841659392/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 601422,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2117915670841659392"
+  },
+  {
+    "time": 1793777529,
+    "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+    "build": "2117882451526160384",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-slow-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should work for type=LoadBalancer [Slow]",
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-slow-master.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-slow-master/2117882451526160384",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-slow-master/2117882451526160384/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-slow-master/2117882451526160384/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 287700,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2117882451526160384"
+  },
+  {
+    "time": 1793776779,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117879430373183488",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117879430373183488",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117879430373183488/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117879430373183488/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 388211,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117879430373183488"
+  },
+  {
+    "time": 1793776091,
+    "job": "ci-kubernetes-e2e-kind",
+    "build": "2117876411313164288",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a custom resource.",
+      "ci-kubernetes-e2e-kind.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-kind/2117876411313164288",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-kind/2117876411313164288/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-kind/2117876411313164288/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 226774,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2117876411313164288"
+  },
+  {
+    "time": 1793775227,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2117872887380578304",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 1,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-capz-master-windows/2117872887380578304",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-capz-master-windows/2117872887380578304/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-capz-master-windows/2117872887380578304/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 154193,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2117872887380578304"
+  },
+  {
+    "time": 1793774979,
+    "job": "ci-kubernetes-e2e-gci-gce-serial",
+    "build": "2117871880424656896",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-serial"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-1 [Serial]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-serial.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce-serial/2117871880424656896",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce-serial/2117871880424656896/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce-serial/2117871880424656896/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 187143,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2117871880424656896"
+  },
+  {
+    "time": 1793774379,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117869364043583488",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117869364043583488",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117869364043583488/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117869364043583488/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 666379,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117869364043583488"
+  },
+  {
+    "time": 1793774139,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2117868357309960192",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce-slow/2117868357309960192",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce-slow/2117868357309960192/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce-slow/2117868357309960192/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 226362,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2117868357309960192"
+  },
+  {
+    "time": 1793772999,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2117863576176693248",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "kubetest.Up",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/podinfo.json.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-master.serial-1.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-minion-group-b03v.kube-node-configuration.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-minion-group-b03v.kube-node-installation.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-minion-group-rbqx.kube-node-configuration.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-minion-group-rbqx.kube-node-installation.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-minion-group-vnl6.kube-node-configuration.log.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117863576176693248/bootstrap-e2e-minion-group-vnl6.kube-node-installation.log.gz"
+    ],
+    "remote": [],
+    "bytes": 422965,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "node_logs": true,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2117863576176693248"
+  },
+  {
+    "time": 1793772040,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117859551570038784",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] AdmissionWebhook [Privileged:ClusterAdmin] should honor timeout [Conformance]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117859551570038784",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117859551570038784/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117859551570038784/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 292908,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117859551570038784"
+  },
+  {
+    "time": 1793770933,
+    "job": "ci-kubernetes-e2e-gce-cos-default-master",
+    "build": "2117854767693697024",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-default-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-default-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117854767693697024",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117854767693697024/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gce-cos-default-master/2117854767693697024/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 652856,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2117854767693697024"
+  },
+  {
+    "time": 1793770299,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2117852250868027392",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117852250868027392",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117852250868027392/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-gci-gce/2117852250868027392/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 892499,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2117852250868027392"
+  },
+  {
+    "time": 1793769701,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2117849743949303808",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-auth] Projected PodCertificate [FeatureGate:PodCertificateRequest] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] MaxExpirationSeconds validations should issue certificate with specified duration (1h) when MaxExpirationSeconds is set [MinimumKubeletVersion:1.37] [Conformance]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117849743949303808",
+    "run": "2026-11-04T171542Z",
+    "files": [
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117849743949303808/build-log.txt.gz",
+      "runs/2026-11/2026-11-04T171542Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2117849743949303808/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 208984,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117849743949303808"
+  },
+  {
     "time": 1793767659,
     "job": "ci-kubernetes-e2e-gci-gce",
     "build": "2117841177871912960",
@@ -21,7 +983,7 @@
     ],
     "remote": [],
     "bytes": 1382882,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -51,7 +1013,7 @@
     ],
     "remote": [],
     "bytes": 777469,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -80,7 +1042,7 @@
     ],
     "remote": [],
     "bytes": 381591,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -199,7 +1161,7 @@
     ],
     "remote": [],
     "bytes": 170043,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -1318,7 +2280,7 @@
     "remote": [],
     "bytes": 226057,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1347,7 +2309,7 @@
     "remote": [],
     "bytes": 1096107,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1409,7 +2371,7 @@
     "remote": [],
     "bytes": 168753,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1438,7 +2400,7 @@
     "remote": [],
     "bytes": 394477,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1468,7 +2430,7 @@
     "remote": [],
     "bytes": 224563,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1499,7 +2461,7 @@
     "remote": [],
     "bytes": 673053,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1529,7 +2491,7 @@
     "remote": [],
     "bytes": 233474,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1558,7 +2520,7 @@
     "remote": [],
     "bytes": 249712,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1587,7 +2549,7 @@
     "remote": [],
     "bytes": 335093,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1617,7 +2579,7 @@
     "remote": [],
     "bytes": 217588,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1646,7 +2608,7 @@
     "remote": [],
     "bytes": 204849,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1674,7 +2636,7 @@
     "remote": [],
     "bytes": 196029,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1705,7 +2667,7 @@
     "remote": [],
     "bytes": 799546,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1733,7 +2695,7 @@
     "remote": [],
     "bytes": 168973,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

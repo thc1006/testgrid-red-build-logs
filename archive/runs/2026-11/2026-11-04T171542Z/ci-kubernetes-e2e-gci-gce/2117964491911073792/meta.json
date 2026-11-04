@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2117964491911073792",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793797060,
+  "created": 1793797059,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+          "status": "FAIL",
+          "message": "[FAILED] no valid conntrack entry for port 11302 on node 10.40.0.3: ti.../kubernetes/test/e2e/network/kube_proxy.go:208 @ 11/04/26 13:06:55.45\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793799197,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2117964491911073792",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2117964491911073792/build-log.txt",
+  "log": {
+    "bytes": 397735,
+    "md5": "dccfdb55406a0cf6e19b3bc1c81ac20f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 44305,
+    "gcs": {
+      "generation": "1793799216622336",
+      "md5": "dccfdb55406a0cf6e19b3bc1c81ac20f",
+      "crc32c": "990cf7d1",
+      "bytes": 397735,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85659,
+    "md5": "788be8c5783407ffb92d9b8cf32b2a05",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11790,
+    "gcs": {
+      "generation": "1793799219158062",
+      "md5": "788be8c5783407ffb92d9b8cf32b2a05",
+      "crc32c": "897ca3aa",
+      "bytes": 85659,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-04T171542Z",
+  "archived_at": 1793812542.0,
+  "settled": true,
+  "final": false
+}

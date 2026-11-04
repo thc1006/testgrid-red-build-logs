@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2117869364043583488",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793774379,
+  "created": 1793774379,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+          "status": "FAIL",
+          "message": "[FAILED] no valid conntrack entry for port 11302 on node 10.40.0.5: ti...kubernetes/test/e2e/network/kube_proxy.go:208 @ 11/04/26 06:51:04.895\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793776703,
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117869364043583488",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2117869364043583488/build-log.txt",
+  "log": {
+    "bytes": 578875,
+    "md5": "6c94c3a51d6613c1abddc0f47fbb14c1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 56212,
+    "gcs": {
+      "generation": "1793776719083615",
+      "md5": "6c94c3a51d6613c1abddc0f47fbb14c1",
+      "crc32c": "4b778bcb",
+      "bytes": 578875,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87504,
+    "md5": "aba3ef4ec4d07d671009dc958dbec0ee",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12014,
+    "gcs": {
+      "generation": "1793776721796582",
+      "md5": "aba3ef4ec4d07d671009dc958dbec0ee",
+      "crc32c": "60aad8fe",
+      "bytes": 87504,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-04T171542Z",
+  "archived_at": 1793812542.0,
+  "settled": true,
+  "final": false
+}
