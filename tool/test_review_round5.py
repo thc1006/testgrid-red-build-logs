@@ -128,7 +128,7 @@ class JsonOrFetchTest(unittest.TestCase):
     def test_the_fetch_tells_a_bad_file_from_a_failed_read(self):
         # a finished.json that is not JSON still says the build is over (TestGrid judges its bytes)
         with mock.patch.object(frl, "get_json", side_effect=frl.BadJSON("bad JSON")):
-            self.assertEqual(frl.read_finished("base"), {"result": None, "timestamp": None})
+            self.assertEqual(frl.read_finished("base"), {"result": None, "timestamp": None, "job_version": None})
         with mock.patch.object(frl, "get_json", side_effect=frl.IntegrityError("got 2 of 100 bytes")):
             with self.assertRaises(frl.IntegrityError):
                 frl.read_finished("base")

@@ -72,8 +72,9 @@ archive/runs/<YYYY-MM>/<run>/<job>/<build>/
   A build archived before the runs kept these gets them when a run next
   compares it with GCS, if GCS still has them.
 - `meta.json`: the tabs, the red tests (it says when some are left out),
-  TestGrid's messages, the log's md5 and the commit of each repository the
-  build checked out. A build GCS had no file for has only this.
+  TestGrid's messages, the log's md5, the commit of each repository the build
+  checked out and the version of Kubernetes its job says it tested. A build GCS
+  had no file for has only this.
 
 ## What counts as red
 
