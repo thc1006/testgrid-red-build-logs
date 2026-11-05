@@ -1,0 +1,82 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+  "build": "2118275797386006528",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master",
+  "started": 1793871310,
+  "created": 1793871280,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-slow-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach UDP service through 34.135.177.77:80 after 2m...io/kubernetes/test/e2e/network/service.go:569 @ 11/05/26 09:56:49.934\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-slow-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should only target nodes with endpoints [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 34.42.170.151:8081 after...ernetes/test/e2e/framework/service/util.go:49 @ 11/05/26 09:56:00.688\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should work for type=LoadBalancer [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] timed out waiting for the condition\nIn [It] at: k8s.io/kubernetes/test/e2e/network/loadbalancer.go:1069 @ 11/05/26 09:56:58.361\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793874157,
+  "commits": {
+    "kubernetes/kubernetes": "b3b65799be11c6bd1103bc393b3c49a92f82f093"
+  },
+  "job_version": "v1.38.0-alpha.3.505+79858c2bb4c9bd",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2118275797386006528",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2118275797386006528/build-log.txt",
+  "log": {
+    "bytes": 307427,
+    "md5": "12ef2d92ab722e666b40ae99ece5c383",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 45348,
+    "gcs": {
+      "generation": "1793874165754446",
+      "md5": "12ef2d92ab722e666b40ae99ece5c383",
+      "crc32c": "7a0e41b9",
+      "bytes": 307427,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97189,
+    "md5": "68915b7150b9b64a63a5b6b6c870399e",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12401,
+    "gcs": {
+      "generation": "1793874175094079",
+      "md5": "68915b7150b9b64a63a5b6b6c870399e",
+      "crc32c": "856e26e9",
+      "bytes": 97189,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T172525Z",
+  "archived_at": 1793899525.0,
+  "settled": true,
+  "final": false
+}

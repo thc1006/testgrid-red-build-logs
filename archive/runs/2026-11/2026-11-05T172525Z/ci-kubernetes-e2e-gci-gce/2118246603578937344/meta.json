@@ -1,0 +1,75 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2118246603578937344",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793864320,
+  "created": 1793864320,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] AdmissionWebhook [Privileged:ClusterAdmin] should honor timeout [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Internal error occurred: failed calling webhook \"allow-config...ernetes/test/e2e/apimachinery/webhook.go:2570 @ 11/05/26 07:57:27.918\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Inline-volume (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.001s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 11/05/26 07:57:16.621\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793866523,
+  "commits": {},
+  "job_version": "v1.38.0-alpha.3.500+00ca73359fdd96",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2118246603578937344",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2118246603578937344/build-log.txt",
+  "log": {
+    "bytes": 308128,
+    "md5": "d2581173e235acddc9445d1ca8877076",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 43828,
+    "gcs": {
+      "generation": "1793866543856858",
+      "md5": "d2581173e235acddc9445d1ca8877076",
+      "crc32c": "a0b5f9cf",
+      "bytes": 308128,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86637,
+    "md5": "d7d942ef4a982461f76602a422b0951a",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11763,
+    "gcs": {
+      "generation": "1793866546305300",
+      "md5": "d7d942ef4a982461f76602a422b0951a",
+      "crc32c": "2b48c97d",
+      "bytes": 86637,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T172525Z",
+  "archived_at": 1793899525.0,
+  "settled": true,
+  "final": false
+}
