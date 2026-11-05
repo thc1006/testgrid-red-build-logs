@@ -2211,15 +2211,21 @@
     "run": "2026-10-16T043240Z",
     "files": [
       "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/build-log.txt.gz",
-      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/podinfo.json.gz"
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/podinfo.json.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-10/2026-10-16T043240Z/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640/bootstrap-e2e-master.serial-1.log.gz"
     ],
     "remote": [],
-    "bytes": 151271,
+    "bytes": 428117,
     "settled": true,
     "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "node_logs": true,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2110772372301680640"
   },
@@ -3904,15 +3910,21 @@
     "run": "2026-10-14T143159Z",
     "files": [
       "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/build-log.txt.gz",
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/podinfo.json.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/podinfo.json.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312/bootstrap-e2e-master.serial-1.log.gz"
     ],
     "remote": [],
-    "bytes": 150885,
+    "bytes": 431056,
     "settled": true,
     "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "node_logs": true,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2110209156202893312"
   },
@@ -3933,15 +3945,21 @@
     "run": "2026-10-14T143159Z",
     "files": [
       "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/build-log.txt.gz",
-      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/podinfo.json.gz"
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/podinfo.json.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-10/2026-10-14T143159Z/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624/bootstrap-e2e-master.serial-1.log.gz"
     ],
     "remote": [],
-    "bytes": 172283,
+    "bytes": 445569,
     "settled": true,
     "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "node_logs": true,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2110194810542362624"
   },

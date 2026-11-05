@@ -62,5 +62,11 @@
   "refreshed_by_run": "2026-10-17T233055Z",
   "refreshed": [
     "podinfo.json"
-  ]
+  ],
+  "node_e2e": false,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "5e6238f4dc3ea0e672ab52538424114dc2160a6a",
+    "kubernetes-sigs/cluster-api-provider-azure": "093a79cd270077336d49865d679e3eca67b3d43f",
+    "kubernetes-sigs/cloud-provider-azure": "01dfff26d4ec46cbaca191ea941f07be2a91f6fc"
+  }
 }

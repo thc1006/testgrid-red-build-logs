@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2118066918702190592",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1793821509,
+  "created": 1793821479,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+          "status": "FAIL",
+          "message": "[FAILED] no valid conntrack entry for port 11302 on node 10.40.0.5: ti...kubernetes/test/e2e/network/kube_proxy.go:208 @ 11/04/26 20:16:26.771\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793824269,
+  "commits": {
+    "kubernetes/kubernetes": "2af1ee8d0b379c06efa5357d2e9c3c25546d96e5"
+  },
+  "job_version": "v1.38.0-alpha.3.446+9747f7a2245c01",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2118066918702190592",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2118066918702190592/build-log.txt",
+  "log": {
+    "bytes": 331341,
+    "md5": "29e514a151ef07439fa003413c6b7f50",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 38540,
+    "gcs": {
+      "generation": "1793824287811191",
+      "md5": "29e514a151ef07439fa003413c6b7f50",
+      "crc32c": "494c2ef0",
+      "bytes": 331341,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95294,
+    "md5": "334d5b76b7c6c29e723daf54b2ac9d41",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12418,
+    "gcs": {
+      "generation": "1793824290417588",
+      "md5": "334d5b76b7c6c29e723daf54b2ac9d41",
+      "crc32c": "6310f872",
+      "bytes": 95294,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T064518Z",
+  "archived_at": 1793861118.0,
+  "settled": true,
+  "final": false
+}

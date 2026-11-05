@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2118099633476472832",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793829291,
+  "created": 1793829279,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secrets-593251f2-9347-4052-870d-7b8f4d661df...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793834682,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "9f332a3228d0c8e82952bf0a45bb60d16bc32796",
+    "kubernetes-sigs/cluster-api-provider-azure": "43a92f56d68f92cff4be1bf880fd7e66d989c5d4",
+    "kubernetes-sigs/cloud-provider-azure": "2fff0f0855bc9c8e23f7ebdbbecf4e086f403c0f"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2118099633476472832",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2118099633476472832/build-log.txt",
+  "log": {
+    "bytes": 316349,
+    "md5": "508910063395b82c6f1ac293934341b9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 47868,
+    "gcs": {
+      "generation": "1793834693266048",
+      "md5": "508910063395b82c6f1ac293934341b9",
+      "crc32c": "af6defd8",
+      "bytes": 316349,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 65199,
+    "md5": "b6f4a1ef66d6a20d9e1a18f81debcf25",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10837,
+    "gcs": {
+      "generation": "1793834695285894",
+      "md5": "b6f4a1ef66d6a20d9e1a18f81debcf25",
+      "crc32c": "12662d84",
+      "bytes": 65199,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T064518Z",
+  "archived_at": 1793861118.0,
+  "settled": true,
+  "final": false
+}

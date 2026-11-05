@@ -1,0 +1,60 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-correctness",
+  "build": "2118025897318551552",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness",
+  "started": 1793811700,
+  "created": 1793811699,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-master-scale-correctness",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+          "status": "FAIL",
+          "message": "[FAILED] no valid conntrack entry for port 11302 on node 10.40.0.137: .../kubernetes/test/e2e/network/kube_proxy.go:208 @ 11/04/26 17:30:36.98\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793815425,
+  "commits": {},
+  "job_version": "v1.38.0-alpha.3.443+f3fd37c12f846a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2118025897318551552",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2118025897318551552/build-log.txt",
+  "log": {
+    "bytes": 1693986,
+    "md5": "9d25453eafd5d17a530f6d946975dcda",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 140048,
+    "gcs": {
+      "generation": "1793815446109559",
+      "md5": "9d25453eafd5d17a530f6d946975dcda",
+      "crc32c": "eb138d87",
+      "bytes": 1693986,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 77741,
+    "md5": "7971f229ae1f22b3e8debf38eefdd9eb",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11934,
+    "gcs": {
+      "generation": "1793815448566723",
+      "md5": "7971f229ae1f22b3e8debf38eefdd9eb",
+      "crc32c": "14b5b3ae",
+      "bytes": 77741,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T064518Z",
+  "archived_at": 1793861118.0,
+  "settled": true,
+  "final": false
+}

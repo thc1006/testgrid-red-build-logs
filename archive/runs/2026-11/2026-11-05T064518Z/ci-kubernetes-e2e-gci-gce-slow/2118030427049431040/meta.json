@@ -1,0 +1,85 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2118030427049431040",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1793812780,
+  "created": 1793812779,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] cpu & mem restart resizing pod-level mem [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] verify container cgroup values for Pod \"resize-test-vxxw8\": [...common/node/pod_level_resources_resize.go:789 @ 11/04/26 17:34:11.754\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR guaranteed qos - 1 container with resize policy [Environment:NotInUserNS] no restart resizing mem [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] verify container cgroup values for Pod \"resize-test-255v8\": [...e/common/node/pod_level_resources_resize.go:789 @ 11/04/26 17:40:39.5\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR pod-level burstable pods - 1 container with all requests & limits set and resize policy mem restart resizing pod-level cpu limits [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] verify container cgroup values for Pod \"resize-test-b8245\": [...common/node/pod_level_resources_resize.go:789 @ 11/04/26 17:52:05.723\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] PLR Pod InPlace Resize [FeatureGate:InPlacePodLevelResourcesVerticalScaling] PLR pod-level burstable pods - 1 container with all requests & limits set and resize policy no restart resizing cpu limits [Beta] [FeatureGate:InPlacePodVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources] [NodeConformance] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] verify container cgroup values for Pod \"resize-test-qh7g5\": [...common/node/pod_level_resources_resize.go:789 @ 11/04/26 17:43:51.402\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793815446,
+  "commits": {},
+  "job_version": "v1.38.0-alpha.3.443+f3fd37c12f846a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2118030427049431040",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2118030427049431040/build-log.txt",
+  "log": {
+    "bytes": 465928,
+    "md5": "a01547668b2a23172d6677dedd93fe91",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 55532,
+    "gcs": {
+      "generation": "1793815457360646",
+      "md5": "a01547668b2a23172d6677dedd93fe91",
+      "crc32c": "8778a02c",
+      "bytes": 465928,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85294,
+    "md5": "8866e28b633818b26b270d0979e69571",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11714,
+    "gcs": {
+      "generation": "1793815459800649",
+      "md5": "8866e28b633818b26b270d0979e69571",
+      "crc32c": "0fc6ec34",
+      "bytes": 85294,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T064518Z",
+  "archived_at": 1793861118.0,
+  "settled": true,
+  "final": false
+}

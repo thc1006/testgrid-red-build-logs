@@ -53,5 +53,10 @@
   "archived_by_run": "2026-10-26T044539Z",
   "archived_at": 1792989939.0,
   "settled": true,
-  "final": true
+  "final": true,
+  "node_e2e": false,
+  "commits": {
+    "kubernetes-sigs/cloud-provider-kind": "5823a06c135a0fc87a9bbd112f6325f74c9f552c",
+    "kubernetes/kubernetes": "765dd1d145814464051056c0eff14b7357eace82"
+  }
 }

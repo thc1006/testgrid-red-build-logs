@@ -103,5 +103,169 @@
   "archived_by_run": "2026-10-25T161715Z",
   "archived_at": 1792945035.0,
   "settled": true,
-  "final": true
+  "final": true,
+  "node_e2e": true,
+  "commits": {
+    "containerd/containerd": "890e903648cc788e36f6248c8441c774089be0de",
+    "kubernetes/test-infra": "2701e8443109f95406e40b109f5b3e468b894c22"
+  },
+  "job_version": "v1.38.0-alpha.2.649+765dd1d1458144",
+  "artifacts_asset": {
+    "name": "ci-node-e2e-containerd-2-1-cos-dra_2114333059980464128.tar.xz",
+    "month": "2026-10",
+    "bytes": 1126892,
+    "sha256": "7152aaebed0cd2b1fc72429a2ef3513a4781ec4758ebcab222181bc1e80e9bd4",
+    "members": [
+      {
+        "path": "artifacts/junit_cos01.xml",
+        "bytes": 1017897,
+        "md5": "c995fb5500d8170ac5b224afb66c89e7",
+        "gcs": {
+          "generation": "1792935031480604",
+          "md5": "c995fb5500d8170ac5b224afb66c89e7",
+          "crc32c": "c3ea0ed7",
+          "bytes": 1017897,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/junit_runner.xml",
+        "bytes": 254,
+        "md5": "1d6fe93292df001e3513f71f8ae8a342",
+        "gcs": {
+          "generation": "1792935031332462",
+          "md5": "1d6fe93292df001e3513f71f8ae8a342",
+          "crc32c": "d9fa923d",
+          "bytes": 254,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/metadata.json",
+        "bytes": 167,
+        "md5": "708fe16cfbdd9282d4fe69187b03082f",
+        "gcs": {
+          "generation": "1792935031436533",
+          "md5": "708fe16cfbdd9282d4fe69187b03082f",
+          "crc32c": "69239ddd",
+          "bytes": 167,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-94585765-cos-125-19216-760-8-system.log",
+        "bytes": 7593670,
+        "md5": "dc7f5da61e31afbfd364916b8070cad6",
+        "gcs": {
+          "generation": "1792935031272025",
+          "md5": "dc7f5da61e31afbfd364916b8070cad6",
+          "crc32c": "f188fb9c",
+          "bytes": 7593670,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-94585765-cos-125-19216-760-8/cloud-init.log",
+        "bytes": 13129,
+        "md5": "78e1e473dc00ca7e3c126d2c6a88a0ca",
+        "gcs": {
+          "generation": "1792935031470096",
+          "md5": "78e1e473dc00ca7e3c126d2c6a88a0ca",
+          "crc32c": "23110826",
+          "bytes": 13129,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-94585765-cos-125-19216-760-8/containerd-installation.log",
+        "bytes": 2718072,
+        "md5": "947604c6b276b110a16356c18aebb990",
+        "gcs": {
+          "generation": "1792935031254618",
+          "md5": "947604c6b276b110a16356c18aebb990",
+          "crc32c": "41adfa5f",
+          "bytes": 2718072,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-94585765-cos-125-19216-760-8/containerd.log",
+        "bytes": 4416010,
+        "md5": "4edbee7e4f033ddcea3fa571598761bb",
+        "gcs": {
+          "generation": "1792935031381079",
+          "md5": "4edbee7e4f033ddcea3fa571598761bb",
+          "crc32c": "129fc8bb",
+          "bytes": 4416010,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-94585765-cos-125-19216-760-8/kern.log",
+        "bytes": 49408,
+        "md5": "f0e88086195044070531fe2613c4b003",
+        "gcs": {
+          "generation": "1792935031287030",
+          "md5": "f0e88086195044070531fe2613c4b003",
+          "crc32c": "df48e6b8",
+          "bytes": 49408,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-94585765-cos-125-19216-760-8/kubelet.log",
+        "bytes": 7536857,
+        "md5": "01d7d46e89d184af6cf5483e701f019d",
+        "gcs": {
+          "generation": "1792935031437042",
+          "md5": "01d7d46e89d184af6cf5483e701f019d",
+          "crc32c": "5191c122",
+          "bytes": 7536857,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-94585765-cos-125-19216-760-8/serial-1.log",
+        "bytes": 128921,
+        "md5": "87440ac0719493d179eac74cd7e48095",
+        "gcs": {
+          "generation": "1792935031212556",
+          "md5": "87440ac0719493d179eac74cd7e48095",
+          "crc32c": "e9288752",
+          "bytes": 128921,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-94585765-cos-125-19216-760-8/services.log",
+        "bytes": 5088373,
+        "md5": "528bda38e3a07263bbf2b66337fa7929",
+        "gcs": {
+          "generation": "1792935031260693",
+          "md5": "528bda38e3a07263bbf2b66337fa7929",
+          "crc32c": "3c7338cf",
+          "bytes": 5088373,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-94585765-cos-125-19216-760-8/tmp-node-e2e-94585765-cos-125-19216-760-8-ginkgo.log",
+        "bytes": 388662,
+        "md5": "05f5ece5c0d89d9d277cbff143b72d40",
+        "gcs": {
+          "generation": "1792935031411639",
+          "md5": "05f5ece5c0d89d9d277cbff143b72d40",
+          "crc32c": "32944328",
+          "bytes": 388662,
+          "encoding": "identity"
+        }
+      }
+    ],
+    "built_by_run": "2026-11-05T064518Z",
+    "pending_since": 1793861118.1308205,
+    "uploaded": {
+      "release": "node-logs-2026-10",
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-node-e2e-containerd-2-1-cos-dra_2114333059980464128.tar.xz"
+    }
+  }
 }

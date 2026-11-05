@@ -2809,15 +2809,28 @@
     "run": "2026-10-08T192522Z",
     "files": [
       "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/build-log.txt.gz",
-      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/podinfo.json.gz"
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/podinfo.json.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-master.kube-apiserver.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-master.serial-1.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-minion-group-08b8.kube-node-configuration.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-minion-group-08b8.kube-node-installation.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-minion-group-hznp.kube-node-configuration.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-minion-group-hznp.kube-node-installation.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-minion-group-kxw1.kube-node-configuration.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-gci-gce/2108180654662356992/bootstrap-e2e-minion-group-kxw1.kube-node-installation.log.gz"
     ],
     "remote": [],
-    "bytes": 127878,
+    "bytes": 1758368,
     "settled": true,
     "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "node_logs": true,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2108180654662356992"
   },
@@ -3256,15 +3269,27 @@
     "run": "2026-10-08T192522Z",
     "files": [
       "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/build-log.txt.gz",
-      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/podinfo.json.gz"
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/podinfo.json.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-master.serial-1.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-minion-group-32dv.kube-node-configuration.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-minion-group-32dv.kube-node-installation.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-minion-group-d7mz.kube-node-configuration.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-minion-group-d7mz.kube-node-installation.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-minion-group-ngkc.kube-node-configuration.log.gz",
+      "runs/2026-10/2026-10-08T192522Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328/bootstrap-e2e-minion-group-ngkc.kube-node-installation.log.gz"
     ],
     "remote": [],
-    "bytes": 158179,
+    "bytes": 1842749,
     "settled": true,
     "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "node_logs": true,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2107998181609443328"
   },
@@ -4394,6 +4419,9 @@
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-kubernetes-node-e2e-containerd_2107297055163551744.tar.xz"
+    },
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2107297055163551744"
   },

@@ -1,0 +1,78 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2118009035675406336",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793807687,
+  "created": 1793807679,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable from pods in env vars [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secrets-369acb46-3e73-45a7-a3ff-6b53a0ef236...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable via the environment [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-configmaps-d831473f-a36e-4fd9-a48f-2a213953...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Secrets should be consumable as environment variable names variable names with various prefixes [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-secret-193fb540-1b26-4a56-a99a-fe89d8307d9a...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793814394,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "9f332a3228d0c8e82952bf0a45bb60d16bc32796",
+    "kubernetes-sigs/cluster-api-provider-azure": "43a92f56d68f92cff4be1bf880fd7e66d989c5d4",
+    "kubernetes-sigs/cloud-provider-azure": "2fff0f0855bc9c8e23f7ebdbbecf4e086f403c0f"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2118009035675406336",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2118009035675406336/build-log.txt",
+  "log": {
+    "bytes": 618792,
+    "md5": "f037d593c7b12889f788c0ac0c214930",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 95804,
+    "gcs": {
+      "generation": "1793814400690444",
+      "md5": "f037d593c7b12889f788c0ac0c214930",
+      "crc32c": "4a925b85",
+      "bytes": 618792,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 64772,
+    "md5": "dbbcbeb7a501455d03e3c966b5b29b65",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10725,
+    "gcs": {
+      "generation": "1793814402308840",
+      "md5": "dbbcbeb7a501455d03e3c966b5b29b65",
+      "crc32c": "ab1cb156",
+      "bytes": 64772,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T064518Z",
+  "archived_at": 1793861118.0,
+  "settled": true,
+  "final": false
+}

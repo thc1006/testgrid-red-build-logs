@@ -54,5 +54,10 @@
   "archived_by_run": "2026-11-03T170520Z",
   "archived_at": 1793725520.0,
   "settled": true,
-  "final": false
+  "final": false,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "d763246dba6b184e2277a8f656756757b58be913",
+    "kubernetes-sigs/cluster-api-provider-azure": "6923efd82ff9718cd5bfd22bdc9fedbd1f72e375",
+    "kubernetes-sigs/cloud-provider-azure": "09607c9e213cf76cf56e356050e7767b0c1d1d72"
+  }
 }

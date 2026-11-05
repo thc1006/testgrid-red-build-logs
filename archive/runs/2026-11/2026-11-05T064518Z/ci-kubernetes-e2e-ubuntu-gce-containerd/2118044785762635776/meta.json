@@ -1,0 +1,75 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2118044785762635776",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793816203,
+  "created": 1793816202,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update endpoints: http",
+          "status": "FAIL",
+          "message": "[FAILED] failed dialing endpoint (recovery), received unexpected respo...kubernetes/test/e2e/network/networking.go:337 @ 11/04/26 18:27:28.919\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pods Extended (pod generation) Pod Generation pod generation should start at 1 and increment per update [MinimumKubeletVersion:1.34] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 20.000s.\nexpected pod generation to be 5, got...: k8s.io/kubernetes/test/e2e/node/pods.go:534 @ 11/04/26 18:30:36.344\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793818444,
+  "commits": {},
+  "job_version": "v1.38.0-alpha.3.443+f3fd37c12f846a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2118044785762635776",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2118044785762635776/build-log.txt",
+  "log": {
+    "bytes": 222349,
+    "md5": "b70107d8b8a13c6e3f009973dd70c19d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 32472,
+    "gcs": {
+      "generation": "1793818462646946",
+      "md5": "b70107d8b8a13c6e3f009973dd70c19d",
+      "crc32c": "bcf24983",
+      "bytes": 222349,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86153,
+    "md5": "3bf01bef36048bf8161b4a4056adae6a",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11931,
+    "gcs": {
+      "generation": "1793818466821472",
+      "md5": "3bf01bef36048bf8161b4a4056adae6a",
+      "crc32c": "964a0722",
+      "bytes": 86153,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T064518Z",
+  "archived_at": 1793861118.0,
+  "settled": true,
+  "final": false
+}

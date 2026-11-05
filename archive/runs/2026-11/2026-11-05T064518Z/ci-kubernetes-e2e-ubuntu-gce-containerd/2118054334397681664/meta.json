@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2118054334397681664",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1793818480,
+  "created": 1793818479,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] KubeProxy should set TCP CLOSE_WAIT timeout [Privileged]",
+          "status": "FAIL",
+          "message": "[FAILED] no valid conntrack entry for port 11302 on node 10.40.0.3: ti...kubernetes/test/e2e/network/kube_proxy.go:208 @ 11/04/26 19:15:53.361\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793820847,
+  "commits": {},
+  "job_version": "v1.38.0-alpha.3.446+9747f7a2245c01",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2118054334397681664",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2118054334397681664/build-log.txt",
+  "log": {
+    "bytes": 373462,
+    "md5": "256cd4b478ebf4dd8d467bbecacc8cf4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 41419,
+    "gcs": {
+      "generation": "1793820862389279",
+      "md5": "256cd4b478ebf4dd8d467bbecacc8cf4",
+      "crc32c": "8d996a97",
+      "bytes": 373462,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87551,
+    "md5": "4fd82d9d43dc8b37d687d80bc2de23f1",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11985,
+    "gcs": {
+      "generation": "1793820869000738",
+      "md5": "4fd82d9d43dc8b37d687d80bc2de23f1",
+      "crc32c": "443cdd08",
+      "bytes": 87551,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T064518Z",
+  "archived_at": 1793861118.0,
+  "settled": true,
+  "final": false
+}

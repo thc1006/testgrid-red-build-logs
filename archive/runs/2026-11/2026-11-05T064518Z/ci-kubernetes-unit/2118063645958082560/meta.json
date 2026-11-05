@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2118063645958082560",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1793820727,
+  "created": 1793820699,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/apiserver/pkg/storage.cacher",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCompactRevision\n    store_tests.go:5862: Expected... of closed network connection\"}\n--- FAIL: TestCompactRevision (2.02s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793822094,
+  "commits": {
+    "kubernetes/kubernetes": "9747f7a2245c010d43df4fd0af0b80d3b3d1fbc9"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2118063645958082560",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2118063645958082560/build-log.txt",
+  "log": {
+    "bytes": 246291,
+    "md5": "6e251441303d5161a79df3f9bf3955d9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 33427,
+    "gcs": {
+      "generation": "1793822094869042",
+      "md5": "6e251441303d5161a79df3f9bf3955d9",
+      "crc32c": "b5487ac6",
+      "bytes": 246291,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 90821,
+    "md5": "90e06fbf6db1b06c97ffb5b659018727",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11656,
+    "gcs": {
+      "generation": "1793822097591779",
+      "md5": "90e06fbf6db1b06c97ffb5b659018727",
+      "crc32c": "138404e7",
+      "bytes": 90821,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-05T064518Z",
+  "archived_at": 1793861118.0,
+  "settled": true,
+  "final": false
+}
