@@ -1,0 +1,71 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2118395588054618112",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1793899873,
+  "created": 1793899840,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Down",
+          "status": "FAIL",
+          "message": "error encountered during /home/prow/go/src/k8s.io/kubernetes/cluster/kube-down.sh: exit status 1"
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793900315,
+  "commits": {
+    "kubernetes/kubernetes": "0d89050dd0c6b431fa8545f8c13199be2b5347bf"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2118395588054618112",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2118395588054618112/build-log.txt",
+  "log": {
+    "bytes": 32287,
+    "md5": "e453dcbe7784cc051af94922a14dad98",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 7310,
+    "gcs": {
+      "generation": "1793900316900676",
+      "md5": "e453dcbe7784cc051af94922a14dad98",
+      "crc32c": "953d6505",
+      "bytes": 32287,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97853,
+    "md5": "257bb086475c5154934009171f7c7ed7",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12687,
+    "gcs": {
+      "generation": "1793900331268587",
+      "md5": "257bb086475c5154934009171f7c7ed7",
+      "crc32c": "2d3341ad",
+      "bytes": 97853,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-06T064145Z",
+  "archived_at": 1793947305.0,
+  "settled": true,
+  "final": false
+}

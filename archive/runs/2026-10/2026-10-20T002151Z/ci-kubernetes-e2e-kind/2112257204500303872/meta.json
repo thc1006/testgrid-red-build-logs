@@ -58,5 +58,9 @@
   "archived_by_run": "2026-10-20T002151Z",
   "archived_at": 1792455711.0,
   "settled": true,
-  "final": true
+  "final": true,
+  "node_e2e": false,
+  "commits": {
+    "kubernetes/kubernetes": "c4b82fa98ba55e179c76ed4c085798fe6e680e69"
+  }
 }

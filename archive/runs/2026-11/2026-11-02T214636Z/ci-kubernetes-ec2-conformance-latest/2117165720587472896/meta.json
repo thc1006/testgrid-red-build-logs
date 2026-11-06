@@ -54,5 +54,9 @@
   "archived_by_run": "2026-11-02T214636Z",
   "archived_at": 1793655996.0,
   "settled": true,
-  "final": true
+  "final": true,
+  "commits": {
+    "kubernetes-sigs/provider-aws-test-infra": "7d26ecef69a7d08b04ab2c1f83b682a08719487b",
+    "kubernetes/kubernetes": "34e91277032c2c132c5131f42fc02fb3cba47037"
+  }
 }

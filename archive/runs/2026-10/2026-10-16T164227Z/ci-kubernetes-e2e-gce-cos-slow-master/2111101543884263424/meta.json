@@ -223,5 +223,10 @@
         "encoding": "identity"
       }
     }
-  ]
+  ],
+  "node_e2e": false,
+  "commits": {
+    "kubernetes/kubernetes": "625d634722837a25981f28888bfc7245932c817c"
+  },
+  "job_version": "v1.38.0-alpha.2.345+625d634722837a"
 }

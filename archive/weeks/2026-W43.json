@@ -896,6 +896,9 @@
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-node-e2e-containerd-2-1-cos-dra_2114151864722264064.tar.xz"
+    },
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-1-cos-dra/2114151864722264064"
   },

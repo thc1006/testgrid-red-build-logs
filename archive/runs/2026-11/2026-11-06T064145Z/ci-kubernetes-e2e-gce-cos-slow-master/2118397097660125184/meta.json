@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+  "build": "2118397097660125184",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master",
+  "started": 1793900230,
+  "created": 1793900200,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-slow-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] kubelet host cleanup with volume mounts [HostCleanup] Host cleanup after disrupting NFS volume [NFS] [Provider:gce,aws,local,azure] after stopping the nfs-server and deleting the (active) client pod, the NFS mount and the pod's UID directory should be removed. [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nexpected pod to be running and read...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-slow-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793903747,
+  "commits": {
+    "kubernetes/kubernetes": "0d89050dd0c6b431fa8545f8c13199be2b5347bf"
+  },
+  "job_version": "v1.38.0-alpha.3.539+0d89050dd0c6b4",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2118397097660125184",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2118397097660125184/build-log.txt",
+  "log": {
+    "bytes": 132275,
+    "md5": "957b9cca6b367b68125c521f4e942145",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22926,
+    "gcs": {
+      "generation": "1793903755500363",
+      "md5": "957b9cca6b367b68125c521f4e942145",
+      "crc32c": "75b1d12f",
+      "bytes": 132275,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96270,
+    "md5": "a1d5ac4bcf8000f2c3fe501be07bf86c",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12397,
+    "gcs": {
+      "generation": "1793903757633111",
+      "md5": "a1d5ac4bcf8000f2c3fe501be07bf86c",
+      "crc32c": "fd8595a0",
+      "bytes": 96270,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-06T064145Z",
+  "archived_at": 1793947305.0,
+  "settled": true,
+  "final": false
+}

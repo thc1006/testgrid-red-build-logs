@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2118565713076555776",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1793940428,
+  "created": 1793940401,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with multiple PVs and PVCs all in same ns should create 3 PVs and 3 PVCs: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-9c42j\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:350 @ 11/06/26 05:15:22.51\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793942192,
+  "commits": {
+    "kubernetes/kubernetes": "671745e4ffcf3ee0110f6446ef3b5f032db2c51c"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2118565713076555776",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2118565713076555776/build-log.txt",
+  "log": {
+    "bytes": 128793,
+    "md5": "b804950ca741645295fb67b9503f2572",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21124,
+    "gcs": {
+      "generation": "1793942211551654",
+      "md5": "b804950ca741645295fb67b9503f2572",
+      "crc32c": "7c890aaa",
+      "bytes": 128793,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 93949,
+    "md5": "82e21e62b92c20ccd3ca4224cb21e62d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12568,
+    "gcs": {
+      "generation": "1793942214140930",
+      "md5": "82e21e62b92c20ccd3ca4224cb21e62d",
+      "crc32c": "bfc5392e",
+      "bytes": 93949,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-06T064145Z",
+  "archived_at": 1793947305.0,
+  "settled": false,
+  "final": false
+}

@@ -67,5 +67,10 @@
   "refreshed_by_run": "2026-10-17T233055Z",
   "refreshed": [
     "podinfo.json"
-  ]
+  ],
+  "node_e2e": false,
+  "commits": {
+    "kubernetes/kubernetes": "b1dc9d16763d2546b8464a09307471f3411ab391"
+  },
+  "job_version": "v1.38.0-alpha.1.142+a31e8d97cf877c"
 }

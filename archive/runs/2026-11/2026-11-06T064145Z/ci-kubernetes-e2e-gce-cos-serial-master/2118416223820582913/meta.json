@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2118416223820582913",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1793904792,
+  "created": 1793904760,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-2 [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.000s.\nexpected pod to be display pod resi...o/kubernetes/test/e2e/node/pod_resize.go:1423 @ 11/05/26 21:04:49.003\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793919680,
+  "commits": {
+    "kubernetes/kubernetes": "a6f04b605a786abb122ccc314106868fc82ad29e"
+  },
+  "job_version": "v1.38.0-alpha.3.543+a6f04b605a786a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2118416223820582913",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2118416223820582913/build-log.txt",
+  "log": {
+    "bytes": 125841,
+    "md5": "310af30c65a5f334d130f197663590b8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21631,
+    "gcs": {
+      "generation": "1793919708426657",
+      "md5": "310af30c65a5f334d130f197663590b8",
+      "crc32c": "faf0c293",
+      "bytes": 125841,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 69781,
+    "md5": "ce2bc42e142d8e76703861377ac935b9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10623,
+    "gcs": {
+      "generation": "1793919722704320",
+      "md5": "ce2bc42e142d8e76703861377ac935b9",
+      "crc32c": "bf63bdfb",
+      "bytes": 69781,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-06T064145Z",
+  "archived_at": 1793947305.0,
+  "settled": true,
+  "final": false
+}

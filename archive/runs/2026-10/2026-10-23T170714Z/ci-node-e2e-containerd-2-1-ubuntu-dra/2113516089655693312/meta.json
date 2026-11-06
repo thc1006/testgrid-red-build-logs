@@ -58,5 +58,14 @@
   "archived_by_run": "2026-10-23T170714Z",
   "archived_at": 1792775234.0,
   "settled": true,
-  "final": true
+  "final": true,
+  "node_e2e": true,
+  "commits": {
+    "containerd/containerd": "890e903648cc788e36f6248c8441c774089be0de",
+    "kubernetes/test-infra": "e087ec19ea536507a536018f8b699aca1734de8b"
+  },
+  "job_version": "v1.38.0-alpha.2.598+061e55d37f0219",
+  "artifacts_asset": {
+    "members": []
+  }
 }

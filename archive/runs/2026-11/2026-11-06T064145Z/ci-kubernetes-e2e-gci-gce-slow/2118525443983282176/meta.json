@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2118525443983282176",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1793930801,
+  "created": 1793930800,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach UDP service through 136.112.15.6:80 after 2m0...io/kubernetes/test/e2e/network/service.go:569 @ 11/06/26 02:36:31.615\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793934322,
+  "commits": {},
+  "job_version": "v1.38.0-alpha.3.563+1ca7499c9a5669",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2118525443983282176",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2118525443983282176/build-log.txt",
+  "log": {
+    "bytes": 132127,
+    "md5": "f58997bf9034fcca9deaf05159ed1b0b",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22098,
+    "gcs": {
+      "generation": "1793934330157796",
+      "md5": "f58997bf9034fcca9deaf05159ed1b0b",
+      "crc32c": "cb4d0aaf",
+      "bytes": 132127,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86151,
+    "md5": "38f75c6fa1677570ddd6f95369639a68",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11718,
+    "gcs": {
+      "generation": "1793934332508307",
+      "md5": "38f75c6fa1677570ddd6f95369639a68",
+      "crc32c": "9cf9e87c",
+      "bytes": 86151,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-06T064145Z",
+  "archived_at": 1793947305.0,
+  "settled": true,
+  "final": false
+}

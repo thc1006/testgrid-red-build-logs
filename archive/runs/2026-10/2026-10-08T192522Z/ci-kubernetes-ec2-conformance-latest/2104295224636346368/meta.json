@@ -67,5 +67,10 @@
   "refreshed_by_run": "2026-10-17T233055Z",
   "refreshed": [
     "podinfo.json"
-  ]
+  ],
+  "node_e2e": false,
+  "commits": {
+    "kubernetes-sigs/provider-aws-test-infra": "d323a9624c21d88fb57c9dc30fb926a5b9081a73",
+    "kubernetes/kubernetes": "6c1c7702cf2052245ef10e699d45f071af306f59"
+  }
 }

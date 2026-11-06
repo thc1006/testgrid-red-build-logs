@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2118526701741805568",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1793931108,
+  "created": 1793931100,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793946194,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "d40d9f21729cba9de6c24666e1f40640e98a834d",
+    "kubernetes-sigs/cluster-api-provider-azure": "e8df296a2fa99336237dfac5005a50c96ff44d69",
+    "kubernetes-sigs/cloud-provider-azure": "e414260ed0735a3db208ce23aae81853d770c26c"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2118526701741805568",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2118526701741805568/build-log.txt",
+  "log": {
+    "bytes": 171574,
+    "md5": "969632efcbf0d1254585aafbcbbd4174",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25382,
+    "gcs": {
+      "generation": "1793946198763112",
+      "md5": "969632efcbf0d1254585aafbcbbd4174",
+      "crc32c": "1e36c56f",
+      "bytes": 171574,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 64778,
+    "md5": "565b56cc36105b727e6a4c3e92876542",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10552,
+    "gcs": {
+      "generation": "1793946201242033",
+      "md5": "565b56cc36105b727e6a4c3e92876542",
+      "crc32c": "9fdba4b5",
+      "bytes": 64778,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-06T064145Z",
+  "archived_at": 1793947305.0,
+  "settled": false,
+  "final": false
+}

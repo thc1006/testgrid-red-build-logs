@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2118469577774993408",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793917481,
+  "created": 1793917481,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with multiple PVs and PVCs all in same ns should create 2 PVs and 4 PVCs: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-4jc2v\" did not exit with Success: pod \"pvc-te...es/test/e2e/storage/persistent_volumes.go:340 @ 11/05/26 22:53:58.137\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793920027,
+  "commits": {},
+  "job_version": "v1.38.0-alpha.3.555+d9229a7cd1b089",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2118469577774993408",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2118469577774993408/build-log.txt",
+  "log": {
+    "bytes": 147638,
+    "md5": "a55312099cd7b01d717c46a2e6056eaa",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24847,
+    "gcs": {
+      "generation": "1793920045804991",
+      "md5": "a55312099cd7b01d717c46a2e6056eaa",
+      "crc32c": "c0954286",
+      "bytes": 147638,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87055,
+    "md5": "292fcf255aeeec8324ff5184714d0040",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11761,
+    "gcs": {
+      "generation": "1793920047805435",
+      "md5": "292fcf255aeeec8324ff5184714d0040",
+      "crc32c": "12254615",
+      "bytes": 87055,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-06T064145Z",
+  "archived_at": 1793947305.0,
+  "settled": true,
+  "final": false
+}
