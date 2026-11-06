@@ -59,7 +59,7 @@
   "archived_by_run": "2026-11-04T171542Z",
   "archived_at": 1793812542.0,
   "settled": true,
-  "final": false,
+  "final": true,
   "commits": {
     "kubernetes/test-infra": "d20b8569bf8185796daf07d08a7722e9be15a6d0",
     "containerd/containerd": "dedd537242de686b53134b85da6ce34fd95e008a"

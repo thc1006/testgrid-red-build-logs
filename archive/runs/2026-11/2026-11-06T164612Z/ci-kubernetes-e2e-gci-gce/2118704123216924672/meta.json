@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2118704123216924672",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1793973401,
+  "created": 1793973401,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should verify ResourceQuota with cross namespace pod affinity scope using scope-selectors.",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.000s.\nExpected:\n    <*v1.ResourceQuota | .../test/e2e/apimachinery/resource_quota.go:2041 @ 11/06/26 14:16:56.281\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793975979,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.30+c056500f5708e5",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2118704123216924672",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2118704123216924672/build-log.txt",
+  "log": {
+    "bytes": 138589,
+    "md5": "bec142bb763ea42165637613ddef0318",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23715,
+    "gcs": {
+      "generation": "1793976000477496",
+      "md5": "bec142bb763ea42165637613ddef0318",
+      "crc32c": "55d6ceb3",
+      "bytes": 138589,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85141,
+    "md5": "00e7da5e38f99f32090e05a0285a0670",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11732,
+    "gcs": {
+      "generation": "1793976002630746",
+      "md5": "00e7da5e38f99f32090e05a0285a0670",
+      "crc32c": "75e5ff06",
+      "bytes": 85141,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-06T164612Z",
+  "archived_at": 1793983572.0,
+  "settled": true,
+  "final": false
+}
