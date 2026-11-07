@@ -1,0 +1,58 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2118939175414665216",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1794029470,
+  "created": 1794029442,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Pod",
+          "status": "FAIL",
+          "message": "sidecar still running"
+        },
+        {
+          "test": "kubetest2.Down",
+          "status": "FAIL",
+          "message": "error encountered during /home/prow/go/src/k8s.io/kubernetes/cluster/kube-down.sh: signal: terminated"
+        }
+      ]
+    }
+  ],
+  "result": "failure",
+  "finished": 1794030791,
+  "commits": {
+    "kubernetes/kubernetes": "669606250e3141b73169b9b3d5a20cdd3124dae8"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2118939175414665216",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2118939175414665216/build-log.txt",
+  "log": null,
+  "podinfo": {
+    "bytes": 64725,
+    "md5": "f140f7654fc4f5a84a4164fe581b0c70",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 7171,
+    "gcs": {
+      "generation": "1794030792279293",
+      "md5": "f140f7654fc4f5a84a4164fe581b0c70",
+      "crc32c": "a23bc930",
+      "bytes": 64725,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-07T125906Z",
+  "archived_at": 1794056346.0,
+  "settled": true,
+  "final": false
+}

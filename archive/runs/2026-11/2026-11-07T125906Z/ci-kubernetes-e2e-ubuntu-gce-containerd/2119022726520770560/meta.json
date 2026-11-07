@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2119022726520770560",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794049362,
+  "created": 1794049362,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] StatefulSet StatefulSet Recreate Update Strategy should recreate stuck pods with ImagePullBackOff when the update strategy is Recreate [FeatureGate:StatefulSetRecreateStrategy] [Beta]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed waiting for 1 pods to be stuck with image pull error: ...es/test/e2e/framework/statefulset/wait.go:229 @ 11/07/26 11:16:24.977\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794051502,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.140+d590cbd3229b45",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2119022726520770560",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2119022726520770560/build-log.txt",
+  "log": {
+    "bytes": 155393,
+    "md5": "235682a9cc2f77eba7d730cc886dff68",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24685,
+    "gcs": {
+      "generation": "1794051515764235",
+      "md5": "235682a9cc2f77eba7d730cc886dff68",
+      "crc32c": "b351e648",
+      "bytes": 155393,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85773,
+    "md5": "c1224c6a8a01a8366670ad51579ee29d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11832,
+    "gcs": {
+      "generation": "1794051517610271",
+      "md5": "c1224c6a8a01a8366670ad51579ee29d",
+      "crc32c": "0f2d91bf",
+      "bytes": 85773,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-07T125906Z",
+  "archived_at": 1794056346.0,
+  "settled": false,
+  "final": false
+}

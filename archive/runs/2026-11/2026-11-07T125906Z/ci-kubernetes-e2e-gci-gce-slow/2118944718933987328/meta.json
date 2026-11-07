@@ -1,0 +1,64 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2118944718933987328",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1794030764,
+  "created": 1794030763,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Pod",
+          "status": "FAIL",
+          "message": "sidecar still running"
+        }
+      ]
+    }
+  ],
+  "result": "ABORTED",
+  "finished": 1794031011,
+  "commits": {},
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2118944718933987328",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2118944718933987328/build-log.txt",
+  "log": {
+    "bytes": 27777,
+    "md5": "bdfdb3d0c2e6ed6fc99793b70fbd8177",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 7357,
+    "gcs": {
+      "generation": "1794031011354120",
+      "md5": "bdfdb3d0c2e6ed6fc99793b70fbd8177",
+      "crc32c": "fa3ddea9",
+      "bytes": 27777,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 52978,
+    "md5": "8b0f58fce3cae77dc14ca763ac43ef17",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 6245,
+    "gcs": {
+      "generation": "1794031172700101",
+      "md5": "8b0f58fce3cae77dc14ca763ac43ef17",
+      "crc32c": "96fe4d85",
+      "bytes": 52978,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-07T125906Z",
+  "archived_at": 1794056346.0,
+  "settled": true,
+  "final": false
+}

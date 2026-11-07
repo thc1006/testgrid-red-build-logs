@@ -1,0 +1,58 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2118926339149926400",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1794026410,
+  "created": 1794026381,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container guaranteed qos - 1 container with resize policy [Feature:InPlacePodVerticalScaling] no restart + resize initContainers resizing cpu & mem in opposite directions",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...outine 16329\n          k8s.io/client-go/tools/remotecommand/v2.go:142\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Pod",
+          "status": "FAIL",
+          "message": "sidecar still running"
+        }
+      ]
+    }
+  ],
+  "result": "failure",
+  "finished": 1794031147,
+  "commits": {
+    "kubernetes/kubernetes": "669606250e3141b73169b9b3d5a20cdd3124dae8"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2118926339149926400",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2118926339149926400/build-log.txt",
+  "log": null,
+  "podinfo": {
+    "bytes": 38156,
+    "md5": "40c30f38ae089b0c5f04373e11472c0f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 5715,
+    "gcs": {
+      "generation": "1794031148628070",
+      "md5": "40c30f38ae089b0c5f04373e11472c0f",
+      "crc32c": "4558f010",
+      "bytes": 38156,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-07T125906Z",
+  "archived_at": 1794056346.0,
+  "settled": true,
+  "final": false
+}
