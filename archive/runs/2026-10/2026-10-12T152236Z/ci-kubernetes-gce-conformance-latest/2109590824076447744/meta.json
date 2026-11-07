@@ -64,5 +64,8 @@
     "podinfo.json"
   ],
   "artifacts": [],
-  "node_e2e": false
+  "node_e2e": false,
+  "commits": {
+    "kubernetes/kubernetes": "bfc85351d3a3aaaf77709c09b40b600c244a505a"
+  }
 }

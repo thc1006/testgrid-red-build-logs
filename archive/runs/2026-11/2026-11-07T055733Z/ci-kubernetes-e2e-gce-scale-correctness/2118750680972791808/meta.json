@@ -1,0 +1,60 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-correctness",
+  "build": "2118750680972791808",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness",
+  "started": 1793984502,
+  "created": 1793984501,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-master-scale-correctness",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] StatefulSet StatefulSet Recreate Update Strategy should recreate stuck pods with ImagePullBackOff when the update strategy is Recreate [FeatureGate:StatefulSetRecreateStrategy] [Beta]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed waiting for 1 pods to be stuck with image pull error: ...tes/test/e2e/framework/statefulset/wait.go:229 @ 11/06/26 17:34:52.84\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1793988022,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.52+8db047b9682a76",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2118750680972791808",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-correctness/2118750680972791808/build-log.txt",
+  "log": {
+    "bytes": 1475109,
+    "md5": "9b3713c8078eb3bca0da55ffc757d8f9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 127836,
+    "gcs": {
+      "generation": "1793988043506434",
+      "md5": "9b3713c8078eb3bca0da55ffc757d8f9",
+      "crc32c": "c5a26245",
+      "bytes": 1475109,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 101089,
+    "md5": "0123c6cf0b6a0cf9b3da1e529758838d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13751,
+    "gcs": {
+      "generation": "1793988048428265",
+      "md5": "0123c6cf0b6a0cf9b3da1e529758838d",
+      "crc32c": "0392832a",
+      "bytes": 101089,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-07T055733Z",
+  "archived_at": 1794031053.0,
+  "settled": true,
+  "final": false
+}

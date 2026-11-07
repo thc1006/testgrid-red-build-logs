@@ -208,5 +208,7 @@
     "bootstrap-e2e-minion-group-x3cp.kube-node-configuration.log",
     "bootstrap-e2e-minion-group-x3cp.kube-node-installation.log"
   ],
-  "node_e2e": false
+  "node_e2e": false,
+  "commits": {},
+  "job_version": "v1.38.0-alpha.2.784+53db21f676b21f"
 }

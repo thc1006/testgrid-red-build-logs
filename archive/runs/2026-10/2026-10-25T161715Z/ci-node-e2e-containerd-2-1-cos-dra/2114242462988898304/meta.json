@@ -262,5 +262,10 @@
       "release": "node-logs-2026-10",
       "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-node-e2e-containerd-2-1-cos-dra_2114242462988898304.tar.xz"
     }
-  }
+  },
+  "commits": {
+    "containerd/containerd": "890e903648cc788e36f6248c8441c774089be0de",
+    "kubernetes/test-infra": "ae3a7551e2edd87d4c60e906a04ce6ab5dc15227"
+  },
+  "job_version": "v1.38.0-alpha.2.649+765dd1d1458144"
 }

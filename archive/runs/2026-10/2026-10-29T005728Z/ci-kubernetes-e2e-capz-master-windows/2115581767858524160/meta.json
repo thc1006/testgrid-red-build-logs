@@ -59,5 +59,10 @@
   "archived_at": 1793235448.0,
   "settled": true,
   "final": true,
-  "node_e2e": false
+  "node_e2e": false,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "35c3334a1dc0b94e8fd1c98ff0ab6abd63730b18",
+    "kubernetes-sigs/cluster-api-provider-azure": "b40aeba7879b104489b1ca56f434cf22e4198c9b",
+    "kubernetes-sigs/cloud-provider-azure": "2468b5b0170b1a2629246c54adcb43c649af2612"
+  }
 }

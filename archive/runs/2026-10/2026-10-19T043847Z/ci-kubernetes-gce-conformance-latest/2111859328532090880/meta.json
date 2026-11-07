@@ -240,5 +240,8 @@
     "kt2-ba8465a3-fec2-minion-group-b0bq.kube-node-configuration.log",
     "kt2-ba8465a3-fec2-minion-group-b0bq.kube-node-installation.log"
   ],
-  "node_e2e": false
+  "node_e2e": false,
+  "commits": {
+    "kubernetes/kubernetes": "98d0129cf21ce0871637ae36e67b5ff82d3db50d"
+  }
 }
