@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "build": "2119055694245138432",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "started": 1794057418,
+  "created": 1794057222,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "sig-network-kind, loadbalancer",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[SynchronizedBeforeSuite]",
+          "status": "FAIL",
+          "message": "0/25 runs passed: [FAILED] �[1m�[38;5;9mSynchronizedBeforeSuite fa...ite] at: k8s.io/kubernetes/test/e2e/e2e.go:69 @ 11/07/26 13:48:07.154\n"
+        },
+        {
+          "test": "ci-kubernetes-kind-cloud-provider-loadbalancer.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794059287,
+  "commits": {
+    "kubernetes-sigs/cloud-provider-kind": "96bfe2c8308467c57fa67fbc760a854c8424984a",
+    "kubernetes/kubernetes": "ac8d3ed1cdf6c8bb11e9d3eda8acf2a9f03915b8"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2119055694245138432",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2119055694245138432/build-log.txt",
+  "log": {
+    "bytes": 176119,
+    "md5": "48884290590a361a0425d4dfdc3e0b50",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22511,
+    "gcs": {
+      "generation": "1794059287643768",
+      "md5": "48884290590a361a0425d4dfdc3e0b50",
+      "crc32c": "74246428",
+      "bytes": 176119,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 116868,
+    "md5": "765674f661ff930661449191cd29d8b9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 14074,
+    "gcs": {
+      "generation": "1794059290219278",
+      "md5": "765674f661ff930661449191cd29d8b9",
+      "crc32c": "8c180261",
+      "bytes": 116868,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T003532Z",
+  "archived_at": 1794098132.0,
+  "settled": true,
+  "final": false
+}

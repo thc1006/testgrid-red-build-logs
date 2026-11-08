@@ -60,5 +60,9 @@
   "settled": true,
   "final": true,
   "node_e2e": false,
-  "artifacts": []
+  "artifacts": [],
+  "commits": {
+    "kubernetes/kubernetes": "98d0129cf21ce0871637ae36e67b5ff82d3db50d"
+  },
+  "job_version": "v1.38.0-alpha.2.384+98d0129cf21ce0"
 }

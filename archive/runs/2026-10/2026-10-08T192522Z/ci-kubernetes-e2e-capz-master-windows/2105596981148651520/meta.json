@@ -58,5 +58,10 @@
   "refreshed": [
     "podinfo.json"
   ],
-  "node_e2e": false
+  "node_e2e": false,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "5fd6a38b6c66b03972a6d965110a4313887dfd7c",
+    "kubernetes-sigs/cluster-api-provider-azure": "e4d7dc547c4e88a80c6e523df9d989a421d693be",
+    "kubernetes-sigs/cloud-provider-azure": "e8126bbdf1e1cc5367ad5e2d7e76434b6311b5b7"
+  }
 }

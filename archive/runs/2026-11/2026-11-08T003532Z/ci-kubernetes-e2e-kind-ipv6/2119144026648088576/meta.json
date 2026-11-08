@@ -1,0 +1,71 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2119144026648088576",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1794078311,
+  "created": 1794078282,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test phase transition timestamp is set",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-92g98\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 11/07/26 19:16:33.025\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and use it multiple times in a single pod",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-zllm9\" failed to reach Success: Timed out aft...es/test/e2e/storage/persistent_volumes.go:232 @ 11/07/26 19:16:59.058\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794080040,
+  "commits": {
+    "kubernetes/kubernetes": "59332646f342a3e2c485e4f9e4b776eb2f79042f"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2119144026648088576",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2119144026648088576/build-log.txt",
+  "log": {
+    "bytes": 203428,
+    "md5": "52377115d56b42797b76f8ecff49f4c6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 31619,
+    "gcs": {
+      "generation": "1794080054506876",
+      "md5": "52377115d56b42797b76f8ecff49f4c6",
+      "crc32c": "ad8b8214",
+      "bytes": 203428,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 105192,
+    "md5": "c8ca85ba1b3e10eb95da82956f48b559",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12941,
+    "gcs": {
+      "generation": "1794080056828845",
+      "md5": "c8ca85ba1b3e10eb95da82956f48b559",
+      "crc32c": "274905d6",
+      "bytes": 105192,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T003532Z",
+  "archived_at": 1794098132.0,
+  "settled": true,
+  "final": false
+}

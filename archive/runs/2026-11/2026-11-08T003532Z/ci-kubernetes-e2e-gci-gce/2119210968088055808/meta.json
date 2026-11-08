@@ -1,0 +1,232 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2119210968088055808",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1794094243,
+  "created": 1794094242,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Up",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-up.sh: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794096832,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.149+6b5d04cd0bf7e9",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2119210968088055808",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2119210968088055808/build-log.txt",
+  "log": {
+    "bytes": 65990,
+    "md5": "5cd2cfa716af151cc7b039b46b8e7a76",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 10091,
+    "gcs": {
+      "generation": "1794096833190868",
+      "md5": "5cd2cfa716af151cc7b039b46b8e7a76",
+      "crc32c": "bf839fd8",
+      "bytes": 65990,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85177,
+    "md5": "f4da4e26180a394a0e373cf72c08e71d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11649,
+    "gcs": {
+      "generation": "1794096835206623",
+      "md5": "f4da4e26180a394a0e373cf72c08e71d",
+      "crc32c": "344da626",
+      "bytes": 85177,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/bootstrap-e2e-master/containerd.log",
+      "bytes": 107230,
+      "md5": "43041450552e933a4122ceec6567a3f9",
+      "verified": true,
+      "file": "bootstrap-e2e-master.containerd.log.gz",
+      "file_bytes": 13437,
+      "gcs": {
+        "generation": "1794096832881483",
+        "md5": "43041450552e933a4122ceec6567a3f9",
+        "crc32c": "df9f574d",
+        "bytes": 107230,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-master/etcd.log",
+      "bytes": 22162,
+      "md5": "7ec4ad7ccf2fb1ae97bdeb2eabf4c3bc",
+      "verified": true,
+      "file": "bootstrap-e2e-master.etcd.log.gz",
+      "file_bytes": 4766,
+      "gcs": {
+        "generation": "1794096832526899",
+        "md5": "7ec4ad7ccf2fb1ae97bdeb2eabf4c3bc",
+        "crc32c": "0011c76b",
+        "bytes": 22162,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-master/kube-master-configuration.log",
+      "bytes": 47633,
+      "md5": "bf5554e6b64c5b23d989dcb4470fb63e",
+      "verified": true,
+      "file": "bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "file_bytes": 5382,
+      "gcs": {
+        "generation": "1794096833058852",
+        "md5": "bf5554e6b64c5b23d989dcb4470fb63e",
+        "crc32c": "0987d718",
+        "bytes": 47633,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-master/kube-master-installation.log",
+      "bytes": 24299,
+      "md5": "4b49de5ff64b8789d206b834444aa673",
+      "verified": true,
+      "file": "bootstrap-e2e-master.kube-master-installation.log.gz",
+      "file_bytes": 3662,
+      "gcs": {
+        "generation": "1794096833079480",
+        "md5": "4b49de5ff64b8789d206b834444aa673",
+        "crc32c": "df0a16ed",
+        "bytes": 24299,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-master/serial-1.log",
+      "bytes": 73655,
+      "md5": "9cf3e5c3205bd2f6694ef90ab883a46e",
+      "verified": true,
+      "file": "bootstrap-e2e-master.serial-1.log.gz",
+      "file_bytes": 19681,
+      "gcs": {
+        "generation": "1794096832427914",
+        "md5": "9cf3e5c3205bd2f6694ef90ab883a46e",
+        "crc32c": "ef2ba62a",
+        "bytes": 73655,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-minion-group-cc12/kube-node-configuration.log",
+      "bytes": 17,
+      "md5": "cdfc37141b925a27919a83355bf842dd",
+      "verified": true,
+      "file": "bootstrap-e2e-minion-group-cc12.kube-node-configuration.log.gz",
+      "file_bytes": 97,
+      "gcs": {
+        "generation": "1794096832440250",
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "crc32c": "4cbc7ffc",
+        "bytes": 17,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-minion-group-cc12/kube-node-installation.log",
+      "bytes": 17,
+      "md5": "cdfc37141b925a27919a83355bf842dd",
+      "verified": true,
+      "file": "bootstrap-e2e-minion-group-cc12.kube-node-installation.log.gz",
+      "file_bytes": 96,
+      "gcs": {
+        "generation": "1794096832990777",
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "crc32c": "4cbc7ffc",
+        "bytes": 17,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-minion-group-gzvm/kube-node-configuration.log",
+      "bytes": 17,
+      "md5": "cdfc37141b925a27919a83355bf842dd",
+      "verified": true,
+      "file": "bootstrap-e2e-minion-group-gzvm.kube-node-configuration.log.gz",
+      "file_bytes": 97,
+      "gcs": {
+        "generation": "1794096832572493",
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "crc32c": "4cbc7ffc",
+        "bytes": 17,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-minion-group-gzvm/kube-node-installation.log",
+      "bytes": 17,
+      "md5": "cdfc37141b925a27919a83355bf842dd",
+      "verified": true,
+      "file": "bootstrap-e2e-minion-group-gzvm.kube-node-installation.log.gz",
+      "file_bytes": 96,
+      "gcs": {
+        "generation": "1794096832778576",
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "crc32c": "4cbc7ffc",
+        "bytes": 17,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-minion-group-nclp/kube-node-configuration.log",
+      "bytes": 17,
+      "md5": "cdfc37141b925a27919a83355bf842dd",
+      "verified": true,
+      "file": "bootstrap-e2e-minion-group-nclp.kube-node-configuration.log.gz",
+      "file_bytes": 97,
+      "gcs": {
+        "generation": "1794096832737421",
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "crc32c": "4cbc7ffc",
+        "bytes": 17,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-minion-group-nclp/kube-node-installation.log",
+      "bytes": 17,
+      "md5": "cdfc37141b925a27919a83355bf842dd",
+      "verified": true,
+      "file": "bootstrap-e2e-minion-group-nclp.kube-node-installation.log.gz",
+      "file_bytes": 96,
+      "gcs": {
+        "generation": "1794096832291858",
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "crc32c": "4cbc7ffc",
+        "bytes": 17,
+        "encoding": "identity"
+      }
+    }
+  ],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T003532Z",
+  "archived_at": 1794098132.0,
+  "settled": false,
+  "final": false
+}
