@@ -1,0 +1,130 @@
+{
+  "job": "ci-node-e2e-containerd-2-4-ubuntu-dra",
+  "build": "2119362718308765696",
+  "query": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-ubuntu-dra",
+  "started": 1794130430,
+  "created": 1794130422,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ci-node-e2e-containerd-2-4-ubuntu-dra",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-node-e2e-containerd-2-4-ubuntu-dra.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794130560,
+  "commits": {
+    "kubernetes/test-infra": "1a94437b08d381ec0d960141e7b26221ad50b631",
+    "containerd/containerd": "00477f22802490155912250161b5e7c20924a3c1"
+  },
+  "job_version": "v1.38.0-beta.0.156+6dabbdc67bca2a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-ubuntu-dra/2119362718308765696",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-ubuntu-dra/2119362718308765696/build-log.txt",
+  "log": {
+    "bytes": 57871,
+    "md5": "9a3bdbc6c2584be798968478c69162f4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 11682,
+    "gcs": {
+      "generation": "1794130560695376",
+      "md5": "9a3bdbc6c2584be798968478c69162f4",
+      "crc32c": "a4eecaf0",
+      "bytes": 57871,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 101200,
+    "md5": "c06b5f7be07dfd73fc1e68d5b1d67c5b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12788,
+    "gcs": {
+      "generation": "1794130563189058",
+      "md5": "c06b5f7be07dfd73fc1e68d5b1d67c5b",
+      "crc32c": "33d6e94b",
+      "bytes": 101200,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": true,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false,
+  "artifacts_asset": {
+    "name": "ci-node-e2e-containerd-2-4-ubuntu-dra_2119362718308765696.tar.xz",
+    "month": "2026-11",
+    "bytes": 52176,
+    "sha256": "253fb49b7736584531387e981127438df2ffc87a41eb702833652a568ef0aac4",
+    "members": [
+      {
+        "path": "artifacts/junit_runner.xml",
+        "bytes": 252,
+        "md5": "fe20ffae609b980622e38ce5c30e1ceb",
+        "gcs": {
+          "generation": "1794130560596001",
+          "md5": "fe20ffae609b980622e38ce5c30e1ceb",
+          "crc32c": "e0045085",
+          "bytes": 252,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/metadata.json",
+        "bytes": 166,
+        "md5": "13002ea915e8836a96b70033f0075c7c",
+        "gcs": {
+          "generation": "1794130560529026",
+          "md5": "13002ea915e8836a96b70033f0075c7c",
+          "crc32c": "99ede595",
+          "bytes": 166,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-fcf6d64b-ubuntu-gke-2404-1-34-amd64-v20261107-system.log",
+        "bytes": 422595,
+        "md5": "57836163cee5f8e7f6453e4a66993bf1",
+        "gcs": {
+          "generation": "1794130560523220",
+          "md5": "57836163cee5f8e7f6453e4a66993bf1",
+          "crc32c": "50ce1756",
+          "bytes": 422595,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-fcf6d64b-ubuntu-gke-2404-1-34-amd64-v20261107/serial-1.log",
+        "bytes": 74814,
+        "md5": "fbb8b093c69d487e5f78b448210804ea",
+        "gcs": {
+          "generation": "1794130560522523",
+          "md5": "fbb8b093c69d487e5f78b448210804ea",
+          "crc32c": "c34c0c93",
+          "bytes": 74814,
+          "encoding": "identity"
+        }
+      }
+    ],
+    "built_by_run": "2026-11-08T175617Z",
+    "pending_since": 1794160577.3220358,
+    "uploaded": {
+      "release": "node-logs-2026-11",
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-node-e2e-containerd-2-4-ubuntu-dra_2119362718308765696.tar.xz"
+    }
+  }
+}

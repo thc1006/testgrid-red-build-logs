@@ -1,0 +1,51 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2119289234316595200",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794112903,
+  "created": 1794112902,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Pod",
+          "status": "FAIL",
+          "message": "sidecar still running"
+        }
+      ]
+    }
+  ],
+  "result": "failure",
+  "finished": 1794114130,
+  "commits": {},
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2119289234316595200",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2119289234316595200/build-log.txt",
+  "log": null,
+  "podinfo": {
+    "bytes": 53926,
+    "md5": "db988c7116c24079b98419f9391b876a",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 6395,
+    "gcs": {
+      "generation": "1794114132571641",
+      "md5": "db988c7116c24079b98419f9391b876a",
+      "crc32c": "1c5e200e",
+      "bytes": 53926,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

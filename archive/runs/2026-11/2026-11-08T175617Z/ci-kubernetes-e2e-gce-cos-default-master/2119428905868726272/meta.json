@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2119428905868726272",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1794146232,
+  "created": 1794146202,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test phase transition timestamp multiple updates",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-tnbgm\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 11/08/26 14:15:58.665\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794148901,
+  "commits": {
+    "kubernetes/kubernetes": "6dabbdc67bca2a1c0519234773cf7f088cdb3c7f"
+  },
+  "job_version": "v1.38.0-beta.0.156+6dabbdc67bca2a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2119428905868726272",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2119428905868726272/build-log.txt",
+  "log": {
+    "bytes": 155372,
+    "md5": "50cd26c322720a1e02df5bd32edb4e40",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25761,
+    "gcs": {
+      "generation": "1794148916294987",
+      "md5": "50cd26c322720a1e02df5bd32edb4e40",
+      "crc32c": "3f59d078",
+      "bytes": 155372,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96298,
+    "md5": "3832f7fd22c4b6bddafb00d4e28fdd8b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12363,
+    "gcs": {
+      "generation": "1794148919200238",
+      "md5": "3832f7fd22c4b6bddafb00d4e28fdd8b",
+      "crc32c": "29ec9378",
+      "bytes": 96298,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,64 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-performance-100",
+  "build": "2119369261750161408",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100",
+  "started": 1794132013,
+  "created": 1794131982,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-master-scale-performance-100",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-scale-performance-100.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794135986,
+  "commits": {
+    "kubernetes/perf-tests": "57b411e1302432c50266bd11d98920838ef87a1c",
+    "kubernetes/kops": "912b46f53ac976f65fffb2f1b3899c885aa07ad2",
+    "kubernetes/kubernetes": "6dabbdc67bca2a1c0519234773cf7f088cdb3c7f"
+  },
+  "job_version": "v1.38.0-beta.0.156+6dabbdc67bca2a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2119369261750161408",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2119369261750161408/build-log.txt",
+  "log": {
+    "bytes": 2049867,
+    "md5": "63db248d69427bf7c57bc6c0465869b7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 163318,
+    "gcs": {
+      "generation": "1794136001609826",
+      "md5": "63db248d69427bf7c57bc6c0465869b7",
+      "crc32c": "8afd5eb3",
+      "bytes": 2049867,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 77978,
+    "md5": "4c01f8d8a9fb52d737680afeaf9dca5c",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11254,
+    "gcs": {
+      "generation": "1794136004204795",
+      "md5": "4c01f8d8a9fb52d737680afeaf9dca5c",
+      "crc32c": "5d43489c",
+      "bytes": 77978,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

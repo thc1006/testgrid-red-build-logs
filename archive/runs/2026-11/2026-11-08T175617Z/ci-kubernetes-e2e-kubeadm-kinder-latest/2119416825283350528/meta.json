@@ -1,0 +1,62 @@
+{
+  "job": "ci-kubernetes-e2e-kubeadm-kinder-latest",
+  "build": "2119416825283350528",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest",
+  "started": 1794143355,
+  "created": 1794143322,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kubeadm-kinder-latest",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kubeadm-kinder-latest.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794143788,
+  "commits": {
+    "kubernetes/kubeadm": "57a21fcc1403533937d37af678b955f356e3e17c",
+    "kubernetes/kubernetes": "6dabbdc67bca2a1c0519234773cf7f088cdb3c7f"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest/2119416825283350528",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest/2119416825283350528/build-log.txt",
+  "log": {
+    "bytes": 4259,
+    "md5": "7051bcfc2b9efed3f2bf3595cc09aece",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 1495,
+    "gcs": {
+      "generation": "1794143788477580",
+      "md5": "7051bcfc2b9efed3f2bf3595cc09aece",
+      "crc32c": "a67a7ef8",
+      "bytes": 4259,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 82484,
+    "md5": "d67a1562ca4a438aabde9a4136e96564",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11708,
+    "gcs": {
+      "generation": "1794143790473479",
+      "md5": "d67a1562ca4a438aabde9a4136e96564",
+      "crc32c": "00d485ec",
+      "bytes": 82484,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

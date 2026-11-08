@@ -1,0 +1,141 @@
+{
+  "job": "ci-node-crio-conformance",
+  "build": "2119373037441650688",
+  "query": "kubernetes-ci-logs/logs/ci-node-crio-conformance",
+  "started": 1794132950,
+  "created": 1794132882,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-node-crio-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-node-crio-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794133464,
+  "commits": {
+    "kubernetes/test-infra": "1a94437b08d381ec0d960141e7b26221ad50b631",
+    "kubernetes/kubernetes": "6dabbdc67bca2a1c0519234773cf7f088cdb3c7f"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2119373037441650688",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-crio-conformance/2119373037441650688/build-log.txt",
+  "log": {
+    "bytes": 23454,
+    "md5": "3c6372e2ab66ba89379466367d1541fc",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 6672,
+    "gcs": {
+      "generation": "1794133464921349",
+      "md5": "3c6372e2ab66ba89379466367d1541fc",
+      "crc32c": "0b041a60",
+      "bytes": 23454,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 103265,
+    "md5": "a427ad121763d549a154fd8c9d0719d0",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13167,
+    "gcs": {
+      "generation": "1794133467271576",
+      "md5": "a427ad121763d549a154fd8c9d0719d0",
+      "crc32c": "195b0722",
+      "bytes": 103265,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": true,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false,
+  "artifacts_asset": {
+    "name": "ci-node-crio-conformance_2119373037441650688.tar.xz",
+    "month": "2026-11",
+    "bytes": 70620,
+    "sha256": "36498b8974af69d94b17d0a94414e34b18ca113d93e6d0a7148372eabaf2160d",
+    "members": [
+      {
+        "path": "artifacts/build-log.txt",
+        "bytes": 19795,
+        "md5": "03715378513638d408f29ecbf69486ae",
+        "gcs": {
+          "generation": "1794133464810890",
+          "md5": "03715378513638d408f29ecbf69486ae",
+          "crc32c": "08d878c3",
+          "bytes": 19795,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/junit_runner.xml",
+        "bytes": 252,
+        "md5": "3e632ea962660063256308949ad3c6f0",
+        "gcs": {
+          "generation": "1794133464828984",
+          "md5": "3e632ea962660063256308949ad3c6f0",
+          "crc32c": "752fd421",
+          "bytes": 252,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/metadata.json",
+        "bytes": 133,
+        "md5": "70a4efef1f3956f6f0176bb2d12f43e7",
+        "gcs": {
+          "generation": "1794133464749721",
+          "md5": "70a4efef1f3956f6f0176bb2d12f43e7",
+          "crc32c": "6281ff42",
+          "bytes": 133,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-44-20261023-3-1-gcp-x86-64-system.log",
+        "bytes": 517026,
+        "md5": "26ee5f37c3cd6cfa87e34d90c3b41117",
+        "gcs": {
+          "generation": "1794133464753377",
+          "md5": "26ee5f37c3cd6cfa87e34d90c3b41117",
+          "crc32c": "24976ffd",
+          "bytes": 517026,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-44-20261023-3-1-gcp-x86-64/serial-1.log",
+        "bytes": 263440,
+        "md5": "2cbb511a00ab9fec5d51fa94f059f542",
+        "gcs": {
+          "generation": "1794133464750553",
+          "md5": "2cbb511a00ab9fec5d51fa94f059f542",
+          "crc32c": "9f463cbc",
+          "bytes": 263440,
+          "encoding": "identity"
+        }
+      }
+    ],
+    "built_by_run": "2026-11-08T175617Z",
+    "pending_since": 1794160577.3220358,
+    "uploaded": {
+      "release": "node-logs-2026-11",
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-node-crio-conformance_2119373037441650688.tar.xz"
+    }
+  }
+}

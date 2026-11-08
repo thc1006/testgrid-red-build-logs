@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2119361964021911552",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1794130271,
+  "created": 1794130242,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Up",
+          "status": "FAIL",
+          "message": "error encountered during /home/prow/go/src/k8s.io/kubernetes/cluster/kube-up.sh: exit status 2"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794130655,
+  "commits": {
+    "kubernetes/kubernetes": "6dabbdc67bca2a1c0519234773cf7f088cdb3c7f"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2119361964021911552",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2119361964021911552/build-log.txt",
+  "log": {
+    "bytes": 29473,
+    "md5": "ac4ea20c25486ca7a4112c3a13951969",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 6016,
+    "gcs": {
+      "generation": "1794130656084679",
+      "md5": "ac4ea20c25486ca7a4112c3a13951969",
+      "crc32c": "8347aa7f",
+      "bytes": 29473,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98309,
+    "md5": "c7e8d5880d6bdb60dfa9898a6169a23f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12552,
+    "gcs": {
+      "generation": "1794130657852361",
+      "md5": "c7e8d5880d6bdb60dfa9898a6169a23f",
+      "crc32c": "5aa226a9",
+      "bytes": 98309,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

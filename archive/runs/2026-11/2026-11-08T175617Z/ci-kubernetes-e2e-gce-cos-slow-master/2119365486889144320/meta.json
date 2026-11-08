@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-slow-master",
+  "build": "2119365486889144320",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master",
+  "started": 1794131110,
+  "created": 1794131082,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-slow-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-slow-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Up",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-up.sh: exit status 2"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794131605,
+  "commits": {
+    "kubernetes/kubernetes": "6dabbdc67bca2a1c0519234773cf7f088cdb3c7f"
+  },
+  "job_version": "v1.38.0-beta.0.156+6dabbdc67bca2a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2119365486889144320",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-slow-master/2119365486889144320/build-log.txt",
+  "log": {
+    "bytes": 35968,
+    "md5": "3d20fb246f78a5651bd24f1f1592e02d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 7353,
+    "gcs": {
+      "generation": "1794131605974627",
+      "md5": "3d20fb246f78a5651bd24f1f1592e02d",
+      "crc32c": "51468a5c",
+      "bytes": 35968,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96351,
+    "md5": "7f379581fb198d60862246dd6704a3b9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12292,
+    "gcs": {
+      "generation": "1794131619110295",
+      "md5": "7f379581fb198d60862246dd6704a3b9",
+      "crc32c": "1de0a585",
+      "bytes": 96351,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

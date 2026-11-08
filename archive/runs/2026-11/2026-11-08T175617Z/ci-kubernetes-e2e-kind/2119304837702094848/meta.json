@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2119304837702094848",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1794116652,
+  "created": 1794116622,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and use it multiple times in a single pod",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-jdwzr\" failed to reach Success: Timed out aft...es/test/e2e/storage/persistent_volumes.go:232 @ 11/08/26 05:55:27.671\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794118164,
+  "commits": {
+    "kubernetes/kubernetes": "fadb6229e9bf8109bec10c4729d3d08862a7d6ea"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2119304837702094848",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2119304837702094848/build-log.txt",
+  "log": {
+    "bytes": 129639,
+    "md5": "c5523b74946a17ce36cdf83f2f54bb9d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21035,
+    "gcs": {
+      "generation": "1794118178526007",
+      "md5": "c5523b74946a17ce36cdf83f2f54bb9d",
+      "crc32c": "4f0c1551",
+      "bytes": 129639,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97645,
+    "md5": "3cc650af2da88134f920f558bd07a384",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12534,
+    "gcs": {
+      "generation": "1794118180683471",
+      "md5": "3cc650af2da88134f920f558bd07a384",
+      "crc32c": "466549f2",
+      "bytes": 97645,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

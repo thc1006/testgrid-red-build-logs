@@ -1,0 +1,71 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2119289484989173760",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1794112992,
+  "created": 1794112962,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container burstable pods - 1 container with all requests & limits set and resize policy [Feature:InPlacePodVerticalScaling] cpu restart resizing cpu requests",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e... 4106\n          k8s.io/client-go/tools/remotecommand/websocket.go:164\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Pod",
+          "status": "FAIL",
+          "message": "sidecar still running"
+        }
+      ]
+    }
+  ],
+  "result": "ABORTED",
+  "finished": 1794113643,
+  "commits": {
+    "kubernetes/kubernetes": "fadb6229e9bf8109bec10c4729d3d08862a7d6ea"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2119289484989173760",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2119289484989173760/build-log.txt",
+  "log": {
+    "bytes": 53747,
+    "md5": "d1a17bc67aaedada3ce13d1e6d1853d1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 11814,
+    "gcs": {
+      "generation": "1794113643972580",
+      "md5": "d1a17bc67aaedada3ce13d1e6d1853d1",
+      "crc32c": "eb4d7895",
+      "bytes": 53747,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 63750,
+    "md5": "b707e85adc4d67f45ea6f964e2a5fd00",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 7018,
+    "gcs": {
+      "generation": "1794113795753789",
+      "md5": "b707e85adc4d67f45ea6f964e2a5fd00",
+      "crc32c": "88d39f31",
+      "bytes": 63750,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

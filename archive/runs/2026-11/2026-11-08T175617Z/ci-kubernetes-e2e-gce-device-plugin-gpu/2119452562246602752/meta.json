@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2119452562246602752",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1794151871,
+  "created": 1794151843,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Up",
+          "status": "FAIL",
+          "message": "error encountered during /home/prow/go/src/k8s.io/kubernetes/cluster/get-kube.sh: exit status 92"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794152073,
+  "commits": {
+    "kubernetes/kubernetes": "e3d37bb9fb1d695daff432925cd44b1452df64e1"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2119452562246602752",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2119452562246602752/build-log.txt",
+  "log": {
+    "bytes": 19226,
+    "md5": "ba958807f73eb515a59266af1f42cce1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 4245,
+    "gcs": {
+      "generation": "1794152074218566",
+      "md5": "ba958807f73eb515a59266af1f42cce1",
+      "crc32c": "3d71259b",
+      "bytes": 19226,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 100899,
+    "md5": "f91879850c261284f15f1fe57cc600d5",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12680,
+    "gcs": {
+      "generation": "1794152076790981",
+      "md5": "f91879850c261284f15f1fe57cc600d5",
+      "crc32c": "7e7c8b20",
+      "bytes": 100899,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

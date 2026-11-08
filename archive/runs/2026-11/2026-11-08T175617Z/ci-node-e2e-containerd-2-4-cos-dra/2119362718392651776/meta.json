@@ -1,0 +1,130 @@
+{
+  "job": "ci-node-e2e-containerd-2-4-cos-dra",
+  "build": "2119362718392651776",
+  "query": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra",
+  "started": 1794130430,
+  "created": 1794130422,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ci-node-e2e-containerd-2-4-cos-dra",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-node-e2e-containerd-2-4-cos-dra.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794130550,
+  "commits": {
+    "containerd/containerd": "00477f22802490155912250161b5e7c20924a3c1",
+    "kubernetes/test-infra": "1a94437b08d381ec0d960141e7b26221ad50b631"
+  },
+  "job_version": "v1.38.0-beta.0.156+6dabbdc67bca2a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra/2119362718392651776",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra/2119362718392651776/build-log.txt",
+  "log": {
+    "bytes": 34031,
+    "md5": "08191cc0ed48efd902754ba266471ec7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 8731,
+    "gcs": {
+      "generation": "1794130550723535",
+      "md5": "08191cc0ed48efd902754ba266471ec7",
+      "crc32c": "9799500e",
+      "bytes": 34031,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 101173,
+    "md5": "d7ddc6552f102d03bf0cda7789175892",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12806,
+    "gcs": {
+      "generation": "1794130553117408",
+      "md5": "d7ddc6552f102d03bf0cda7789175892",
+      "crc32c": "78f65cd5",
+      "bytes": 101173,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": true,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false,
+  "artifacts_asset": {
+    "name": "ci-node-e2e-containerd-2-4-cos-dra_2119362718392651776.tar.xz",
+    "month": "2026-11",
+    "bytes": 131668,
+    "sha256": "e25334f24478dc4f525a5a046070b7e38869c7c808c1eb5713f617a89f824d5b",
+    "members": [
+      {
+        "path": "artifacts/junit_runner.xml",
+        "bytes": 252,
+        "md5": "0cb52b9595cd187665de729be1d96e2d",
+        "gcs": {
+          "generation": "1794130550543555",
+          "md5": "0cb52b9595cd187665de729be1d96e2d",
+          "crc32c": "788a9bce",
+          "bytes": 252,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/metadata.json",
+        "bytes": 166,
+        "md5": "13002ea915e8836a96b70033f0075c7c",
+        "gcs": {
+          "generation": "1794130550606919",
+          "md5": "13002ea915e8836a96b70033f0075c7c",
+          "crc32c": "99ede595",
+          "bytes": 166,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-42be329d-cos-133-19999-44-193-system.log",
+        "bytes": 2913239,
+        "md5": "9588df6e67491e534f85f395ca2e725a",
+        "gcs": {
+          "generation": "1794130550587879",
+          "md5": "9588df6e67491e534f85f395ca2e725a",
+          "crc32c": "73d3df8c",
+          "bytes": 2913239,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/tmp-node-e2e-42be329d-cos-133-19999-44-193/serial-1.log",
+        "bytes": 64352,
+        "md5": "78e7b1ad7b39e132655e4284e102c8be",
+        "gcs": {
+          "generation": "1794130550548289",
+          "md5": "78e7b1ad7b39e132655e4284e102c8be",
+          "crc32c": "6927042d",
+          "bytes": 64352,
+          "encoding": "identity"
+        }
+      }
+    ],
+    "built_by_run": "2026-11-08T175617Z",
+    "pending_since": 1794160577.3220358,
+    "uploaded": {
+      "release": "node-logs-2026-11",
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-node-e2e-containerd-2-4-cos-dra_2119362718392651776.tar.xz"
+    }
+  }
+}

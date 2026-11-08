@@ -1,0 +1,69 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-alpha-features",
+  "build": "2119290240286855168",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-alpha-features",
+  "started": 1794113143,
+  "created": 1794113142,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-alpha-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-alpha-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-alpha-features.Pod",
+          "status": "FAIL",
+          "message": "sidecar still running"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update nodePort: udp [Slow]",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...netes/test/e2e/framework/pod/exec_util.go:130 @ 11/08/26 04:54:03.764\n"
+        }
+      ]
+    }
+  ],
+  "result": "ABORTED",
+  "finished": 1794113644,
+  "commits": {},
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-alpha-features/2119290240286855168",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-alpha-features/2119290240286855168/build-log.txt",
+  "log": {
+    "bytes": 45546,
+    "md5": "f58ce0b37aa7bc37b200126d35a6554c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 10619,
+    "gcs": {
+      "generation": "1794113645050075",
+      "md5": "f58ce0b37aa7bc37b200126d35a6554c",
+      "crc32c": "caa639ad",
+      "bytes": 45546,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 53523,
+    "md5": "b8940ed067f2d571941597416c3dc6e7",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 6304,
+    "gcs": {
+      "generation": "1794113796777127",
+      "md5": "b8940ed067f2d571941597416c3dc6e7",
+      "crc32c": "fccef3c4",
+      "bytes": 53523,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

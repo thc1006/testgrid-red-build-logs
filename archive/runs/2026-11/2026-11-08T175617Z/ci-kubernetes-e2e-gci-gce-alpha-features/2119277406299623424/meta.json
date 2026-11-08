@@ -1,0 +1,69 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-alpha-features",
+  "build": "2119277406299623424",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-alpha-features",
+  "started": 1794110083,
+  "created": 1794110082,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-alpha-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-alpha-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-alpha-features.Pod",
+          "status": "FAIL",
+          "message": "sidecar still running"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Container guaranteed qos - 1 container with resize policy [Feature:InPlacePodVerticalScaling] cpu & mem restart resizing cpu",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e....run in goroutine 3378\n          k8s.io/klog/v2@v2.140.0/klog.go:1182\n"
+        }
+      ]
+    }
+  ],
+  "result": "ABORTED",
+  "finished": 1794112937,
+  "commits": {},
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-alpha-features/2119277406299623424",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-alpha-features/2119277406299623424/build-log.txt",
+  "log": {
+    "bytes": 40456,
+    "md5": "56f9dece9155d4364155cbc0375018f9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 9288,
+    "gcs": {
+      "generation": "1794112937838741",
+      "md5": "56f9dece9155d4364155cbc0375018f9",
+      "crc32c": "0152ebc5",
+      "bytes": 40456,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 53525,
+    "md5": "28e17ad614071e5ca8ffff5062de17b2",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 6314,
+    "gcs": {
+      "generation": "1794113088632075",
+      "md5": "28e17ad614071e5ca8ffff5062de17b2",
+      "crc32c": "1694c064",
+      "bytes": 53525,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

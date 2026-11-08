@@ -1,0 +1,53 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2119269100659150848",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1794108133,
+  "created": 1794108102,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Pod",
+          "status": "FAIL",
+          "message": "sidecar still running"
+        }
+      ]
+    }
+  ],
+  "result": "failure",
+  "finished": 1794114129,
+  "commits": {
+    "kubernetes/kubernetes": "776432e660634388d82e866341df0f35cf0e82c4"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2119269100659150848",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2119269100659150848/build-log.txt",
+  "log": null,
+  "podinfo": {
+    "bytes": 37529,
+    "md5": "7694accaf641e25aeac79d7c79228298",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 5505,
+    "gcs": {
+      "generation": "1794114130353891",
+      "md5": "7694accaf641e25aeac79d7c79228298",
+      "crc32c": "b1bf7352",
+      "bytes": 37529,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false
+}

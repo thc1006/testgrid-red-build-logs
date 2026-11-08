@@ -1,0 +1,75 @@
+{
+  "job": "ci-node-crio-conformance",
+  "build": "2119282438646534144",
+  "query": "kubernetes-ci-logs/logs/ci-node-crio-conformance",
+  "started": 1794111367,
+  "created": 1794111282,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-node-crio-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-node-crio-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "signal: terminated"
+        },
+        {
+          "test": "ci-node-crio-conformance.Pod",
+          "status": "FAIL",
+          "message": "sidecar still running"
+        }
+      ]
+    }
+  ],
+  "result": "ABORTED",
+  "finished": 1794112937,
+  "commits": {
+    "kubernetes/test-infra": "489e2b29ab327361c48758a993f12be8057ace72",
+    "kubernetes/kubernetes": "fadb6229e9bf8109bec10c4729d3d08862a7d6ea"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2119282438646534144",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-crio-conformance/2119282438646534144/build-log.txt",
+  "log": {
+    "bytes": 24603,
+    "md5": "c4eff8c8f747d5a5848e8e7f45faf627",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 7145,
+    "gcs": {
+      "generation": "1794112937556270",
+      "md5": "c4eff8c8f747d5a5848e8e7f45faf627",
+      "crc32c": "10d70e9d",
+      "bytes": 24603,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 76641,
+    "md5": "37a198ec7df973321efd0f91070bae31",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 7822,
+    "gcs": {
+      "generation": "1794113089352578",
+      "md5": "37a198ec7df973321efd0f91070bae31",
+      "crc32c": "5126daa4",
+      "bytes": 76641,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": true,
+  "archived_by_run": "2026-11-08T175617Z",
+  "archived_at": 1794160577.0,
+  "settled": true,
+  "final": false,
+  "artifacts_asset": {
+    "members": []
+  }
+}
