@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled-conformance",
+  "build": "2119808409623597056",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled-conformance",
+  "started": 1794236718,
+  "created": 1794236683,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourceDefinition resources [Privileged:ClusterAdmin] Simple CustomResourceDefinition creating/deleting custom resource definition objects works [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] creating CustomResourceDefinition: customresourcedefinitions....apimachinery/custom_resource_definition.go:72 @ 11/09/26 15:11:37.484\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794237514,
+  "commits": {
+    "kubernetes/kubernetes": "70712d12d27b7be5f92bd08e93ce9ec406c75bf6"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled-conformance/2119808409623597056",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled-conformance/2119808409623597056/build-log.txt",
+  "log": {
+    "bytes": 116156,
+    "md5": "9a8c335e1255e4f0717bd9a02d6b5ba8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 18266,
+    "gcs": {
+      "generation": "1794237516666509",
+      "md5": "9a8c335e1255e4f0717bd9a02d6b5ba8",
+      "crc32c": "69ef8d5b",
+      "bytes": 116156,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96315,
+    "md5": "29137919a588c9498aa7136106bc09af",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12551,
+    "gcs": {
+      "generation": "1794237531710201",
+      "md5": "29137919a588c9498aa7136106bc09af",
+      "crc32c": "13e24fd9",
+      "bytes": 96315,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-09T195021Z",
+  "archived_at": 1794253821.0,
+  "settled": true,
+  "final": false
+}

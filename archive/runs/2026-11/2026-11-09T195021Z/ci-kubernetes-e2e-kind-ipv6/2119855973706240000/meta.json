@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2119855973706240000",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1794248053,
+  "created": 1794248023,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] StatefulSet StatefulSet Recreate Update Strategy should recreate stuck pods with ImagePullBackOff when the update strategy is Recreate [FeatureGate:StatefulSetRecreateStrategy] [Beta]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed waiting for 1 pods to be stuck with image pull error: ...es/test/e2e/framework/statefulset/wait.go:229 @ 11/09/26 18:20:16.062\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794249741,
+  "commits": {
+    "kubernetes/kubernetes": "9fcfd6ad18cc3398bb0593861196da6b350b462e"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2119855973706240000",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2119855973706240000/build-log.txt",
+  "log": {
+    "bytes": 172150,
+    "md5": "6a2be94a754aa321ca8552df56131af2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24540,
+    "gcs": {
+      "generation": "1794249762372599",
+      "md5": "6a2be94a754aa321ca8552df56131af2",
+      "crc32c": "abf83792",
+      "bytes": 172150,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95485,
+    "md5": "8bc45d9bdd5b5da03fc737140424e1ed",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12439,
+    "gcs": {
+      "generation": "1794249766245187",
+      "md5": "8bc45d9bdd5b5da03fc737140424e1ed",
+      "crc32c": "c54e0d3b",
+      "bytes": 95485,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-09T195021Z",
+  "archived_at": 1794253821.0,
+  "settled": false,
+  "final": false
+}

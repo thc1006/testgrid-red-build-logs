@@ -1,0 +1,75 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2119760351653269504",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794225226,
+  "created": 1794225225,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should support inline execution and attach",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...netes/test/e2e/framework/kubectl/builder.go:97 @ 11/09/26 13:13:48.62\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...r=/logs/artifacts --disable-log-dump=true (interrupted): exit status 1"
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794230541,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.189+b969789ab951dc",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2119760351653269504",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2119760351653269504/build-log.txt",
+  "log": {
+    "bytes": 151063,
+    "md5": "928701de3daf47863596bcfb475a85e4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25259,
+    "gcs": {
+      "generation": "1794230555732141",
+      "md5": "928701de3daf47863596bcfb475a85e4",
+      "crc32c": "a90eb925",
+      "bytes": 151063,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 66978,
+    "md5": "02f3a8dce6a8dedf85d4a103a538ab87",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10465,
+    "gcs": {
+      "generation": "1794230560119773",
+      "md5": "02f3a8dce6a8dedf85d4a103a538ab87",
+      "crc32c": "a10e81bf",
+      "bytes": 66978,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-09T195021Z",
+  "archived_at": 1794253821.0,
+  "settled": true,
+  "final": false
+}

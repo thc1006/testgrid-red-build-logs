@@ -1,0 +1,48 @@
+{
+  "run": "2026-11-09T195021Z",
+  "outcome": "ok",
+  "started": 1794253839.058635,
+  "finished": 1794253859.5363336,
+  "tool": {
+    "commit": "c872bae2688aae8c43a100e26e90c2a95ad41e47",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "42686734671",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1794081021.9626696,
+      "to": 1794253821.9626696
+    },
+    "tabs": 46,
+    "builds": 1613,
+    "compared_with_gcs": 324,
+    "sevenths": [
+      4
+    ],
+    "differ": 0,
+    "not_settled": 2,
+    "assets": {
+      "uploaded": 77,
+      "compared_with_gcs": 17,
+      "downloaded": 5
+    },
+    "red_on_testgrid": 103,
+    "red_not_settled": 0,
+    "gcs_builds": 1961,
+    "judged_by_rule": 24
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 5,
+  "notes": [
+    "ci-kubernetes-build-fast/2119264319441997824: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2119446018054426624: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2119742475114385408: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind/2119395434655911936: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-enabled-conformance/2119264068257714176: ERROR, not listed on TestGrid (not archived)"
+  ]
+}
