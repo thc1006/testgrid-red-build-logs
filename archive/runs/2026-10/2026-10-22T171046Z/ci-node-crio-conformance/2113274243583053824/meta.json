@@ -261,5 +261,9 @@
       "release": "node-logs-2026-10",
       "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-node-crio-conformance_2113274243583053824.tar.xz"
     }
+  },
+  "commits": {
+    "kubernetes/test-infra": "522e53fb467024c70823b8452451891ce1465d1a",
+    "kubernetes/kubernetes": "adc24a78c7f38d82faeb7eb544bbccfaa1788181"
   }
 }

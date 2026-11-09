@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2119670751316414464",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1794203894,
+  "created": 1794203863,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Up",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-up.sh: exit status 2"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794204362,
+  "commits": {
+    "kubernetes/kubernetes": "324e283398e6793d0d325bffc97f25551d122723"
+  },
+  "job_version": "v1.38.0-beta.0.177+324e283398e679",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2119670751316414464",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2119670751316414464/build-log.txt",
+  "log": {
+    "bytes": 35969,
+    "md5": "a0df33246677a32ad9c7de06ec1e8c59",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 7370,
+    "gcs": {
+      "generation": "1794204362988002",
+      "md5": "a0df33246677a32ad9c7de06ec1e8c59",
+      "crc32c": "3c1e2e10",
+      "bytes": 35969,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96712,
+    "md5": "aa20d17896ab4909e0334feea5d8d5d1",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12406,
+    "gcs": {
+      "generation": "1794204364825097",
+      "md5": "aa20d17896ab4909e0334feea5d8d5d1",
+      "crc32c": "5e1ebdc2",
+      "bytes": 96712,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-09T062345Z",
+  "archived_at": 1794205425.0,
+  "settled": false,
+  "final": false
+}

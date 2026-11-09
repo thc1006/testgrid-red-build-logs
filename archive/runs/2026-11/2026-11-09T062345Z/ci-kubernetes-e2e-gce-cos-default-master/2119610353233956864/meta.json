@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2119610353233956864",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1794189492,
+  "created": 1794189463,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl rollout undo undo should rollback and update deployment env",
+          "status": "FAIL",
+          "message": "[FAILED] kubectl failed to rollback deployment\nIn [It] at: k8s.io/kubernetes/test/e2e/kubectl/rollout.go:115 @ 11/09/26 02:17:34.831\n"
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794191722,
+  "commits": {
+    "kubernetes/kubernetes": "dbe731cf4b0286d68d743068f251263c70719f3e"
+  },
+  "job_version": "v1.38.0-beta.0.172+4281d93a4f46d9",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2119610353233956864",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2119610353233956864/build-log.txt",
+  "log": {
+    "bytes": 139691,
+    "md5": "1d920b8663830b71267ba25e366a4751",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22974,
+    "gcs": {
+      "generation": "1794191740454832",
+      "md5": "1d920b8663830b71267ba25e366a4751",
+      "crc32c": "443b2d14",
+      "bytes": 139691,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98078,
+    "md5": "07e7f95c1889129e05e55c9385da5c76",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12360,
+    "gcs": {
+      "generation": "1794191742232511",
+      "md5": "07e7f95c1889129e05e55c9385da5c76",
+      "crc32c": "b46b1838",
+      "bytes": 98078,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-09T062345Z",
+  "archived_at": 1794205425.0,
+  "settled": true,
+  "final": false
+}

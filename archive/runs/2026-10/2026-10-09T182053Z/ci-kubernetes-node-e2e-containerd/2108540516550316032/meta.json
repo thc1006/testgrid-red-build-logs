@@ -329,5 +329,10 @@
       "release": "node-logs-2026-10",
       "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-10/ci-kubernetes-node-e2e-containerd_2108540516550316032.tar.xz"
     }
-  }
+  },
+  "commits": {
+    "kubernetes/test-infra": "833c44cbe6a2cb7e378076dd6bb40b9f4850816b",
+    "kubernetes/kubernetes": "4dfdf5067a24f093387bdce6a49f842493e0df55"
+  },
+  "job_version": "v1.38.0-alpha.2.83+4dfdf5067a24f0"
 }

@@ -63,5 +63,8 @@
   "refreshed": [
     "podinfo.json"
   ],
-  "node_e2e": false
+  "node_e2e": false,
+  "commits": {
+    "kubernetes/kubernetes": "d4f9e04d5d2a7f43314dd93ca2efcf13ad17c46f"
+  }
 }

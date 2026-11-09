@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "build": "2119511953813540864",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "started": 1794166031,
+  "created": 1794166003,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] StatefulSet StatefulSet Recreate Update Strategy should recreate stuck pods with ImagePullBackOff when the update strategy is Recreate [FeatureGate:StatefulSetRecreateStrategy] [Beta]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed waiting for 1 pods to be stuck with image pull error: ...es/test/e2e/framework/statefulset/wait.go:229 @ 11/08/26 19:33:30.069\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794167583,
+  "commits": {
+    "kubernetes/kubernetes": "896c5b4ce4c44881eed2930add2dc3b3293323ab"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2119511953813540864",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2119511953813540864/build-log.txt",
+  "log": {
+    "bytes": 180027,
+    "md5": "3840c13a17778bc0857fc409bb3ca7f7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24107,
+    "gcs": {
+      "generation": "1794167596967906",
+      "md5": "3840c13a17778bc0857fc409bb3ca7f7",
+      "crc32c": "06a11b49",
+      "bytes": 180027,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96688,
+    "md5": "87b412cc242d21c8688f3d13654ca911",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12539,
+    "gcs": {
+      "generation": "1794167599217349",
+      "md5": "87b412cc242d21c8688f3d13654ca911",
+      "crc32c": "173c5b4a",
+      "bytes": 96688,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-09T062345Z",
+  "archived_at": 1794205425.0,
+  "settled": true,
+  "final": false
+}
