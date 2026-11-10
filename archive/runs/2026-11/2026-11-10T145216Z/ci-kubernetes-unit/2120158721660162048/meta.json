@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2120158721660162048",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1794320234,
+  "created": 1794320204,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/apiserver/pkg/storage.cacher",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestWatch/WatchCacheStallResume=true/WatchWithoutPrev...PrevKV=true (2.79s)\n\n=== RUN   TestWatch\n--- FAIL: TestWatch (68.33s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794321605,
+  "commits": {
+    "kubernetes/kubernetes": "233d4264f96aeaad0e7df0fac058c51736b43360"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2120158721660162048",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2120158721660162048/build-log.txt",
+  "log": {
+    "bytes": 253228,
+    "md5": "61b088be57b7c4be15924c0d7f00007e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 34312,
+    "gcs": {
+      "generation": "1794321605552703",
+      "md5": "61b088be57b7c4be15924c0d7f00007e",
+      "crc32c": "696e1ee6",
+      "bytes": 253228,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 92886,
+    "md5": "8ce303f07b6a527b87424f0156cb48f1",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11648,
+    "gcs": {
+      "generation": "1794321607634851",
+      "md5": "8ce303f07b6a527b87424f0156cb48f1",
+      "crc32c": "7f63d8f0",
+      "bytes": 92886,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-10T145216Z",
+  "archived_at": 1794322336.0,
+  "settled": false,
+  "final": false
+}

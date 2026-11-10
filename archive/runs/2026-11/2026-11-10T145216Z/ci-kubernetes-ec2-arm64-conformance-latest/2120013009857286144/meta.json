@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-ec2-arm64-conformance-latest",
+  "build": "2120013009857286144",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-ec2-arm64-conformance-latest",
+  "started": 1794285499,
+  "created": 1794285464,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "Conformance - EC2 - arm64 - master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-ec2-arm64-conformance-latest.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Up",
+          "status": "FAIL",
+          "message": "instance i-043722a28ae0f1a37 is not running"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794286677,
+  "commits": {
+    "kubernetes-sigs/provider-aws-test-infra": "7d26ecef69a7d08b04ab2c1f83b682a08719487b",
+    "kubernetes/kubernetes": "54e25c20fa011565ba9ef2fdf88dec144a9caa9d"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-ec2-arm64-conformance-latest/2120013009857286144",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-ec2-arm64-conformance-latest/2120013009857286144/build-log.txt",
+  "log": {
+    "bytes": 87156,
+    "md5": "7027cac77e812becbdddb37dbee38f49",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 8783,
+    "gcs": {
+      "generation": "1794286678553760",
+      "md5": "7027cac77e812becbdddb37dbee38f49",
+      "crc32c": "6d3d0817",
+      "bytes": 87156,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 90253,
+    "md5": "e7ba1b93b0987cd48897f9bcaa9daec5",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12265,
+    "gcs": {
+      "generation": "1794286680779853",
+      "md5": "e7ba1b93b0987cd48897f9bcaa9daec5",
+      "crc32c": "8888f434",
+      "bytes": 90253,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-10T145216Z",
+  "archived_at": 1794322336.0,
+  "settled": true,
+  "final": false
+}

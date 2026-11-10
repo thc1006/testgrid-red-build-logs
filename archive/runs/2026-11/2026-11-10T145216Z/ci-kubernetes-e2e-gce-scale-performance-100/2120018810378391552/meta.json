@@ -1,0 +1,64 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-performance-100",
+  "build": "2120018810378391552",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100",
+  "started": 1794286877,
+  "created": 1794286847,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-master-scale-performance-100",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-scale-performance-100.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794291134,
+  "commits": {
+    "kubernetes/perf-tests": "01a4367bce12691ea1e910394290b72a90b4fa65",
+    "kubernetes/kops": "39a5be5cfadc179cb46e3c8323e2a8ffb8db2724",
+    "kubernetes/kubernetes": "3d7b2dcafbc3aade5fb68b04f5dbc4d85e1eee79"
+  },
+  "job_version": "v1.38.0-beta.0.235+54e25c20fa0115",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2120018810378391552",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2120018810378391552/build-log.txt",
+  "log": {
+    "bytes": 2078977,
+    "md5": "29f31c2b0be6e97fd577cab079b075f7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 162132,
+    "gcs": {
+      "generation": "1794291147722832",
+      "md5": "29f31c2b0be6e97fd577cab079b075f7",
+      "crc32c": "76d47403",
+      "bytes": 2078977,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 77521,
+    "md5": "81604414155ccb0e033f1e4ffc7a1f40",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11238,
+    "gcs": {
+      "generation": "1794291149766251",
+      "md5": "81604414155ccb0e033f1e4ffc7a1f40",
+      "crc32c": "1eafd935",
+      "bytes": 77521,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-10T145216Z",
+  "archived_at": 1794322336.0,
+  "settled": true,
+  "final": false
+}

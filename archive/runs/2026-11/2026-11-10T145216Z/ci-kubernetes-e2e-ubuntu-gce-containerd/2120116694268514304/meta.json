@@ -1,0 +1,75 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2120116694268514304",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794310185,
+  "created": 1794310184,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] ReplicaSet should validate Replicaset Status endpoints [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] locate replicaset test-rs in namespace replicaset-8932: watch...o/kubernetes/test/e2e/apps/replica_set.go:699 @ 11/10/26 11:37:56.793\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] StatefulSet StatefulSet Recreate Update Strategy should recreate stuck pods with ImagePullBackOff when the update strategy is Recreate [FeatureGate:StatefulSetRecreateStrategy] [Beta]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed waiting for 1 pods to be stuck with image pull error: ...es/test/e2e/framework/statefulset/wait.go:229 @ 11/10/26 11:58:29.697\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794312508,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.241+175a062d81cd96",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2120116694268514304",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2120116694268514304/build-log.txt",
+  "log": {
+    "bytes": 212412,
+    "md5": "650b72e1075cada7a48ac48cd13044d3",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 32930,
+    "gcs": {
+      "generation": "1794312522615791",
+      "md5": "650b72e1075cada7a48ac48cd13044d3",
+      "crc32c": "2a97f814",
+      "bytes": 212412,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87551,
+    "md5": "f5793f3a6440cb2074b1cf8dfe8d2997",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11913,
+    "gcs": {
+      "generation": "1794312524476141",
+      "md5": "f5793f3a6440cb2074b1cf8dfe8d2997",
+      "crc32c": "bdaca9cc",
+      "bytes": 87551,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-10T145216Z",
+  "archived_at": 1794322336.0,
+  "settled": true,
+  "final": false
+}
