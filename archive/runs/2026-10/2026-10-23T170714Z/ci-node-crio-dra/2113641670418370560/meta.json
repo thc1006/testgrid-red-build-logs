@@ -62,5 +62,9 @@
   "node_e2e": true,
   "artifacts_asset": {
     "members": []
-  }
+  },
+  "commits": {
+    "kubernetes/test-infra": "0bbd18770a788bb366e0dc4ff09859e871539a48"
+  },
+  "job_version": "v1.38.0-alpha.2.625+f81cad6d4a14e3"
 }

@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2119989605863264256",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1794279914,
+  "created": 1794279884,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] StatefulSet StatefulSet Recreate Update Strategy should recreate stuck pods with ImagePullBackOff when the update strategy is Recreate [FeatureGate:StatefulSetRecreateStrategy] [Beta]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed waiting for 1 pods to be stuck with image pull error: ...es/test/e2e/framework/statefulset/wait.go:229 @ 11/10/26 03:12:56.114\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794281438,
+  "commits": {
+    "kubernetes/kubernetes": "54e25c20fa011565ba9ef2fdf88dec144a9caa9d"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2119989605863264256",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2119989605863264256/build-log.txt",
+  "log": {
+    "bytes": 173146,
+    "md5": "cbe3e5512d21a1dde4fe9553e43f45f9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23713,
+    "gcs": {
+      "generation": "1794281453390673",
+      "md5": "cbe3e5512d21a1dde4fe9553e43f45f9",
+      "crc32c": "2eb27e44",
+      "bytes": 173146,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98307,
+    "md5": "726d8a2ea46d5702edf1c382298aabc3",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12661,
+    "gcs": {
+      "generation": "1794281455365064",
+      "md5": "726d8a2ea46d5702edf1c382298aabc3",
+      "crc32c": "53fc3d13",
+      "bytes": 98307,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-10T033424Z",
+  "archived_at": 1794281664.0,
+  "settled": false,
+  "final": false
+}

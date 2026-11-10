@@ -62,5 +62,9 @@
   "node_e2e": true,
   "artifacts_asset": {
     "members": []
+  },
+  "commits": {
+    "kubernetes/test-infra": "6a6c1cc4b7ababa0f0fc494946bc30ad6eacac2f",
+    "kubernetes/kubernetes": "098ec58c5a98cc5da18f119d0123361afca888b4"
   }
 }

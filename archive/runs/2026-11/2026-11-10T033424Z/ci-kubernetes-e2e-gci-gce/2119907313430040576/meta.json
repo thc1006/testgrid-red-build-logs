@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2119907313430040576",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1794260264,
+  "created": 1794260264,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics PVC should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 11/09/26 22:40:37.953\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794264554,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.219+7b73e06e61d988",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2119907313430040576",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2119907313430040576/build-log.txt",
+  "log": {
+    "bytes": 185343,
+    "md5": "735d8c61f2992c79666cb65561b7d1d2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25419,
+    "gcs": {
+      "generation": "1794264568355512",
+      "md5": "735d8c61f2992c79666cb65561b7d1d2",
+      "crc32c": "a6e2dc3d",
+      "bytes": 185343,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 65680,
+    "md5": "515d42c38b9eb38caaf110ba5ae580d6",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10272,
+    "gcs": {
+      "generation": "1794264570487015",
+      "md5": "515d42c38b9eb38caaf110ba5ae580d6",
+      "crc32c": "53f52759",
+      "bytes": 65680,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-10T033424Z",
+  "archived_at": 1794281664.0,
+  "settled": true,
+  "final": false
+}
