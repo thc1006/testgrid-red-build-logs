@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2120431774273114112",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794385305,
+  "created": 1794385305,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Services should implement NodePort and HealthCheckNodePort correctly when ExternalTrafficPolicy changes",
+          "status": "FAIL",
+          "message": "[FAILED] updating ExternalTrafficPolicy and HealthCheckNodePort: faile...o/kubernetes/test/e2e/network/service.go:4036 @ 11/11/26 08:45:09.112\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794387598,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.281+7898e97f1724f7",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2120431774273114112",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2120431774273114112/build-log.txt",
+  "log": {
+    "bytes": 152223,
+    "md5": "d5253832dd2b87aa4cb308b81285149b",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24757,
+    "gcs": {
+      "generation": "1794387610621165",
+      "md5": "d5253832dd2b87aa4cb308b81285149b",
+      "crc32c": "baa35fdb",
+      "bytes": 152223,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 88818,
+    "md5": "a4347b9714cfe33692d689edd958d144",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12009,
+    "gcs": {
+      "generation": "1794387612882132",
+      "md5": "a4347b9714cfe33692d689edd958d144",
+      "crc32c": "3e45ece0",
+      "bytes": 88818,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-11T142720Z",
+  "archived_at": 1794407240.0,
+  "settled": true,
+  "final": false
+}

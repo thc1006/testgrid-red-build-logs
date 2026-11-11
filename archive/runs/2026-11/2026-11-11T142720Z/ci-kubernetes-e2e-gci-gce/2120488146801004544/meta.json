@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2120488146801004544",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1794398747,
+  "created": 1794398745,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Memory-Backed Volume [FeatureGate:InPlacePodVerticalScalingMemoryBackedVolumes] memory-backed emptyDir volume resize volume resize sizeLimit exceeding pod memory limit is capped to pod limit [Beta] [FeatureGate:NodeDeclaredFeatures]",
+          "status": "FAIL",
+          "message": "[FAILED] run df inside container: error reading from error stream: nex...rnetes/test/e2e/common/node/pod_resize.go:887 @ 11/11/26 12:14:15.606\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794401239,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.283+9a2c82fcee3494",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2120488146801004544",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2120488146801004544/build-log.txt",
+  "log": {
+    "bytes": 127120,
+    "md5": "dc4564e099cd0ae75888983255f76c55",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21938,
+    "gcs": {
+      "generation": "1794401254246307",
+      "md5": "dc4564e099cd0ae75888983255f76c55",
+      "crc32c": "430a0371",
+      "bytes": 127120,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86507,
+    "md5": "5c9d5d2c82c9302ca9be406a890fb5a5",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11799,
+    "gcs": {
+      "generation": "1794401270571739",
+      "md5": "5c9d5d2c82c9302ca9be406a890fb5a5",
+      "crc32c": "cd3a077d",
+      "bytes": 86507,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-11T142720Z",
+  "archived_at": 1794407240.0,
+  "settled": false,
+  "final": false
+}

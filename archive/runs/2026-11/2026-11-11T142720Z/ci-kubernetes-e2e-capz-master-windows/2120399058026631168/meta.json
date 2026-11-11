@@ -1,0 +1,78 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2120399058026631168",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1794377513,
+  "created": 1794377505,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FAILING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] WebSocket streaming port forwarding over the WebSocket tunnel should forward to a server listening on localhost [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] data forwarded from the pod\nExpected\n    <[]uint8 | len:0, ca...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pods Extended (pod generation) Pod Generation issue 500 podspec updates and verify generation and observedGeneration eventually converge [MinimumKubeletVersion:1.34] [Conformance]",
+          "status": "FAIL",
+          "message": "[TIMEDOUT] A grace period timeout occurred\nIn [It] at: k8s.io/kubernet...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Probing container with readiness probe that fails should never be ready and never restart [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[TIMEDOUT] A grace period timeout occurred\nIn [It] at: k8s.io/kubernet...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794383673,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "8fc420ae464573a40bbe8f9baa18b54e88a82611",
+    "kubernetes-sigs/cluster-api-provider-azure": "0de8296be59fe3bfa83fff5b9c13f07bd9d64921",
+    "kubernetes-sigs/cloud-provider-azure": "9333e4b9156b97eebce69614a5647fc921a3424f"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2120399058026631168",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2120399058026631168/build-log.txt",
+  "log": {
+    "bytes": 528177,
+    "md5": "6f0c31e912ef6a1d56d51cdfe9db3fd2",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 83793,
+    "gcs": {
+      "generation": "1794383680736578",
+      "md5": "6f0c31e912ef6a1d56d51cdfe9db3fd2",
+      "crc32c": "4ad555cc",
+      "bytes": 528177,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 63690,
+    "md5": "4ef7d0d2c2950c5c3cab160515bb7cec",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10517,
+    "gcs": {
+      "generation": "1794383682539498",
+      "md5": "4ef7d0d2c2950c5c3cab160515bb7cec",
+      "crc32c": "c6d31fab",
+      "bytes": 63690,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-11T142720Z",
+  "archived_at": 1794407240.0,
+  "settled": true,
+  "final": false
+}
