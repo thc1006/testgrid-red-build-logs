@@ -64,5 +64,9 @@
   "archived_at": 1792557957.0,
   "settled": true,
   "final": true,
-  "node_e2e": false
+  "node_e2e": false,
+  "commits": {
+    "kubernetes/kubernetes": "b91fd789fe3f61d022a9ad0fff37979283b99b2f"
+  },
+  "job_version": "v1.38.0-alpha.2.439+b91fd789fe3f61"
 }

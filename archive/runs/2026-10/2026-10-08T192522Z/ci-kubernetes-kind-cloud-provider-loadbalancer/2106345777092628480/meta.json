@@ -63,5 +63,9 @@
   "refreshed": [
     "podinfo.json"
   ],
-  "node_e2e": false
+  "node_e2e": false,
+  "commits": {
+    "kubernetes-sigs/cloud-provider-kind": "a4c830edd41d065251da516904d45c575ee6917d",
+    "kubernetes/kubernetes": "12eb5840594c0b9b1454b6b809d2aa2c9447c9b9"
+  }
 }

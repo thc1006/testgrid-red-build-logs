@@ -1,0 +1,75 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2120229942804353024",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794337185,
+  "created": 1794337184,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] StatefulSet StatefulSet Recreate Update Strategy should recreate stuck pods with ImagePullBackOff when the update strategy is Recreate [FeatureGate:StatefulSetRecreateStrategy] [Beta]",
+          "status": "FAIL",
+          "message": "[FAILED] Failed waiting for 1 pods to be stuck with image pull error: ...es/test/e2e/framework/statefulset/wait.go:229 @ 11/10/26 19:23:18.156\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Mock volume expansion Expansion with recovery should allow recovery if controller expansion fails with infeasible error",
+          "status": "FAIL",
+          "message": "[FAILED] While waiting for PV resize to finish: error while waiting fo...e/storage/csimock/csi_volume_expansion.go:852 @ 11/10/26 19:23:13.003\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794339626,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.259+e3e86e8988a9a5",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2120229942804353024",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2120229942804353024/build-log.txt",
+  "log": {
+    "bytes": 331500,
+    "md5": "4df3f535f5ce30a2b06ec1eee4aff708",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 44999,
+    "gcs": {
+      "generation": "1794339640243572",
+      "md5": "4df3f535f5ce30a2b06ec1eee4aff708",
+      "crc32c": "a501362a",
+      "bytes": 331500,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85588,
+    "md5": "61f9c7d003840532d33b43f11b565ab9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11919,
+    "gcs": {
+      "generation": "1794339642824724",
+      "md5": "61f9c7d003840532d33b43f11b565ab9",
+      "crc32c": "7d7abbac",
+      "bytes": 85588,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-11T061543Z",
+  "archived_at": 1794377743.0,
+  "settled": true,
+  "final": false
+}

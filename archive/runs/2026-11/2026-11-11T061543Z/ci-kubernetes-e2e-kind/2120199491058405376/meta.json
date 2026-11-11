@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2120199491058405376",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1794329959,
+  "created": 1794329924,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a custom resource.",
+          "status": "FAIL",
+          "message": "[FAILED] context deadline exceeded\nIn [It] at: k8s.io/kubernetes/test/e2e/apimachinery/resource_quota.go:681 @ 11/10/26 17:16:55.405\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794331415,
+  "commits": {
+    "kubernetes/kubernetes": "3ea8876700f17d85f8cb5482029b33b8d2bba12c"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2120199491058405376",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2120199491058405376/build-log.txt",
+  "log": {
+    "bytes": 130913,
+    "md5": "61f3b34d7efa501c99cb26a0ad6b7cfe",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19965,
+    "gcs": {
+      "generation": "1794331439967158",
+      "md5": "61f3b34d7efa501c99cb26a0ad6b7cfe",
+      "crc32c": "efde1b13",
+      "bytes": 130913,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96487,
+    "md5": "e63db789500deaf526e58230e444ac92",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12372,
+    "gcs": {
+      "generation": "1794331442135082",
+      "md5": "e63db789500deaf526e58230e444ac92",
+      "crc32c": "96a42339",
+      "bytes": 96487,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-11T061543Z",
+  "archived_at": 1794377743.0,
+  "settled": true,
+  "final": false
+}

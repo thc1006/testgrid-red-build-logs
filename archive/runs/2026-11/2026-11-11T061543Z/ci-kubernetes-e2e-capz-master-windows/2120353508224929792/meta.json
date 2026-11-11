@@ -1,0 +1,73 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2120353508224929792",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1794366653,
+  "created": 1794366645,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] WebSocket streaming port forwarding over the WebSocket tunnel should forward to a server listening on localhost [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] data forwarded from the pod\nExpected\n    <[]uint8 | len:0, ca...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should be capable to mount multiple trust bundles by signer+labels can combine all signer CTBs with an empty label selector [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected \"(mode of file \\\"/var/run/ctbtest/trust-bundle.crt\\\"...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794377080,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "8fc420ae464573a40bbe8f9baa18b54e88a82611",
+    "kubernetes-sigs/cluster-api-provider-azure": "0de8296be59fe3bfa83fff5b9c13f07bd9d64921",
+    "kubernetes-sigs/cloud-provider-azure": "baabfb774d73cdeb9d2ad40b0a3f495103d7b712"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2120353508224929792",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2120353508224929792/build-log.txt",
+  "log": {
+    "bytes": 692388,
+    "md5": "2eaf31793b538fa582079d0e4d2af251",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 98891,
+    "gcs": {
+      "generation": "1794377089657278",
+      "md5": "2eaf31793b538fa582079d0e4d2af251",
+      "crc32c": "5fb8936d",
+      "bytes": 692388,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 64046,
+    "md5": "0bffddfe69263ef52b6058c5d1f921fa",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10604,
+    "gcs": {
+      "generation": "1794377091931050",
+      "md5": "0bffddfe69263ef52b6058c5d1f921fa",
+      "crc32c": "2bb3d480",
+      "bytes": 64046,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-11T061543Z",
+  "archived_at": 1794377743.0,
+  "settled": false,
+  "final": false
+}

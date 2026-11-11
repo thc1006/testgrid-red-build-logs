@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2120308208416329728",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1794355852,
+  "created": 1794355844,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] WebSocket streaming port forwarding over the WebSocket tunnel should forward to a server listening on localhost [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] data forwarded from the pod\nExpected\n    <[]uint8 | len:0, ca...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794364051,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "8fc420ae464573a40bbe8f9baa18b54e88a82611",
+    "kubernetes-sigs/cluster-api-provider-azure": "0de8296be59fe3bfa83fff5b9c13f07bd9d64921",
+    "kubernetes-sigs/cloud-provider-azure": "baabfb774d73cdeb9d2ad40b0a3f495103d7b712"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2120308208416329728",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2120308208416329728/build-log.txt",
+  "log": {
+    "bytes": 433096,
+    "md5": "bd6d586a78ff408b857af209fc36762d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 61549,
+    "gcs": {
+      "generation": "1794364059086178",
+      "md5": "bd6d586a78ff408b857af209fc36762d",
+      "crc32c": "4c6f5767",
+      "bytes": 433096,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 62963,
+    "md5": "dfb8b78df1da4c7cac95d5551a1272de",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10328,
+    "gcs": {
+      "generation": "1794364061528542",
+      "md5": "dfb8b78df1da4c7cac95d5551a1272de",
+      "crc32c": "355a3438",
+      "bytes": 62963,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-11T061543Z",
+  "archived_at": 1794377743.0,
+  "settled": true,
+  "final": false
+}
