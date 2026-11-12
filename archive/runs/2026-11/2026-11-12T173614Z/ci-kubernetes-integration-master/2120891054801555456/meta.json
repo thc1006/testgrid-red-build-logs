@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2120891054801555456",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1794494844,
+  "created": 1794494806,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-apps] k8s.io/kubernetes/test/integration.daemonset",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestInsufficientCapacityNode/RollingUpdate\n    test_s...tTaintedNode/OnDelete (7.13s)\n=== RUN   TestTaintedNode/RollingUpdate\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794497482,
+  "commits": {
+    "kubernetes/kubernetes": "cc0ea37b5787e34db6f8d5ec0be907c31fc98bc8"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2120891054801555456",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2120891054801555456/build-log.txt",
+  "log": {
+    "bytes": 297858,
+    "md5": "9b1c45129db579494daf63170bddc697",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23672,
+    "gcs": {
+      "generation": "1794497486630085",
+      "md5": "9b1c45129db579494daf63170bddc697",
+      "crc32c": "4fe2e6cc",
+      "bytes": 297858,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96680,
+    "md5": "7a12d7ca7c55980f1cfc577548e0178d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12384,
+    "gcs": {
+      "generation": "1794497489331969",
+      "md5": "7a12d7ca7c55980f1cfc577548e0178d",
+      "crc32c": "73b8b51f",
+      "bytes": 96680,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T173614Z",
+  "archived_at": 1794504974.0,
+  "settled": true,
+  "final": false
+}

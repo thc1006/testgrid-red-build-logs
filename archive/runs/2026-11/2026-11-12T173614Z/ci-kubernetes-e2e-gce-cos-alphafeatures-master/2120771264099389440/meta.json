@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2120771264099389440",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1794466276,
+  "created": 1794466246,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update nodePort: udp [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failure validating that node port service STOPPED removed pro...kubernetes/test/e2e/network/networking.go:407 @ 11/12/26 06:59:01.581\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Feature:(AdmissionW...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794472365,
+  "commits": {
+    "kubernetes/kubernetes": "69a8e1ff31556386089beebee70216693c229c10"
+  },
+  "job_version": "v1.38.0-beta.0.310+69a8e1ff315563",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2120771264099389440",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2120771264099389440/build-log.txt",
+  "log": {
+    "bytes": 140081,
+    "md5": "8f93c75593d06c9650c311492b131f02",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21819,
+    "gcs": {
+      "generation": "1794472368270729",
+      "md5": "8f93c75593d06c9650c311492b131f02",
+      "crc32c": "522cf0ee",
+      "bytes": 140081,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 71719,
+    "md5": "f3cc7d73e7f1e9cffd4849bf13b46664",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10711,
+    "gcs": {
+      "generation": "1794472370143742",
+      "md5": "f3cc7d73e7f1e9cffd4849bf13b46664",
+      "crc32c": "47fa0199",
+      "bytes": 71719,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T173614Z",
+  "archived_at": 1794504974.0,
+  "settled": true,
+  "final": false
+}

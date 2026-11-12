@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2120883504974663680",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1794493007,
+  "created": 1794493006,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and a pre-bound PV: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-tmz8q\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 11/12/26 14:36:10.555\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794495643,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.319+ba112edc01b2f6",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2120883504974663680",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2120883504974663680/build-log.txt",
+  "log": {
+    "bytes": 145040,
+    "md5": "16b6128f658b04bb62114abf071d7ee1",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24566,
+    "gcs": {
+      "generation": "1794495659367221",
+      "md5": "16b6128f658b04bb62114abf071d7ee1",
+      "crc32c": "ab709ec8",
+      "bytes": 145040,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 85865,
+    "md5": "45373a73fcfdd5f1579ba968a2af0803",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11705,
+    "gcs": {
+      "generation": "1794495668760486",
+      "md5": "45373a73fcfdd5f1579ba968a2af0803",
+      "crc32c": "759929a6",
+      "bytes": 85865,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T173614Z",
+  "archived_at": 1794504974.0,
+  "settled": true,
+  "final": false
+}

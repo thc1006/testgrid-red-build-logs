@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2120783595923574784",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1794469215,
+  "created": 1794469186,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and a pre-bound PV: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-bnk4b\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 11/12/26 07:55:47.619\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794470839,
+  "commits": {
+    "kubernetes/kubernetes": "69a8e1ff31556386089beebee70216693c229c10"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2120783595923574784",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2120783595923574784/build-log.txt",
+  "log": {
+    "bytes": 169338,
+    "md5": "bd0ee26c5665afc52f18be5aa95b3c07",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25221,
+    "gcs": {
+      "generation": "1794470855264274",
+      "md5": "bd0ee26c5665afc52f18be5aa95b3c07",
+      "crc32c": "b03e8d17",
+      "bytes": 169338,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97198,
+    "md5": "4599d93044aeec940a22fca4716dea74",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12717,
+    "gcs": {
+      "generation": "1794470857657073",
+      "md5": "4599d93044aeec940a22fca4716dea74",
+      "crc32c": "8ae5641c",
+      "bytes": 97198,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T173614Z",
+  "archived_at": 1794504974.0,
+  "settled": true,
+  "final": false
+}
