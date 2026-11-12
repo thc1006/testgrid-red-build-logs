@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2120625301250641921",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1794431475,
+  "created": 1794431445,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with multiple PVs and PVCs all in same ns should create 3 PVs and 3 PVCs: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-ghzt5\" did not exit with Success: pod \"pvc-te...es/test/e2e/storage/persistent_volumes.go:350 @ 11/11/26 21:35:32.601\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794433031,
+  "commits": {
+    "kubernetes/kubernetes": "2cb26b34ab73d92b12ad99830b3c0242a4e62010"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2120625301250641921",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2120625301250641921/build-log.txt",
+  "log": {
+    "bytes": 129527,
+    "md5": "caff6b1d4c2588ed840e4ef00950821e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20846,
+    "gcs": {
+      "generation": "1794433048076648",
+      "md5": "caff6b1d4c2588ed840e4ef00950821e",
+      "crc32c": "5802a066",
+      "bytes": 129527,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95738,
+    "md5": "6416d289efaa5f2ecf6af886de77dcd7",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12705,
+    "gcs": {
+      "generation": "1794433050485569",
+      "md5": "6416d289efaa5f2ecf6af886de77dcd7",
+      "crc32c": "b5cb2a26",
+      "bytes": 95738,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T070902Z",
+  "archived_at": 1794467342.0,
+  "settled": true,
+  "final": false
+}

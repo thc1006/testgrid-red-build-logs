@@ -1,0 +1,77 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2120517841663823872",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1794405853,
+  "created": 1794405825,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...r=/logs/artifacts --disable-log-dump=true (interrupted): exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should support inline execution and attach",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...etes/test/e2e/framework/kubectl/builder.go:97 @ 11/11/26 16:04:55.871\n"
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794413545,
+  "commits": {
+    "kubernetes/kubernetes": "dd21ea95bc597663b263c040dc7abf43c037a7d0"
+  },
+  "job_version": "v1.38.0-beta.0.285+dd21ea95bc5976",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2120517841663823872",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2120517841663823872/build-log.txt",
+  "log": {
+    "bytes": 198661,
+    "md5": "3f03e85c1ec31b43487b45b943565740",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25852,
+    "gcs": {
+      "generation": "1794413566184253",
+      "md5": "3f03e85c1ec31b43487b45b943565740",
+      "crc32c": "4e900a4e",
+      "bytes": 198661,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 71977,
+    "md5": "3ae3642f3af1527ccfaaec45d00b32ee",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10730,
+    "gcs": {
+      "generation": "1794413568277285",
+      "md5": "3ae3642f3af1527ccfaaec45d00b32ee",
+      "crc32c": "ba47d210",
+      "bytes": 71977,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T070902Z",
+  "archived_at": 1794467342.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "build": "2120539736937336832",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu",
+  "started": 1794411078,
+  "created": 1794411045,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-device-plugin-gpu-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] [Feature:GPUDevicePlugin] Sanity test using nvidia-smi [Provider:aws,gce] should run nvidia-smi and cuda-demo-suite [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] Expected\n    <v1.PodPhase>: Failed\nto equal\n    <v1.PodPhase>...t: k8s.io/kubernetes/test/e2e/node/gpu.go:167 @ 11/11/26 15:42:34.098\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-device-plugin-gpu.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794412401,
+  "commits": {
+    "kubernetes/kubernetes": "dd21ea95bc597663b263c040dc7abf43c037a7d0"
+  },
+  "job_version": "v1.38.0-beta.0.285+dd21ea95bc5976",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2120539736937336832",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-device-plugin-gpu/2120539736937336832/build-log.txt",
+  "log": {
+    "bytes": 141084,
+    "md5": "f8c62480675aa7bda39ae4e21f56452c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 17431,
+    "gcs": {
+      "generation": "1794412403055855",
+      "md5": "f8c62480675aa7bda39ae4e21f56452c",
+      "crc32c": "6820cee5",
+      "bytes": 141084,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98348,
+    "md5": "79e831788141a4769aeee98331d17275",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12618,
+    "gcs": {
+      "generation": "1794412405680494",
+      "md5": "79e831788141a4769aeee98331d17275",
+      "crc32c": "da0026e1",
+      "bytes": 98348,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T070902Z",
+  "archived_at": 1794467342.0,
+  "settled": true,
+  "final": false
+}

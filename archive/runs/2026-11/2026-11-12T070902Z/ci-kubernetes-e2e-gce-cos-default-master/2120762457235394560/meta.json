@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2120762457235394560",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1794464175,
+  "created": 1794464146,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Mock volume expansion Expansion with recovery should allow recovery if controller expansion fails with final error",
+          "status": "FAIL",
+          "message": "[FAILED] While waiting for PV resize to finish: error while waiting fo...e/storage/csimock/csi_volume_expansion.go:852 @ 11/12/26 06:41:43.788\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794466532,
+  "commits": {
+    "kubernetes/kubernetes": "69a8e1ff31556386089beebee70216693c229c10"
+  },
+  "job_version": "v1.38.0-beta.0.310+69a8e1ff315563",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2120762457235394560",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2120762457235394560/build-log.txt",
+  "log": {
+    "bytes": 264255,
+    "md5": "2fd338baef6dcd301acc9fbd2c06db2a",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 35933,
+    "gcs": {
+      "generation": "1794466547891583",
+      "md5": "2fd338baef6dcd301acc9fbd2c06db2a",
+      "crc32c": "8e6ab6d8",
+      "bytes": 264255,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95836,
+    "md5": "2f8ca8ed0600059b77706278d25da27f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12435,
+    "gcs": {
+      "generation": "1794466549762373",
+      "md5": "2f8ca8ed0600059b77706278d25da27f",
+      "crc32c": "9f511d59",
+      "bytes": 95836,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T070902Z",
+  "archived_at": 1794467342.0,
+  "settled": false,
+  "final": false
+}

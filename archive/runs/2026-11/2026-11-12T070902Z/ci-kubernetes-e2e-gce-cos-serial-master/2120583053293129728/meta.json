@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2120583053293129728",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1794421405,
+  "created": 1794421373,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: local] [LocalVolumeType: dir-link] [Testpattern: Pre-provisioned PV (filesystem volmode)] disruptive [LinuxOnly] [Provider:gce,aws,local,azure] Should test that pv written before kubelet restart is readable after restart. [Disruptive]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 60.002s.\nNode bootstrap-e2e-minion-group-fsfm...ubernetes/test/e2e/framework/node/wait.go:181 @ 11/11/26 21:35:53.436\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794435907,
+  "commits": {
+    "kubernetes/kubernetes": "693185fdbac8a8e223f9a4ed78eeb95f06d20bb1"
+  },
+  "job_version": "v1.38.0-beta.0.292+693185fdbac8a8",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2120583053293129728",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2120583053293129728/build-log.txt",
+  "log": {
+    "bytes": 117099,
+    "md5": "67c3e4ac10fe676adecd34fc71779801",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20879,
+    "gcs": {
+      "generation": "1794435934814395",
+      "md5": "67c3e4ac10fe676adecd34fc71779801",
+      "crc32c": "20a4ba81",
+      "bytes": 117099,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 71152,
+    "md5": "78c709236338197904142e015134383e",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10642,
+    "gcs": {
+      "generation": "1794435937020362",
+      "md5": "78c709236338197904142e015134383e",
+      "crc32c": "c2f38804",
+      "bytes": 71152,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T070902Z",
+  "archived_at": 1794467342.0,
+  "settled": true,
+  "final": false
+}

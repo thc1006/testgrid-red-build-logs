@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-ec2-conformance-latest",
+  "build": "2120518596709847040",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-ec2-conformance-latest",
+  "started": 1794406039,
+  "created": 1794406005,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "Conformance - EC2 - master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-ec2-conformance-latest.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Up",
+          "status": "FAIL",
+          "message": "instance i-0e8f8d0e1d00fc859 is not running"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794407098,
+  "commits": {
+    "kubernetes-sigs/provider-aws-test-infra": "7d26ecef69a7d08b04ab2c1f83b682a08719487b",
+    "kubernetes/kubernetes": "dd21ea95bc597663b263c040dc7abf43c037a7d0"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-ec2-conformance-latest/2120518596709847040",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-ec2-conformance-latest/2120518596709847040/build-log.txt",
+  "log": {
+    "bytes": 96718,
+    "md5": "956127cdc9cd7d7cf77a44589cf95374",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 8845,
+    "gcs": {
+      "generation": "1794407099184704",
+      "md5": "956127cdc9cd7d7cf77a44589cf95374",
+      "crc32c": "594cb7e3",
+      "bytes": 96718,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 88235,
+    "md5": "ad1a9f7aa029ae926f34f765ebd81a4a",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11757,
+    "gcs": {
+      "generation": "1794407100886699",
+      "md5": "ad1a9f7aa029ae926f34f765ebd81a4a",
+      "crc32c": "1389a1f3",
+      "bytes": 88235,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-12T070902Z",
+  "archived_at": 1794467342.0,
+  "settled": true,
+  "final": false
+}
