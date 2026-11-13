@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2121035005571371008",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1794529155,
+  "created": 1794529126,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics Ephemeral should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 11/13/26 01:20:08.524\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794533302,
+  "commits": {
+    "kubernetes/kubernetes": "7bd6e5e0c87d1a4558433f40278e4612adc9d530"
+  },
+  "job_version": "v1.38.0-beta.0.361+1db16547367370",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2121035005571371008",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2121035005571371008/build-log.txt",
+  "log": {
+    "bytes": 184660,
+    "md5": "5f0aa74fb25a7797bd2df59b63f23a49",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25447,
+    "gcs": {
+      "generation": "1794533319204154",
+      "md5": "5f0aa74fb25a7797bd2df59b63f23a49",
+      "crc32c": "8201af15",
+      "bytes": 184660,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 71211,
+    "md5": "aff1e45c552fa53a6d43316483b812dd",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10714,
+    "gcs": {
+      "generation": "1794533321409962",
+      "md5": "aff1e45c552fa53a6d43316483b812dd",
+      "crc32c": "b265922b",
+      "bytes": 71211,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-13T064416Z",
+  "archived_at": 1794552256.0,
+  "settled": true,
+  "final": false
+}
