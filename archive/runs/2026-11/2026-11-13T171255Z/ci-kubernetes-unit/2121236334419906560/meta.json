@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2121236334419906560",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1794577304,
+  "created": 1794577127,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/apiserver/pkg/server.egressselector",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestUDSGRPCConnectorTunnelOutlivesConnectContext\n    ...ed\n--- FAIL: TestUDSGRPCConnectorTunnelOutlivesConnectContext (0.01s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794578686,
+  "commits": {
+    "kubernetes/kubernetes": "1a1c255bbe0b717f9f2e3bfbb4f103934b974554"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2121236334419906560",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2121236334419906560/build-log.txt",
+  "log": {
+    "bytes": 231940,
+    "md5": "0687240be21b385535c25b98c7ed567e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 32190,
+    "gcs": {
+      "generation": "1794578686974079",
+      "md5": "0687240be21b385535c25b98c7ed567e",
+      "crc32c": "e01c9e57",
+      "bytes": 231940,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 122518,
+    "md5": "06a76d814379e68e230b28ecc1c8f571",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13874,
+    "gcs": {
+      "generation": "1794578689227265",
+      "md5": "06a76d814379e68e230b28ecc1c8f571",
+      "crc32c": "23b4f379",
+      "bytes": 122518,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-13T171255Z",
+  "archived_at": 1794589975.0,
+  "settled": true,
+  "final": false
+}

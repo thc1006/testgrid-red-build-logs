@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2121162849349799936",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1794559637,
+  "created": 1794559607,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestDeferredResizeQueueingHandlers/UpdatePod_handler_...QueueingHandlers\n--- FAIL: TestDeferredResizeQueueingHandlers (4.75s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794562257,
+  "commits": {
+    "kubernetes/kubernetes": "02814b43b6e007cf844f872b3ef2733636463647"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2121162849349799936",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2121162849349799936/build-log.txt",
+  "log": {
+    "bytes": 213593,
+    "md5": "24aed18aa50ed1ec20f562401272ad9d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 18550,
+    "gcs": {
+      "generation": "1794562261543035",
+      "md5": "24aed18aa50ed1ec20f562401272ad9d",
+      "crc32c": "73f12707",
+      "bytes": 213593,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97637,
+    "md5": "9b9fe84a5e4e87bab1d890f550e80ff9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12407,
+    "gcs": {
+      "generation": "1794562263349390",
+      "md5": "9b9fe84a5e4e87bab1d890f550e80ff9",
+      "crc32c": "7f0f8c41",
+      "bytes": 97637,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-13T171255Z",
+  "archived_at": 1794589975.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2121275088580907008",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1794586367,
+  "created": 1794586367,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] AdmissionWebhook [Privileged:ClusterAdmin] should be able to deny pod and configmap creation [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expect error contains \"the configmap contains unwanted key an...ernetes/test/e2e/apimachinery/webhook.go:1511 @ 11/13/26 16:20:56.664\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794588865,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.402+9eba9965c1ddae",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2121275088580907008",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2121275088580907008/build-log.txt",
+  "log": {
+    "bytes": 195792,
+    "md5": "7231e9762bc4207bed6254a6792db8c6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 28159,
+    "gcs": {
+      "generation": "1794588883388623",
+      "md5": "7231e9762bc4207bed6254a6792db8c6",
+      "crc32c": "2cdf5211",
+      "bytes": 195792,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86512,
+    "md5": "f204c02b93ac1511b16990b20552fcb1",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11813,
+    "gcs": {
+      "generation": "1794588885624806",
+      "md5": "f204c02b93ac1511b16990b20552fcb1",
+      "crc32c": "665c973c",
+      "bytes": 86512,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-13T171255Z",
+  "archived_at": 1794589975.0,
+  "settled": false,
+  "final": false
+}

@@ -1,0 +1,70 @@
+{
+  "job": "ci-node-crio-conformance",
+  "build": "2121254704120860672",
+  "query": "kubernetes-ci-logs/logs/ci-node-crio-conformance",
+  "started": 1794581535,
+  "created": 1794581507,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-node-crio-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-node-crio-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794581789,
+  "commits": {
+    "kubernetes/test-infra": "ef9929248f45fc460b9d8589df6b52dca8d1e5d1",
+    "kubernetes/kubernetes": "17b0bfecee0a69f6c1e89a37d4ba40c7319c5629"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2121254704120860672",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-crio-conformance/2121254704120860672/build-log.txt",
+  "log": {
+    "bytes": 16798,
+    "md5": "2f108ce2973421ea5a324b2f03a9e41e",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 6173,
+    "gcs": {
+      "generation": "1794581789740205",
+      "md5": "2f108ce2973421ea5a324b2f03a9e41e",
+      "crc32c": "ff5e9687",
+      "bytes": 16798,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98493,
+    "md5": "c8ba2bb4c63b19d0165dbc8cd055b325",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12810,
+    "gcs": {
+      "generation": "1794581791737957",
+      "md5": "c8ba2bb4c63b19d0165dbc8cd055b325",
+      "crc32c": "65efd48a",
+      "bytes": 98493,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": true,
+  "archived_by_run": "2026-11-13T171255Z",
+  "archived_at": 1794589975.0,
+  "settled": true,
+  "final": false,
+  "artifacts_asset": {
+    "members": []
+  }
+}

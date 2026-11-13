@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2121218717210644480",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1794572927,
+  "created": 1794572927,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should return command exit codes should handle in-cluster config",
+          "status": "FAIL",
+          "message": "[FAILED] error running /workspace/kubernetes/platforms/linux/amd64/kub...etes/test/e2e/framework/kubectl/builder.go:97 @ 11/13/26 12:41:22.088\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794575555,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.392+bd74e69937458e",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2121218717210644480",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2121218717210644480/build-log.txt",
+  "log": {
+    "bytes": 137300,
+    "md5": "d5e19b6bba63b76a307a33ab4c9eb6a7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23258,
+    "gcs": {
+      "generation": "1794575571169849",
+      "md5": "d5e19b6bba63b76a307a33ab4c9eb6a7",
+      "crc32c": "0bf5b9ef",
+      "bytes": 137300,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87093,
+    "md5": "506e7c398188c62f1fa32b16b8a9ae67",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11722,
+    "gcs": {
+      "generation": "1794575574666504",
+      "md5": "506e7c398188c62f1fa32b16b8a9ae67",
+      "crc32c": "38a0b4f5",
+      "bytes": 87093,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-13T171255Z",
+  "archived_at": 1794589975.0,
+  "settled": true,
+  "final": false
+}
