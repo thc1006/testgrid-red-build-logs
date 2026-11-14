@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2121411993385570304",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794619008,
+  "created": 1794619007,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl Port forwarding Shutdown client connection while the remote stream is writing data to the port-forward connection port-forward should keep working after detect broken connection",
+          "status": "FAIL",
+          "message": "[FAILED] couldn't get http response from port-forward: Get \"http://127...ubernetes/test/e2e/kubectl/portforward.go:678 @ 11/14/26 01:39:01.742\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794621316,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.477+89679797334c52",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2121411993385570304",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2121411993385570304/build-log.txt",
+  "log": {
+    "bytes": 136784,
+    "md5": "66fcbff2293ed71187afae8ea6d72d33",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23089,
+    "gcs": {
+      "generation": "1794621329217672",
+      "md5": "66fcbff2293ed71187afae8ea6d72d33",
+      "crc32c": "05e4a06e",
+      "bytes": 136784,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86662,
+    "md5": "4138aaddab90aae104e08285e669d257",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11998,
+    "gcs": {
+      "generation": "1794621331495086",
+      "md5": "4138aaddab90aae104e08285e669d257",
+      "crc32c": "df35195e",
+      "bytes": 86662,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-14T062009Z",
+  "archived_at": 1794637209.0,
+  "settled": true,
+  "final": false
+}

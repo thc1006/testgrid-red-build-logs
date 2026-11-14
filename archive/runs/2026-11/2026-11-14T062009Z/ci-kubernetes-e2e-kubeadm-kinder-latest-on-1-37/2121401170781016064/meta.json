@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37",
+  "build": "2121401170781016064",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37",
+  "started": 1794616459,
+  "created": 1794616427,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kubeadm-kinder-latest-on-1-37",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "task-01-add-kubernetes-versions",
+          "status": "FAIL",
+          "message": "exit status 1"
+        },
+        {
+          "test": "task-09-reset",
+          "status": "FAIL",
+          "message": "exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794616560,
+  "commits": {
+    "kubernetes/kubeadm": "57a21fcc1403533937d37af678b955f356e3e17c",
+    "kubernetes/kubernetes": "91c32c2bbd92976fe0d36f3a3e7b36db8a39c640"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37/2121401170781016064",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-latest-on-1-37/2121401170781016064/build-log.txt",
+  "log": {
+    "bytes": 15574,
+    "md5": "24ea616f1a788e7bc183670d8bf6ab72",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 4266,
+    "gcs": {
+      "generation": "1794616560621359",
+      "md5": "24ea616f1a788e7bc183670d8bf6ab72",
+      "crc32c": "39cf053d",
+      "bytes": 15574,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 81946,
+    "md5": "e857fa87f650365b3e7ba7fa96252caf",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11699,
+    "gcs": {
+      "generation": "1794616562349458",
+      "md5": "e857fa87f650365b3e7ba7fa96252caf",
+      "crc32c": "c9eb9497",
+      "bytes": 81946,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-14T062009Z",
+  "archived_at": 1794637209.0,
+  "settled": true,
+  "final": false
+}

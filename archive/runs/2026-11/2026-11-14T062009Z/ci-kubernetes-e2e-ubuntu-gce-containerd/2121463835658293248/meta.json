@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2121463835658293248",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794631368,
+  "created": 1794631367,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Lifecycle sleep action zero value when create a pod with lifecycle hook using sleep action with a duration of zero seconds prestop hook using sleep action with zero duration [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] unexpected delay duration before killing the pod, cost = 32.5...tes/test/e2e/common/node/lifecycle_hook.go:765 @ 11/14/26 05:12:51.76\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794633814,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.492+eb24fe4e932bf9",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2121463835658293248",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2121463835658293248/build-log.txt",
+  "log": {
+    "bytes": 131711,
+    "md5": "33d772db905514b19d815f18e8537e22",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22179,
+    "gcs": {
+      "generation": "1794633828174882",
+      "md5": "33d772db905514b19d815f18e8537e22",
+      "crc32c": "e8d74d76",
+      "bytes": 131711,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 88767,
+    "md5": "ed15579aec3e5f8c54f06dc7ac13283f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11971,
+    "gcs": {
+      "generation": "1794633830645806",
+      "md5": "ed15579aec3e5f8c54f06dc7ac13283f",
+      "crc32c": "bf22dd30",
+      "bytes": 88767,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-14T062009Z",
+  "archived_at": 1794637209.0,
+  "settled": false,
+  "final": false
+}

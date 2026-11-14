@@ -1,0 +1,68 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2121275088828370944",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1794586376,
+  "created": 1794586367,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should be capable to mount multiple trust bundles by signer+labels can combine multiple CTBs with signer name and label selector [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected \"(mode of file \\\"/var/run/ctbtest/trust-bundle.crt\\\"...detected after the initial failure. These are visible in the timeline\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794594388,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "8fc420ae464573a40bbe8f9baa18b54e88a82611",
+    "kubernetes-sigs/cluster-api-provider-azure": "f4a5c8b56c3318a0b74164d965ed60bde116aaab",
+    "kubernetes-sigs/cloud-provider-azure": "3d3fd1b1aa293053743582572f70aa5470b4a093"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2121275088828370944",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2121275088828370944/build-log.txt",
+  "log": {
+    "bytes": 409983,
+    "md5": "dc5acac6ed5d4c96fd1559e6812575d9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 63137,
+    "gcs": {
+      "generation": "1794594397545020",
+      "md5": "dc5acac6ed5d4c96fd1559e6812575d9",
+      "crc32c": "be1cdad6",
+      "bytes": 409983,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 64329,
+    "md5": "4e3b29a043006c94c30f48098e32c064",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10610,
+    "gcs": {
+      "generation": "1794594399249848",
+      "md5": "4e3b29a043006c94c30f48098e32c064",
+      "crc32c": "a411a4fc",
+      "bytes": 64329,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-14T062009Z",
+  "archived_at": 1794637209.0,
+  "settled": true,
+  "final": false
+}
