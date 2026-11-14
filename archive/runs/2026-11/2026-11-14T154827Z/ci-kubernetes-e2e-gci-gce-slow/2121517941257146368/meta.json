@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2121517941257146368",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1794644268,
+  "created": 1794644267,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Up",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-up.sh: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794644873,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.492+eb24fe4e932bf9",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2121517941257146368",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2121517941257146368/build-log.txt",
+  "log": {
+    "bytes": 37831,
+    "md5": "969e46b205fed1404d533c3b3618198f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 7630,
+    "gcs": {
+      "generation": "1794644874126644",
+      "md5": "969e46b205fed1404d533c3b3618198f",
+      "crc32c": "cd0408a3",
+      "bytes": 37831,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87420,
+    "md5": "28566de01bf1b710377f6fe4a4b35401",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11710,
+    "gcs": {
+      "generation": "1794644879652174",
+      "md5": "28566de01bf1b710377f6fe4a4b35401",
+      "crc32c": "401bbbae",
+      "bytes": 87420,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-14T154827Z",
+  "archived_at": 1794671307.0,
+  "settled": true,
+  "final": false
+}

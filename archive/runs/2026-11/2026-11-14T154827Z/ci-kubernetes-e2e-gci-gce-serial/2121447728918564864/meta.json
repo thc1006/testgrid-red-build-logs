@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-serial",
+  "build": "2121447728918564864",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial",
+  "started": 1794627528,
+  "created": 1794627527,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-serial",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: csi-hostpath] [Testpattern: Dynamic PV (default fs)] provisioning should provision storage with any volume data source [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] 404 page not found\nIn [It] at: k8s.io/kubernetes/test/e2e/storage/testsuites/provisioning.go:415 @ 11/14/26 07:03:49.601\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-serial.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794642777,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.492+eb24fe4e932bf9",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2121447728918564864",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-serial/2121447728918564864/build-log.txt",
+  "log": {
+    "bytes": 298913,
+    "md5": "676b395111a93ba05c3f83ed9aa36452",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 36704,
+    "gcs": {
+      "generation": "1794642801092737",
+      "md5": "676b395111a93ba05c3f83ed9aa36452",
+      "crc32c": "dd03abd1",
+      "bytes": 298913,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 68205,
+    "md5": "7b6de88adc28eff6b9f932ed01b98f91",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10372,
+    "gcs": {
+      "generation": "1794642802885004",
+      "md5": "7b6de88adc28eff6b9f932ed01b98f91",
+      "crc32c": "7c12476d",
+      "bytes": 68205,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-14T154827Z",
+  "archived_at": 1794671307.0,
+  "settled": true,
+  "final": false
+}

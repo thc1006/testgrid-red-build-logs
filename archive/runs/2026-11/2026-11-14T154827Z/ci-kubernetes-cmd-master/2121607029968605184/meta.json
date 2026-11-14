@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-cmd-master",
+  "build": "2121607029968605184",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-cmd-master",
+  "started": 1794665541,
+  "created": 1794665508,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "cmd-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-cmd-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "test-cmd.run_assert_singular_name_tests",
+          "status": "FAIL",
+          "message": "\nNo resources found in namespace-1794665680-25227 namespace.\nerror: er...!!! [1114 14:14:40]  5: hack/make-rules/test-cmd.sh:184 runTests(...)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794666070,
+  "commits": {
+    "kubernetes/kubernetes": "94841abaf205957d9d239004898d064d1150f16e"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-cmd-master/2121607029968605184",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-cmd-master/2121607029968605184/build-log.txt",
+  "log": {
+    "bytes": 1152140,
+    "md5": "c4f88787cb195322b3650caaa420734d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 130896,
+    "gcs": {
+      "generation": "1794666071232719",
+      "md5": "c4f88787cb195322b3650caaa420734d",
+      "crc32c": "eee3ee13",
+      "bytes": 1152140,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 81688,
+    "md5": "b89bbcecbc233bcfdc3fb544731da467",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11529,
+    "gcs": {
+      "generation": "1794666072967998",
+      "md5": "b89bbcecbc233bcfdc3fb544731da467",
+      "crc32c": "32622382",
+      "bytes": 81688,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-14T154827Z",
+  "archived_at": 1794671307.0,
+  "settled": false,
+  "final": false
+}

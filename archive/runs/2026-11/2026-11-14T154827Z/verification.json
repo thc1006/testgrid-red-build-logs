@@ -1,0 +1,73 @@
+{
+  "run": "2026-11-14T154827Z",
+  "outcome": "ok",
+  "started": 1794671332.0745385,
+  "finished": 1794671352.9186866,
+  "tool": {
+    "commit": "620358064fd9117338e602b9e7afc88da5b86d5e",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "43612121720",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1794498507.8567245,
+      "to": 1794671307.8567245
+    },
+    "tabs": 46,
+    "builds": 1787,
+    "compared_with_gcs": 316,
+    "sevenths": [
+      2
+    ],
+    "differ": 0,
+    "not_settled": 3,
+    "assets": {
+      "uploaded": 78,
+      "compared_with_gcs": 15,
+      "downloaded": 1
+    },
+    "red_on_testgrid": 65,
+    "red_not_settled": 0,
+    "gcs_builds": 1917,
+    "judged_by_rule": 25
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 30,
+  "notes": [
+    "ci-kubernetes-build/2121424575597121536: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121020911418085376: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121088105158021120: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121122331874037760: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121152783729037312: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121202862116573184: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121208409087807488: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121427595529555968: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121447477633617920: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121464087563997184: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121468113261170688: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2121597718198489088: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-cos-default-master/2121610049578078208: ERROR, TestGrid paints it NO_RESULT (not red, not archived)",
+    "ci-kubernetes-e2e-gce-cos-slow-master/2121120569079369728: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-device-plugin-gpu/2121355117650251776: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-scale-performance-100/2121385064796262400: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind/2121354613696237568: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-alpha-beta-features/2121185247222566912: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-ipv6/2121270307745435648: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2121089616483192832: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2121180715780411392: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2121195815497109504: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2121287671992029184: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2121378521807851520: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2121514418964533248: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2121544617286438912: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-kind-cloud-provider-loadbalancer/2121259235563016192: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-unit/2121569532303642624: ERROR, not listed on TestGrid (not archived)",
+    "ci-node-crio-conformance/2121132146239213568: ERROR, not listed on TestGrid (not archived)",
+    "ci-node-crio-conformance/2121300759118090240: ERROR, not listed on TestGrid (not archived)"
+  ]
+}

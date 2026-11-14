@@ -1,0 +1,71 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "build": "2121570538466840576",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "started": 1794656836,
+  "created": 1794656807,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: local] [LocalVolumeType: tmpfs] [Testpattern: Pre-provisioned PV (default fs)] subPath should support existing directories when readOnly specified in the volumeSource",
+          "status": "FAIL",
+          "message": "[FAILED] unable to upgrade connection: error dialing backend: dial tcp...ubernetes/test/e2e/storage/utils/local.go:121 @ 11/14/26 11:53:14.057\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes-local [LocalVolumeType: dir-link-bindmounted] Two pods mounting a local volume at the same time should be able to write from pod1 and read from pod2",
+          "status": "FAIL",
+          "message": "[FAILED] unable to upgrade connection: error dialing backend: dial tcp...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794658393,
+  "commits": {
+    "kubernetes/kubernetes": "94841abaf205957d9d239004898d064d1150f16e"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2121570538466840576",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2121570538466840576/build-log.txt",
+  "log": {
+    "bytes": 190237,
+    "md5": "81c6aa642a0061373dc22051e964740a",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 28259,
+    "gcs": {
+      "generation": "1794658407843719",
+      "md5": "81c6aa642a0061373dc22051e964740a",
+      "crc32c": "218fdcb2",
+      "bytes": 190237,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97611,
+    "md5": "6cb22de6404188c2e537736c1064fa80",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12665,
+    "gcs": {
+      "generation": "1794658409872612",
+      "md5": "6cb22de6404188c2e537736c1064fa80",
+      "crc32c": "0bc9392b",
+      "bytes": 97611,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-14T154827Z",
+  "archived_at": 1794671307.0,
+  "settled": true,
+  "final": false
+}

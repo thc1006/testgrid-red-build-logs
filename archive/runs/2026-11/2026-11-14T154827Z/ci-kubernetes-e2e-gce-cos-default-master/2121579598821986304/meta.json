@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2121579598821986304",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1794658996,
+  "created": 1794658968,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should verify ResourceQuota with best effort scope using scope-selectors.",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\nExpected:\n    <*v1.ResourceQuota | .../test/e2e/apimachinery/resource_quota.go:1465 @ 11/14/26 12:37:49.458\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794661327,
+  "commits": {
+    "kubernetes/kubernetes": "94841abaf205957d9d239004898d064d1150f16e"
+  },
+  "job_version": "v1.38.0-beta.0.494+94841abaf20595",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2121579598821986304",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2121579598821986304/build-log.txt",
+  "log": {
+    "bytes": 142952,
+    "md5": "50db5c13236922266f0ba7fab0e3066c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23834,
+    "gcs": {
+      "generation": "1794661342387535",
+      "md5": "50db5c13236922266f0ba7fab0e3066c",
+      "crc32c": "ff4f54ea",
+      "bytes": 142952,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97920,
+    "md5": "b1ff52961684948b4583c8ec43d5cbba",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12376,
+    "gcs": {
+      "generation": "1794661344135751",
+      "md5": "b1ff52961684948b4583c8ec43d5cbba",
+      "crc32c": "208deac8",
+      "bytes": 97920,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-14T154827Z",
+  "archived_at": 1794671307.0,
+  "settled": true,
+  "final": false
+}
