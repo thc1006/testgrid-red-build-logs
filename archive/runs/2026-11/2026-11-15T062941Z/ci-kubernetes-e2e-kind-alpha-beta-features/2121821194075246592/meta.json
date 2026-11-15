@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2121821194075246592",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1794716615,
+  "created": 1794716568,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pods Extended (pod generation) Pod Generation pod generation should start at 1 and increment per update [MinimumKubeletVersion:1.34] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 20.000s.\nexpected pod generation to be 5, got...: k8s.io/kubernetes/test/e2e/node/pods.go:534 @ 11/15/26 04:30:39.815\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794718229,
+  "commits": {
+    "kubernetes/kubernetes": "04d3cc7a37391af9ee4363e2c0f7ae907c9c800e"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2121821194075246592",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2121821194075246592/build-log.txt",
+  "log": {
+    "bytes": 135511,
+    "md5": "affedb49c80ca3269b6e6ecb97db1baa",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20126,
+    "gcs": {
+      "generation": "1794718242763682",
+      "md5": "affedb49c80ca3269b6e6ecb97db1baa",
+      "crc32c": "0ed9d762",
+      "bytes": 135511,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 102059,
+    "md5": "f8f48fceebcc5db796c2b9aa9139adfe",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13305,
+    "gcs": {
+      "generation": "1794718244756533",
+      "md5": "f8f48fceebcc5db796c2b9aa9139adfe",
+      "crc32c": "90ff32a7",
+      "bytes": 102059,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-15T062941Z",
+  "archived_at": 1794724181.0,
+  "settled": false,
+  "final": false
+}

@@ -1,0 +1,71 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2121681521772335104",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1794683304,
+  "created": 1794683268,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestDeferredResizeQueueingHandlers/UpdatePod_handler_...QueueingHandlers\n--- FAIL: TestDeferredResizeQueueingHandlers (5.07s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-apps] k8s.io/kubernetes/test/integration.daemonset",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestUpdateStatusDespitePodCreationFailure/OnDelete\n  ...Failure (15.39s)\n\n=== RUN   TestDaemonSetRollingUpdateWithTolerations\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794685831,
+  "commits": {
+    "kubernetes/kubernetes": "cf33c49bef1f08f7550251d4879ee0eaec558873"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2121681521772335104",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2121681521772335104/build-log.txt",
+  "log": {
+    "bytes": 308822,
+    "md5": "35b52f85bd81010a9b284280e11225d8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 26470,
+    "gcs": {
+      "generation": "1794685835668624",
+      "md5": "35b52f85bd81010a9b284280e11225d8",
+      "crc32c": "38454ab4",
+      "bytes": 308822,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 105285,
+    "md5": "9a46cef3c9f7803848ec2cdf50db1f5e",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12773,
+    "gcs": {
+      "generation": "1794685837493358",
+      "md5": "9a46cef3c9f7803848ec2cdf50db1f5e",
+      "crc32c": "6cd8b049",
+      "bytes": 105285,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-15T062941Z",
+  "archived_at": 1794724181.0,
+  "settled": true,
+  "final": false
+}

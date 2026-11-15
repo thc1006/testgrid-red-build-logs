@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2121813391398932480",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1794714738,
+  "created": 1794714708,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/apiserver/pkg/storage/cacher.delegator",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCompactRevision\n    store_tests.go:5920: Expected... of closed network connection\"}\n--- FAIL: TestCompactRevision (1.62s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794716139,
+  "commits": {
+    "kubernetes/kubernetes": "04d3cc7a37391af9ee4363e2c0f7ae907c9c800e"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2121813391398932480",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2121813391398932480/build-log.txt",
+  "log": {
+    "bytes": 233955,
+    "md5": "5c2cc8e01eb402ba358b2df4f48104a7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 32607,
+    "gcs": {
+      "generation": "1794716140084615",
+      "md5": "5c2cc8e01eb402ba358b2df4f48104a7",
+      "crc32c": "b6a71c5e",
+      "bytes": 233955,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 92279,
+    "md5": "4113d37d2e3326980ff37ab87d59dfde",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11647,
+    "gcs": {
+      "generation": "1794716141767607",
+      "md5": "4113d37d2e3326980ff37ab87d59dfde",
+      "crc32c": "d98024f9",
+      "bytes": 92279,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-15T062941Z",
+  "archived_at": 1794724181.0,
+  "settled": true,
+  "final": false
+}

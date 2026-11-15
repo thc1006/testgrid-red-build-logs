@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2121650064014184448",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794675768,
+  "created": 1794675768,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: csi-hostpath] [Testpattern: Dynamic PV (default fs)] subPath should support existing single file [LinuxOnly]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"pod-subpath-test-dynamicpv-xwzq\" success: Timed...s/test/e2e/framework/pod/output/output.go:263 @ 11/14/26 17:16:12.357\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794678147,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.498+cf33c49bef1f08",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2121650064014184448",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2121650064014184448/build-log.txt",
+  "log": {
+    "bytes": 256086,
+    "md5": "7e24b2042dc7f77278970e161d0a0f24",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 35953,
+    "gcs": {
+      "generation": "1794678160319469",
+      "md5": "7e24b2042dc7f77278970e161d0a0f24",
+      "crc32c": "63e4dbab",
+      "bytes": 256086,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 87927,
+    "md5": "e8a2f352cdab6e193cf5f03b9be502e3",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11911,
+    "gcs": {
+      "generation": "1794678162206235",
+      "md5": "e8a2f352cdab6e193cf5f03b9be502e3",
+      "crc32c": "5c6103ac",
+      "bytes": 87927,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-15T062941Z",
+  "archived_at": 1794724181.0,
+  "settled": true,
+  "final": false
+}
