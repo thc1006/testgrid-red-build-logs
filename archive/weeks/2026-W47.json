@@ -1,5 +1,659 @@
 [
   {
+    "time": 1794853767,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+    "build": "2122396508773945344",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-apps] Job should allow updating pod resources for a job that started and then was suspended [FeatureGate:MutablePodResourcesForSuspendedJobs] [Beta]",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should delete pods when suspended",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should update the status ready field",
+      "ci-kubernetes-e2e-kind-alpha-beta-features.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-features/2122396508773945344",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-features/2122396508773945344/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-features/2122396508773945344/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 365530,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2122396508773945344"
+  },
+  {
+    "time": 1794852982,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2122393219042906112",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-master/2122393219042906112",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-master/2122393219042906112/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-master/2122393219042906112/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 315191,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2122393219042906112"
+  },
+  {
+    "time": 1794851721,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+    "build": "2122387933032878080",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-enabled"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-apps] Job should allow updating pod resources for a job that started and then was suspended [FeatureGate:MutablePodResourcesForSuspendedJobs] [Beta]",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should delete pods when suspended",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should update the status ready field",
+      "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122387933032878080",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122387933032878080/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122387933032878080/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 353103,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122387933032878080"
+  },
+  {
+    "time": 1794847943,
+    "job": "ci-kubernetes-build",
+    "build": "2122372079884963840",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#build-master"
+    ],
+    "red_tests": [
+      "ci-kubernetes-build.Overall"
+    ],
+    "red_test_count": 1,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-build/2122372079884963840",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-build/2122372079884963840/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-build/2122372079884963840/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 195403,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-build/2122372079884963840"
+  },
+  {
+    "time": 1794846499,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+    "build": "2122366039256731648",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-apps] Job should allow updating pod resources for a job that started and then was suspended [FeatureGate:MutablePodResourcesForSuspendedJobs] [Beta]",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should delete pods when suspended",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should update the status ready field",
+      "ci-kubernetes-e2e-kind-alpha-beta-features.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-features/2122366039256731648",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-features/2122366039256731648/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-features/2122366039256731648/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 366551,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2122366039256731648"
+  },
+  {
+    "time": 1794846083,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2122364276973768704",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-apps] k8s.io/kubernetes/test/integration.job",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122364276973768704",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122364276973768704/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122364276973768704/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 357959,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2122364276973768704"
+  },
+  {
+    "time": 1794844461,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+    "build": "2122357483375693824",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-enabled"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-apps] Job should allow updating pod resources for a job that started and then was suspended [FeatureGate:MutablePodResourcesForSuspendedJobs] [Beta]",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should delete pods when suspended",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should update the status ready field",
+      "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122357483375693824",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122357483375693824/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122357483375693824/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 379735,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122357483375693824"
+  },
+  {
+    "time": 1794839372,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+    "build": "2122335839961747456",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-apps] Job should allow updating pod resources for a job that started and then was suspended [FeatureGate:MutablePodResourcesForSuspendedJobs] [Beta]",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should delete pods when suspended",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should update the status ready field",
+      "ci-kubernetes-e2e-kind-alpha-beta-features.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-features/2122335839961747456",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-features/2122335839961747456/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-features/2122335839961747456/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 446163,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2122335839961747456"
+  },
+  {
+    "time": 1794837260,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+    "build": "2122327283661279232",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-enabled"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-apps] Job should allow updating pod resources for a job that started and then was suspended [FeatureGate:MutablePodResourcesForSuspendedJobs] [Beta]",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should delete pods when suspended",
+      "Kubernetes e2e suite.[It] [sig-apps] Job should update the status ready field",
+      "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122327283661279232",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122327283661279232/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122327283661279232/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 381115,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2122327283661279232"
+  },
+  {
+    "time": 1794836570,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2122324515676491776",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Memory-Backed Volume [FeatureGate:InPlacePodVerticalScalingMemoryBackedVolumes] should fail to shrink container memory limit below active memory-backed volume usage [Beta] [FeatureGate:NodeDeclaredFeatures]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gci-gce/2122324515676491776",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gci-gce/2122324515676491776/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gci-gce/2122324515676491776/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 235577,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2122324515676491776"
+  },
+  {
+    "time": 1794835940,
+    "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+    "build": "2122321746982866944",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-serial-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: pd.csi.storage.gke.io] [Provider:gce] [Testpattern: Dynamic PV (default fs)] provisioning should provision storage with any volume data source [Serial]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-serial-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gce-cos-serial-master/2122321746982866944",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gce-cos-serial-master/2122321746982866944/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gce-cos-serial-master/2122321746982866944/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 363911,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2122321746982866944"
+  },
+  {
+    "time": 1794835288,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2122318978901610496",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122318978901610496",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122318978901610496/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122318978901610496/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 313763,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2122318978901610496"
+  },
+  {
+    "time": 1794831682,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2122303878216028160",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122303878216028160",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122303878216028160/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122303878216028160/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 322816,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2122303878216028160"
+  },
+  {
+    "time": 1794828681,
+    "job": "ci-kubernetes-build",
+    "build": "2122291295467606016",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#build-master"
+    ],
+    "red_tests": [
+      "ci-kubernetes-build.Overall"
+    ],
+    "red_test_count": 1,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-build/2122291295467606016",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-build/2122291295467606016/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-build/2122291295467606016/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 195780,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-build/2122291295467606016"
+  },
+  {
+    "time": 1794826759,
+    "job": "ci-kubernetes-unit",
+    "build": "2122283242303262720",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-kubernetes-unit"
+    ],
+    "red_tests": [
+      "[sig-testing] k8s.io.ktesting",
+      "ci-kubernetes-unit.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-unit/2122283242303262720",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-unit/2122283242303262720/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-unit/2122283242303262720/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 326512,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2122283242303262720"
+  },
+  {
+    "time": 1794825079,
+    "job": "ci-kubernetes-e2e-gce-cos-default-master",
+    "build": "2122276196996616192",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-default-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and a pre-bound PV: test write access",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-default-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gce-cos-default-master/2122276196996616192",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gce-cos-default-master/2122276196996616192/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gce-cos-default-master/2122276196996616192/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 250660,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2122276196996616192"
+  },
+  {
+    "time": 1794819557,
+    "job": "ci-kubernetes-unit",
+    "build": "2122253042697900032",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-kubernetes-unit"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/apiserver/pkg/storage/cacher.delegator",
+      "ci-kubernetes-unit.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-unit/2122253042697900032",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-unit/2122253042697900032/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-unit/2122253042697900032/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 327491,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2122253042697900032"
+  },
+  {
+    "time": 1794816008,
+    "job": "ci-kubernetes-unit",
+    "build": "2122237943337717760",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-kubernetes-unit"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/apiserver/pkg/storage/cacher.delegator",
+      "ci-kubernetes-unit.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-unit/2122237943337717760",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-unit/2122237943337717760/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-unit/2122237943337717760/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 340061,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2122237943337717760"
+  },
+  {
+    "time": 1794813568,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2122227876936814592",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122227876936814592",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122227876936814592/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122227876936814592/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 317381,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2122227876936814592"
+  },
+  {
+    "time": 1794812573,
+    "job": "ci-kubernetes-e2e-ec2-scale-performance-5000",
+    "build": "2122223599195525120",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#ec2-master-scale-performance-5000"
+    ],
+    "red_tests": [
+      "ClusterLoaderV2.load overall (/home/prow/go/src/k8s.io/perf-tests/clusterloader2/testing/load/config.yaml)",
+      "ClusterLoaderV2.load: [step: 29] gathering measurements [10] - APIResponsivenessPrometheusSimple",
+      "kubetest2.Test",
+      "ci-kubernetes-e2e-ec2-scale-performance-5000.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-ec2-scale-performance-5000/2122223599195525120",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-ec2-scale-performance-5000/2122223599195525120/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-ec2-scale-performance-5000/2122223599195525120/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 53820450,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2122223599195525120"
+  },
+  {
+    "time": 1794809965,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2122212777710850048",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-apps] k8s.io/kubernetes/test/integration.daemonset",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122212777710850048",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122212777710850048/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-integration-arm64-master/2122212777710850048/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 387542,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2122212777710850048"
+  },
+  {
+    "time": 1794809630,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2122211518727589888",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Memory-Backed Volume [FeatureGate:InPlacePodVerticalScalingMemoryBackedVolumes] memory-backed emptyDir volume resize volume resize (upsize then downsize) [Beta] [FeatureGate:NodeDeclaredFeatures]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gci-gce/2122211518727589888",
+    "run": "2026-11-16T193754Z",
+    "files": [
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gci-gce/2122211518727589888/build-log.txt.gz",
+      "runs/2026-11/2026-11-16T193754Z/ci-kubernetes-e2e-gci-gce/2122211518727589888/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 229609,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2122211518727589888"
+  },
+  {
     "time": 1794806364,
     "job": "ci-kubernetes-integration-arm64-master",
     "build": "2122197677377589248",
@@ -20,7 +674,7 @@
     ],
     "remote": [],
     "bytes": 313193,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -51,7 +705,7 @@
     ],
     "remote": [],
     "bytes": 411444,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,

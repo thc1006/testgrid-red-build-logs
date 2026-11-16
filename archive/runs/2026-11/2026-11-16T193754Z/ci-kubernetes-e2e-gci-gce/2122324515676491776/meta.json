@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2122324515676491776",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1794836570,
+  "created": 1794836570,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Memory-Backed Volume [FeatureGate:InPlacePodVerticalScalingMemoryBackedVolumes] should fail to shrink container memory limit below active memory-backed volume usage [Beta] [FeatureGate:NodeDeclaredFeatures]",
+          "status": "FAIL",
+          "message": "[FAILED] failed to write large file inside container: error reading fr...netes/test/e2e/common/node/pod_resize.go:1144 @ 11/16/26 14:11:02.945\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794839277,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.529+7f9021b4a7f9d4",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2122324515676491776",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2122324515676491776/build-log.txt",
+  "log": {
+    "bytes": 148782,
+    "md5": "451034ccad4d737e049bad0e9738fd95",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24775,
+    "gcs": {
+      "generation": "1794839293393059",
+      "md5": "451034ccad4d737e049bad0e9738fd95",
+      "crc32c": "12135059",
+      "bytes": 148782,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86795,
+    "md5": "336ea227b94fed5bb04b0dd58f1f8cce",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11715,
+    "gcs": {
+      "generation": "1794839296867565",
+      "md5": "336ea227b94fed5bb04b0dd58f1f8cce",
+      "crc32c": "4e7969aa",
+      "bytes": 86795,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-16T193754Z",
+  "archived_at": 1794857874.0,
+  "settled": true,
+  "final": false
+}
