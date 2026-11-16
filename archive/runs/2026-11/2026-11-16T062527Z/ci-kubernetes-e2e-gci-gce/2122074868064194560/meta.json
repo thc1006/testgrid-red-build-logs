@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2122074868064194560",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1794777050,
+  "created": 1794777049,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourceDefinition resources [Privileged:ClusterAdmin] Simple CustomResourceDefinition creating/deleting custom resource definition objects works [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] deleting CustomResourceDefinition: context deadline exceeded\n...apimachinery/custom_resource_definition.go:76 @ 11/15/26 21:18:32.465\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794779464,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.508+d475325584653d",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2122074868064194560",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2122074868064194560/build-log.txt",
+  "log": {
+    "bytes": 125281,
+    "md5": "6bb46371ea05d7b66192245e23006aed",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21035,
+    "gcs": {
+      "generation": "1794779480235271",
+      "md5": "6bb46371ea05d7b66192245e23006aed",
+      "crc32c": "f655d120",
+      "bytes": 125281,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86900,
+    "md5": "5432be8c02315acbbbe4b2e3fa21191f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11717,
+    "gcs": {
+      "generation": "1794779482389595",
+      "md5": "5432be8c02315acbbbe4b2e3fa21191f",
+      "crc32c": "fe8cc613",
+      "bytes": 86900,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-16T062527Z",
+  "archived_at": 1794810327.0,
+  "settled": true,
+  "final": false
+}

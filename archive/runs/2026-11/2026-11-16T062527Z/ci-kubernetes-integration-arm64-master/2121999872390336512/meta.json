@@ -1,0 +1,71 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2121999872390336512",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1794759203,
+  "created": 1794759169,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-apps] k8s.io/kubernetes/test/integration.daemonset",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestUpdateStatusDespitePodCreationFailure/RollingUpda...rix\n=== RUN   TestDaemonSetReconcileRobustnessMatrix/BaselineNoFaults\n"
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestLeaseCandidateCleanup\n    testserver.go:708: Reso...eout waiting for lease gc\n--- FAIL: TestLeaseCandidateCleanup (5.89s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794761723,
+  "commits": {
+    "kubernetes/kubernetes": "04d3cc7a37391af9ee4363e2c0f7ae907c9c800e"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2121999872390336512",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2121999872390336512/build-log.txt",
+  "log": {
+    "bytes": 267108,
+    "md5": "2b0cdfdcff34b51fd8c285cb4e7fe4d7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 25670,
+    "gcs": {
+      "generation": "1794761726710934",
+      "md5": "2b0cdfdcff34b51fd8c285cb4e7fe4d7",
+      "crc32c": "9256c3ed",
+      "bytes": 267108,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95218,
+    "md5": "ae77e6ba194eca3bace269653ba13b07",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12372,
+    "gcs": {
+      "generation": "1794761728355646",
+      "md5": "ae77e6ba194eca3bace269653ba13b07",
+      "crc32c": "daff1d97",
+      "bytes": 95218,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-16T062527Z",
+  "archived_at": 1794810327.0,
+  "settled": true,
+  "final": false
+}

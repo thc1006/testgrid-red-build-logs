@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2122059264385093632",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1794773585,
+  "created": 1794773329,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler.preemption",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestDeferredResizeQueueingHandlers/UpdatePod_handler_...QueueingHandlers\n--- FAIL: TestDeferredResizeQueueingHandlers (4.40s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794776025,
+  "commits": {
+    "kubernetes/kubernetes": "d475325584653d1129461450528dcf6c63bff366"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2122059264385093632",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2122059264385093632/build-log.txt",
+  "log": {
+    "bytes": 218029,
+    "md5": "9b64cd4b1b51d29c263c5ff8b592780f",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19163,
+    "gcs": {
+      "generation": "1794776028553511",
+      "md5": "9b64cd4b1b51d29c263c5ff8b592780f",
+      "crc32c": "96e38860",
+      "bytes": 218029,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 123448,
+    "md5": "34764bd882eb1791569e05f2143e9ec7",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 14224,
+    "gcs": {
+      "generation": "1794776038593274",
+      "md5": "34764bd882eb1791569e05f2143e9ec7",
+      "crc32c": "8b1cd87d",
+      "bytes": 123448,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-16T062527Z",
+  "archived_at": 1794810327.0,
+  "settled": true,
+  "final": false
+}

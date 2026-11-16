@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "build": "2122018495666327552",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "started": 1794763636,
+  "created": 1794763609,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "sig-network-kind, loadbalancer",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update nodePort: http [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Failure validating that node port service STOPPED removed pro...kubernetes/test/e2e/network/networking.go:375 @ 11/15/26 17:35:44.273\n"
+        },
+        {
+          "test": "ci-kubernetes-kind-cloud-provider-loadbalancer.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794764761,
+  "commits": {
+    "kubernetes-sigs/cloud-provider-kind": "aefe0b4d76abca2457230fc18b635b29da561ae1",
+    "kubernetes/kubernetes": "0de1960759c6849cdbd43677602a6bee80cb4722"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2122018495666327552",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2122018495666327552/build-log.txt",
+  "log": {
+    "bytes": 186738,
+    "md5": "309ccd3b7c3f870345e0f15f3785ae99",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 28725,
+    "gcs": {
+      "generation": "1794764764308821",
+      "md5": "309ccd3b7c3f870345e0f15f3785ae99",
+      "crc32c": "32fc4044",
+      "bytes": 186738,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98755,
+    "md5": "d3f2f17fc60c02d8cc5184971c2a2532",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12551,
+    "gcs": {
+      "generation": "1794764767370147",
+      "md5": "d3f2f17fc60c02d8cc5184971c2a2532",
+      "crc32c": "b655409b",
+      "bytes": 98755,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-16T062527Z",
+  "archived_at": 1794810327.0,
+  "settled": true,
+  "final": false
+}
