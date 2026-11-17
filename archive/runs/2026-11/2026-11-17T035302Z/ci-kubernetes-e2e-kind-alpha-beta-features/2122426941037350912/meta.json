@@ -1,0 +1,76 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2122426941037350912",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1794861023,
+  "created": 1794860990,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Job should allow updating pod resources for a job that started and then was suspended [FeatureGate:MutablePodResourcesForSuspendedJobs] [Beta]",
+          "status": "FAIL",
+          "message": "[FAILED] wait for pods to be deleted after suspension: Timed out after...: k8s.io/kubernetes/test/e2e/apps/job.go:1773 @ 11/16/26 21:07:04.813\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Job should delete pods when suspended",
+          "status": "FAIL",
+          "message": "[FAILED] ensure pods are deleted after suspend=true: Timed out after 9...t: k8s.io/kubernetes/test/e2e/apps/job.go:483 @ 11/16/26 21:01:01.759\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Job should update the status ready field",
+          "status": "FAIL",
+          "message": "[FAILED] ensure job status ready field in namespace: job-2635: Timed o...: k8s.io/kubernetes/test/e2e/apps/job.go:1460 @ 11/16/26 20:52:52.601\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794863290,
+  "commits": {
+    "kubernetes/kubernetes": "a127cf3778f67e6c549daf06654bb59d02d31b7b"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2122426941037350912",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2122426941037350912/build-log.txt",
+  "log": {
+    "bytes": 269202,
+    "md5": "46b5e6a3668d327cfaab426d87425ec8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 36874,
+    "gcs": {
+      "generation": "1794863306674157",
+      "md5": "46b5e6a3668d327cfaab426d87425ec8",
+      "crc32c": "4b90b43b",
+      "bytes": 269202,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 106236,
+    "md5": "fe5be49019cc265b436e0c1e87d77b91",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13211,
+    "gcs": {
+      "generation": "1794863322151225",
+      "md5": "fe5be49019cc265b436e0c1e87d77b91",
+      "crc32c": "0a42e5ca",
+      "bytes": 106236,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-17T035302Z",
+  "archived_at": 1794887582.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,69 @@
+{
+  "job": "ci-kubernetes-e2e-ec2-scale-performance-5000",
+  "build": "2122432856553689088",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000",
+  "started": 1794862465,
+  "created": 1794862400,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ec2-master-scale-performance-5000",
+      "tab_status": "FAILING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-ec2-scale-performance-5000.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794867095,
+  "commits": {
+    "kubernetes/perf-tests": "621a5461581bb3406242fd3b30e50643dc9f8f6c",
+    "kubernetes/kops": "83d6814ebe0610e579a826f6c4213a85ebbe3c5c",
+    "kubernetes/kubernetes": "a127cf3778f67e6c549daf06654bb59d02d31b7b"
+  },
+  "job_version": "v1.38.0-beta.0.587+a127cf3778f67e",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2122432856553689088",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2122432856553689088/build-log.txt",
+  "log": {
+    "bytes": 5286309,
+    "md5": "ab674b025ab5cf423c3cc7a4b24db518",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 1125737,
+    "gcs": {
+      "generation": "1794868029530620",
+      "md5": "ab674b025ab5cf423c3cc7a4b24db518",
+      "crc32c": "388fda71",
+      "bytes": 5286309,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 62070,
+    "md5": "09a8660d122db5cb258b90a887708cff",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10203,
+    "gcs": {
+      "generation": "1794868032076501",
+      "md5": "09a8660d122db5cb258b90a887708cff",
+      "crc32c": "d7e02e93",
+      "bytes": 62070,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-17T035302Z",
+  "archived_at": 1794887582.0,
+  "settled": true,
+  "final": false
+}

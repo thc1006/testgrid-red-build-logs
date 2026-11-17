@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2122516030126297088",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1794882260,
+  "created": 1794882230,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics Ephemeral should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 11/17/26 03:17:24.108\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794885523,
+  "commits": {
+    "kubernetes/kubernetes": "074eb5db5bbe70923fd2d0af4dc2d0091a539253"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2122516030126297088",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2122516030126297088/build-log.txt",
+  "log": {
+    "bytes": 163615,
+    "md5": "1f745c099c7444a3360a721fec6348eb",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22179,
+    "gcs": {
+      "generation": "1794885540889773",
+      "md5": "1f745c099c7444a3360a721fec6348eb",
+      "crc32c": "d8a19fac",
+      "bytes": 163615,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97070,
+    "md5": "28f55f712a94e7edfafa41d9e6a69f1e",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12663,
+    "gcs": {
+      "generation": "1794885543401572",
+      "md5": "28f55f712a94e7edfafa41d9e6a69f1e",
+      "crc32c": "7cfe6e28",
+      "bytes": 97070,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-17T035302Z",
+  "archived_at": 1794887582.0,
+  "settled": false,
+  "final": false
+}

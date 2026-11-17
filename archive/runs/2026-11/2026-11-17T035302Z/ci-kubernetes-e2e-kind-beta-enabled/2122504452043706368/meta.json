@@ -1,0 +1,71 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2122504452043706368",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1794879500,
+  "created": 1794879470,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs] [Testpattern: Pre-provisioned PV (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-preprovisionedpv-qmzx\" success...s/test/e2e/framework/pod/output/output.go:263 @ 11/17/26 01:50:16.762\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with multiple PVs and PVCs all in same ns should create 2 PVs and 4 PVCs: test write access",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-p26sb\" did not exit with Success: pod \"pvc-te...es/test/e2e/storage/persistent_volumes.go:340 @ 11/17/26 01:50:10.188\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794881196,
+  "commits": {
+    "kubernetes/kubernetes": "98aa94189e84b874578bd04a403bb8edd5a65c58"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2122504452043706368",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2122504452043706368/build-log.txt",
+  "log": {
+    "bytes": 221908,
+    "md5": "2c516c7e92a3c2ac69760e57c83c8708",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 33788,
+    "gcs": {
+      "generation": "1794881215538908",
+      "md5": "2c516c7e92a3c2ac69760e57c83c8708",
+      "crc32c": "2e1a4a21",
+      "bytes": 221908,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 105790,
+    "md5": "ce7bd207525e4d2e03b0098dfccb145f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13121,
+    "gcs": {
+      "generation": "1794881217768802",
+      "md5": "ce7bd207525e4d2e03b0098dfccb145f",
+      "crc32c": "8faa0596",
+      "bytes": 105790,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-17T035302Z",
+  "archived_at": 1794887582.0,
+  "settled": false,
+  "final": false
+}
