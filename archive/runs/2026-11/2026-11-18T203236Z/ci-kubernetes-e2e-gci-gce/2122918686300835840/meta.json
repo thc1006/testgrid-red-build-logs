@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2122918686300835840",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1794978231,
+  "created": 1794978231,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should verify ResourceQuota with terminating scopes. [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.000s.\nExpected:\n    <*v1.ResourceQuota | ...s/test/e2e/apimachinery/resource_quota.go:833 @ 11/18/26 05:28:42.268\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794980503,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.737+b86a4b80d366e6",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2122918686300835840",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2122918686300835840/build-log.txt",
+  "log": {
+    "bytes": 141622,
+    "md5": "a87f19e7f1f55d9d99999a07570eaba3",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22770,
+    "gcs": {
+      "generation": "1794980520477938",
+      "md5": "a87f19e7f1f55d9d99999a07570eaba3",
+      "crc32c": "e3c704d5",
+      "bytes": 141622,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86952,
+    "md5": "65a74559be5a333d12de438b770fd3e8",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11710,
+    "gcs": {
+      "generation": "1794980522200799",
+      "md5": "65a74559be5a333d12de438b770fd3e8",
+      "crc32c": "240a8c37",
+      "bytes": 86952,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-18T203236Z",
+  "archived_at": 1795033956.0,
+  "settled": true,
+  "final": false
+}

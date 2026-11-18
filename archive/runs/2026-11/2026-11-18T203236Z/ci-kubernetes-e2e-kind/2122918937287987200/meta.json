@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2122918937287987200",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1794978331,
+  "created": 1794978291,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] CustomResourceDefinition resources [Privileged:ClusterAdmin] Simple CustomResourceDefinition listing custom resource definition objects works [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] deleting CustomResourceDefinition: context deadline exceeded\n...pimachinery/custom_resource_definition.go:114 @ 11/18/26 05:17:45.834\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794980011,
+  "commits": {
+    "kubernetes/kubernetes": "b86a4b80d366e646afcce3c8d837c67eeeb20130"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2122918937287987200",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2122918937287987200/build-log.txt",
+  "log": {
+    "bytes": 124162,
+    "md5": "52ca1c53e6fc8f285ad508de89743fda",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 19227,
+    "gcs": {
+      "generation": "1794980027109369",
+      "md5": "52ca1c53e6fc8f285ad508de89743fda",
+      "crc32c": "303a1b01",
+      "bytes": 124162,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96416,
+    "md5": "fb72a1bc76c7fe9511817c59fd21c6bb",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12658,
+    "gcs": {
+      "generation": "1794980029839411",
+      "md5": "fb72a1bc76c7fe9511817c59fd21c6bb",
+      "crc32c": "cde996e8",
+      "bytes": 96416,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-18T203236Z",
+  "archived_at": 1795033956.0,
+  "settled": true,
+  "final": false
+}

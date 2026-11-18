@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2123092835648409600",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1795019786,
+  "created": 1795019751,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration.examples",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestAggregatedAPIServer/WithoutWardleFeatureGateAtV1....  TestAggregatedAPIServer\n--- FAIL: TestAggregatedAPIServer (262.26s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795022286,
+  "commits": {
+    "kubernetes/kubernetes": "5ea8f9b0cf014050c06e38be1f7f7d8680653ca7"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2123092835648409600",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2123092835648409600/build-log.txt",
+  "log": {
+    "bytes": 578099,
+    "md5": "179235d8d79c60cf09bdd010856f4a98",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 67595,
+    "gcs": {
+      "generation": "1795022291056721",
+      "md5": "179235d8d79c60cf09bdd010856f4a98",
+      "crc32c": "bfbc6b70",
+      "bytes": 578099,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98001,
+    "md5": "7c482dd461433fe1514e5dfab4c898e1",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12224,
+    "gcs": {
+      "generation": "1795022293804716",
+      "md5": "7c482dd461433fe1514e5dfab4c898e1",
+      "crc32c": "ce6584c7",
+      "bytes": 98001,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-18T203236Z",
+  "archived_at": 1795033956.0,
+  "settled": true,
+  "final": false
+}

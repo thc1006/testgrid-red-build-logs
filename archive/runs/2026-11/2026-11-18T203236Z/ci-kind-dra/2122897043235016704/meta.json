@@ -1,0 +1,59 @@
+{
+  "job": "ci-kind-dra",
+  "build": "2122897043235016704",
+  "query": "kubernetes-ci-logs/logs/ci-kind-dra",
+  "started": 1794973072,
+  "created": 1794973071,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ci-kind-dra",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kind-dra.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794973732,
+  "commits": {},
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kind-dra/2122897043235016704",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kind-dra/2122897043235016704/build-log.txt",
+  "log": {
+    "bytes": 6995,
+    "md5": "7da02a5313bc0c87cb5a5ef3044b3147",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 2431,
+    "gcs": {
+      "generation": "1794973733239644",
+      "md5": "7da02a5313bc0c87cb5a5ef3044b3147",
+      "crc32c": "bc6304ee",
+      "bytes": 6995,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 80998,
+    "md5": "84ae4fc223187ab600845b0016470fd8",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12622,
+    "gcs": {
+      "generation": "1794973735624191",
+      "md5": "84ae4fc223187ab600845b0016470fd8",
+      "crc32c": "535469d6",
+      "bytes": 80998,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-18T203236Z",
+  "archived_at": 1795033956.0,
+  "settled": true,
+  "final": false
+}
