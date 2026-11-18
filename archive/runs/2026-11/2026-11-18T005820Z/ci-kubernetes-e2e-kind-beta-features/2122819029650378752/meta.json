@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2122819029650378752",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1794954504,
+  "created": 1794954471,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: csi-hostpath] [Testpattern: Dynamic PV (default fs)] provisioning should provision storage with pvc data source",
+          "status": "FAIL",
+          "message": "[FAILED] error running /home/prow/go/src/k8s.io/kubernetes/_output/bin...rnetes/test/e2e/framework/kubectl/builder.go:97 @ 11/17/26 22:41:54.7\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794956182,
+  "commits": {
+    "kubernetes/kubernetes": "c921933e39782a84840db3abd346154d9f0d7084"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2122819029650378752",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2122819029650378752/build-log.txt",
+  "log": {
+    "bytes": 198960,
+    "md5": "d9e606a3af342d7778ed61e2ccf82ba3",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 28469,
+    "gcs": {
+      "generation": "1794956197885254",
+      "md5": "d9e606a3af342d7778ed61e2ccf82ba3",
+      "crc32c": "dd84ca33",
+      "bytes": 198960,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96002,
+    "md5": "8c6c9804cba81d8eab74809bb15ea64a",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12513,
+    "gcs": {
+      "generation": "1794956200189639",
+      "md5": "8c6c9804cba81d8eab74809bb15ea64a",
+      "crc32c": "a1c2540c",
+      "bytes": 96002,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-18T005820Z",
+  "archived_at": 1794963500.0,
+  "settled": true,
+  "final": false
+}

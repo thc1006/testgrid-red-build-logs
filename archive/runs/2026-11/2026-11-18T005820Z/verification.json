@@ -1,0 +1,66 @@
+{
+  "run": "2026-11-18T005820Z",
+  "outcome": "ok",
+  "started": 1794963519.0846305,
+  "finished": 1794963538.5721285,
+  "tool": {
+    "commit": "da8565b8e50c90f1d9049f4de5484743275fa23e",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "44211848781",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1794790700.8262095,
+      "to": 1794963500.8262095
+    },
+    "tabs": 46,
+    "builds": 1899,
+    "compared_with_gcs": 324,
+    "sevenths": [
+      6
+    ],
+    "differ": 0,
+    "not_settled": 2,
+    "assets": {
+      "uploaded": 81,
+      "compared_with_gcs": 9,
+      "downloaded": 3
+    },
+    "red_on_testgrid": 71,
+    "red_not_settled": 0,
+    "gcs_builds": 1928,
+    "judged_by_rule": 20
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 23,
+  "notes": [
+    "ci-kubernetes-build-fast/2122210764008722432: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2122312938294349824: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2122483815908642816: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2122802168611213312: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-cos-default-master/2122306394827788288: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-cos-slow-master/2122331309991792640: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-device-plugin-gpu/2122321494804533248: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-scale-performance-100/2122159676626833408: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-scale-performance-100/2122381643254599680: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-scale-performance-100/2122688922180915200: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind/2122553777436233728: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-alpha-beta-conformance/2122215797366460416: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-features/2122712827541065728: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-ipv6/2122196670912401408: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-ipv6/2122743026613751808: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2122152378634342400: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2122349177223516160: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2122455882766749696: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2122744033116688384: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-kind-cloud-provider-loadbalancer/2122748311378071552: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-unit/2122724404608634880: ERROR, not listed on TestGrid (not archived)",
+    "ci-node-crio-conformance/2122636323373191168: ERROR, not listed on TestGrid (not archived)",
+    "periodic-kubernetes-e2e-kind-kms/2122748074412478464: ERROR, TestGrid paints it NO_RESULT (not red, not archived)"
+  ]
+}

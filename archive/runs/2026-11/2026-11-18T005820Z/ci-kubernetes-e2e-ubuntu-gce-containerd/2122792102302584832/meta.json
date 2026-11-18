@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2122792102302584832",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1794948051,
+  "created": 1794948051,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] AdmissionWebhook [Privileged:ClusterAdmin] should honor timeout [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Internal error occurred: failed calling webhook \"allow-config...ernetes/test/e2e/apimachinery/webhook.go:2570 @ 11/17/26 20:59:55.056\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794950363,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.728+d9489cf81cb09b",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2122792102302584832",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2122792102302584832/build-log.txt",
+  "log": {
+    "bytes": 197389,
+    "md5": "a8a1a825300dedd620ae525786a89086",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 28861,
+    "gcs": {
+      "generation": "1794950380015861",
+      "md5": "a8a1a825300dedd620ae525786a89086",
+      "crc32c": "e9e5eb67",
+      "bytes": 197389,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 88753,
+    "md5": "6818e7c49c2b9addde325fbaa6243de6",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11923,
+    "gcs": {
+      "generation": "1794950381766591",
+      "md5": "6818e7c49c2b9addde325fbaa6243de6",
+      "crc32c": "16ec8303",
+      "bytes": 88753,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-18T005820Z",
+  "archived_at": 1794963500.0,
+  "settled": true,
+  "final": false
+}

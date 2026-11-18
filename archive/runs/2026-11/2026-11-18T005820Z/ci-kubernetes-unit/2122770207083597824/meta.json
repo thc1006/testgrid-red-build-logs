@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2122770207083597824",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1794942860,
+  "created": 1794942831,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-storage] k8s.io/kubernetes/pkg/registry/core/persistentvolume.storage",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestCreate\n    resttest.go:341: unexpected obj: &core...7123: use of closed network connection\"}\n--- FAIL: TestCreate (0.96s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794944286,
+  "commits": {
+    "kubernetes/kubernetes": "d9489cf81cb09b9f30e6f5531adb3aa1465d4e78"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2122770207083597824",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2122770207083597824/build-log.txt",
+  "log": {
+    "bytes": 243053,
+    "md5": "370dd3aa096be40ee563ca58037240e9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 34290,
+    "gcs": {
+      "generation": "1794944286620573",
+      "md5": "370dd3aa096be40ee563ca58037240e9",
+      "crc32c": "28177c79",
+      "bytes": 243053,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 93624,
+    "md5": "fc503fb9b9be3f27f79ef6e7e25a7d7c",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11745,
+    "gcs": {
+      "generation": "1794944301199421",
+      "md5": "fc503fb9b9be3f27f79ef6e7e25a7d7c",
+      "crc32c": "f72079fc",
+      "bytes": 93624,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-18T005820Z",
+  "archived_at": 1794963500.0,
+  "settled": true,
+  "final": false
+}

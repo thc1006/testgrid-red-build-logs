@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2122760392571621376",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1794940520,
+  "created": 1794940491,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics Ephemeral should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 11/17/26 19:22:10.661\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1794943408,
+  "commits": {
+    "kubernetes/kubernetes": "276d19fcb06b2e64c0df720d75553271bfe637ed"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2122760392571621376",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2122760392571621376/build-log.txt",
+  "log": {
+    "bytes": 170426,
+    "md5": "e4eb091cb4d66775c2d8b7917b42e5de",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22449,
+    "gcs": {
+      "generation": "1794943424737098",
+      "md5": "e4eb091cb4d66775c2d8b7917b42e5de",
+      "crc32c": "8ab66881",
+      "bytes": 170426,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97599,
+    "md5": "21949002f44f6f455742992c01190cd3",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12664,
+    "gcs": {
+      "generation": "1794943426591741",
+      "md5": "21949002f44f6f455742992c01190cd3",
+      "crc32c": "2249375f",
+      "bytes": 97599,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-18T005820Z",
+  "archived_at": 1794963500.0,
+  "settled": true,
+  "final": false
+}
