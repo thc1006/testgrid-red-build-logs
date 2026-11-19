@@ -1,0 +1,71 @@
+{
+  "job": "ci-node-e2e-containerd-2-4-cos-dra",
+  "build": "2123441637886529536",
+  "query": "kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra",
+  "started": 1795102920,
+  "created": 1795102912,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ci-node-e2e-containerd-2-4-cos-dra",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-node-e2e-containerd-2-4-cos-dra.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795102962,
+  "commits": {
+    "kubernetes/test-infra": "f20d842cdc1da01d3719d66dbcc2505ecf7d4a95",
+    "containerd/containerd": "c6c04b4c64667ff022d0bd88df69f21fdcd4a45a"
+  },
+  "job_version": "v1.38.0-beta.0.807+34a0056c2ba4ab",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra/2123441637886529536",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-cos-dra/2123441637886529536/build-log.txt",
+  "log": {
+    "bytes": 28242,
+    "md5": "f3be69ec47266b425575705f14e6d742",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 8220,
+    "gcs": {
+      "generation": "1795102962774495",
+      "md5": "f3be69ec47266b425575705f14e6d742",
+      "crc32c": "deedee47",
+      "bytes": 28242,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 99824,
+    "md5": "d67abd0b7d7e9ffd6d33d052e1d75db9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12999,
+    "gcs": {
+      "generation": "1795102965094044",
+      "md5": "d67abd0b7d7e9ffd6d33d052e1d75db9",
+      "crc32c": "ae8a0aa6",
+      "bytes": 99824,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": true,
+  "archived_by_run": "2026-11-19T203849Z",
+  "archived_at": 1795120729.0,
+  "settled": true,
+  "final": false,
+  "artifacts_asset": {
+    "members": []
+  }
+}

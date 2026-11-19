@@ -1,0 +1,64 @@
+{
+  "job": "ci-kubernetes-e2e-gce-scale-performance-100",
+  "build": "2123239301427761152",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100",
+  "started": 1795054704,
+  "created": 1795054671,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-master-scale-performance-100",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-scale-performance-100.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795058342,
+  "commits": {
+    "kubernetes/perf-tests": "621a5461581bb3406242fd3b30e50643dc9f8f6c",
+    "kubernetes/kops": "342813d27b0fd53e6d7dfeceff43a828541a29ea",
+    "kubernetes/kubernetes": "07f8a0edfd890e4f5f24197e6a50ed1c6dd0c9e8"
+  },
+  "job_version": "v1.38.0-beta.0.791+07f8a0edfd890e",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2123239301427761152",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-scale-performance-100/2123239301427761152/build-log.txt",
+  "log": {
+    "bytes": 1938101,
+    "md5": "7a5caa9dafec1ad354148ba812a882d4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 162025,
+    "gcs": {
+      "generation": "1795058357133323",
+      "md5": "7a5caa9dafec1ad354148ba812a882d4",
+      "crc32c": "0062a2e8",
+      "bytes": 1938101,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97900,
+    "md5": "1613346cab93cc1db6e698645f6258d0",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12575,
+    "gcs": {
+      "generation": "1795058359695586",
+      "md5": "1613346cab93cc1db6e698645f6258d0",
+      "crc32c": "d9aa8710",
+      "bytes": 97900,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-19T203849Z",
+  "archived_at": 1795120729.0,
+  "settled": true,
+  "final": false
+}

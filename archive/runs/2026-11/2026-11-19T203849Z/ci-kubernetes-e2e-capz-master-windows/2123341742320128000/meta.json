@@ -1,0 +1,78 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2123341742320128000",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1795079104,
+  "created": 1795079095,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FAILING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Downward API Downward API tests for pod level resources should provide default limits.cpu/memory from pod level resources [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"downward-api-d7683a17-2052-4abf-8452-8617f3a72e...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Downward API Downward API tests for pod level resources should provide default limits.cpu/memory from pod level resources or node allocatable [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] wait for Pod \"downward-api-b1bb57f5-60ed-4d6b-b17e-7cbeb140de...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Pod Level Resources should support pod-level resource limits and requests specification [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Told to stop trying after 0.106s.\nExpected pod to reach phase...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795088262,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "8fc420ae464573a40bbe8f9baa18b54e88a82611",
+    "kubernetes-sigs/cluster-api-provider-azure": "291f232c5f4d98efd674d0efca508a34864e94a3",
+    "kubernetes-sigs/cloud-provider-azure": "621017d5bf61b29b05e1246aefbe9b162b099bc6"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2123341742320128000",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2123341742320128000/build-log.txt",
+  "log": {
+    "bytes": 760187,
+    "md5": "415b1b942e89d8b2aacd293ee6c4eb75",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 102980,
+    "gcs": {
+      "generation": "1795088268502179",
+      "md5": "415b1b942e89d8b2aacd293ee6c4eb75",
+      "crc32c": "431c8941",
+      "bytes": 760187,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 62966,
+    "md5": "49fa1e9c98f39a5a3475555cd8c823cd",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10277,
+    "gcs": {
+      "generation": "1795088284043325",
+      "md5": "49fa1e9c98f39a5a3475555cd8c823cd",
+      "crc32c": "16709107",
+      "bytes": 62966,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-19T203849Z",
+  "archived_at": 1795120729.0,
+  "settled": true,
+  "final": false
+}
