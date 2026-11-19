@@ -1,0 +1,85 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2123160028180385792",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1795035772,
+  "created": 1795035771,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach UDP service through 34.61.207.72:80 after 2m0....io/kubernetes/test/e2e/network/service.go:569 @ 11/18/26 21:27:15.57\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should only target nodes with endpoints [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 136.111.12.218:8081 afte...ernetes/test/e2e/framework/service/util.go:49 @ 11/18/26 21:30:30.977\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a TCP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 34.44.135.175:81 after 1...bernetes/test/e2e/framework/service/util.go:49 @ 11/18/26 21:33:46.95\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should not have connectivity disruption during rolling update with externalTrafficPolicy=Cluster [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Encountered too many errors when doing HTTP requests to the l...bernetes/test/e2e/network/loadbalancer.go:1464 @ 11/18/26 21:29:10.11\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795039089,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.756+5e2cad18bceac0",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2123160028180385792",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2123160028180385792/build-log.txt",
+  "log": {
+    "bytes": 432007,
+    "md5": "83d5077272cc9e89f39ea800aab53ffa",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 57729,
+    "gcs": {
+      "generation": "1795039097503370",
+      "md5": "83d5077272cc9e89f39ea800aab53ffa",
+      "crc32c": "8f752dee",
+      "bytes": 432007,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86925,
+    "md5": "a48a899ab68961d03cc42ca9d52645aa",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11722,
+    "gcs": {
+      "generation": "1795039103836299",
+      "md5": "a48a899ab68961d03cc42ca9d52645aa",
+      "crc32c": "d0b25b5f",
+      "bytes": 86925,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-19T023412Z",
+  "archived_at": 1795055652.0,
+  "settled": true,
+  "final": false
+}

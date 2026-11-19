@@ -1,0 +1,75 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2123203062104330240",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1795046032,
+  "created": 1795046031,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should work for type=LoadBalancer [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] timed out waiting for the condition\nIn [It] at: k8s.io/kubernetes/test/e2e/network/loadbalancer.go:1069 @ 11/19/26 00:06:56.602\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach UDP service through 34.133.20.108:80 after 2m...io/kubernetes/test/e2e/network/service.go:569 @ 11/19/26 00:06:55.469\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795049624,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.773+70cf7a0260ffbb",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2123203062104330240",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2123203062104330240/build-log.txt",
+  "log": {
+    "bytes": 225117,
+    "md5": "24610338dc85fc73541f496248768635",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 34469,
+    "gcs": {
+      "generation": "1795049631097694",
+      "md5": "24610338dc85fc73541f496248768635",
+      "crc32c": "b7017754",
+      "bytes": 225117,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 84184,
+    "md5": "4200b8a747cbbb19fcca9868f621dca4",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11481,
+    "gcs": {
+      "generation": "1795049634881560",
+      "md5": "4200b8a747cbbb19fcca9868f621dca4",
+      "crc32c": "eb2d84bd",
+      "bytes": 84184,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-19T023412Z",
+  "archived_at": 1795055652.0,
+  "settled": false,
+  "final": false
+}
