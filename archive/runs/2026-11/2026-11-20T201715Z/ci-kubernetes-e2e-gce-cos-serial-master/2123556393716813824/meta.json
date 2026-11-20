@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2123556393716813824",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1795130303,
+  "created": 1795130272,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-apps] Daemon set should surge pods onto nodes when spec was updated and update strategy is RollingUpdate [Serial]",
+          "status": "FAIL",
+          "message": "[FAILED] complete surge rollout of DaemonSet \"daemon-set\" while preser...io/kubernetes/test/e2e/apps/daemon_set.go:833 @ 11/20/26 03:02:48.221\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Serial\\]|\\[Disrupti...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795145543,
+  "commits": {
+    "kubernetes/kubernetes": "dee14a0ede00099d6441a8991ad6137b938d2a9d"
+  },
+  "job_version": "v1.38.0-beta.0.819+dee14a0ede0009",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2123556393716813824",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2123556393716813824/build-log.txt",
+  "log": {
+    "bytes": 247900,
+    "md5": "33de973ba1de6fecdf0936c8067bdc0d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 26992,
+    "gcs": {
+      "generation": "1795145569838316",
+      "md5": "33de973ba1de6fecdf0936c8067bdc0d",
+      "crc32c": "1ac92259",
+      "bytes": 247900,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 71428,
+    "md5": "4efc76283c665460a42810168d83c0dc",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10623,
+    "gcs": {
+      "generation": "1795145571921701",
+      "md5": "4efc76283c665460a42810168d83c0dc",
+      "crc32c": "c72e46fd",
+      "bytes": 71428,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-20T201715Z",
+  "archived_at": 1795205835.0,
+  "settled": true,
+  "final": false
+}

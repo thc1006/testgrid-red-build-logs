@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-features",
+  "build": "2123809063136399360",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features",
+  "started": 1795190556,
+  "created": 1795190513,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota [FeatureGate:VolumeAttributesClass] should verify ResourceQuota's volume attributes class scope (quota set to pvc count: 1) against a pvc with different volume attributes class.",
+          "status": "FAIL",
+          "message": "[FAILED] persistentvolumeclaims \"test-claim\" is forbidden: exceeded qu.../test/e2e/apimachinery/resource_quota.go:1387 @ 11/20/26 16:24:36.119\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795192154,
+  "commits": {
+    "kubernetes/kubernetes": "1988b1907f178ce1891dd1613be4704c2289a799"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2123809063136399360",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2123809063136399360/build-log.txt",
+  "log": {
+    "bytes": 130299,
+    "md5": "1abd4dfbecf2c5325982b5a7b5fd5ecc",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20436,
+    "gcs": {
+      "generation": "1795192170877293",
+      "md5": "1abd4dfbecf2c5325982b5a7b5fd5ecc",
+      "crc32c": "d07ddf2b",
+      "bytes": 130299,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 104475,
+    "md5": "25b63cfff90d2293d04c9cf68d405ee9",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13333,
+    "gcs": {
+      "generation": "1795192182801682",
+      "md5": "25b63cfff90d2293d04c9cf68d405ee9",
+      "crc32c": "c8593478",
+      "bytes": 104475,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-20T201715Z",
+  "archived_at": 1795205835.0,
+  "settled": true,
+  "final": false
+}

@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-default-master",
+  "build": "2123699086828769280",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master",
+  "started": 1795164322,
+  "created": 1795164293,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-default-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] [DRA] control plane supports count/resourceclaims.resource.k8s.io ResourceQuota",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.001s.\ncreating second claim not allowed\nE...t: k8s.io/kubernetes/test/e2e/dra/dra.go:4268 @ 11/20/26 09:19:59.764\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-default-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795166877,
+  "commits": {
+    "kubernetes/kubernetes": "22faa13ad67e6d20270977dd8e2c2da54ee992e9"
+  },
+  "job_version": "v1.38.0-beta.0.821+22faa13ad67e6d",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2123699086828769280",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2123699086828769280/build-log.txt",
+  "log": {
+    "bytes": 122772,
+    "md5": "876ee50ed72c4be17016bb817adff72c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20844,
+    "gcs": {
+      "generation": "1795166893221892",
+      "md5": "876ee50ed72c4be17016bb817adff72c",
+      "crc32c": "af257134",
+      "bytes": 122772,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98372,
+    "md5": "0db798b4f49af6aaec6d1ec460e078cc",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12458,
+    "gcs": {
+      "generation": "1795166895654611",
+      "md5": "0db798b4f49af6aaec6d1ec460e078cc",
+      "crc32c": "b230824e",
+      "bytes": 98372,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-20T201715Z",
+  "archived_at": 1795205835.0,
+  "settled": true,
+  "final": false
+}

@@ -11,7 +11,7 @@ TestGrid's config: test-infra c193f14bbb74 of 2026-11-19T19:30:31Z, uploaded 202
 
 | Time | Tab | Build | Red tests | Files |
 |---|---|---|---|---|
-| 00:47 | blocking#integration-arm64-master | [ci-kubernetes-integration-arm64-master 2123578791493111808](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2123578791493111808) | \[sig-api-machinery\] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection (+1) | [build-log.txt.gz](../../../runs/2026-11/2026-11-20T021831Z/ci-kubernetes-integration-arm64-master/2123578791493111808/build-log.txt.gz) [podinfo.json.gz](../../../runs/2026-11/2026-11-20T021831Z/ci-kubernetes-integration-arm64-master/2123578791493111808/podinfo.json.gz) (provisional) |
+| 00:47 | blocking#integration-arm64-master | [ci-kubernetes-integration-arm64-master 2123578791493111808](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2123578791493111808) | \[sig-api-machinery\] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection (+1) | [build-log.txt.gz](../../../runs/2026-11/2026-11-20T021831Z/ci-kubernetes-integration-arm64-master/2123578791493111808/build-log.txt.gz) [podinfo.json.gz](../../../runs/2026-11/2026-11-20T021831Z/ci-kubernetes-integration-arm64-master/2123578791493111808/podinfo.json.gz) |
 
 ### 2026-11-19
 
