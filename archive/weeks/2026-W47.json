@@ -1,5 +1,65 @@
 [
   {
+    "time": 1795135646,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2123578791493111808",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-20T021831Z/ci-kubernetes-integration-arm64-master/2123578791493111808",
+    "run": "2026-11-20T021831Z",
+    "files": [
+      "runs/2026-11/2026-11-20T021831Z/ci-kubernetes-integration-arm64-master/2123578791493111808/build-log.txt.gz",
+      "runs/2026-11/2026-11-20T021831Z/ci-kubernetes-integration-arm64-master/2123578791493111808/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 323778,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2123578791493111808"
+  },
+  {
+    "time": 1795122420,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2123523428060237824",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Downward API Downward API tests for pod level resources should provide default limits.cpu/memory from pod level resources [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Downward API Downward API tests for pod level resources should provide default limits.cpu/memory from pod level resources or node allocatable [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Pod Level Resources should support pod-level resource limits and requests specification [Conformance]",
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-20T021831Z/ci-kubernetes-e2e-capz-master-windows/2123523428060237824",
+    "run": "2026-11-20T021831Z",
+    "files": [
+      "runs/2026-11/2026-11-20T021831Z/ci-kubernetes-e2e-capz-master-windows/2123523428060237824/build-log.txt.gz",
+      "runs/2026-11/2026-11-20T021831Z/ci-kubernetes-e2e-capz-master-windows/2123523428060237824/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 622925,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2123523428060237824"
+  },
+  {
     "time": 1795111584,
     "job": "ci-kubernetes-build",
     "build": "2123477875729371136",
@@ -26,6 +86,37 @@
     "in_parts": false,
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-build/2123477875729371136"
+  },
+  {
+    "time": 1795111501,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2123477624423452672",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Downward API Downward API tests for pod level resources should provide default limits.cpu/memory from pod level resources [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Downward API Downward API tests for pod level resources should provide default limits.cpu/memory from pod level resources or node allocatable [NodeConformance]",
+      "Kubernetes e2e suite.[It] [sig-node] Pod Level Resources should support pod-level resource limits and requests specification [Conformance]",
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-20T021831Z/ci-kubernetes-e2e-capz-master-windows/2123477624423452672",
+    "run": "2026-11-20T021831Z",
+    "files": [
+      "runs/2026-11/2026-11-20T021831Z/ci-kubernetes-e2e-capz-master-windows/2123477624423452672/build-log.txt.gz",
+      "runs/2026-11/2026-11-20T021831Z/ci-kubernetes-e2e-capz-master-windows/2123477624423452672/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 758715,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2123477624423452672"
   },
   {
     "time": 1795110686,
@@ -110,7 +201,7 @@
     ],
     "remote": [],
     "bytes": 132721,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -1557,7 +1648,7 @@
     "remote": [],
     "bytes": 1998114,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1590,7 +1681,7 @@
     "remote": [],
     "bytes": 500192,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1619,7 +1710,7 @@
     "remote": [],
     "bytes": 358191,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1648,7 +1739,7 @@
     "remote": [],
     "bytes": 294962,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1677,7 +1768,7 @@
     "remote": [],
     "bytes": 360167,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1707,7 +1798,7 @@
     "remote": [],
     "bytes": 228810,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1735,7 +1826,7 @@
     "remote": [],
     "bytes": 201326,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1765,7 +1856,7 @@
     "remote": [],
     "bytes": 286142,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1794,7 +1885,7 @@
     "remote": [],
     "bytes": 325954,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1823,7 +1914,7 @@
     "remote": [],
     "bytes": 325962,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

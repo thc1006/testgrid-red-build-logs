@@ -1,0 +1,51 @@
+{
+  "run": "2026-11-20T021831Z",
+  "outcome": "ok",
+  "started": 1795141131.6630294,
+  "finished": 1795141160.2928996,
+  "tool": {
+    "commit": "8d4a400584143ee6632d4af7b14e791c1b6b3ef5",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "44659772857",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1794968311.7536666,
+      "to": 1795141111.7536666
+    },
+    "tabs": 46,
+    "builds": 1956,
+    "compared_with_gcs": 337,
+    "sevenths": [
+      1
+    ],
+    "differ": 0,
+    "not_settled": 1,
+    "assets": {
+      "uploaded": 86,
+      "compared_with_gcs": 19,
+      "downloaded": 5
+    },
+    "red_on_testgrid": 50,
+    "red_not_settled": 0,
+    "gcs_builds": 1933,
+    "judged_by_rule": 43
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 8,
+  "notes": [
+    "ci-kubernetes-build/2122888738097860608: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2122978078224289792: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2122980847630946304: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-build-fast/2123581559960244224: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-gce-scale-performance-100/2123033946596839424: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-e2e-kind-beta-features/2123017338339987456: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-integration-arm64-master/2123518393251270656: ERROR, not listed on TestGrid (not archived)",
+    "ci-kubernetes-kind-cloud-provider-loadbalancer/2122992423985483776: ERROR, not listed on TestGrid (not archived)"
+  ]
+}
