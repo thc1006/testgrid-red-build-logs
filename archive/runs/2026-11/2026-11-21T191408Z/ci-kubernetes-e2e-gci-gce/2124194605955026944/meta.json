@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2124194605955026944",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1795282434,
+  "created": 1795282434,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] [DRA] control plane supports count/resourceclaims.resource.k8s.io ResourceQuota",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 300.000s.\ncreating second claim not allowed\nE...t: k8s.io/kubernetes/test/e2e/dra/dra.go:4268 @ 11/21/26 17:55:42.691\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795284952,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.880+80d51ceb32d28a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2124194605955026944",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2124194605955026944/build-log.txt",
+  "log": {
+    "bytes": 139756,
+    "md5": "e2c116b11bfb9b9dcca5fc4946d0d686",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 23194,
+    "gcs": {
+      "generation": "1795284968477672",
+      "md5": "e2c116b11bfb9b9dcca5fc4946d0d686",
+      "crc32c": "e0dffb79",
+      "bytes": 139756,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86968,
+    "md5": "0ed27e01ae2e424bdc74ea52773fb928",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11753,
+    "gcs": {
+      "generation": "1795284970687440",
+      "md5": "0ed27e01ae2e424bdc74ea52773fb928",
+      "crc32c": "beb21d46",
+      "bytes": 86968,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-21T191408Z",
+  "archived_at": 1795288448.0,
+  "settled": false,
+  "final": false
+}

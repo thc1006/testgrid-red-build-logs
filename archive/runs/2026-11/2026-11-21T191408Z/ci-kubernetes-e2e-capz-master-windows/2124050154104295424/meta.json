@@ -1,0 +1,63 @@
+{
+  "job": "ci-kubernetes-e2e-capz-master-windows",
+  "build": "2124050154104295424",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows",
+  "started": 1795248001,
+  "created": 1795247994,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "capz-windows-master",
+      "tab_status": "FAILING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-capz-master-windows.Overall",
+          "status": "FAIL",
+          "message": "Build failed outside of test results"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795263305,
+  "commits": {
+    "kubernetes-sigs/windows-testing": "8fc420ae464573a40bbe8f9baa18b54e88a82611",
+    "kubernetes-sigs/cluster-api-provider-azure": "bbcdfa1f444665c5341bffcc234ac78024c87221",
+    "kubernetes-sigs/cloud-provider-azure": "d373078f74c541e6f4288f1947628ccabb903165"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2124050154104295424",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2124050154104295424/build-log.txt",
+  "log": {
+    "bytes": 627115,
+    "md5": "a529b69f511ee9322a41a5c0c6529863",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 79096,
+    "gcs": {
+      "generation": "1795263310919423",
+      "md5": "a529b69f511ee9322a41a5c0c6529863",
+      "crc32c": "13c33f59",
+      "bytes": 627115,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 63203,
+    "md5": "43d7452825e2c2693cfbb8c4dc704491",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10126,
+    "gcs": {
+      "generation": "1795263312925665",
+      "md5": "43d7452825e2c2693cfbb8c4dc704491",
+      "crc32c": "22c6f366",
+      "bytes": 63203,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-21T191408Z",
+  "archived_at": 1795288448.0,
+  "settled": true,
+  "final": false
+}
