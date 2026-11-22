@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2124324714552758272",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1795313483,
+  "created": 1795313454,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.001s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 11/22/26 02:23:07.032\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795315193,
+  "commits": {
+    "kubernetes/kubernetes": "43cbb94ee845ad387717fe851bf5f421b7284329"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2124324714552758272",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2124324714552758272/build-log.txt",
+  "log": {
+    "bytes": 142771,
+    "md5": "c26921abe5885c6ba11cf570727043fc",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22247,
+    "gcs": {
+      "generation": "1795315207854406",
+      "md5": "c26921abe5885c6ba11cf570727043fc",
+      "crc32c": "52cc3676",
+      "bytes": 142771,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94541,
+    "md5": "a576ff7dafcd129da619f7a2af1c8dda",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12415,
+    "gcs": {
+      "generation": "1795315209742236",
+      "md5": "a576ff7dafcd129da619f7a2af1c8dda",
+      "crc32c": "9d94da07",
+      "bytes": 94541,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-22T193815Z",
+  "archived_at": 1795376295.0,
+  "settled": true,
+  "final": false
+}

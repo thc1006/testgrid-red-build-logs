@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-arm64-master",
+  "build": "2124445009448013824",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master",
+  "started": 1795342169,
+  "created": 1795342135,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-arm64-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestLeaseCandidateCleanup\n    testserver.go:708: Reso...eout waiting for lease gc\n--- FAIL: TestLeaseCandidateCleanup (5.86s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-arm64-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795344622,
+  "commits": {
+    "kubernetes/kubernetes": "43cbb94ee845ad387717fe851bf5f421b7284329"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2124445009448013824",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2124445009448013824/build-log.txt",
+  "log": {
+    "bytes": 229407,
+    "md5": "03ba20e134a70be554bea58bb22eda68",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22008,
+    "gcs": {
+      "generation": "1795344627121094",
+      "md5": "03ba20e134a70be554bea58bb22eda68",
+      "crc32c": "a8210ebd",
+      "bytes": 229407,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95409,
+    "md5": "2f440f15a6f0c67c4adea0d9cdee5a34",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12267,
+    "gcs": {
+      "generation": "1795344629560411",
+      "md5": "2f440f15a6f0c67c4adea0d9cdee5a34",
+      "crc32c": "a9f23c39",
+      "bytes": 95409,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-22T193815Z",
+  "archived_at": 1795376295.0,
+  "settled": true,
+  "final": false
+}

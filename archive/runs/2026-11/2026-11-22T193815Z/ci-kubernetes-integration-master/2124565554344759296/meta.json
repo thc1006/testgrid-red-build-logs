@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2124565554344759296",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1795370904,
+  "created": 1795370875,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration.examples",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestAggregatedAPIServer/WithoutWardleFeatureGateAtV1....  TestAggregatedAPIServer\n--- FAIL: TestAggregatedAPIServer (261.17s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795373261,
+  "commits": {
+    "kubernetes/kubernetes": "43cbb94ee845ad387717fe851bf5f421b7284329"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2124565554344759296",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2124565554344759296/build-log.txt",
+  "log": {
+    "bytes": 578317,
+    "md5": "2a17c829b5df1354e7261b060474318d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 67463,
+    "gcs": {
+      "generation": "1795373264521477",
+      "md5": "2a17c829b5df1354e7261b060474318d",
+      "crc32c": "f162b874",
+      "bytes": 578317,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96484,
+    "md5": "f9afd80784fdfd2ab26d256a4be10b90",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12202,
+    "gcs": {
+      "generation": "1795373266653830",
+      "md5": "f9afd80784fdfd2ab26d256a4be10b90",
+      "crc32c": "aa9e0806",
+      "bytes": 96484,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-22T193815Z",
+  "archived_at": 1795376295.0,
+  "settled": false,
+  "final": false
+}

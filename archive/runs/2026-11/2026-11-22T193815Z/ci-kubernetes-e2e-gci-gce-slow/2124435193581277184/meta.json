@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce-slow",
+  "build": "2124435193581277184",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow",
+  "started": 1795339795,
+  "created": 1795339794,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-master-slow",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] HostPathType Block Device Should fail on mounting block device 'ablkdev' when HostPathType is HostPathFile [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] command \"mknod /mnt/test/ablkdev b 89 1\": stdout: \nstderr: mk...rnetes/test/e2e/storage/host_path_type.go:343 @ 11/22/26 09:58:03.689\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce-slow.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.focus=\\[Slow\\] --ginkgo.ski...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795342582,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.882+43cbb94ee845ad",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2124435193581277184",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2124435193581277184/build-log.txt",
+  "log": {
+    "bytes": 120589,
+    "md5": "b6da3d6b1693fec0188774f06221c919",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20977,
+    "gcs": {
+      "generation": "1795342589249106",
+      "md5": "b6da3d6b1693fec0188774f06221c919",
+      "crc32c": "4df5111c",
+      "bytes": 120589,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86919,
+    "md5": "d3b9343980731969e09a1236a6b0b0ff",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11638,
+    "gcs": {
+      "generation": "1795342591482188",
+      "md5": "d3b9343980731969e09a1236a6b0b0ff",
+      "crc32c": "e2ec6bed",
+      "bytes": 86919,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-22T193815Z",
+  "archived_at": 1795376295.0,
+  "settled": true,
+  "final": false
+}
