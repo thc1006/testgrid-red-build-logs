@@ -1,5 +1,250 @@
 [
   {
+    "time": 1795306435,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2124295271415287808",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers ExternalTrafficPolicy: Local [Feature:LoadBalancer] should work for type=LoadBalancer [Slow]",
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "red_test_count": 4,
+    "dir": "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-gci-gce-slow/2124295271415287808",
+    "run": "2026-11-22T011722Z",
+    "files": [
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-gci-gce-slow/2124295271415287808/build-log.txt.gz",
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-gci-gce-slow/2124295271415287808/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 316161,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2124295271415287808"
+  },
+  {
+    "time": 1795301481,
+    "job": "ci-kubernetes-e2e-gce-cos-default-master",
+    "build": "2124274382342721536",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-default-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Memory-Backed Volume [FeatureGate:InPlacePodVerticalScalingMemoryBackedVolumes] memory-backed emptyDir volume resize volume resize add sizeLimit then remove (zero value) [Beta] [FeatureGate:NodeDeclaredFeatures]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-default-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-gce-cos-default-master/2124274382342721536",
+    "run": "2026-11-22T011722Z",
+    "files": [
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-gce-cos-default-master/2124274382342721536/build-log.txt.gz",
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-gce-cos-default-master/2124274382342721536/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 240800,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2124274382342721536"
+  },
+  {
+    "time": 1795298544,
+    "job": "ci-node-crio-conformance",
+    "build": "2124262052271755264",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update container image [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-22T011722Z/ci-node-crio-conformance/2124262052271755264",
+    "run": "2026-11-22T011722Z",
+    "files": [
+      "runs/2026-11/2026-11-22T011722Z/ci-node-crio-conformance/2124262052271755264/build-log.txt.gz",
+      "runs/2026-11/2026-11-22T011722Z/ci-node-crio-conformance/2124262052271755264/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2021289,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-node-crio-conformance_2124262052271755264.tar.xz"
+    },
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2124262052271755264"
+  },
+  {
+    "time": 1795295822,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2124250727940362240",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-auth] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should be capable to mount multiple trust bundles by signer+labels can combine all signer CTBs with an empty label selector [MinimumKubeletVersion:1.37] [Conformance]",
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-capz-master-windows/2124250727940362240",
+    "run": "2026-11-22T011722Z",
+    "files": [
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-capz-master-windows/2124250727940362240/build-log.txt.gz",
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-capz-master-windows/2124250727940362240/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 385393,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2124250727940362240"
+  },
+  {
+    "time": 1795291344,
+    "job": "ci-node-crio-conformance",
+    "build": "2124231851705896960",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update initContainer image [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-22T011722Z/ci-node-crio-conformance/2124231851705896960",
+    "run": "2026-11-22T011722Z",
+    "files": [
+      "runs/2026-11/2026-11-22T011722Z/ci-node-crio-conformance/2124231851705896960/build-log.txt.gz",
+      "runs/2026-11/2026-11-22T011722Z/ci-node-crio-conformance/2124231851705896960/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2047164,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-node-crio-conformance_2124231851705896960.tar.xz"
+    },
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2124231851705896960"
+  },
+  {
+    "time": 1795290415,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2124228076932960256",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Memory-Backed Volume [FeatureGate:InPlacePodVerticalScalingMemoryBackedVolumes] memory-backed emptyDir volume resize volume resize add sizeLimit then remove (zero value) [Beta] [FeatureGate:NodeDeclaredFeatures]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-gci-gce/2124228076932960256",
+    "run": "2026-11-22T011722Z",
+    "files": [
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-gci-gce/2124228076932960256/build-log.txt.gz",
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-gci-gce/2124228076932960256/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 224817,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2124228076932960256"
+  },
+  {
+    "time": 1795287882,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2124217256421363712",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-integration-master/2124217256421363712",
+    "run": "2026-11-22T011722Z",
+    "files": [
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-integration-master/2124217256421363712/build-log.txt.gz",
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-integration-master/2124217256421363712/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 329819,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2124217256421363712"
+  },
+  {
+    "time": 1795286395,
+    "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+    "build": "2124211215407255552",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-ubuntu-master-containerd"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update endpoints: http",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2124211215407255552",
+    "run": "2026-11-22T011722Z",
+    "files": [
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2124211215407255552/build-log.txt.gz",
+      "runs/2026-11/2026-11-22T011722Z/ci-kubernetes-e2e-ubuntu-gce-containerd/2124211215407255552/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 227812,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2124211215407255552"
+  },
+  {
     "time": 1795284143,
     "job": "ci-node-crio-conformance",
     "build": "2124201652343803904",
@@ -21,11 +266,14 @@
     ],
     "remote": [],
     "bytes": 2005291,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-node-crio-conformance_2124201652343803904.tar.xz"
+    },
     "from_gcs": false,
     "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2124201652343803904"
   },
@@ -51,7 +299,7 @@
     ],
     "remote": [],
     "bytes": 226724,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -80,7 +328,7 @@
     ],
     "remote": [],
     "bytes": 324910,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -1718,7 +1966,7 @@
     "remote": [],
     "bytes": 622925,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1777,7 +2025,7 @@
     "remote": [],
     "bytes": 758715,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1868,7 +2116,7 @@
     "remote": [],
     "bytes": 132721,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
