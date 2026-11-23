@@ -854,6 +854,14 @@ class RelevantDiff(unittest.TestCase):
         self.assertEqual(relevant_diff.changes(old, new),
                          ["config/cache.go", "config/config.go", "config/converge.go"])  # fails: []
 
+    def test_a_file_removed_or_added_counts(self):
+        # (of FILES: a file TestGrid removes or adds counts as changed)
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
+        import relevant_diff
+        old = self.tree({"config/cache.go": "k", "pb/test_status/test_status.proto": "s"})
+        new = self.tree({"config/config.go": "x", "pb/test_status/test_status.proto": "s"})
+        self.assertEqual(relevant_diff.changes(old, new), ["config/cache.go", "config/config.go"])
+
     def test_the_custom_evaluators_rules_count(self):
         # (cell_options reads a group's custom_evaluator_rule_set, a RuleSet of this proto, which config.proto imports)
         sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
