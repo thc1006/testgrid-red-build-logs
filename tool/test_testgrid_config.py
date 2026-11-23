@@ -832,7 +832,7 @@ class RelevantDiff(unittest.TestCase):
         # taken, when a tab is written again)
         sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
         import relevant_diff
-        files = {"util/queue/queue.go": "q", "config/queue.go": "c", "config/config.go": "x",
+        files = {"util/queue/queue.go": "q", "config/queue.go": "c",
                  "config/snapshot/config_snapshot.go": "s", "cmd/config_merger/main.go": "m", "pkg/merger/merger.go": "g",
                  "cmd/tabulator/main.go": "t", "go.mod": "module m\n\nrequire github.com/sethvargo/go-retry v0.2.4\n"}
         old = self.tree(files)
@@ -841,6 +841,18 @@ class RelevantDiff(unittest.TestCase):
                          ["util/queue/queue.go", "config/snapshot/config_snapshot.go", "cmd/config_merger/main.go",
                           "pkg/merger/merger.go", "cmd/tabulator/main.go", "config/queue.go",
                           "go.mod: github.com/sethvargo/go-retry v0.2.4 -> v0.2.5"])  # fails: []
+
+    def test_the_config_code_a_new_config_is_taken_through_counts(self):
+        # (pkg/merger reads each source with config.ReadGCS, through its cache, drops one config.Validate refuses and
+        # merges the rest with config.Converge; config/snapshot reads the merged config with config.Unmarshal. Of config,
+        # fields.go only counts a config's fields, for metrics.)
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "oracle"))
+        import relevant_diff
+        files = {"config/cache.go": "k", "config/config.go": "x", "config/converge.go": "v", "config/fields.go": "f"}
+        old = self.tree(files)
+        new = self.tree({k: v + "2" for k, v in files.items()})
+        self.assertEqual(relevant_diff.changes(old, new),
+                         ["config/cache.go", "config/config.go", "config/converge.go"])  # fails: []
 
     def test_the_custom_evaluators_rules_count(self):
         # (cell_options reads a group's custom_evaluator_rule_set, a RuleSet of this proto, which config.proto imports)

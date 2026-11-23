@@ -2697,9 +2697,10 @@ REPROCESS = 20 * 60  # an update that begins less than this long after a build s
 REPROCESS_DAYS = 7  # after its test group's config changed, it reads again its columns of builds started this recently
 # TestGrid's components take a config this long after a run of the upload job uploaded it at
 # most: its config merger copies it into the config they read every 15 minutes
-# (cluster/prod/config_merger.yaml: --wait=15m), a merge taking up to 10 (cmd/config_merger),
-# and they read that config every minute (config/snapshot; a failed read is tried again twice,
-# 5 and 10 seconds later). (A merge that fails, such as when one of its sources cannot be
+# (cluster/prod/config_merger.yaml: --wait=15m), a merge taking up to 10 (cmd/config_merger) and
+# reading each source through a cache kept 5 minutes (config/cache.go), so each merge reads them
+# anew, and they read that config every minute (config/snapshot; a failed read is tried again
+# twice, 5 and 10 seconds later). (A merge that fails, such as when one of its sources cannot be
 # read, keeps the config before until the next one: that cannot be seen from here.)
 PICKUP = (15 + 10 + 1) * 60 + 30
 # TestGrid's tabulator applies a tab's new filters when it next writes the tab: at its test
