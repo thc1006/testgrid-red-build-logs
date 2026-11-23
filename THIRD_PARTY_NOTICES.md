@@ -80,13 +80,15 @@ The Kubernetes Authors` (K8s), with the year shown, but the protos
   `pkg/updater/read.go`, `pkg/updater/gcs.go` and `pkg/updater/inflate.go`
   (TG 2020), `util/queue/queue.go` and `config/queue.go` (TG 2021), and when
   TestGrid takes a new config and writes a tab again, following
-  `cmd/config_merger/main.go` and `pkg/merger/merger.go` (K8s 2021),
-  `pkg/tabulator/pubsub.go` (TG 2021), `config/snapshot/config_snapshot.go`
-  (TG 2022; with go-retry, below), `pkg/tabulator/tabstate.go` and
-  `cmd/tabulator/main.go` (TG 2022). It reads the links of Prow's index as
-  `readLink`, `ListBuilds` and `Build` in `util/gcs/read.go` (K8s 2019) and
-  `Path.SetURL` and `Path.Object` in `util/gcs/gcs.go` (K8s 2018) do, rewritten
-  in Python.
+  `cmd/config_merger/main.go` and `pkg/merger/merger.go` (K8s 2021) with what
+  the merger calls (`ReadGCS` and its cache in `config/cache.go`, TG 2021;
+  `Validate` in `config/config.go`, K8s 2019; `Converge` in
+  `config/converge.go`, K8s 2021), `pkg/tabulator/pubsub.go` (TG 2021),
+  `config/snapshot/config_snapshot.go` (TG 2022; with go-retry, below),
+  `pkg/tabulator/tabstate.go` and `cmd/tabulator/main.go` (TG 2022). It reads
+  the links of Prow's index as `readLink`, `ListBuilds` and `Build` in
+  `util/gcs/read.go` (K8s 2019) and `Path.SetURL` and `Path.Object` in
+  `util/gcs/gcs.go` (K8s 2018) do, rewritten in Python.
 - `tool/oracle/go/pkg/updater/zz_oracle.go`: adapted from `readResult` and
   `readColumns` in `pkg/updater/read.go` (TG 2020). The four reads run one after
   another and every error is kept, so the oracle can compare each one with the
