@@ -2702,8 +2702,10 @@ REPROCESS_DAYS = 7  # after its test group's config changed, it reads again its 
 # anew, and they read that config every minute (pkg/updater and pkg/tabulator, through
 # config/snapshot: a failed read is tried again twice, 5 and 10 seconds later, unless the config
 # is over 1 GiB, config.MaxConfigSize). (A merge that fails, such as when one of its sources
-# cannot be read, keeps the previous config until one succeeds, and a config over 1 GiB is never
-# taken: neither can be seen from here.)
+# cannot be read, keeps the previous config until one succeeds; a config over 1 GiB is never
+# taken; and a config merger that starts again merges at once but sets its timer only after that
+# merge, so its second merge may begin up to 25 minutes after its first, past PICKUP when the
+# two merges take more than 10 minutes together: none of this can be seen from here.)
 PICKUP = (15 + 10 + 1) * 60 + 30
 # TestGrid's tabulator applies a tab's new filters when it next writes the tab: at its test
 # group's next grid write (a column read), or within an hour (cluster/prod/tabulator.yaml:
