@@ -5,7 +5,7 @@ some of its data comes from them. The tool judges builds the way TestGrid does,
 so those parts follow the upstream code closely. This file names the upstream
 files each part comes from, their licenses, and what changed.
 
-The ports were written from Go 1.26.9, TestGrid `2bbb98db9f1a`, and
+The ports were written from Go 1.26.9, TestGrid `8fbcf086e57a`, and
 k8s.io/apimachinery and k8s.io/api v0.27.4, the versions TestGrid's `go.mod`
 requires. [`tool/oracle/pinned.json`](tool/oracle/pinned.json) names the
 versions the tool is checked against now;
@@ -56,7 +56,7 @@ in [`third_party/unicode/LICENSE`](third_party/unicode/LICENSE).
 
 ## TestGrid
 
-github.com/GoogleCloudPlatform/testgrid at `2bbb98db9f1a`, under the Apache
+github.com/GoogleCloudPlatform/testgrid at `8fbcf086e57a`, under the Apache
 License 2.0, the license of this repository ([`LICENSE`](LICENSE)). Each file
 below carries `Copyright <year> The TestGrid Authors` (TG) or `Copyright <year>
 The Kubernetes Authors` (K8s), with the year shown, but the protos
@@ -84,7 +84,8 @@ The Kubernetes Authors` (K8s), with the year shown, but the protos
   the merger calls (`ReadGCS` and its cache in `config/cache.go`, TG 2021;
   `Validate` in `config/config.go`, K8s 2019; `Converge` in
   `config/converge.go`, K8s 2021), `pkg/tabulator/pubsub.go` (TG 2021),
-  `config/snapshot/config_snapshot.go` (TG 2022; with go-retry, below),
+  `config/snapshot/config_snapshot.go` (TG 2022; with go-retry, below) and its
+  size limit, `MaxConfigSize` in `config/config.go` (K8s 2019),
   `pkg/tabulator/tabstate.go` and `cmd/tabulator/main.go` (TG 2022). It reads
   the links of Prow's index as `readLink`, `ListBuilds` and `Build` in
   `util/gcs/read.go` (K8s 2019) and `Path.SetURL` and `Path.Object` in
@@ -131,4 +132,5 @@ copyright holder.
 - `tool/fetch_red_logs.py` follows how TestGrid's `config/snapshot` retries a
   failed read of its config with it (`Do` and `RetryableError` in `retry.go`,
   `WithMaxRetries` in `backoff.go`, `NewExponential` in
-  `backoff_exponential.go`): twice, 5 and 10 seconds later.
+  `backoff_exponential.go`): twice, 5 and 10 seconds later, unless the config
+  is over its size limit.

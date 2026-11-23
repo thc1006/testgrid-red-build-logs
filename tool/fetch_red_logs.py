@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Parts of this file follow TestGrid's cmd/updater, pkg/updater, util/gcs, util/queue, config, config/snapshot,
-# cmd/config_merger, pkg/merger, pkg/tabulator and cmd/tabulator (2bbb98db9f1a; Copyright The Kubernetes Authors and
+# cmd/config_merger, pkg/merger, pkg/tabulator and cmd/tabulator (8fbcf086e57a; Copyright The Kubernetes Authors and
 # The TestGrid Authors), the GCS client's reading of a gzip-encoded object (cloud.google.com/go/storage v1.31.0;
 # Copyright Google LLC) and go-retry's retries (github.com/sethvargo/go-retry v0.2.4), Apache License 2.0
 # (LICENSE), Go's net/url, strings, path and encoding/json (1.26.9; Copyright The Go Authors), BSD 3-Clause
@@ -2699,9 +2699,11 @@ REPROCESS_DAYS = 7  # after its test group's config changed, it reads again its 
 # most: its config merger copies it into the config they read every 15 minutes
 # (cluster/prod/config_merger.yaml: --wait=15m), a merge taking up to 10 (cmd/config_merger) and
 # reading each source through a cache kept 5 minutes (config/cache.go), so each merge reads them
-# anew, and they read that config every minute (config/snapshot; a failed read is tried again
-# twice, 5 and 10 seconds later). (A merge that fails, such as when one of its sources cannot be
-# read, keeps the config before until the next one: that cannot be seen from here.)
+# anew, and they read that config every minute (pkg/updater and pkg/tabulator, through
+# config/snapshot: a failed read is tried again twice, 5 and 10 seconds later, unless the config
+# is over 1 GiB, config.MaxConfigSize). (A merge that fails, such as when one of its sources
+# cannot be read, keeps the previous config until one succeeds, and a config over 1 GiB is never
+# taken: neither can be seen from here.)
 PICKUP = (15 + 10 + 1) * 60 + 30
 # TestGrid's tabulator applies a tab's new filters when it next writes the tab: at its test
 # group's next grid write (a column read), or within an hour (cluster/prod/tabulator.yaml:
