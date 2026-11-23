@@ -1,5 +1,123 @@
 [
   {
+    "time": 1795388713,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+    "build": "2124640045120884736",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Dynamic Node-Local Ephemeral Volumes [FeatureGate:DynamicNodeLocalEphemeralVolumes] [FeatureGate:DynamicContainers] with OCI Image volumes and failure cleanup should isolate bad OCI Image volume pulls, mount valid OCI Image volumes, and release volumes from removed RunContainerError containers [Alpha] [Feature:OffByDefault] [FeatureGate:InPlacePodLevelResourcesVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources]",
+      "ci-kubernetes-e2e-kind-alpha-beta-features.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-kind-alpha-beta-features/2124640045120884736",
+    "run": "2026-11-23T014126Z",
+    "files": [
+      "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-kind-alpha-beta-features/2124640045120884736/build-log.txt.gz",
+      "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-kind-alpha-beta-features/2124640045120884736/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 246432,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2124640045120884736"
+  },
+  {
+    "time": 1795388191,
+    "job": "ci-kubernetes-e2e-gce-cos-default-master",
+    "build": "2124638032505081856",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-default-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota should create a ResourceQuota and capture the life of a ResourceClaim [DRA]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gce-cos-default-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-gce-cos-default-master/2124638032505081856",
+    "run": "2026-11-23T014126Z",
+    "files": [
+      "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-gce-cos-default-master/2124638032505081856/build-log.txt.gz",
+      "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-gce-cos-default-master/2124638032505081856/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 222740,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-default-master/2124638032505081856"
+  },
+  {
+    "time": 1795382342,
+    "job": "ci-kubernetes-e2e-capz-master-windows",
+    "build": "2124613621005684736",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#capz-windows-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-auth] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should be capable to mount multiple trust bundles by signer+labels can combine all signer CTBs with an empty label selector [MinimumKubeletVersion:1.37] [Conformance]",
+      "ci-kubernetes-e2e-capz-master-windows.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-capz-master-windows/2124613621005684736",
+    "run": "2026-11-23T014126Z",
+    "files": [
+      "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-capz-master-windows/2124613621005684736/build-log.txt.gz",
+      "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-capz-master-windows/2124613621005684736/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 416150,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-capz-master-windows/2124613621005684736"
+  },
+  {
+    "time": 1795381075,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2124608335893237760",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Pod InPlace Resize Memory-Backed Volume [FeatureGate:InPlacePodVerticalScalingMemoryBackedVolumes] memory-backed emptyDir volume resize volume resize add sizeLimit then remove (zero value) [Beta] [FeatureGate:NodeDeclaredFeatures]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-gci-gce/2124608335893237760",
+    "run": "2026-11-23T014126Z",
+    "files": [
+      "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-gci-gce/2124608335893237760/build-log.txt.gz",
+      "runs/2026-11/2026-11-23T014126Z/ci-kubernetes-e2e-gci-gce/2124608335893237760/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 220698,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2124608335893237760"
+  },
+  {
     "time": 1795370904,
     "job": "ci-kubernetes-integration-master",
     "build": "2124565554344759296",
@@ -20,7 +138,7 @@
     ],
     "remote": [],
     "bytes": 674801,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -49,7 +167,7 @@
     ],
     "remote": [],
     "bytes": 325094,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -78,7 +196,7 @@
     ],
     "remote": [],
     "bytes": 327996,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -108,7 +226,7 @@
     ],
     "remote": [],
     "bytes": 236205,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -1248,7 +1366,7 @@
     "remote": [],
     "bytes": 327572,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1278,7 +1396,7 @@
     "remote": [],
     "bytes": 2024393,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1311,7 +1429,7 @@
     "remote": [],
     "bytes": 302972,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1340,7 +1458,7 @@
     "remote": [],
     "bytes": 324707,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1368,7 +1486,7 @@
     "remote": [],
     "bytes": 673480,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1632,7 +1750,7 @@
     "remote": [],
     "bytes": 191336,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
