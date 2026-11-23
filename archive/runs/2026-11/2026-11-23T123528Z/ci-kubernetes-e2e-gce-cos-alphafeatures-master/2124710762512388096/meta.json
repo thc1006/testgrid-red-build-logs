@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "build": "2124710762512388096",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+  "started": 1795405526,
+  "created": 1795405495,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-alphafeatures-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.TearDown",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-down.sh (interrupted): signal: interrupt"
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795412885,
+  "commits": {
+    "kubernetes/kubernetes": "43cbb94ee845ad387717fe851bf5f421b7284329"
+  },
+  "job_version": "v1.38.0-beta.0.882+43cbb94ee845ad",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2124710762512388096",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2124710762512388096/build-log.txt",
+  "log": {
+    "bytes": 60688,
+    "md5": "ccd0059486b16c06dbed619d5ad613e6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 12072,
+    "gcs": {
+      "generation": "1795412887724975",
+      "md5": "ccd0059486b16c06dbed619d5ad613e6",
+      "crc32c": "1d023f66",
+      "bytes": 60688,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 72936,
+    "md5": "98905209fab12e2f5d69d588d12afe5e",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10765,
+    "gcs": {
+      "generation": "1795412890131306",
+      "md5": "98905209fab12e2f5d69d588d12afe5e",
+      "crc32c": "bb7784fc",
+      "bytes": 72936,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-23T123528Z",
+  "archived_at": 1795437328.0,
+  "settled": true,
+  "final": false
+}

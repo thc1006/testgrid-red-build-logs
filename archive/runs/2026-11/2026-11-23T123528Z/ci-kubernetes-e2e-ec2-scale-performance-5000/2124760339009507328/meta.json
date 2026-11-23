@@ -1,0 +1,79 @@
+{
+  "job": "ci-kubernetes-e2e-ec2-scale-performance-5000",
+  "build": "2124760339009507328",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000",
+  "started": 1795417380,
+  "created": 1795417315,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "ec2-master-scale-performance-5000",
+      "tab_status": "FAILING",
+      "red_cells": [
+        {
+          "test": "ClusterLoaderV2.load overall (/home/prow/go/src/k8s.io/perf-tests/clusterloader2/testing/load/config.yaml)",
+          "status": "FAIL",
+          "message": ":0\n[measurement call APIResponsivenessPrometheus - APIResponsivenessPr... 1.019743293s Count:364884 SlowCount:3734}; expected perc99 <= 1s]]\n:0"
+        },
+        {
+          "test": "ClusterLoaderV2.load: [step: 29] gathering measurements [10] - APIResponsivenessPrometheusSimple",
+          "status": "FAIL",
+          "message": ":0\n[measurement call APIResponsivenessPrometheus - APIResponsivenessPr... 1.019743293s Count:364884 SlowCount:3734}; expected perc99 <= 1s]]\n:0"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ec2-scale-performance-5000.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795426575,
+  "commits": {
+    "kubernetes/perf-tests": "e38ecad17105e2783c10ff0cdfcd51fa830e7283",
+    "kubernetes/kops": "71fbd701a844eee76059e0b3e4e92281e7b93c4b",
+    "kubernetes/kubernetes": "43cbb94ee845ad387717fe851bf5f421b7284329"
+  },
+  "job_version": "v1.38.0-beta.0.882+43cbb94ee845ad",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2124760339009507328",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2124760339009507328/build-log.txt",
+  "log": {
+    "bytes": 53190848,
+    "md5": "942b18e8fa08d1177fa5cf55f1c1599d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 3220736,
+    "gcs": {
+      "generation": "1795427391321936",
+      "md5": "942b18e8fa08d1177fa5cf55f1c1599d",
+      "crc32c": "39f09b92",
+      "bytes": 53190848,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 61851,
+    "md5": "505d808e7683a147dd2a84986e65adfa",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10207,
+    "gcs": {
+      "generation": "1795427400057175",
+      "md5": "505d808e7683a147dd2a84986e65adfa",
+      "crc32c": "007db28a",
+      "bytes": 61851,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-23T123528Z",
+  "archived_at": 1795437328.0,
+  "settled": true,
+  "final": false
+}
