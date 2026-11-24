@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-gce-conformance-latest",
+  "build": "2124877109531774976",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-gce-conformance-latest",
+  "started": 1795445189,
+  "created": 1795445155,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "Conformance - GCE - master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should prevent a pod from starting if: sets optional=false and no trust bundle matches query [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] expected the pod to not be ready because of a missing volume,.../e2e/auth/projected_clustertrustbundle.go:290 @ 11/23/26 15:51:57.158\n"
+        },
+        {
+          "test": "ci-kubernetes-gce-conformance-latest.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795454133,
+  "commits": {
+    "kubernetes/kubernetes": "43cbb94ee845ad387717fe851bf5f421b7284329"
+  },
+  "job_version": "v1.38.0-beta.0.882+43cbb94ee845ad",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-gce-conformance-latest/2124877109531774976",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-gce-conformance-latest/2124877109531774976/build-log.txt",
+  "log": {
+    "bytes": 146894,
+    "md5": "26e744a1953c06ded46ebf3b511441bb",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 18493,
+    "gcs": {
+      "generation": "1795454136904792",
+      "md5": "26e744a1953c06ded46ebf3b511441bb",
+      "crc32c": "6d247b35",
+      "bytes": 146894,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 73928,
+    "md5": "22dd1f0f05b37d32f8e1610c595a4033",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10920,
+    "gcs": {
+      "generation": "1795454138845727",
+      "md5": "22dd1f0f05b37d32f8e1610c595a4033",
+      "crc32c": "73c3b32e",
+      "bytes": 73928,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-24T021409Z",
+  "archived_at": 1795486449.0,
+  "settled": true,
+  "final": false
+}

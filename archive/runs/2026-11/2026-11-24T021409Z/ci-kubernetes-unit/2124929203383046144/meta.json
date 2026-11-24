@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2124929203383046144",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1795457616,
+  "created": 1795457576,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/apiserver/pkg/server.filters",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestClientReceivedGOAWAY/got_GOAWAY_after_set-up_watc... TestClientReceivedGOAWAY\n--- FAIL: TestClientReceivedGOAWAY (20.11s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795459054,
+  "commits": {
+    "kubernetes/kubernetes": "43cbb94ee845ad387717fe851bf5f421b7284329"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2124929203383046144",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2124929203383046144/build-log.txt",
+  "log": {
+    "bytes": 241102,
+    "md5": "ef5cea822dd7b73a28b55f8fc18aaee7",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 33558,
+    "gcs": {
+      "generation": "1795459055312512",
+      "md5": "ef5cea822dd7b73a28b55f8fc18aaee7",
+      "crc32c": "55af0d40",
+      "bytes": 241102,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 94422,
+    "md5": "545e09f118a2d49d2e8433d85c5daabd",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11777,
+    "gcs": {
+      "generation": "1795459057272427",
+      "md5": "545e09f118a2d49d2e8433d85c5daabd",
+      "crc32c": "c2c66bc7",
+      "bytes": 94422,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-24T021409Z",
+  "archived_at": 1795486449.0,
+  "settled": true,
+  "final": false
+}
