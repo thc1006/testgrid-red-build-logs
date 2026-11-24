@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
+  "build": "2125064345766334464",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
+  "started": 1795489831,
+  "created": 1795489796,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kubeadm-kinder-upgrade-1-37-latest",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-api-machinery] WebSocket streaming port forwarding over the WebSocket tunnel should forward to a server listening on 0.0.0.0 [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] waiting for the pod to be ready: Timed out after 300.000s.\nex...t/e2e/apimachinery/websocket_streaming.go:237 @ 11/24/26 03:37:50.183\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "task-09-e2e-after",
+          "status": "FAIL",
+          "message": "exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795491597,
+  "commits": {
+    "kubernetes/kubeadm": "57a21fcc1403533937d37af678b955f356e3e17c",
+    "kubernetes/kubernetes": "43cbb94ee845ad387717fe851bf5f421b7284329"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2125064345766334464",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2125064345766334464/build-log.txt",
+  "log": {
+    "bytes": 713523,
+    "md5": "c40742a52e27a5e38bd304ceb9036331",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 85257,
+    "gcs": {
+      "generation": "1795491601733511",
+      "md5": "c40742a52e27a5e38bd304ceb9036331",
+      "crc32c": "af3b4962",
+      "bytes": 713523,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 80620,
+    "md5": "92e19cfc5143924390c1becdc69ad236",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11310,
+    "gcs": {
+      "generation": "1795491603980736",
+      "md5": "92e19cfc5143924390c1becdc69ad236",
+      "crc32c": "05c6d0f2",
+      "bytes": 80620,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-24T134058Z",
+  "archived_at": 1795527658.0,
+  "settled": true,
+  "final": false
+}

@@ -1,5 +1,275 @@
 [
   {
+    "time": 1795519048,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2125186904516202496",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+      "[sig-scheduling] k8s.io/kubernetes/test/integration/scheduler/podgroup.topology_aware_scheduling",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-integration-master/2125186904516202496",
+    "run": "2026-11-24T134058Z",
+    "files": [
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-integration-master/2125186904516202496/build-log.txt.gz",
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-integration-master/2125186904516202496/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 389646,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125186904516202496"
+  },
+  {
+    "time": 1795515936,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2125173315378089984",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-apps] k8s.io/kubernetes/test/integration.daemonset",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-integration-arm64-master/2125173315378089984",
+    "run": "2026-11-24T134058Z",
+    "files": [
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-integration-arm64-master/2125173315378089984/build-log.txt.gz",
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-integration-arm64-master/2125173315378089984/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 334959,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2125173315378089984"
+  },
+  {
+    "time": 1795515328,
+    "job": "ci-kubernetes-node-e2e-containerd",
+    "build": "2125171301772431360",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-e2e"
+    ],
+    "red_tests": [
+      "kubetest.Node Tests",
+      "ci-kubernetes-node-e2e-containerd.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-node-e2e-containerd/2125171301772431360",
+    "run": "2026-11-24T134058Z",
+    "files": [
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-node-e2e-containerd/2125171301772431360/build-log.txt.gz",
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-node-e2e-containerd/2125171301772431360/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 3023017,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-kubernetes-node-e2e-containerd_2125171301772431360.tar.xz"
+    },
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-node-e2e-containerd/2125171301772431360"
+  },
+  {
+    "time": 1795513592,
+    "job": "ci-kubernetes-kind-cloud-provider-loadbalancer",
+    "build": "2125164004790767616",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#sig-network-kind, loadbalancer"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] Networking Granular Checks: Services should update nodePort: udp [Slow]",
+      "ci-kubernetes-kind-cloud-provider-loadbalancer.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-kind-cloud-provider-loadbalancer/2125164004790767616",
+    "run": "2026-11-24T134058Z",
+    "files": [
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-kind-cloud-provider-loadbalancer/2125164004790767616/build-log.txt.gz",
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-kind-cloud-provider-loadbalancer/2125164004790767616/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 284848,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2125164004790767616"
+  },
+  {
+    "time": 1795511666,
+    "job": "ci-node-crio-conformance",
+    "build": "2125155950036783104",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update initContainer image [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-24T134058Z/ci-node-crio-conformance/2125155950036783104",
+    "run": "2026-11-24T134058Z",
+    "files": [
+      "runs/2026-11/2026-11-24T134058Z/ci-node-crio-conformance/2125155950036783104/build-log.txt.gz",
+      "runs/2026-11/2026-11-24T134058Z/ci-node-crio-conformance/2125155950036783104/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2030596,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-node-crio-conformance_2125155950036783104.tar.xz"
+    },
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2125155950036783104"
+  },
+  {
+    "time": 1795508333,
+    "job": "ci-kubernetes-unit",
+    "build": "2125141606095917056",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-kubernetes-unit"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/apiserver/pkg/server.filters",
+      "ci-kubernetes-unit.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-unit/2125141606095917056",
+    "run": "2026-11-24T134058Z",
+    "files": [
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-unit/2125141606095917056/build-log.txt.gz",
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-unit/2125141606095917056/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 348349,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2125141606095917056"
+  },
+  {
+    "time": 1795496846,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+    "build": "2125093789939798016",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-node] Dynamic Node-Local Ephemeral Volumes [FeatureGate:DynamicNodeLocalEphemeralVolumes] [FeatureGate:DynamicContainers] with OCI Image volumes and failure cleanup should isolate bad OCI Image volume pulls, mount valid OCI Image volumes, and release volumes from removed RunContainerError containers [Alpha] [Feature:OffByDefault] [FeatureGate:InPlacePodLevelResourcesVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources]",
+      "ci-kubernetes-e2e-kind-alpha-beta-features.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-e2e-kind-alpha-beta-features/2125093789939798016",
+    "run": "2026-11-24T134058Z",
+    "files": [
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-e2e-kind-alpha-beta-features/2125093789939798016/build-log.txt.gz",
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-e2e-kind-alpha-beta-features/2125093789939798016/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 237301,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2125093789939798016"
+  },
+  {
+    "time": 1795489831,
+    "job": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
+    "build": "2125064345766334464",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kubeadm-kinder-upgrade-1-37-latest"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] WebSocket streaming port forwarding over the WebSocket tunnel should forward to a server listening on 0.0.0.0 [Conformance]",
+      "task-09-e2e-after",
+      "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2125064345766334464",
+    "run": "2026-11-24T134058Z",
+    "files": [
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2125064345766334464/build-log.txt.gz",
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2125064345766334464/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 794143,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2125064345766334464"
+  },
+  {
+    "time": 1795487014,
+    "job": "ci-kubernetes-integration-arm64-master",
+    "build": "2125052517287989248",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-arm64-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+      "ci-kubernetes-integration-arm64-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-integration-arm64-master/2125052517287989248",
+    "run": "2026-11-24T134058Z",
+    "files": [
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-integration-arm64-master/2125052517287989248/build-log.txt.gz",
+      "runs/2026-11/2026-11-24T134058Z/ci-kubernetes-integration-arm64-master/2125052517287989248/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 324650,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-arm64-master/2125052517287989248"
+  },
+  {
     "time": 1795483411,
     "job": "ci-kubernetes-integration-arm64-master",
     "build": "2125037418011693056",
@@ -20,7 +290,7 @@
     ],
     "remote": [],
     "bytes": 674691,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -49,7 +319,7 @@
     ],
     "remote": [],
     "bytes": 240275,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -78,7 +348,7 @@
     ],
     "remote": [],
     "bytes": 326688,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,

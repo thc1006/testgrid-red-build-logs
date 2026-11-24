@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-unit",
+  "build": "2125141606095917056",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-unit",
+  "started": 1795508333,
+  "created": 1795508216,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-kubernetes-unit",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/apiserver/pkg/server.filters",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestPriorityAndFairnessWithPanicRecoveryAndTimeoutFil...AIL: TestPriorityAndFairnessWithPanicRecoveryAndTimeoutFilter (0.14s)\n"
+        },
+        {
+          "test": "ci-kubernetes-unit.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795509769,
+  "commits": {
+    "kubernetes/kubernetes": "43cbb94ee845ad387717fe851bf5f421b7284329"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-unit/2125141606095917056",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-unit/2125141606095917056/build-log.txt",
+  "log": {
+    "bytes": 240927,
+    "md5": "1150eb255a4846f6fc7315d6ebecc299",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 34428,
+    "gcs": {
+      "generation": "1795509769536560",
+      "md5": "1150eb255a4846f6fc7315d6ebecc299",
+      "crc32c": "3928952b",
+      "bytes": 240927,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 107422,
+    "md5": "c2b7883e164debb22cb154b30c68d4b6",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12631,
+    "gcs": {
+      "generation": "1795510252730289",
+      "md5": "c2b7883e164debb22cb154b30c68d4b6",
+      "crc32c": "f8336e38",
+      "bytes": 107422,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-24T134058Z",
+  "archived_at": 1795527658.0,
+  "settled": true,
+  "final": false
+}

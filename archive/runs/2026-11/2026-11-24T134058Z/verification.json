@@ -1,0 +1,44 @@
+{
+  "run": "2026-11-24T134058Z",
+  "outcome": "ok",
+  "started": 1795527727.2967052,
+  "finished": 1795527745.4975348,
+  "tool": {
+    "commit": "de7821b589aabd56f9889c6815eab50483943fca",
+    "modified": false
+  },
+  "github": {
+    "repository": "thc1006/testgrid-red-build-logs",
+    "run_id": "45405764674",
+    "run_attempt": "1"
+  },
+  "scope": {
+    "window": {
+      "from": 1795354858.4081714,
+      "to": 1795527658.4081714
+    },
+    "tabs": 46,
+    "builds": 2073,
+    "compared_with_gcs": 327,
+    "sevenths": [
+      5
+    ],
+    "differ": 0,
+    "not_settled": 1,
+    "assets": {
+      "uploaded": 98,
+      "compared_with_gcs": 13,
+      "downloaded": 4
+    },
+    "red_on_testgrid": 39,
+    "red_not_settled": 0,
+    "gcs_builds": 1947,
+    "judged_by_rule": 22
+  },
+  "problem_count": 0,
+  "problems": [],
+  "note_count": 1,
+  "notes": [
+    "ci-kubernetes-e2e-kind-beta-features/2124840367239991296: ERROR, not listed on TestGrid (not archived)"
+  ]
+}
