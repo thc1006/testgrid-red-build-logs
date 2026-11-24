@@ -1,6 +1,6 @@
 {
   "about": "The TestGrid code testgrid_rule.py ports: the commit TestGrid's production manifest deploys the updater at (its image tag in cluster/prod/updater.yaml ends in -g<commit>), and the Go it is built with (the one its Bazel WORKSPACE registers; else its go.mod's).",
-  "testgrid_commit": "8fbcf086e57a",
-  "testgrid_module_version": "v0.0.179",
-  "go": "1.26.9"
+  "testgrid_commit": "5d17de4b3aba",
+  "testgrid_module_version": "v0.0.180-0.20261123061725-5d17de4b3aba",
+  "go": "1.26.11"
 }
