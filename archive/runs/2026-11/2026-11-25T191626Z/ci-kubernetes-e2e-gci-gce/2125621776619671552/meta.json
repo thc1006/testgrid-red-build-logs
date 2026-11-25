@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2125621776619671552",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1795622698,
+  "created": 1795622698,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Mock volume expansion Expansion with recovery should allow recovery if controller expansion fails with infeasible error",
+          "status": "FAIL",
+          "message": "[FAILED] While waiting for PV resize to finish: error while waiting fo...e/storage/csimock/csi_volume_expansion.go:852 @ 11/25/26 16:37:04.792\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795625243,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.899+9f140ee0061e18",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2125621776619671552",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2125621776619671552/build-log.txt",
+  "log": {
+    "bytes": 232522,
+    "md5": "d3dd67061b1c7e2158fb25a17f83b2c0",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 31832,
+    "gcs": {
+      "generation": "1795625262040393",
+      "md5": "d3dd67061b1c7e2158fb25a17f83b2c0",
+      "crc32c": "4a762366",
+      "bytes": 232522,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86708,
+    "md5": "4b657fda995a5af7937d7d6efcb1267d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11672,
+    "gcs": {
+      "generation": "1795625264081994",
+      "md5": "4b657fda995a5af7937d7d6efcb1267d",
+      "crc32c": "229fe7d2",
+      "bytes": 86708,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-25T191626Z",
+  "archived_at": 1795634186.0,
+  "settled": true,
+  "final": false
+}

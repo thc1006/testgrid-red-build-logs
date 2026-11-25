@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2125652981968801792",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1795630165,
+  "created": 1795630138,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Inline-volume (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.001s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 11/25/26 18:24:06.164\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795631800,
+  "commits": {
+    "kubernetes/kubernetes": "3596eb69d25147bd790810090712c79f02426b90"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2125652981968801792",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2125652981968801792/build-log.txt",
+  "log": {
+    "bytes": 130103,
+    "md5": "8a7f10be526b42a802095b124f873a01",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20978,
+    "gcs": {
+      "generation": "1795631820821926",
+      "md5": "8a7f10be526b42a802095b124f873a01",
+      "crc32c": "59242bff",
+      "bytes": 130103,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 93600,
+    "md5": "a25a79d1e50988c7ffa1a10e4c40e728",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12299,
+    "gcs": {
+      "generation": "1795631823486927",
+      "md5": "a25a79d1e50988c7ffa1a10e4c40e728",
+      "crc32c": "acbc435b",
+      "bytes": 93600,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-25T191626Z",
+  "archived_at": 1795634186.0,
+  "settled": false,
+  "final": false
+}

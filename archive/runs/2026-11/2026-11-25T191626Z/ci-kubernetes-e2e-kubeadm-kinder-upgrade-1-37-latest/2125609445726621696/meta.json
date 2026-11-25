@@ -1,0 +1,72 @@
+{
+  "job": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
+  "build": "2125609445726621696",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest",
+  "started": 1795619797,
+  "created": 1795619758,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kubeadm-kinder-upgrade-1-37-latest",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "task-01-add-kubernetes-versions",
+          "status": "FAIL",
+          "message": "exit status 1"
+        },
+        {
+          "test": "task-11-reset",
+          "status": "FAIL",
+          "message": "exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795619909,
+  "commits": {
+    "kubernetes/kubeadm": "61f7ad074afb22eff1010911d206eec7ab2ba740",
+    "kubernetes/kubernetes": "9f140ee0061e181fa296a4257dda0044a63f1f6c"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2125609445726621696",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kubeadm-kinder-upgrade-1-37-latest/2125609445726621696/build-log.txt",
+  "log": {
+    "bytes": 31537,
+    "md5": "284dde0c1f6ac458eb8104aeef2995f6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 5830,
+    "gcs": {
+      "generation": "1795619909801353",
+      "md5": "284dde0c1f6ac458eb8104aeef2995f6",
+      "crc32c": "9aa456e9",
+      "bytes": 31537,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 81998,
+    "md5": "0b5ba09504f13cd4d4cb7f5f723f4281",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11579,
+    "gcs": {
+      "generation": "1795619912383578",
+      "md5": "0b5ba09504f13cd4d4cb7f5f723f4281",
+      "crc32c": "f01b596d",
+      "bytes": 81998,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-25T191626Z",
+  "archived_at": 1795634186.0,
+  "settled": true,
+  "final": false
+}

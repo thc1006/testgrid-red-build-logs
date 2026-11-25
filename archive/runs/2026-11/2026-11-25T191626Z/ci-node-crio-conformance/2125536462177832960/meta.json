@@ -1,0 +1,266 @@
+{
+  "job": "ci-node-crio-conformance",
+  "build": "2125536462177832960",
+  "query": "kubernetes-ci-logs/logs/ci-node-crio-conformance",
+  "started": 1795602390,
+  "created": 1795602357,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-node-crio-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-node-crio-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        },
+        {
+          "test": "E2eNode Suite.[It] [sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update container image [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 120.001s.\nExpected success, but got an error:...bernetes/test/e2e_node/mirror_pod_test.go:383 @ 11/25/26 10:50:41.393\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795604429,
+  "commits": {
+    "kubernetes/test-infra": "ee08d6308e019a61f0329a40bc1ceece36410595",
+    "kubernetes/kubernetes": "12a341541c442c4ce0edd93fa06233747b6f5a35"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2125536462177832960",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-crio-conformance/2125536462177832960/build-log.txt",
+  "log": {
+    "bytes": 1971448,
+    "md5": "c67c898178bd0c9b0ac38a01c863f822",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 250471,
+    "gcs": {
+      "generation": "1795604431264916",
+      "md5": "c67c898178bd0c9b0ac38a01c863f822",
+      "crc32c": "0826a3c7",
+      "bytes": 1971448,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 99305,
+    "md5": "5ec4be1f17f29a7614e6788979d6356e",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12594,
+    "gcs": {
+      "generation": "1795604433332566",
+      "md5": "5ec4be1f17f29a7614e6788979d6356e",
+      "crc32c": "45481205",
+      "bytes": 99305,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": true,
+  "archived_by_run": "2026-11-25T191626Z",
+  "archived_at": 1795634186.0,
+  "settled": true,
+  "final": false,
+  "artifacts_asset": {
+    "name": "ci-node-crio-conformance_2125536462177832960.tar.xz",
+    "month": "2026-11",
+    "bytes": 9424624,
+    "sha256": "b5b2a4f10544065430801b98b5fae304aa5c07bc3e1f474bebf2aa96096515f6",
+    "members": [
+      {
+        "path": "artifacts/build-log.txt",
+        "bytes": 1967789,
+        "md5": "51c12900d43dbec891b1c91861e164ce",
+        "gcs": {
+          "generation": "1795604429996300",
+          "md5": "51c12900d43dbec891b1c91861e164ce",
+          "crc32c": "3020c8aa",
+          "bytes": 1967789,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/junit_fedora01.xml",
+        "bytes": 497762,
+        "md5": "36287fa054a50749a21be817be4db327",
+        "gcs": {
+          "generation": "1795604429910898",
+          "md5": "36287fa054a50749a21be817be4db327",
+          "crc32c": "f92f2662",
+          "bytes": 497762,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/junit_runner.xml",
+        "bytes": 254,
+        "md5": "bbb77bca10171bf52c83586d8461352f",
+        "gcs": {
+          "generation": "1795604429899756",
+          "md5": "bbb77bca10171bf52c83586d8461352f",
+          "crc32c": "34b837b5",
+          "bytes": 254,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/metadata.json",
+        "bytes": 133,
+        "md5": "d31d749d459702407446bab14ff79252",
+        "gcs": {
+          "generation": "1795604430055459",
+          "md5": "d31d749d459702407446bab14ff79252",
+          "crc32c": "6c9cd12c",
+          "bytes": 133,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64-system.log",
+        "bytes": 81028880,
+        "md5": "8a4cebc962809c00dd88e0e6836cb704",
+        "gcs": {
+          "generation": "1795604430922630",
+          "md5": "8a4cebc962809c00dd88e0e6836cb704",
+          "crc32c": "46cd9e95",
+          "bytes": 81028880,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/containerd-installation.log",
+        "bytes": 17,
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "gcs": {
+          "generation": "1795604430129033",
+          "md5": "cdfc37141b925a27919a83355bf842dd",
+          "crc32c": "4cbc7ffc",
+          "bytes": 17,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/containerd.log",
+        "bytes": 17,
+        "md5": "cdfc37141b925a27919a83355bf842dd",
+        "gcs": {
+          "generation": "1795604430259225",
+          "md5": "cdfc37141b925a27919a83355bf842dd",
+          "crc32c": "4cbc7ffc",
+          "bytes": 17,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/crio.log",
+        "bytes": 75632778,
+        "md5": "159b2bc618dff85037d89bdcea191129",
+        "gcs": {
+          "generation": "1795604431156058",
+          "md5": "159b2bc618dff85037d89bdcea191129",
+          "crc32c": "f2e1a902",
+          "bytes": 75632778,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/kern.log",
+        "bytes": 705976,
+        "md5": "af0534a2af7c94c54ba93d8ee72e8034",
+        "gcs": {
+          "generation": "1795604430325554",
+          "md5": "af0534a2af7c94c54ba93d8ee72e8034",
+          "crc32c": "22dfe550",
+          "bytes": 705976,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/kubelet.log",
+        "bytes": 40537841,
+        "md5": "5933bbd8e7653a6285a08b1c5b75caf6",
+        "gcs": {
+          "generation": "1795604430418450",
+          "md5": "5933bbd8e7653a6285a08b1c5b75caf6",
+          "crc32c": "80b7d02b",
+          "bytes": 40537841,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/pods/container-probe-5095_busybox-e560d9ea-b4a3-4d5f-b601-fe036b93c222_fad5dd33-8ace-4e3b-a17e-ca8559382328/busybox/0.log",
+        "bytes": 0,
+        "md5": "d41d8cd98f00b204e9800998ecf8427e",
+        "gcs": {
+          "generation": "1795604430188102",
+          "md5": "d41d8cd98f00b204e9800998ecf8427e",
+          "crc32c": "00000000",
+          "bytes": 0,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/pods/container-probe-5095_busybox-e560d9ea-b4a3-4d5f-b601-fe036b93c222_fad5dd33-8ace-4e3b-a17e-ca8559382328/cf65465aaceae278865f1acb8ffaff14216238fc2b87879446cb707dab41be55.log",
+        "bytes": 83,
+        "md5": "76be09602731570d7b1fbca98dce6765",
+        "gcs": {
+          "generation": "1795604429975733",
+          "md5": "76be09602731570d7b1fbca98dce6765",
+          "crc32c": "0607cda4",
+          "bytes": 83,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/serial-1.log",
+        "bytes": 263555,
+        "md5": "02895361bb05e3e15d5953b6ca65ccbc",
+        "gcs": {
+          "generation": "1795604430144772",
+          "md5": "02895361bb05e3e15d5953b6ca65ccbc",
+          "crc32c": "9b07c97d",
+          "bytes": 263555,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/services.log",
+        "bytes": 27142842,
+        "md5": "34eab7202863b16db5a3099049d4c353",
+        "gcs": {
+          "generation": "1795604430545132",
+          "md5": "34eab7202863b16db5a3099049d4c353",
+          "crc32c": "07f3554d",
+          "bytes": 27142842,
+          "encoding": "identity"
+        }
+      },
+      {
+        "path": "artifacts/test-fedora-coreos-45-20261030-3-1-gcp-x86-64/test-fedora-coreos-45-20261030-3-1-gcp-x86-64-ginkgo.log",
+        "bytes": 970119,
+        "md5": "717542533be7906f0789b2b1e3e9bf56",
+        "gcs": {
+          "generation": "1795604430083000",
+          "md5": "717542533be7906f0789b2b1e3e9bf56",
+          "crc32c": "36bf7528",
+          "bytes": 970119,
+          "encoding": "identity"
+        }
+      }
+    ],
+    "built_by_run": "2026-11-25T191626Z",
+    "pending_since": 1795634186.2845345,
+    "uploaded": {
+      "release": "node-logs-2026-11",
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-node-crio-conformance_2125536462177832960.tar.xz"
+    }
+  }
+}
