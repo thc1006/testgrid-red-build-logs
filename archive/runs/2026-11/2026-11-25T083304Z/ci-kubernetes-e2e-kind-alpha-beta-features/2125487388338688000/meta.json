@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2125487388338688000",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1795590686,
+  "created": 1795590657,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-scheduling] WorkloadAwarePreemption [FeatureGate:GenericWorkload] workload-aware preemption should preempt group when preemptor pod group explicitly sets PreemptLowerPriority preemption policy [Beta] [Feature:OffByDefault]",
+          "status": "FAIL",
+          "message": "[FAILED] failed to create PodGroup pg-victim-workload-aware-preemption...2e/scheduling/workload_aware_preemption.go:72 @ 11/25/26 07:24:31.038\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795592353,
+  "commits": {
+    "kubernetes/kubernetes": "66bd456f172228e5d5b32db1ed983a9725726683"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2125487388338688000",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2125487388338688000/build-log.txt",
+  "log": {
+    "bytes": 136908,
+    "md5": "26316e01b1775fb730bc5381b08ea1d4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 20718,
+    "gcs": {
+      "generation": "1795592371069946",
+      "md5": "26316e01b1775fb730bc5381b08ea1d4",
+      "crc32c": "84bac328",
+      "bytes": 136908,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96240,
+    "md5": "bca8466cf6cb55301043610bc7eb3fec",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12574,
+    "gcs": {
+      "generation": "1795592373172186",
+      "md5": "bca8466cf6cb55301043610bc7eb3fec",
+      "crc32c": "6504f20a",
+      "bytes": 96240,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-25T083304Z",
+  "archived_at": 1795595584.0,
+  "settled": false,
+  "final": false
+}

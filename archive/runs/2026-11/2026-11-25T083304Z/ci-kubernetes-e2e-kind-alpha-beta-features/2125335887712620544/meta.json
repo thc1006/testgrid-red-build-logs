@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2125335887712620544",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1795554569,
+  "created": 1795554537,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-node] Dynamic Node-Local Ephemeral Volumes [FeatureGate:DynamicNodeLocalEphemeralVolumes] [FeatureGate:DynamicContainers] with OCI Image volumes and failure cleanup should isolate bad OCI Image volume pulls, mount valid OCI Image volumes, and release volumes from removed RunContainerError containers [Alpha] [Feature:OffByDefault] [FeatureGate:InPlacePodLevelResourcesVerticalScaling] [FeatureGate:NodeDeclaredFeatures] [FeatureGate:PodLevelResources]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 60.000s.\nThe function passed to Eventually fa...s/test/e2e/common/node/dynamic_volumes.go:486 @ 11/24/26 21:24:08.017\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795556138,
+  "commits": {
+    "kubernetes/kubernetes": "eb180eecb22eff4ba46879744d439853c657f74f"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2125335887712620544",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2125335887712620544/build-log.txt",
+  "log": {
+    "bytes": 139350,
+    "md5": "ca8d53f774740e22f810428f9800c91c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21217,
+    "gcs": {
+      "generation": "1795556156751451",
+      "md5": "ca8d53f774740e22f810428f9800c91c",
+      "crc32c": "c4b679d1",
+      "bytes": 139350,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98730,
+    "md5": "0f9b4c3acc61737c5f6b822156df8719",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12752,
+    "gcs": {
+      "generation": "1795556160974071",
+      "md5": "0f9b4c3acc61737c5f6b822156df8719",
+      "crc32c": "5ea9b357",
+      "bytes": 98730,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-25T083304Z",
+  "archived_at": 1795595584.0,
+  "settled": true,
+  "final": false
+}

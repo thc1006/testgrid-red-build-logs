@@ -1,0 +1,90 @@
+{
+  "job": "ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "build": "2125472288613601280",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd",
+  "started": 1795587058,
+  "created": 1795587057,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-ubuntu-master-containerd",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-cli] Kubectl client Simple pod should return command exit codes should handle in-cluster config",
+          "status": "FAIL",
+          "message": "[FAILED] error running /workspace/kubernetes/platforms/linux/amd64/kub...etes/test/e2e/framework/kubectl/builder.go:97 @ 11/25/26 06:20:08.861\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] CSI Mock volume expansion CSI Volume expansion should not have staging_path missing in node expand volume pod if attach=on, nodeExpansion=on",
+          "status": "FAIL",
+          "message": "[FAILED] While waiting for CSI PV resize to finish: error while waitin...detected after the initial failure. These are visible in the timeline\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] EmptyDir volumes should support (non-root,0644,default) [LinuxOnly] [Conformance] [NodeConformance]",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...etes/test/e2e/framework/pod/pod_client.go:237 @ 11/25/26 07:31:02.115\n"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: local] [LocalVolumeType: dir-link] [Testpattern: Pre-provisioned PV (default fs)] subPath should support existing directory",
+          "status": "FAIL",
+          "message": "[INTERRUPTED] Interrupted by User\nIn [It] at: k8s.io/kubernetes/test/e...etes/test/e2e/framework/pod/pod_client.go:237 @ 11/25/26 07:31:02.115\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-ubuntu-gce-containerd.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...r=/logs/artifacts --disable-log-dump=true (interrupted): exit status 1"
+        },
+        {
+          "test": "kubetest.Timeout",
+          "status": "FAIL",
+          "message": "kubetest --timeout triggered"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795592337,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.894+66bd456f172228",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2125472288613601280",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ubuntu-gce-containerd/2125472288613601280/build-log.txt",
+  "log": {
+    "bytes": 565220,
+    "md5": "b007810271a32ffd8c9b0a01256779d6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 73673,
+    "gcs": {
+      "generation": "1795592351486257",
+      "md5": "b007810271a32ffd8c9b0a01256779d6",
+      "crc32c": "2d077d89",
+      "bytes": 565220,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 65712,
+    "md5": "375cebaa6a34c50c84d10eacb1493298",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 10425,
+    "gcs": {
+      "generation": "1795592353490186",
+      "md5": "375cebaa6a34c50c84d10eacb1493298",
+      "crc32c": "eb6cd89b",
+      "bytes": 65712,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-25T083304Z",
+  "archived_at": 1795595584.0,
+  "settled": false,
+  "final": false
+}

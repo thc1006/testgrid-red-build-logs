@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "build": "2125423466365587456",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "started": 1795575447,
+  "created": 1795575417,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "sig-network-kind, loadbalancer",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to switch session affinity for LoadBalancer service with Local traffic policy [LinuxOnly] [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Affinity shouldn't hold but did.\nIn [It] at: k8s.io/kubernetes/test/e2e/network/service.go:247 @ 11/25/26 03:15:00.018\n"
+        },
+        {
+          "test": "ci-kubernetes-kind-cloud-provider-loadbalancer.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795576566,
+  "commits": {
+    "kubernetes-sigs/cloud-provider-kind": "4a0f6c2c32e8d2f55667f65a06948314d0bc3d9d",
+    "kubernetes/kubernetes": "24b9c61760755c5b71f6aaede79f4c593f352020"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2125423466365587456",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2125423466365587456/build-log.txt",
+  "log": {
+    "bytes": 1663086,
+    "md5": "1585063e37c4e7a2f0f3df82836e7cfd",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 92999,
+    "gcs": {
+      "generation": "1795576569746006",
+      "md5": "1585063e37c4e7a2f0f3df82836e7cfd",
+      "crc32c": "773297e0",
+      "bytes": 1663086,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98585,
+    "md5": "7cdd27f1e5f6b074b2e37e3f0236eb13",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12802,
+    "gcs": {
+      "generation": "1795576573220124",
+      "md5": "7cdd27f1e5f6b074b2e37e3f0236eb13",
+      "crc32c": "3b4806a2",
+      "bytes": 98585,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-25T083304Z",
+  "archived_at": 1795595584.0,
+  "settled": true,
+  "final": false
+}

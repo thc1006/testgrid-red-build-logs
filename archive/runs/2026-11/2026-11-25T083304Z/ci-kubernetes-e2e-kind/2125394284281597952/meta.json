@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind",
+  "build": "2125394284281597952",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind",
+  "started": 1795568709,
+  "created": 1795568459,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test phase transition timestamp multiple updates",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-hw52b\" did not exit with Success: pod \"pvc-te...tes/test/e2e/storage/persistent_volumes.go:63 @ 11/25/26 01:16:13.863\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795570346,
+  "commits": {
+    "kubernetes/kubernetes": "04f93d8cbd34db350090cf48c7cdc93a584744b0"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2125394284281597952",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2125394284281597952/build-log.txt",
+  "log": {
+    "bytes": 130984,
+    "md5": "62dbd36c9c46cc06dbc296cb8a58294c",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 21132,
+    "gcs": {
+      "generation": "1795570363707231",
+      "md5": "62dbd36c9c46cc06dbc296cb8a58294c",
+      "crc32c": "a9dbb0df",
+      "bytes": 130984,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 115386,
+    "md5": "e9f257e73a77a293ac3dbe806e7d4cf6",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 13796,
+    "gcs": {
+      "generation": "1795570365851670",
+      "md5": "e9f257e73a77a293ac3dbe806e7d4cf6",
+      "crc32c": "31213cda",
+      "bytes": 115386,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-25T083304Z",
+  "archived_at": 1795595584.0,
+  "settled": true,
+  "final": false
+}

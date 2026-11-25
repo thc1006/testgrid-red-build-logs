@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2125293357214208001",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1795544426,
+  "created": 1795544397,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration.examples",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestAggregatedAPIServer/WithoutWardleFeatureGateAtV1....  TestAggregatedAPIServer\n--- FAIL: TestAggregatedAPIServer (262.07s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795546792,
+  "commits": {
+    "kubernetes/kubernetes": "eb180eecb22eff4ba46879744d439853c657f74f"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125293357214208001",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125293357214208001/build-log.txt",
+  "log": {
+    "bytes": 579570,
+    "md5": "5307535f3fc1866d9e435a77e834636b",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 67846,
+    "gcs": {
+      "generation": "1795546796590586",
+      "md5": "5307535f3fc1866d9e435a77e834636b",
+      "crc32c": "941c2916",
+      "bytes": 579570,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96667,
+    "md5": "03ee168f4773419fb99b139dcc08d23d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12214,
+    "gcs": {
+      "generation": "1795546801257636",
+      "md5": "03ee168f4773419fb99b139dcc08d23d",
+      "crc32c": "2157a71a",
+      "bytes": 96667,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-25T083304Z",
+  "archived_at": 1795595584.0,
+  "settled": true,
+  "final": false
+}
