@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2125826627815346176",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1795671569,
+  "created": 1795671538,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration.examples",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestAggregatedAPIServer/WithoutWardleFeatureGateAtV1....  TestAggregatedAPIServer\n--- FAIL: TestAggregatedAPIServer (262.07s)\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795673944,
+  "commits": {
+    "kubernetes/kubernetes": "3596eb69d25147bd790810090712c79f02426b90"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125826627815346176",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125826627815346176/build-log.txt",
+  "log": {
+    "bytes": 578941,
+    "md5": "009cd3a193c47bc910423235a32358f6",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 67477,
+    "gcs": {
+      "generation": "1795673948434798",
+      "md5": "009cd3a193c47bc910423235a32358f6",
+      "crc32c": "5a561ec9",
+      "bytes": 578941,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 99201,
+    "md5": "88cd1784ed1c8e55cb4992106ad13568",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12437,
+    "gcs": {
+      "generation": "1795673950808195",
+      "md5": "88cd1784ed1c8e55cb4992106ad13568",
+      "crc32c": "c5fa722b",
+      "bytes": 99201,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-26T165303Z",
+  "archived_at": 1795711983.0,
+  "settled": true,
+  "final": false
+}

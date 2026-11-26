@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "build": "2125839964968062976",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled",
+  "started": 1795674747,
+  "created": 1795674718,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and use it multiple times in a single pod",
+          "status": "FAIL",
+          "message": "[FAILED] pod \"pvc-tester-fx84t\" failed to reach Success: Timed out aft...es/test/e2e/storage/persistent_volumes.go:232 @ 11/26/26 06:54:17.054\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795676338,
+  "commits": {
+    "kubernetes/kubernetes": "3596eb69d25147bd790810090712c79f02426b90"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2125839964968062976",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2125839964968062976/build-log.txt",
+  "log": {
+    "bytes": 148486,
+    "md5": "384a8f483bea255a63790d704f6d86d3",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22567,
+    "gcs": {
+      "generation": "1795676352982394",
+      "md5": "384a8f483bea255a63790d704f6d86d3",
+      "crc32c": "acdf49f4",
+      "bytes": 148486,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96483,
+    "md5": "cc2d399de4bfc7a026e548a7ed71609f",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12542,
+    "gcs": {
+      "generation": "1795676355290157",
+      "md5": "cc2d399de4bfc7a026e548a7ed71609f",
+      "crc32c": "00861056",
+      "bytes": 96483,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-26T165303Z",
+  "archived_at": 1795711983.0,
+  "settled": true,
+  "final": false
+}

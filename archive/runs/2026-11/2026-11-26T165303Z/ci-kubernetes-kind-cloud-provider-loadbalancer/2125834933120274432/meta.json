@@ -1,0 +1,67 @@
+{
+  "job": "ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "build": "2125834933120274432",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer",
+  "started": 1795673547,
+  "created": 1795673518,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "sig-network-kind, loadbalancer",
+      "tab_status": "PASSING",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should only allow access from service loadbalancer source ranges [Slow]",
+          "status": "FAIL",
+          "message": "[FAILED] Could not reach HTTP service through 172.18.0.5:80 after 10m0...ernetes/test/e2e/framework/service/util.go:49 @ 11/26/26 06:30:03.136\n"
+        },
+        {
+          "test": "ci-kubernetes-kind-cloud-provider-loadbalancer.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795674688,
+  "commits": {
+    "kubernetes-sigs/cloud-provider-kind": "4a0f6c2c32e8d2f55667f65a06948314d0bc3d9d",
+    "kubernetes/kubernetes": "3596eb69d25147bd790810090712c79f02426b90"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2125834933120274432",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2125834933120274432/build-log.txt",
+  "log": {
+    "bytes": 242906,
+    "md5": "9f1c8a8629ddfeda48a066413ec6e5ee",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 32059,
+    "gcs": {
+      "generation": "1795674690687368",
+      "md5": "9f1c8a8629ddfeda48a066413ec6e5ee",
+      "crc32c": "4af6a4ae",
+      "bytes": 242906,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98129,
+    "md5": "1b584ea97b6f6032de77d60f586d09e4",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12781,
+    "gcs": {
+      "generation": "1795674693421954",
+      "md5": "1b584ea97b6f6032de77d60f586d09e4",
+      "crc32c": "2e010613",
+      "bytes": 98129,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-26T165303Z",
+  "archived_at": 1795711983.0,
+  "settled": true,
+  "final": false
+}

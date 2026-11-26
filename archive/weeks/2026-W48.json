@@ -1,5 +1,150 @@
 [
   {
+    "time": 1795674747,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-enabled",
+    "build": "2125839964968062976",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-enabled"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and use it multiple times in a single pod",
+      "ci-kubernetes-e2e-kind-alpha-beta-enabled.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2125839964968062976",
+    "run": "2026-11-26T165303Z",
+    "files": [
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2125839964968062976/build-log.txt.gz",
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2125839964968062976/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 244969,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2125839964968062976"
+  },
+  {
+    "time": 1795673547,
+    "job": "ci-kubernetes-kind-cloud-provider-loadbalancer",
+    "build": "2125834933120274432",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#sig-network-kind, loadbalancer"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should only allow access from service loadbalancer source ranges [Slow]",
+      "ci-kubernetes-kind-cloud-provider-loadbalancer.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-kind-cloud-provider-loadbalancer/2125834933120274432",
+    "run": "2026-11-26T165303Z",
+    "files": [
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-kind-cloud-provider-loadbalancer/2125834933120274432/build-log.txt.gz",
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-kind-cloud-provider-loadbalancer/2125834933120274432/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 341035,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2125834933120274432"
+  },
+  {
+    "time": 1795671569,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2125826627815346176",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration.examples",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125826627815346176",
+    "run": "2026-11-26T165303Z",
+    "files": [
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125826627815346176/build-log.txt.gz",
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125826627815346176/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 678142,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125826627815346176"
+  },
+  {
+    "time": 1795670187,
+    "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+    "build": "2125820838895685632",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#kind-master-alpha-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] Volume metrics PVC should create prometheus metrics for volume provisioning and attach/detach",
+      "ci-kubernetes-e2e-kind-alpha-beta-features.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-features/2125820838895685632",
+    "run": "2026-11-26T165303Z",
+    "files": [
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-features/2125820838895685632/build-log.txt.gz",
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-features/2125820838895685632/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 269310,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2125820838895685632"
+  },
+  {
+    "time": 1795667966,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2125811528182534144",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125811528182534144",
+    "run": "2026-11-26T165303Z",
+    "files": [
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125811528182534144/build-log.txt.gz",
+      "runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125811528182534144/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 327375,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125811528182534144"
+  },
+  {
     "time": 1795660767,
     "job": "ci-kubernetes-integration-master",
     "build": "2125781328279375872",
@@ -20,7 +165,7 @@
     ],
     "remote": [],
     "bytes": 302978,
-    "settled": false,
+    "settled": true,
     "final": false,
     "backfilled": false,
     "has_log": true,
@@ -1182,7 +1327,7 @@
     "remote": [],
     "bytes": 319668,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1211,7 +1356,7 @@
     "remote": [],
     "bytes": 241993,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1241,7 +1386,7 @@
     "remote": [],
     "bytes": 242933,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1271,7 +1416,7 @@
     "remote": [],
     "bytes": 389646,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1300,7 +1445,7 @@
     "remote": [],
     "bytes": 334959,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1329,7 +1474,7 @@
     "remote": [],
     "bytes": 3023017,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1361,7 +1506,7 @@
     "remote": [],
     "bytes": 284848,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1391,7 +1536,7 @@
     "remote": [],
     "bytes": 2030596,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1423,7 +1568,7 @@
     "remote": [],
     "bytes": 348349,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1452,7 +1597,7 @@
     "remote": [],
     "bytes": 237301,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1482,7 +1627,7 @@
     "remote": [],
     "bytes": 794143,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

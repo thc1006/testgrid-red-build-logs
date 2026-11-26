@@ -1,0 +1,18 @@
+# Run 2026-11-26 16:53:03 UTC
+
+46 tabs read (0 failed), 333 red builds on TestGrid. This run archived 5 new builds.
+TestGrid's config: test-infra 319386a3c38e of 2026-11-26T05:20:47Z, uploaded 2026-11-26T05:21:01Z, read by this run.
+
+[run.json](run.json) has the details; [INDEX.md](../../../INDEX.md) lists the archived builds of the last 14 days, and links a page for each week. A file marked provisional may have been taken before Prow finished uploading; it is compared with GCS on every run and fetched again if GCS changes.
+
+## Builds archived by this run (5)
+
+### 2026-11-26
+
+| Time | Tab | Build | Red tests | Files |
+|---|---|---|---|---|
+| 06:32 | informing#kind-master-alpha-beta-enabled | [ci-kubernetes-e2e-kind-alpha-beta-enabled 2125839964968062976](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-enabled/2125839964968062976) | Kubernetes e2e suite.\[It\] \[sig-storage\] PersistentVolumes NFS with Single PV - PVC pairs c (+1) | [build-log.txt.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2125839964968062976/build-log.txt.gz) [podinfo.json.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-enabled/2125839964968062976/podinfo.json.gz) |
+| 06:12 | blocking#sig-network-kind, loadbalancer | [ci-kubernetes-kind-cloud-provider-loadbalancer 2125834933120274432](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-kind-cloud-provider-loadbalancer/2125834933120274432) | Kubernetes e2e suite.\[It\] \[sig-network\] LoadBalancers \[Feature:LoadBalancer\] should only a (+1) | [build-log.txt.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-kind-cloud-provider-loadbalancer/2125834933120274432/build-log.txt.gz) [podinfo.json.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-kind-cloud-provider-loadbalancer/2125834933120274432/podinfo.json.gz) |
+| 05:39 | blocking#integration-master | [ci-kubernetes-integration-master 2125826627815346176](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125826627815346176) | \[sig-api-machinery\] k8s.io/kubernetes/test/integration.examples (+1) | [build-log.txt.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125826627815346176/build-log.txt.gz) [podinfo.json.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125826627815346176/podinfo.json.gz) |
+| 05:16 | informing#kind-master-alpha-beta-features | [ci-kubernetes-e2e-kind-alpha-beta-features 2125820838895685632](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2125820838895685632) | Kubernetes e2e suite.\[It\] \[sig-storage\] Volume metrics PVC should create prometheus metric (+1) | [build-log.txt.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-features/2125820838895685632/build-log.txt.gz) [podinfo.json.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-e2e-kind-alpha-beta-features/2125820838895685632/podinfo.json.gz) |
+| 04:39 | blocking#integration-master | [ci-kubernetes-integration-master 2125811528182534144](https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125811528182534144) | \[sig-api-machinery\] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection (+1) | [build-log.txt.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125811528182534144/build-log.txt.gz) [podinfo.json.gz](../../../runs/2026-11/2026-11-26T165303Z/ci-kubernetes-integration-master/2125811528182534144/podinfo.json.gz) |

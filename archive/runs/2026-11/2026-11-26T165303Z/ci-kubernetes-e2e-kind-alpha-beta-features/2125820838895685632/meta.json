@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-alpha-beta-features",
+  "build": "2125820838895685632",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features",
+  "started": 1795670187,
+  "created": 1795670158,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-alpha-beta-features",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics PVC should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 11/26/26 05:57:25.841\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-alpha-beta-features.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795672730,
+  "commits": {
+    "kubernetes/kubernetes": "3596eb69d25147bd790810090712c79f02426b90"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2125820838895685632",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-alpha-beta-features/2125820838895685632/build-log.txt",
+  "log": {
+    "bytes": 171495,
+    "md5": "100f7611497bf7ff68a97c29b5120217",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22662,
+    "gcs": {
+      "generation": "1795672745100402",
+      "md5": "100f7611497bf7ff68a97c29b5120217",
+      "crc32c": "755f300d",
+      "bytes": 171495,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97815,
+    "md5": "2bdfd12c3f1999b6326ebe4451123289",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12816,
+    "gcs": {
+      "generation": "1795672746908647",
+      "md5": "2bdfd12c3f1999b6326ebe4451123289",
+      "crc32c": "a1806048",
+      "bytes": 97815,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-26T165303Z",
+  "archived_at": 1795711983.0,
+  "settled": true,
+  "final": false
+}
