@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2125674372554297344",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1795635268,
+  "created": 1795635238,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-apps] k8s.io/kubernetes/test/integration.controllermanager",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestKubeControllerManagerLeaderElectionRecovery\n    t...il>\n--- FAIL: TestKubeControllerManagerLeaderElectionRecovery (3.45s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795637629,
+  "commits": {
+    "kubernetes/kubernetes": "3596eb69d25147bd790810090712c79f02426b90"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125674372554297344",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2125674372554297344/build-log.txt",
+  "log": {
+    "bytes": 309429,
+    "md5": "15b87843909498ef583c761df56a4662",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 32569,
+    "gcs": {
+      "generation": "1795637634222367",
+      "md5": "15b87843909498ef583c761df56a4662",
+      "crc32c": "a1fdd63d",
+      "bytes": 309429,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 96608,
+    "md5": "e163277e8179af60bc1faa2825bc58b5",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12277,
+    "gcs": {
+      "generation": "1795637636772964",
+      "md5": "e163277e8179af60bc1faa2825bc58b5",
+      "crc32c": "f1c96c41",
+      "bytes": 96608,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-26T033410Z",
+  "archived_at": 1795664050.0,
+  "settled": true,
+  "final": false
+}
