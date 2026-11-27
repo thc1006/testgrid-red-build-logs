@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2126071242447392768",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1795729889,
+  "created": 1795729859,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Inline-volume (default fs)] volumes should allow exec of files on the volume",
+          "status": "FAIL",
+          "message": "[FAILED] expected pod \"exec-volume-test-inlinevolume-bn6s\" success: Ti...s/test/e2e/framework/pod/output/output.go:263 @ 11/26/26 22:02:37.654\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795731645,
+  "commits": {
+    "kubernetes/kubernetes": "1dc6ca798017266904fccdceb48f27fee5286723"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2126071242447392768",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2126071242447392768/build-log.txt",
+  "log": {
+    "bytes": 159351,
+    "md5": "e6f1cd2732ac595af6ccd10fa89e24f8",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 24738,
+    "gcs": {
+      "generation": "1795731660047445",
+      "md5": "e6f1cd2732ac595af6ccd10fa89e24f8",
+      "crc32c": "7dc89487",
+      "bytes": 159351,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 95674,
+    "md5": "74306addf713b10dafbbca30285fcb76",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12409,
+    "gcs": {
+      "generation": "1795731664154360",
+      "md5": "74306addf713b10dafbbca30285fcb76",
+      "crc32c": "4a215812",
+      "bytes": 95674,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-27T014459Z",
+  "archived_at": 1795743899.0,
+  "settled": true,
+  "final": false
+}
