@@ -1,5 +1,155 @@
 [
   {
+    "time": 1795772706,
+    "job": "ci-node-e2e-containerd-2-4-ubuntu-dra",
+    "build": "2126250927131201536",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#ci-node-e2e-containerd-2-4-ubuntu-dra"
+    ],
+    "red_tests": [
+      "kubetest2.Test",
+      "ci-node-e2e-containerd-2-4-ubuntu-dra.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-27T121611Z/ci-node-e2e-containerd-2-4-ubuntu-dra/2126250927131201536",
+    "run": "2026-11-27T121611Z",
+    "files": [
+      "runs/2026-11/2026-11-27T121611Z/ci-node-e2e-containerd-2-4-ubuntu-dra/2126250927131201536/build-log.txt.gz",
+      "runs/2026-11/2026-11-27T121611Z/ci-node-e2e-containerd-2-4-ubuntu-dra/2126250927131201536/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 149018,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-e2e-containerd-2-4-ubuntu-dra/2126250927131201536"
+  },
+  {
+    "time": 1795769848,
+    "job": "ci-kubernetes-e2e-kind-ipv6",
+    "build": "2126238848500371456",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-ipv6-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] Volume metrics Ephemeral should create prometheus metrics for volume provisioning and attach/detach",
+      "ci-kubernetes-e2e-kind-ipv6.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-27T121611Z/ci-kubernetes-e2e-kind-ipv6/2126238848500371456",
+    "run": "2026-11-27T121611Z",
+    "files": [
+      "runs/2026-11/2026-11-27T121611Z/ci-kubernetes-e2e-kind-ipv6/2126238848500371456/build-log.txt.gz",
+      "runs/2026-11/2026-11-27T121611Z/ci-kubernetes-e2e-kind-ipv6/2126238848500371456/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 261703,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2126238848500371456"
+  },
+  {
+    "time": 1795766908,
+    "job": "ci-kubernetes-e2e-gce-cos-alphafeatures-master",
+    "build": "2126226516466470912",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-alphafeatures-master"
+    ],
+    "red_tests": [
+      "kubetest.Timeout",
+      "kubetest.listResources After",
+      "ci-kubernetes-e2e-gce-cos-alphafeatures-master.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-27T121611Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2126226516466470912",
+    "run": "2026-11-27T121611Z",
+    "files": [
+      "runs/2026-11/2026-11-27T121611Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2126226516466470912/build-log.txt.gz",
+      "runs/2026-11/2026-11-27T121611Z/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2126226516466470912/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 126160,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-alphafeatures-master/2126226516466470912"
+  },
+  {
+    "time": 1795762109,
+    "job": "ci-node-crio-conformance",
+    "build": "2126206382792249344",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#ci-node-crio-conformance"
+    ],
+    "red_tests": [
+      "E2eNode Suite.[It] [sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update container image [NodeConformance]",
+      "kubetest2.Test",
+      "ci-node-crio-conformance.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-27T121611Z/ci-node-crio-conformance/2126206382792249344",
+    "run": "2026-11-27T121611Z",
+    "files": [
+      "runs/2026-11/2026-11-27T121611Z/ci-node-crio-conformance/2126206382792249344/build-log.txt.gz",
+      "runs/2026-11/2026-11-27T121611Z/ci-node-crio-conformance/2126206382792249344/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 2017926,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "asset": {
+      "url": "https://github.com/thc1006/testgrid-red-build-logs/releases/download/node-logs-2026-11/ci-node-crio-conformance_2126206382792249344.tar.xz"
+    },
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2126206382792249344"
+  },
+  {
+    "time": 1795754909,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2126176183732146176",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-27T121611Z/ci-kubernetes-integration-master/2126176183732146176",
+    "run": "2026-11-27T121611Z",
+    "files": [
+      "runs/2026-11/2026-11-27T121611Z/ci-kubernetes-integration-master/2126176183732146176/build-log.txt.gz",
+      "runs/2026-11/2026-11-27T121611Z/ci-kubernetes-integration-master/2126176183732146176/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 326708,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2126176183732146176"
+  },
+  {
     "time": 1795729889,
     "job": "ci-kubernetes-e2e-kind-ipv6",
     "build": "2126071242447392768",
@@ -759,7 +909,7 @@
     "remote": [],
     "bytes": 327050,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -789,7 +939,7 @@
     "remote": [],
     "bytes": 2070753,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -821,7 +971,7 @@
     "remote": [],
     "bytes": 227193,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -880,7 +1030,7 @@
     "remote": [],
     "bytes": 3011670,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -912,7 +1062,7 @@
     "remote": [],
     "bytes": 233671,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -941,7 +1091,7 @@
     "remote": [],
     "bytes": 233148,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -970,7 +1120,7 @@
     "remote": [],
     "bytes": 323947,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -999,7 +1149,7 @@
     "remote": [],
     "bytes": 326477,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1033,7 +1183,7 @@
     "remote": [],
     "bytes": 630932,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1062,7 +1212,7 @@
     "remote": [],
     "bytes": 674683,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1091,7 +1241,7 @@
     "remote": [],
     "bytes": 332438,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1121,7 +1271,7 @@
     "remote": [],
     "bytes": 340713,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1151,7 +1301,7 @@
     "remote": [],
     "bytes": 236379,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1180,7 +1330,7 @@
     "remote": [],
     "bytes": 1761671,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1210,7 +1360,7 @@
     "remote": [],
     "bytes": 217109,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

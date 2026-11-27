@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-ipv6",
+  "build": "2126238848500371456",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6",
+  "started": 1795769848,
+  "created": 1795769819,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "kind-ipv6-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] Volume metrics Ephemeral should create prometheus metrics for volume provisioning and attach/detach",
+          "status": "FAIL",
+          "message": "[FAILED] Unable to get updated metrics for plugin csi-hostpath-volume-...rnetes/test/e2e/storage/volume_metrics.go:624 @ 11/27/26 09:50:59.764\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-ipv6.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795773138,
+  "commits": {
+    "kubernetes/kubernetes": "ce9710e510979a14cdbe27f70fd695cf5a703db7"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2126238848500371456",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-ipv6/2126238848500371456/build-log.txt",
+  "log": {
+    "bytes": 162838,
+    "md5": "ba22fb0bd7b79495f90fe1cf2fdae0d9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22139,
+    "gcs": {
+      "generation": "1795773154552413",
+      "md5": "ba22fb0bd7b79495f90fe1cf2fdae0d9",
+      "crc32c": "4dbb1e10",
+      "bytes": 162838,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98865,
+    "md5": "c03e86ad40607f0e26460035b60c81b7",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12815,
+    "gcs": {
+      "generation": "1795773179968237",
+      "md5": "c03e86ad40607f0e26460035b60c81b7",
+      "crc32c": "404b59c7",
+      "bytes": 98865,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-27T121611Z",
+  "archived_at": 1795781771.0,
+  "settled": true,
+  "final": false
+}
