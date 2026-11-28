@@ -1,0 +1,72 @@
+{
+  "job": "ci-node-crio-conformance",
+  "build": "2126706685329281024",
+  "query": "kubernetes-ci-logs/logs/ci-node-crio-conformance",
+  "started": 1795881390,
+  "created": 1795881360,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "ci-node-crio-conformance",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "E2eNode Suite.[It] [sig-node] MirrorPod (Pod Generation) mirror pod updates mirror pod: update activeDeadlineSeconds [NodeConformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 120.000s.\nExpected success, but got an error:...bernetes/test/e2e_node/mirror_pod_test.go:383 @ 11/28/26 16:26:39.475\n"
+        },
+        {
+          "test": "ci-node-crio-conformance.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest2.Test",
+          "status": "FAIL",
+          "message": "exit status 255"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795883395,
+  "commits": {
+    "kubernetes/test-infra": "acc586dd5db01c8c7b31462ac42fda0131d0bc4e",
+    "kubernetes/kubernetes": "ce9710e510979a14cdbe27f70fd695cf5a703db7"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-node-crio-conformance/2126706685329281024",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-node-crio-conformance/2126706685329281024/build-log.txt",
+  "log": {
+    "bytes": 1940185,
+    "md5": "99f9606d0fd7364b293a05526fe2d801",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 246218,
+    "gcs": {
+      "generation": "1795883396741350",
+      "md5": "99f9606d0fd7364b293a05526fe2d801",
+      "crc32c": "e16bc9ab",
+      "bytes": 1940185,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98469,
+    "md5": "45987c5868e700ba298c154c1a394b7d",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12588,
+    "gcs": {
+      "generation": "1795883399201831",
+      "md5": "45987c5868e700ba298c154c1a394b7d",
+      "crc32c": "28fa53e7",
+      "bytes": 98469,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": true,
+  "archived_by_run": "2026-11-28T173231Z",
+  "archived_at": 1795887151.0,
+  "settled": false,
+  "final": false
+}

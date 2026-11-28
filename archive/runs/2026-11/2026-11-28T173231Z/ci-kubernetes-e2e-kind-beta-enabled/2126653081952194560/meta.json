@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-e2e-kind-beta-enabled",
+  "build": "2126653081952194560",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled",
+  "started": 1795868608,
+  "created": 1795868580,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "kind-master-beta-enabled",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-storage] In-tree Volumes [Driver: nfs3] [Testpattern: Pre-provisioned PV (default fs)] volumes should store data",
+          "status": "FAIL",
+          "message": "[FAILED] Failed to create injector pod: Timed out after 300.000s.\nExpe...tes/test/e2e/framework/volume/fixtures.go:641 @ 11/28/26 12:35:00.936\n"
+        },
+        {
+          "test": "ci-kubernetes-e2e-kind-beta-enabled.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795870293,
+  "commits": {
+    "kubernetes/kubernetes": "ce9710e510979a14cdbe27f70fd695cf5a703db7"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2126653081952194560",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-enabled/2126653081952194560/build-log.txt",
+  "log": {
+    "bytes": 135890,
+    "md5": "f29c5d997a12feaed040d09af80be8c4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22005,
+    "gcs": {
+      "generation": "1795870308242519",
+      "md5": "f29c5d997a12feaed040d09af80be8c4",
+      "crc32c": "a10b1f24",
+      "bytes": 135890,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 98473,
+    "md5": "faf2f3ff3335cf9772084ca1078ea26b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12611,
+    "gcs": {
+      "generation": "1795870310854639",
+      "md5": "faf2f3ff3335cf9772084ca1078ea26b",
+      "crc32c": "4eb17d44",
+      "bytes": 98473,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-28T173231Z",
+  "archived_at": 1795887151.0,
+  "settled": true,
+  "final": false
+}

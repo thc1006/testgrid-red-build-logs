@@ -1,0 +1,66 @@
+{
+  "job": "ci-kubernetes-integration-master",
+  "build": "2126676988851654656",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-integration-master",
+  "started": 1795874314,
+  "created": 1795874280,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "integration-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "[sig-api-machinery] k8s.io/kubernetes/test/integration/apiserver.coordinatedleaderelection",
+          "status": "FAIL",
+          "message": "Failed\n=== RUN   TestLeaseCandidateCleanup\n    testserver.go:708: Reso...eout waiting for lease gc\n--- FAIL: TestLeaseCandidateCleanup (6.03s)\n"
+        },
+        {
+          "test": "ci-kubernetes-integration-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795876680,
+  "commits": {
+    "kubernetes/kubernetes": "ce9710e510979a14cdbe27f70fd695cf5a703db7"
+  },
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2126676988851654656",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2126676988851654656/build-log.txt",
+  "log": {
+    "bytes": 230302,
+    "md5": "42ec3dab70796b5139b54ac073f970c9",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22121,
+    "gcs": {
+      "generation": "1795876685396082",
+      "md5": "42ec3dab70796b5139b54ac073f970c9",
+      "crc32c": "e144fc44",
+      "bytes": 230302,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 97016,
+    "md5": "17df21ba7f6e312bc88574a183777352",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12306,
+    "gcs": {
+      "generation": "1795876688419641",
+      "md5": "17df21ba7f6e312bc88574a183777352",
+      "crc32c": "365361ab",
+      "bytes": 97016,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-28T173231Z",
+  "archived_at": 1795887151.0,
+  "settled": true,
+  "final": false
+}
