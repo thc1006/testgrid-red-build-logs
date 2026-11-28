@@ -1,5 +1,276 @@
 [
   {
+    "time": 1795847619,
+    "job": "ci-kubernetes-e2e-kind",
+    "build": "2126564999697534976",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test phase transition timestamp multiple updates",
+      "ci-kubernetes-e2e-kind.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-kind/2126564999697534976",
+    "run": "2026-11-28T074631Z",
+    "files": [
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-kind/2126564999697534976/build-log.txt.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-kind/2126564999697534976/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 230567,
+    "settled": false,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind/2126564999697534976"
+  },
+  {
+    "time": 1795839940,
+    "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+    "build": "2126532788332007424",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-serial-master"
+    ],
+    "red_tests": [
+      "kubetest.Up",
+      "ci-kubernetes-e2e-gce-cos-serial-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424",
+    "run": "2026-11-28T074631Z",
+    "files": [
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424/build-log.txt.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424/podinfo.json.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424/bootstrap-e2e-master.containerd.log.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424/bootstrap-e2e-master.etcd.log.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424/bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424/bootstrap-e2e-master.kube-master-installation.log.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424/bootstrap-e2e-master.serial-1.log.gz"
+    ],
+    "remote": [],
+    "bytes": 440376,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "node_logs": true,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424"
+  },
+  {
+    "time": 1795835280,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2126513409238241280",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-api-machinery] ResourceQuota [FeatureGate:VolumeAttributesClass] should verify ResourceQuota's volume attributes class scope (quota set to pvc count: 1) against a pvc with different volume attributes class.",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce/2126513409238241280",
+    "run": "2026-11-28T074631Z",
+    "files": [
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce/2126513409238241280/build-log.txt.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce/2126513409238241280/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 230179,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2126513409238241280"
+  },
+  {
+    "time": 1795831680,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2126498310318460928",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-network] LoadBalancers [Feature:LoadBalancer] should be able to change the type and ports of a UDP service [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce-slow/2126498310318460928",
+    "run": "2026-11-28T074631Z",
+    "files": [
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce-slow/2126498310318460928/build-log.txt.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce-slow/2126498310318460928/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 228570,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2126498310318460928"
+  },
+  {
+    "time": 1795816168,
+    "job": "ci-kubernetes-integration-master",
+    "build": "2126433130893021184",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#integration-master"
+    ],
+    "red_tests": [
+      "[sig-api-machinery] k8s.io/kubernetes/test/integration.garbagecollector",
+      "ci-kubernetes-integration-master.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-integration-master/2126433130893021184",
+    "run": "2026-11-28T074631Z",
+    "files": [
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-integration-master/2126433130893021184/build-log.txt.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-integration-master/2126433130893021184/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 353643,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-integration-master/2126433130893021184"
+  },
+  {
+    "time": 1795813110,
+    "job": "ci-kubernetes-e2e-kind-beta-features",
+    "build": "2126420296515719168",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#kind-master-beta-features"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PV and a pre-bound PVC: test phase transition timestamp is set",
+      "ci-kubernetes-e2e-kind-beta-features.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-kind-beta-features/2126420296515719168",
+    "run": "2026-11-28T074631Z",
+    "files": [
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-kind-beta-features/2126420296515719168/build-log.txt.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-kind-beta-features/2126420296515719168/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 232335,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-kind-beta-features/2126420296515719168"
+  },
+  {
+    "time": 1795800103,
+    "job": "ci-kubernetes-e2e-ec2-scale-performance-5000",
+    "build": "2126365725865021440",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#ec2-master-scale-performance-5000"
+    ],
+    "red_tests": [
+      "kubetest2.Test",
+      "ci-kubernetes-e2e-ec2-scale-performance-5000.Overall"
+    ],
+    "red_test_count": 2,
+    "dir": "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-ec2-scale-performance-5000/2126365725865021440",
+    "run": "2026-11-28T074631Z",
+    "files": [
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-ec2-scale-performance-5000/2126365725865021440/build-log.txt.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-ec2-scale-performance-5000/2126365725865021440/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 5594701,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-ec2-scale-performance-5000/2126365725865021440"
+  },
+  {
+    "time": 1795791960,
+    "job": "ci-kubernetes-e2e-gci-gce-slow",
+    "build": "2126331711317872640",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-informing#gce-cos-master-slow"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-storage] CSI Volumes [Driver: csi-hostpath] [Testpattern: Dynamic PV (block volmode)] provisioning should provision storage with pvc data source in parallel [Slow]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce-slow.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce-slow/2126331711317872640",
+    "run": "2026-11-28T074631Z",
+    "files": [
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce-slow/2126331711317872640/build-log.txt.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce-slow/2126331711317872640/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 334464,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce-slow/2126331711317872640"
+  },
+  {
+    "time": 1795787940,
+    "job": "ci-kubernetes-e2e-gci-gce",
+    "build": "2126314849003638784",
+    "result": "FAILURE",
+    "tabs": [
+      "sig-release-master-blocking#gce-cos-master-default"
+    ],
+    "red_tests": [
+      "Kubernetes e2e suite.[It] [sig-auth] Projected PodCertificate [FeatureGate:PodCertificateRequest] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should allow server and client pods to establish an mTLS connection [MinimumKubeletVersion:1.37] [Conformance]",
+      "kubetest.Test",
+      "ci-kubernetes-e2e-gci-gce.Overall"
+    ],
+    "red_test_count": 3,
+    "dir": "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce/2126314849003638784",
+    "run": "2026-11-28T074631Z",
+    "files": [
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce/2126314849003638784/build-log.txt.gz",
+      "runs/2026-11/2026-11-28T074631Z/ci-kubernetes-e2e-gci-gce/2126314849003638784/podinfo.json.gz"
+    ],
+    "remote": [],
+    "bytes": 228822,
+    "settled": true,
+    "final": false,
+    "backfilled": false,
+    "has_log": true,
+    "in_parts": false,
+    "from_gcs": false,
+    "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2126314849003638784"
+  },
+  {
     "time": 1795772706,
     "job": "ci-node-e2e-containerd-2-4-ubuntu-dra",
     "build": "2126250927131201536",
@@ -351,7 +622,7 @@
     "remote": [],
     "bytes": 244969,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -380,7 +651,7 @@
     "remote": [],
     "bytes": 341035,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -409,7 +680,7 @@
     "remote": [],
     "bytes": 678142,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -438,7 +709,7 @@
     "remote": [],
     "bytes": 269310,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -467,7 +738,7 @@
     "remote": [],
     "bytes": 327375,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -496,7 +767,7 @@
     "remote": [],
     "bytes": 302978,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -525,7 +796,7 @@
     "remote": [],
     "bytes": 1116311,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -558,7 +829,7 @@
     "remote": [],
     "bytes": 270488,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -587,7 +858,7 @@
     "remote": [],
     "bytes": 406037,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -616,7 +887,7 @@
     "remote": [],
     "bytes": 223703,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -645,7 +916,7 @@
     "remote": [],
     "bytes": 324926,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -675,7 +946,7 @@
     "remote": [],
     "bytes": 253126,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -704,7 +975,7 @@
     "remote": [],
     "bytes": 326256,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -734,7 +1005,7 @@
     "remote": [],
     "bytes": 319230,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -762,7 +1033,7 @@
     "remote": [],
     "bytes": 199530,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -792,7 +1063,7 @@
     "remote": [],
     "bytes": 113535,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -822,7 +1093,7 @@
     "remote": [],
     "bytes": 483425,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -851,7 +1122,7 @@
     "remote": [],
     "bytes": 325861,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -880,7 +1151,7 @@
     "remote": [],
     "bytes": 117003,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,
@@ -1001,7 +1272,7 @@
     "remote": [],
     "bytes": 190302,
     "settled": true,
-    "final": false,
+    "final": true,
     "backfilled": false,
     "has_log": true,
     "in_parts": false,

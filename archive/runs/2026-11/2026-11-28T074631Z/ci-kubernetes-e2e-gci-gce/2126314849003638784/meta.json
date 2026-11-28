@@ -1,0 +1,70 @@
+{
+  "job": "ci-kubernetes-e2e-gci-gce",
+  "build": "2126314849003638784",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce",
+  "started": 1795787940,
+  "created": 1795787939,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-blocking",
+      "tab": "gce-cos-master-default",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gci-gce.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Test",
+          "status": "FAIL",
+          "message": "error during ./hack/ginkgo-e2e.sh --ginkgo.skip=\\[Driver:.gcepd\\]|\\[Sl...=8 --report-dir=/logs/artifacts --disable-log-dump=true: exit status 1"
+        },
+        {
+          "test": "Kubernetes e2e suite.[It] [sig-auth] Projected PodCertificate [FeatureGate:PodCertificateRequest] [FeatureGate:ClusterTrustBundle] [FeatureGate:ClusterTrustBundleProjection] should allow server and client pods to establish an mTLS connection [MinimumKubeletVersion:1.37] [Conformance]",
+          "status": "FAIL",
+          "message": "[FAILED] Timed out after 30.001s.\nclient logs did not contain expected...test/e2e/auth/projected_podcertificate.go:126 @ 11/27/26 14:16:45.495\n"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795790164,
+  "commits": {},
+  "job_version": "v1.38.0-beta.0.911+ce9710e510979a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2126314849003638784",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gci-gce/2126314849003638784/build-log.txt",
+  "log": {
+    "bytes": 141878,
+    "md5": "783ee4fb7c95d6c6131b076a26d612d4",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 22958,
+    "gcs": {
+      "generation": "1795790180879475",
+      "md5": "783ee4fb7c95d6c6131b076a26d612d4",
+      "crc32c": "0d6864ff",
+      "bytes": 141878,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 86944,
+    "md5": "d49157ca600f368bf9356fe55864388b",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 11731,
+    "gcs": {
+      "generation": "1795790182617148",
+      "md5": "d49157ca600f368bf9356fe55864388b",
+      "crc32c": "adf58c7e",
+      "bytes": 86944,
+      "encoding": "identity"
+    }
+  },
+  "node_e2e": false,
+  "archived_by_run": "2026-11-28T074631Z",
+  "archived_at": 1795851991.0,
+  "settled": true,
+  "final": false
+}

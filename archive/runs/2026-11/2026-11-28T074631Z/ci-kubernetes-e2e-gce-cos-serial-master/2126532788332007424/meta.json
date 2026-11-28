@@ -1,0 +1,144 @@
+{
+  "job": "ci-kubernetes-e2e-gce-cos-serial-master",
+  "build": "2126532788332007424",
+  "query": "kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master",
+  "started": 1795839940,
+  "created": 1795839900,
+  "tabs": [
+    {
+      "dashboard": "sig-release-master-informing",
+      "tab": "gce-cos-serial-master",
+      "tab_status": "FLAKY",
+      "red_cells": [
+        {
+          "test": "ci-kubernetes-e2e-gce-cos-serial-master.Overall",
+          "status": "FAIL",
+          "message": ""
+        },
+        {
+          "test": "kubetest.Up",
+          "status": "FAIL",
+          "message": "error during ./hack/e2e-internal/e2e-up.sh: exit status 1"
+        }
+      ]
+    }
+  ],
+  "result": "FAILURE",
+  "finished": 1795842651,
+  "commits": {
+    "kubernetes/kubernetes": "ce9710e510979a14cdbe27f70fd695cf5a703db7"
+  },
+  "job_version": "v1.38.0-beta.0.911+ce9710e510979a",
+  "prow_url": "https://prow.k8s.io/view/gs/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424",
+  "log_url": "https://storage.googleapis.com/kubernetes-ci-logs/logs/ci-kubernetes-e2e-gce-cos-serial-master/2126532788332007424/build-log.txt",
+  "log": {
+    "bytes": 62528,
+    "md5": "56141e18ca6ed7fe41f1a117df5c975d",
+    "verified": true,
+    "file": "build-log.txt.gz",
+    "file_bytes": 9595,
+    "gcs": {
+      "generation": "1795842652218276",
+      "md5": "56141e18ca6ed7fe41f1a117df5c975d",
+      "crc32c": "1af3a514",
+      "bytes": 62528,
+      "encoding": "identity"
+    }
+  },
+  "podinfo": {
+    "bytes": 99103,
+    "md5": "238c6927088b816e67cacfc0d88bcecc",
+    "verified": true,
+    "file": "podinfo.json.gz",
+    "file_bytes": 12518,
+    "gcs": {
+      "generation": "1795842654196225",
+      "md5": "238c6927088b816e67cacfc0d88bcecc",
+      "crc32c": "00a2b2ab",
+      "bytes": 99103,
+      "encoding": "identity"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/bootstrap-e2e-master/containerd.log",
+      "bytes": 112966,
+      "md5": "05cb4d06cfd546963eb0c4a5d7534821",
+      "verified": true,
+      "file": "bootstrap-e2e-master.containerd.log.gz",
+      "file_bytes": 13777,
+      "gcs": {
+        "generation": "1795842652082299",
+        "md5": "05cb4d06cfd546963eb0c4a5d7534821",
+        "crc32c": "c84c83de",
+        "bytes": 112966,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-master/etcd.log",
+      "bytes": 19783,
+      "md5": "2c44ccbca9b6be7daa5f587f319d41c5",
+      "verified": true,
+      "file": "bootstrap-e2e-master.etcd.log.gz",
+      "file_bytes": 4231,
+      "gcs": {
+        "generation": "1795842651641828",
+        "md5": "2c44ccbca9b6be7daa5f587f319d41c5",
+        "crc32c": "12bc54fe",
+        "bytes": 19783,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-master/kube-master-configuration.log",
+      "bytes": 47640,
+      "md5": "5bb16aea908ffbf4071c462344f3d363",
+      "verified": true,
+      "file": "bootstrap-e2e-master.kube-master-configuration.log.gz",
+      "file_bytes": 5379,
+      "gcs": {
+        "generation": "1795842652031654",
+        "md5": "5bb16aea908ffbf4071c462344f3d363",
+        "crc32c": "bc9f3cf8",
+        "bytes": 47640,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-master/kube-master-installation.log",
+      "bytes": 24300,
+      "md5": "660006ae357b6972bb846727b4df96e0",
+      "verified": true,
+      "file": "bootstrap-e2e-master.kube-master-installation.log.gz",
+      "file_bytes": 3647,
+      "gcs": {
+        "generation": "1795842651810801",
+        "md5": "660006ae357b6972bb846727b4df96e0",
+        "crc32c": "4601af45",
+        "bytes": 24300,
+        "encoding": "identity"
+      }
+    },
+    {
+      "path": "artifacts/bootstrap-e2e-master/serial-1.log",
+      "bytes": 74056,
+      "md5": "c9f28305641f8a3e0d42adb98b5d8084",
+      "verified": true,
+      "file": "bootstrap-e2e-master.serial-1.log.gz",
+      "file_bytes": 19735,
+      "gcs": {
+        "generation": "1795842652063316",
+        "md5": "c9f28305641f8a3e0d42adb98b5d8084",
+        "crc32c": "a166d537",
+        "bytes": 74056,
+        "encoding": "identity"
+      }
+    }
+  ],
+  "node_e2e": false,
+  "archived_by_run": "2026-11-28T074631Z",
+  "archived_at": 1795851991.0,
+  "settled": true,
+  "final": false
+}
